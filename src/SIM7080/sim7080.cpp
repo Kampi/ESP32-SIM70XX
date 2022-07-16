@@ -308,15 +308,15 @@ SIM70XX_Error_t SIM7080_GetBand(SIM7080_t* const p_Device)
 
     if(Response.find("EGSM_MODE") != std::string::npos)
     {
-        p_Device->Band = SIM7020_BAND_EGSM;
+        p_Device->Band = SIM7080_BAND_EGSM;
     }
     else if(Response.find("DCS_MODE") != std::string::npos)
     {
-        p_Device->Band = SIM7020_BAND_DCS;
+        p_Device->Band = SIM7080_BAND_DCS;
     }
     else if(Response.find("ALL_MODE") != std::string::npos)
     {
-        p_Device->Band = SIM7020_BAND_ALL;
+        p_Device->Band = SIM7080_BAND_ALL;
     }
     else
     {

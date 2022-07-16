@@ -35,7 +35,7 @@
                                                                             .Baudrate = Baud,                               \
                                                                             .isInitialized = false,                         \
                                                                         },                                                  \
-                                                                        .Band = SIM7080_BAND_8,                             \
+                                                                        .Band = SIM7080_BAND_ALL,                           \
                                                                     };
 
 #endif /* SIM7080_CONFIG_1NCE_H_ */

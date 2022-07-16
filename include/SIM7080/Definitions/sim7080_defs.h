@@ -39,15 +39,9 @@
  */
 typedef enum
 {
-    SIM7080_BAND_1          = 0,                            /**< Frequency band 1. */
-    SIM7080_BAND_3          = 3,                            /**< Frequency band 3. */
-    SIM7080_BAND_5          = 5,                            /**< Frequency band 5. */
-    SIM7080_BAND_8          = 8,                            /**< Frequency band 8. */
-    SIM7080_BAND_20         = 20,                           /**< Frequency band 20. */
-    SIM7080_BAND_28         = 28,                           /**< Frequency band 28. */
-    SIM7020_BAND_EGSM       = 253,                          /**< EGSM mode. */
-    SIM7020_BAND_DCS        = 254,                          /**< DCS mode. */
-    SIM7020_BAND_ALL        = 255,                          /**< All band mode. */
+    SIM7080_BAND_EGSM       = 253,                          /**< EGSM mode. */
+    SIM7080_BAND_DCS        = 254,                          /**< DCS mode. */
+    SIM7080_BAND_ALL        = 255,                          /**< All band mode. */
 } SIM7080_Band_t;
 
 /** @brief Phone functionallity definitions.
