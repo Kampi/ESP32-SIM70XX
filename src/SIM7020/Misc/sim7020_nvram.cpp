@@ -19,7 +19,7 @@
 
 #include <sdkconfig.h>
 
-#ifdef CONFIG_SIM70XX_DEV_SIM7020
+#if(CONFIG_SIMXX_DEV == 7020)
 
 #include <esp_log.h>
 
@@ -51,7 +51,7 @@ SIM70XX_Error_t SIM7020_NVRAM_Write(const SIM7020_t* const p_Device, std::string
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CNVMW(Key, Data, Data.length());
     SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -101,7 +101,7 @@ SIM70XX_Error_t SIM7020_NVRAM_Read(const SIM7020_t* const p_Device, std::string 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CNVMR(Key);
     SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -158,7 +158,7 @@ SIM70XX_Error_t SIM7020_NVRAM_Erase(const SIM7020_t* const p_Device, std::string
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CNVMIVD(Key);
     SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -200,7 +200,7 @@ SIM70XX_Error_t SIM7020_NVRAM_GetKeys(const SIM7020_t* const p_Device, std::vect
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CNVMGET;
     SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }

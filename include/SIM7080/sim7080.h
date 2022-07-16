@@ -59,12 +59,24 @@ SIM70XX_Error_t SIM7080_Init(SIM7080_t* const p_Device, const SIM7080_Config_t* 
  */
 SIM70XX_Error_t SIM7080_Init(SIM7080_t* const p_Device, const SIM7080_Config_t* const p_Config, uint32_t Timeout = 10, SIM70XX_Baud_t Old = SIM_BAUD_AUTO);
 
+/** @brief          Deinitialize the SIM7080 module.
+ *  @param p_Device Pointer to SIM7080 device object
+ */
+void SIM7080_Deinit(SIM7080_t* const p_Device);
+
 #ifdef CONFIG_SIM70XX_RESET_USE_HW
     /** @brief          Perform a hardware reset of the module.
      *  @param p_Device Pointer to SIM7080 device object
      */
     void SIM7080_HardReset(SIM7080_t* const p_Device);
 #endif
+
+/** @brief          Perform a software reset of the device.
+ *  @param p_Device Pointer to SIM7080 device object
+ *  @param Timeout  (Optional) Timeout for the device reset in seconds
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_SoftReset(const SIM7080_t* const p_Device, uint32_t Timeout = 10);
 
 /** @brief          Ping the module by sending an empty 'AT'.
  *  @param p_Device Pointer to SIM7080 device object

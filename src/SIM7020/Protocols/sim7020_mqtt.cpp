@@ -19,7 +19,7 @@
 
 #include <sdkconfig.h>
 
-#if((defined CONFIG_SIM70XX_DEV_SIM7020) && (defined CONFIG_SIM70XX_PROT_WITH_MQTT))
+#if((CONFIG_SIMXX_DEV == 7020) && (defined CONFIG_SIM70XX_PROT_WITH_MQTT))
 
 #include <esp_log.h>
 
@@ -65,7 +65,7 @@ SIM70XX_Error_t SIM7020_MQTT_Create(const SIM7020_t* const p_Device, SIM7020_MQT
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CMQNEW(CommandStr);
     SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -140,7 +140,7 @@ SIM70XX_Error_t SIM7020_MQTT_Connect(const SIM7020_t* const p_Device, SIM7020_MQ
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CMQCON(CommandStr);
     SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -181,7 +181,7 @@ SIM70XX_Error_t SIM7020_MQTT_Publish(const SIM7020_t* const p_Device, SIM7020_MQ
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CMQCON(CommandStr);
     SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -210,7 +210,7 @@ SIM70XX_Error_t SIM7020_MQTT_Subscribe(const SIM7020_t* const p_Device, SIM7020_
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CMQSUB(p_Socket->ID, Topic, QoS);
     SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -275,7 +275,7 @@ SIM70XX_Error_t SIM7020_MQTT_Unsubscribe(const SIM7020_t* const p_Device, SIM702
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CMQUNSUB(p_Socket->ID, Topic);
     SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -318,7 +318,7 @@ SIM70XX_Error_t SIM7020_MQTT_Destroy(const SIM7020_t* const p_Device, SIM7020_MQ
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CMQDISCON(p_Socket->ID);
     SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }

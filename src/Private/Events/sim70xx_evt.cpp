@@ -37,9 +37,9 @@ void SIM70XX_Evt_Task(void* p_Arg)
 {
     uint32_t StatusUpdate = 0;
 
-    #if(defined CONFIG_SIM70XX_DEV_SIM7020)
+    #if(CONFIG_SIMXX_DEV == 7020)
         SIM7020_t* Device = (SIM7020_t*)p_Arg;
-    #elif(defined CONFIG_SIM70XX_DEV_SIM7080)
+    #elif(CONFIG_SIMXX_DEV == 7080)
         SIM7080_t* Device = (SIM7080_t*)p_Arg;
     #endif
 

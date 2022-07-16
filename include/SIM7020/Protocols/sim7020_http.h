@@ -101,7 +101,7 @@ SIM70XX_Error_t SIM7020_HTTP_Destroy(const SIM7020_t* const p_Device, SIM7020_HT
  *  @param p_Device Pointer to SIM7020 device object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_HTTP_DestroyAllSockets(const SIM7020_t* const p_Device );
+SIM70XX_Error_t SIM7020_HTTP_DestroyAllSockets(const SIM7020_t* const p_Device);
 
 /** @brief          Add a key / value pair to the message header.
  *  @param Key      Header key

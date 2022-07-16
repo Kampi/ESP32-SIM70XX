@@ -22,11 +22,9 @@
 
 #include <sdkconfig.h>
 
-#ifdef CONFIG_SIM70XX_DEV_SIM7020
+#if(CONFIG_SIMXX_DEV == 7020)
     #include "SIM7020/sim7020.h"
-#endif
-
-#ifdef CONFIG_SIM70XX_DEV_SIM7080
+#elif(CONFIG_SIMXX_DEV == 7080)
     #include "SIM7080/sim7080.h"
 #endif
 

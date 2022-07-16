@@ -19,7 +19,7 @@
 
 #include <sdkconfig.h>
 
-#if((defined CONFIG_SIM70XX_DEV_SIM7020) && (defined CONFIG_SIM70XX_PROT_WITH_SNTP))
+#if((CONFIG_SIMXX_DEV == 7020) && (defined CONFIG_SIM70XX_PROT_WITH_SNTP))
 
 #include <esp_log.h>
 
@@ -53,14 +53,14 @@ SIM70XX_Error_t SIM7020_SNTP_GetNetworkTime(const SIM7020_t* const p_Device, std
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CSNTPSTOP;
     SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, Command->Timeout);
+    SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout);
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue));
 
     // Start a new request.
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CSNTPSTART(Server, Zone);
     SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -72,7 +72,7 @@ SIM70XX_Error_t SIM7020_SNTP_GetNetworkTime(const SIM7020_t* const p_Device, std
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CSNTPSTOP;
     SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, Command->Timeout);
+    SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout);
 
     return SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue);
 }

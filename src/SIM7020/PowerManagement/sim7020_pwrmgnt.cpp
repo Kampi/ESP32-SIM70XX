@@ -19,7 +19,7 @@
 
 #include <sdkconfig.h>
 
-#ifdef CONFIG_SIM70XX_DEV_SIM7020
+#if(CONFIG_SIMXX_DEV == 7020)
 
 #include <esp_log.h>
 
@@ -52,7 +52,7 @@ SIM70XX_Error_t SIM7020_PSM_Enable(const SIM7020_t* const p_Device, uint8_t Base
     // TODO: FIX ME
     //*Command = SIM7020_AT_CPSMS_EN(std::to_string(std::bitset<8>(TAU)), std::to_string(std::bitset<8>(Value)));
     SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -62,7 +62,7 @@ SIM70XX_Error_t SIM7020_PSM_Enable(const SIM7020_t* const p_Device, uint8_t Base
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_RETENTION(UseRetention);
     SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -86,7 +86,7 @@ SIM70XX_Error_t SIM7020_PSM_Disable(const SIM7020_t* const p_Device, SIM7020_PSM
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CPSMS_DIS(Mode);
     SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -125,7 +125,7 @@ SIM70XX_Error_t SIM7020_PSM_GetEventStatus(const SIM7020_t* const p_Device, bool
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CPSMSTATUS_R;
     SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -157,7 +157,7 @@ SIM70XX_Error_t SIM7020_PSM_SetEventStatus(const SIM7020_t* const p_Device, bool
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CPSMSTATUS_W(Enable);
     SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }

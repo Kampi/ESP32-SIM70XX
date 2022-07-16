@@ -1,17 +1,21 @@
 menu "SIM70XX"
-    menu "Device"
+    choice 
+        prompt "Target device"
         config SIM70XX_DEV_SIM7020
-            bool "SIM7020 device support"
-            default y
+            bool "SIM7020"
             help
                 Enable support for the SIM7020 NB-IoT modem.
 
         config SIM70XX_DEV_SIM7080
-            bool "SIM7080 device support"
-            default n
+            bool "SIM7080"
             help
                 Enable support for the SIM7080 LTE Cat-M and NB-IoT modem.
-    endmenu
+    endchoice
+
+    config SIMXX_DEV
+        int
+        default 7020 if SIM70XX_DEV_SIM7020
+        default 7080 if SIM70XX_DEV_SIM7080
 
     menu "FreeRTOS"
         config SIM70XX_TASK_CORE_AFFINITY

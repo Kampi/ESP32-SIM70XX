@@ -19,7 +19,7 @@
 
 #include <sdkconfig.h>
 
-#if((defined CONFIG_SIM70XX_DEV_SIM7020) && (defined CONFIG_SIM70XX_PROT_WITH_TCPIP))
+#if((CONFIG_SIMXX_DEV == 7020) && (defined CONFIG_SIM70XX_PROT_WITH_TCPIP))
 
 #include <esp_log.h>
 
@@ -67,7 +67,7 @@ SIM70XX_Error_t SIM7020_TCP_Create(const SIM7020_t* const p_Device, SIM7020_TCP_
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CSOC(CommandStr);
     SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, p_Socket->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, p_Socket->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -110,7 +110,7 @@ SIM70XX_Error_t SIM7020_TCP_Connect(const SIM7020_t* const p_Device, SIM7020_TCP
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CSOCON(p_Socket->ID, p_Socket->Port, p_Socket->IP);
     SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, p_Socket->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, p_Socket->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -144,7 +144,7 @@ SIM70XX_Error_t SIM7020_TCP_TransmitBytes(const SIM7020_t* const p_Device, SIM70
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CCSOSEND_BYTES(p_Socket->ID, Length, Buffer_Hex);
     SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -172,7 +172,7 @@ SIM70XX_Error_t SIM7020_TCP_TransmitString(const SIM7020_t* const p_Device, SIM7
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CCSOSEND_STRING(p_Socket->ID, Data);
     SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -200,7 +200,7 @@ SIM70XX_Error_t SIM7020_TCP_Destroy(const SIM7020_t* const p_Device, SIM7020_TCP
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CSOCL(p_Socket->ID);
     SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }

@@ -27,7 +27,7 @@
 
 static const char* TAG = "SIM7020_PDP";
 
-SIM70XX_Error_t SIM7020_PDP_GetContext(const SIM7020_t* const p_Device, SIM7020_PDP_Context_t* p_Context)
+SIM70XX_Error_t SIM7020_PDP_GetContext(SIM7020_t* const p_Device, SIM7020_PDP_Context_t* p_Context)
 {
     SIM70XX_TxCmd_t* Command;
 
@@ -43,7 +43,7 @@ SIM70XX_Error_t SIM7020_PDP_GetContext(const SIM7020_t* const p_Device, SIM7020_
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CGDCONT_R;
     SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -55,7 +55,7 @@ SIM70XX_Error_t SIM7020_PDP_GetContext(const SIM7020_t* const p_Device, SIM7020_
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_PDP_Switch(const SIM7020_t* const p_Device, bool Enable, uint8_t Context)
+SIM70XX_Error_t SIM7020_PDP_Switch(SIM7020_t* const p_Device, bool Enable, uint8_t Context)
 {
     SIM70XX_TxCmd_t* Command;
 
@@ -71,7 +71,7 @@ SIM70XX_Error_t SIM7020_PDP_Switch(const SIM7020_t* const p_Device, bool Enable,
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CGACT_W(Context, Enable);
     SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -79,7 +79,7 @@ SIM70XX_Error_t SIM7020_PDP_Switch(const SIM7020_t* const p_Device, bool Enable,
     return SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue);
 }
 
-SIM70XX_Error_t SIM7020_PDP_GetStatus(const SIM7020_t* const p_Device, std::vector<SIM7020_PDP_Status_t>* p_Status)
+SIM70XX_Error_t SIM7020_PDP_GetStatus(SIM7020_t* const p_Device, std::vector<SIM7020_PDP_Status_t>* p_Status)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;
@@ -96,7 +96,7 @@ SIM70XX_Error_t SIM7020_PDP_GetStatus(const SIM7020_t* const p_Device, std::vect
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CGACT_R;
     SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -146,7 +146,7 @@ SIM70XX_Error_t SIM7020_PDP_ReadDynamicParameters(SIM7020_t* const p_Device )
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CGCONTRDP;
     SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }

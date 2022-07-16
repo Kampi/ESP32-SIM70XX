@@ -101,11 +101,12 @@ uint32_t SIM70XX_Queue_GetItems(QueueHandle_t Queue);
 
 /** @brief          Wait for items to receive.
  *  @param Queue    Message queue
+ *  @param p_Active Pointer to active state of the device
  *  @param Timeout  (Optional) Wait timeout in seconds
  *  @param Items    (Optional) Number of items to wait for
  *  @return         #true when the items are placed in the queue
  */
-bool SIM70XX_Queue_Wait(QueueHandle_t Queue, uint32_t Timeout = 1, uint32_t Items = 1);
+bool SIM70XX_Queue_Wait(QueueHandle_t Queue, bool* p_Active, uint32_t Timeout = 1, uint32_t Items = 1);
 
 /** @brief          Reset the recieve queue and discard all items.
  *  @param Queue    Message queue

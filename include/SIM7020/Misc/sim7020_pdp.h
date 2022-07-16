@@ -29,7 +29,7 @@
  *  @param p_Context    Pointer to SIM7020 PDP context object
  *  @return             SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_PDP_GetContext(const SIM7020_t* const p_Device, SIM7020_PDP_Context_t* p_Context);
+SIM70XX_Error_t SIM7020_PDP_GetContext(SIM7020_t* const p_Device, SIM7020_PDP_Context_t* p_Context);
 
 /** @brief          PDP Context activate or deactivate.
  *  @param p_Device Pointer to SIM7020 device object
@@ -37,19 +37,19 @@ SIM70XX_Error_t SIM7020_PDP_GetContext(const SIM7020_t* const p_Device, SIM7020_
  *  @param Context  (Optional) PDP context ID
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_PDP_Switch(const SIM7020_t* const p_Device, bool Enable, uint8_t Context = 1);
+SIM70XX_Error_t SIM7020_PDP_Switch(SIM7020_t* const p_Device, bool Enable, uint8_t Context = 1);
 
 /** @brief          Get the status of all PDP contextes.
  *  @param p_Device Pointer to SIM7020 device object
  *  @param p_Status Pointer to PDP Context status list
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_PDP_GetStatus(const SIM7020_t* const p_Device, std::vector<SIM7020_PDP_Status_t>* p_Status);
+SIM70XX_Error_t SIM7020_PDP_GetStatus(SIM7020_t* const p_Device, std::vector<SIM7020_PDP_Status_t>* p_Status);
 
 /** @brief          Read the dynamic PDP (Packet Data Protocol) context parameters.
  *  @param p_Device Pointer to SIM7020 device object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_PDP_ReadDynamicParameters(SIM7020_t* const p_Device );
+SIM70XX_Error_t SIM7020_PDP_ReadDynamicParameters(SIM7020_t* const p_Device);
 
 #endif /* SIM7020_PDP_H_ */

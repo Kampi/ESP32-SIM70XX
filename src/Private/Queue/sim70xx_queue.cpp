@@ -95,13 +95,13 @@ uint32_t SIM70XX_Queue_GetItems(QueueHandle_t Queue)
     return uxQueueMessagesWaiting(Queue);
 }
 
-bool SIM70XX_Queue_Wait(QueueHandle_t Queue, uint32_t Timeout, uint32_t Items)
+bool SIM70XX_Queue_Wait(QueueHandle_t Queue, bool* p_Active, uint32_t Timeout, uint32_t Items)
 {
     uint32_t Now;
     uint32_t ItemsInQueue;
     uint32_t Timeout_Temp;
 
-    if(Queue == NULL)
+    if((Queue == NULL) || (p_Active == NULL))
     {
         return false;
     }
@@ -118,12 +118,10 @@ bool SIM70XX_Queue_Wait(QueueHandle_t Queue, uint32_t Timeout, uint32_t Items)
         {
             return false;
         }
-        // TODO
-        /*
-        else if(p_Device->Internal.isActive == false)
+        else if(*p_Active == false)
         {
             return false;
-        }*/
+        }
 
         vTaskDelay(10 / portTICK_PERIOD_MS);
     } while(ItemsInQueue != Items);

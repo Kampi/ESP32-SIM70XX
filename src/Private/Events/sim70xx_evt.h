@@ -26,7 +26,7 @@
 
 #include <sdkconfig.h>
 
-#if(defined CONFIG_SIM70XX_DEV_SIM7020)
+#if(CONFIG_SIMXX_DEV == 7020)
     #include "sim7020.h"
     #include "SIM7020/sim7020_evt.h"
 
@@ -35,15 +35,15 @@
     #define SIM70XX_MQTT_PUB_EVENT(Device, Message)             SIM7020_Evt_MQTT_Pub(Device, Message)
     #define SIM70XX_MQTT_DISCONNECT_EVENT(Device, Message)      SIM7020_Evt_MQTT_Disconnect(Device, Message)
     #define SIM70XX_HTTP_EVENT(Device, Message)                 SIM7020_Evt_HTTP(Device, Message)
-#elif(defined CONFIG_SIM70XX_DEV_SIM7080)
+#elif(CONFIG_SIMXX_DEV == 7080)
     #include "sim7080.h"
     #include "SIM7080/sim7080_evt.h"
 
-    #define SIM70XX_PSM_EVENT(Device, Message, isPSM)
-    #define SIM70XX_TCP_DISCONNECT_EVENT(Device, Message)
-    #define SIM70XX_MQTT_PUB_EVENT(Device, Message)
-    #define SIM70XX_MQTT_DISCONNECT_EVENT(Device, Message)
-    #define SIM70XX_HTTP_EVENT(Device, Message)
+    #define SIM70XX_PSM_EVENT(Device, Message, isPSM)           
+    #define SIM70XX_TCP_DISCONNECT_EVENT(Device, Message)       
+    #define SIM70XX_MQTT_PUB_EVENT(Device, Message)             
+    #define SIM70XX_MQTT_DISCONNECT_EVENT(Device, Message)      
+    #define SIM70XX_HTTP_EVENT(Device, Message)                 
 #endif
 
 /** @brief          This task handels the communication with the SIM70XX module.

@@ -19,7 +19,7 @@
 
 #include <sdkconfig.h>
 
-#ifdef CONFIG_SIM70XX_DEV_SIM7080
+#if(CONFIG_SIMXX_DEV == 7080)
 
 #include <esp_log.h>
 
@@ -65,7 +65,7 @@ SIM70XX_Error_t SIM7080_Init(SIM7080_t* const p_Device, const SIM7080_Config_t* 
     }
     else if(p_Device->Internal.isInitialized)
     {
-        //SIM7080_Deinit(p_Device);
+        SIM7080_Deinit(p_Device);
     }
 
     p_Device->Internal.RxQueue = xQueueCreate(CONFIG_SIM70XX_QUEUE_LENGTH, sizeof(SIM70XX_CmdResp_t*));
@@ -124,7 +124,7 @@ SIM70XX_Error_t SIM7080_Init(SIM7080_t* const p_Device, const SIM7080_Config_t* 
 		    SIM7080_HardReset(p_Device);
 		}
     #else
-        //SIM70XX_ERROR_CHECK(SIM7020_SoftReset(p_Device, Timeout));
+        SIM70XX_ERROR_CHECK(SIM7080_SoftReset(p_Device, Timeout));
 	#endif
 
     vTaskSuspend(p_Device->Internal.TaskHandle);
@@ -133,7 +133,7 @@ SIM70XX_Error_t SIM7080_Init(SIM7080_t* const p_Device, const SIM7080_Config_t* 
 
     // Check if the module is ready.
     SIM70XX_ERROR_CHECK(SIM7080_Ping(p_Device));
-        /*SIM70XX_ERROR_CHECK(SIM7020_PSM_Disable(p_Device, SIM_PSM_DIS));
+    /*SIM70XX_ERROR_CHECK(SIM7020_PSM_Disable(p_Device, SIM_PSM_DIS));
     if(SIM7020_GetFunctionality(p_Device) == SIM70XX_ERR_INVALID_STATE)
     {
 
@@ -156,6 +156,26 @@ SIM70XX_Error_t SIM7080_Init(SIM7080_t* const p_Device, const SIM7080_Config_t* 
     return SIM70XX_ERR_OK;
 }
 
+void SIM7080_Deinit(SIM7080_t* const p_Device)
+{
+    assert(p_Device);
+
+    // Stop the receive task.
+    vTaskSuspend(p_Device->Internal.TaskHandle);
+    vTaskDelete(p_Device->Internal.TaskHandle);
+    p_Device->Internal.TaskHandle = NULL;
+
+    // Delete the queues.
+    vQueueDelete(p_Device->Internal.RxQueue);
+    vQueueDelete(p_Device->Internal.TxQueue);
+    vQueueDelete(p_Device->Internal.EventQueue);
+
+    // TODO: Shutdown modem
+
+    // Deinitialize the modem.
+    SIM70XX_UART_Deinit(&p_Device->UART);
+}
+
 #ifdef CONFIG_SIM70XX_RESET_USE_HW
 	void SIM7080_HardReset(SIM7080_t* const p_Device )
 	{
@@ -173,6 +193,62 @@ SIM70XX_Error_t SIM7080_Init(SIM7080_t* const p_Device, const SIM7080_Config_t* 
 	}
 #endif
 
+SIM70XX_Error_t SIM7080_SoftReset(const SIM7080_t* const p_Device, uint32_t Timeout)
+{
+    uint32_t Now;
+    std::string Response;
+
+    if(p_Device == NULL)
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+    else if(p_Device->Internal.isInitialized == false)
+    {
+        return SIM70XX_ERR_NOT_INITIALIZED;
+    }
+
+    if(p_Device->Internal.TaskHandle != NULL)
+    {
+        vTaskSuspend(p_Device->Internal.TaskHandle);
+    }
+
+    ESP_LOGI(TAG, "Performing soft reset...");
+    Now = SIM70XX_Tools_GetmsTimer();
+    do
+    {
+        // Reset the module.
+        // NOTE: Echo mode is enabled after a reset!
+        SIM70XX_UART_SendCommand(&p_Device->UART, "ATZ");
+        Response = SIM70XX_UART_ReadStringUntil(&p_Device->UART, '\n');
+        Response = SIM70XX_UART_ReadStringUntil(&p_Device->UART, '\n');
+        ESP_LOGI(TAG, "Response: %s", Response.c_str());
+
+        // Check if the reset was successful.
+        if(Response.find("OK") != std::string::npos)
+        {
+            ESP_LOGI(TAG, "     Software reset successful!");
+
+            if(p_Device->Internal.TaskHandle != NULL)
+            {
+                vTaskResume(p_Device->Internal.TaskHandle);
+            }
+
+            return SIM70XX_ERR_OK;
+        }
+
+        vTaskDelay(100 / portTICK_PERIOD_MS);
+    } while((SIM70XX_Tools_GetmsTimer() - Now) < (Timeout * 1000UL));
+
+    ESP_LOGE(TAG, "     Software reset timeout!");
+
+    if(p_Device->Internal.TaskHandle != NULL)
+    {
+        vTaskResume(p_Device->Internal.TaskHandle);
+    }
+
+    return SIM70XX_ERR_FAIL;
+}
+
 SIM70XX_Error_t SIM7080_Ping(SIM7080_t* const p_Device)
 {
     SIM70XX_TxCmd_t* Command;
@@ -189,7 +265,7 @@ SIM70XX_Error_t SIM7080_Ping(SIM7080_t* const p_Device)
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM70XX_AT;
     SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_NOT_READY;
     }

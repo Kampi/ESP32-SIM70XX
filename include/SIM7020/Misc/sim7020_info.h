@@ -75,13 +75,13 @@ SIM70XX_Error_t SIM7020_Info_GetICCID(const SIM7020_t* const p_Device, std::stri
  *  @param p_Device Pointer to SIM7020 device object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_Info_GetNetworkRegistrationStatus(SIM7020_t* const p_Device );
+SIM70XX_Error_t SIM7020_Info_GetNetworkRegistrationStatus(SIM7020_t* const p_Device);
 
 /** @brief          Get a signal quality report.
  *  @param p_Device Pointer to SIM7020 device object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_Info_GetQuality(SIM7020_t* const p_Device );
+SIM70XX_Error_t SIM7020_Info_GetQuality(SIM7020_t* const p_Device);
 
 /** @brief          Get the network status.
  *  @param p_Device Pointer to SIM7020 device object
