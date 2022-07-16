@@ -32,7 +32,7 @@
 /** @brief  Get the version number of the SIM70XX library.
  *  @return Library version
  */
-const inline __attribute__((always_inline)) std::string SIM7020_LibVersion(void)
+const inline __attribute__((always_inline)) std::string SIM70XX_LibVersion(void)
 {
     #if((defined SIM70XX_LIB_MAJOR) && (defined SIM70XX_LIB_MINOR) && (defined SIM70XX_LIB_BUILD))
         return std::string(STRINGIFY(SIM70XX_LIB_MAJOR)) + "." + std::string(STRINGIFY(SIM70XX_LIB_MINOR)) + "." + std::string(STRINGIFY(SIM70XX_LIB_BUILD));
