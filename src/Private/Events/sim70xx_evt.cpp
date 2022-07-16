@@ -31,9 +31,30 @@
 #include "../Queue/sim70xx_queue.h"
 #include "../Commands/sim7020_commands.h"
 
+#include <sdkconfig.h>
+
+#ifdef CONFIG_SIM70XX_TASK_CORE_AFFINITY
+    #ifndef CONFIG_SIM70XX_TASK_COM_CORE
+        #define CONFIG_SIM70XX_TASK_COM_CORE    1
+    #endif
+#endif
+
+#ifndef CONFIG_SIM70XX_TASK_COM_PRIO
+    #define CONFIG_SIM70XX_TASK_COM_PRIO        12
+#endif
+
+#ifndef CONFIG_SIM70XX_TASK_COM_STACK
+    #define CONFIG_SIM70XX_TASK_COM_STACK       4096
+#endif
+
 static const char* TAG = "SIM70XX_Evt";
 
-void SIM70XX_Evt_Task(void* p_Arg)
+/** @brief          This task handels the communication with the SIM70XX module.
+ *                  The task will receive a reference to a SIM70XX_TxCmd_t object and start with the transmission of the data.
+ *                  The reference to the object will be destroyed after the transmission.
+ *  @param p_Arg    Pointer to task parameter
+ */
+static void SIM70XX_Evt_Task(void* p_Arg)
 {
     uint32_t StatusUpdate = 0;
 
@@ -310,4 +331,24 @@ void SIM70XX_Evt_Task(void* p_Arg)
 
         vTaskDelay(10 / portTICK_PERIOD_MS);
     }
+}
+
+SIM70XX_Error_t SIM70XX_Evt_StartTask(TaskHandle_t* p_Handle, void* p_Arg)
+{
+    if((p_Handle == NULL) || (p_Arg == NULL))
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+
+	#ifdef CONFIG_SIM7020_TASK_CORE_AFFINITY
+        xTaskCreatePinnedToCore(SIM70XX_Evt_Task, "SIM70XX_Evt", SIM70XX_TASK_COM_STACK, p_Arg, CONFIG_SIM70XX_TASK_COM_PRIO, p_Handle, CONFIG_SIM70XX_TASK_COM_CORE);
+	#else
+        xTaskCreate(SIM70XX_Evt_Task, "SIM70XX_Evt", CONFIG_SIM70XX_TASK_COM_STACK, p_Arg, CONFIG_SIM70XX_TASK_COM_PRIO, p_Handle);
+	#endif
+    if(p_Handle == NULL)
+    {
+        return SIM70XX_ERR_NO_MEM;
+    }
+
+    return SIM70XX_ERR_OK;
 }

@@ -46,11 +46,12 @@
     #define SIM70XX_HTTP_EVENT(Device, Message)                 
 #endif
 
-/** @brief          This task handels the communication with the SIM70XX module.
- *                  The task will receive a reference to a SIM70XX_TxCmd_t object and start with the transmission of the data.
- *                  The reference to the object will be destroyed after the transmission.
- *  @param p_Arg    Pointer to task parameter
+
+/** @brief          Start the SIM70XX event task.
+ *  @param p_Handle Pointer to task handle
+ *  @param p_Arg    Pointer to task arguments
+ *  @return         SIM70XX_ERR_OK when successful
  */
-void SIM70XX_Evt_Task(void* p_Arg);
+SIM70XX_Error_t SIM70XX_Evt_StartTask(TaskHandle_t* p_Handle, void* p_Arg);
 
 #endif /* SIM70XX_EVT_H_ */

@@ -87,15 +87,7 @@ SIM70XX_Error_t SIM7020_Init(SIM7020_t* const p_Device, const SIM7020_Config_t* 
     SIM70XX_UART_Flush(&p_Device->UART);
 
     // No receive task started yet. Start the receive task.
-	#ifdef CONFIG_SIM7020_TASK_CORE_AFFINITY
-        xTaskCreatePinnedToCore(SIM70XX_Evt_Task, "comTask", SIM70XX_TASK_COM_STACK, p_Device, CONFIG_SIM70XX_TASK_COM_PRIO, &p_Device->Internal.TaskHandle, CONFIG_SIM70XX_TASK_COM_CORE);
-	#else
-        xTaskCreate(SIM70XX_Evt_Task, "comTask", CONFIG_SIM70XX_TASK_COM_STACK, p_Device, CONFIG_SIM70XX_TASK_COM_PRIO, &p_Device->Internal.TaskHandle);
-	#endif
-    if(p_Device->Internal.TaskHandle == NULL)
-    {
-        return SIM70XX_ERR_NO_MEM;
-    }
+    SIM70XX_ERROR_CHECK(SIM70XX_Evt_StartTask(&p_Device->Internal.TaskHandle, p_Device));
 
     p_Device->Internal.isActive = true;
     p_Device->Internal.isInitialized = true;

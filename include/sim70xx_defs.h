@@ -31,8 +31,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include <sdkconfig.h>
-
 /** @brief Supported baudrates by the SIM70XX devices.
  */
 typedef enum
