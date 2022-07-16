@@ -1,0 +1,110 @@
+menu "SIM70XX"
+    menu "Device"
+        config SIM70XX_DEV_SIM7020
+            bool "SIM7020 device support"
+            default y
+            help
+                Enable support for the SIM7020 NB-IoT modem.
+
+        config SIM70XX_DEV_SIM7080
+            bool "SIM7080 device support"
+            default n
+            help
+                Enable support for the SIM7080 LTE Cat-M and NB-IoT modem.
+    endmenu
+
+    menu "FreeRTOS"
+        config SIM70XX_TASK_CORE_AFFINITY
+            bool "Communication task core affinity"
+            default y
+            help
+                Enable this option if you want to use a specific core for the driver.
+
+        config SIM70XX_TASK_COM_CORE
+            int "Communication task core"
+            range 0 1
+            default 1
+            depends on SIM7020_TASK_CORE_AFFINITY
+            help
+                Use a specific core for the communication task.
+
+        config SIM70XX_TASK_evt_PRIO
+            int "Communication task priority"
+            range 12 25
+            default 12
+            help
+                Task priority for the communication task.
+
+        config SIM70XX_TASK_evt_STACK
+            int "Communication task stack size"
+            range 4096 16384
+            default 4096
+            help
+                Stack size for the communication task.
+        
+        config SIM70XX_QUEUE_LENGTH
+            int "Communication task queue length"
+            range 8 32
+            default 16
+            help
+                <ToDo>
+    endmenu
+
+    menu "Protocols"
+        config SIM70XX_PROT_WITH_COAP
+            bool "Enable the CoAP protocol"
+            default n
+            help
+                Enable this option if you need the support for the CoAP protocol.
+
+        config SIM70XX_PROT_WITH_MQTT
+            bool "Enable the MQTT protocol"
+            default n
+            help
+                Enable this option if you need the support for the MQTT protocol.
+
+        config SIM70XX_PROT_WITH_HTTP
+            bool "Enable the HTTP protocol"
+            default y
+            help
+                Enable this option if you need the support for the HTTP protocol.
+
+        config SIM70XX_PROT_WITH_TCPIP
+            bool "Enable the TCP/IP protocol"
+            default n
+            help
+                Enable this option if you need the support for the TCP/IP protocol.
+
+        config SIM70XX_PROT_WITH_SNTP
+            bool "Enable the SNTP protocol"
+            default n
+            help
+                Enable this option if you need the support for the SNTP protocol.
+    endmenu
+
+    menu "UART"
+        config SIM70XX_UART_BUFFER_SIZE
+            int "UART buffer size"
+            range 128 1024
+            default 256
+            help
+                UART communication buffer size.
+    endmenu
+
+    menu "Reset"
+        config SIM70XX_RESET_USE_HW
+            bool "Enable hardware reset"
+            default n
+            help
+                Enable this option if you want to use a hardware reset through an IO.
+    endmenu
+
+    menu "Misc"
+        config SIM70XX_MISC_ERROR_BASE
+            hex "SIMXX driver error base definition"
+            range 0 FFFF
+            default 0x9000
+            help
+                Set the error base for the driver.
+    endmenu
+endmenu

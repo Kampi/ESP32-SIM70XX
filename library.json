@@ -1,0 +1,28 @@
+{
+  "name": "SIM70XX",
+  "version": "0.0.1",
+  "keywords": "esp-idf, sim7020, sim7070, sim7080, sim7090, nb-iot, lte cat-m1, cellular",
+  "description": "SIM70XX driver for the esp-idf framework.",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.server-kampert.de/esp32/libraries/sim70xx"
+  },
+  "frameworks": "espidf",
+  "platforms": "*",
+  "build": {
+    "flags": [
+      "-Iinclude"
+      "-DSIMXX_LIB_MAJOR=0",
+      "-DSIMXX_LIB_MINOR=0",
+      "-DSIMXX_LIB_BUILD=1"
+    ],
+    "includeDir": ".",
+    "srcDir": ".",
+    "srcFilter": [
+      "-<*>",
+      "+<src>"
+	  ]
+  },
+  "dependencies": [
+  ]
+}
