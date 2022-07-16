@@ -35,6 +35,33 @@
 
 #include "sim70xx_defs.h"
 
+/** @brief Supported frequency bands.
+ */
+typedef enum
+{
+    SIM7080_BAND_1          = 0,                            /**< Frequency band 1. */
+    SIM7080_BAND_3          = 3,                            /**< Frequency band 3. */
+    SIM7080_BAND_5          = 5,                            /**< Frequency band 5. */
+    SIM7080_BAND_8          = 8,                            /**< Frequency band 8. */
+    SIM7080_BAND_20         = 20,                           /**< Frequency band 20. */
+    SIM7080_BAND_28         = 28,                           /**< Frequency band 28. */
+    SIM7020_BAND_EGSM       = 253,                          /**< EGSM mode. */
+    SIM7020_BAND_DCS        = 254,                          /**< DCS mode. */
+    SIM7020_BAND_ALL        = 255,                          /**< All band mode. */
+} SIM7080_Band_t;
+
+/** @brief Phone functionallity definitions.
+ */
+typedef enum
+{
+    SIM7080_FUNC_MIN        = 0,                            /**< Minimum functionality. */
+    SIM7080_FUNC_FULL       = 1,                            /**< Full functionality. */
+    SIM7080_FUNC_DIS_RF     = 4,                            /**< Disable phone both transmit and receive RF circuits. */
+    SIM7080_FUNC_TEST       = 5,                            /**< Factory Test mode. */
+    SIM7080_FUNC_RESET      = 6,                            /**< Reset. */
+    SIM7080_FUNC_OFFLINE    = 7,                            /**< Offline mode. */
+} SIM7080_Func_t;
+
 /** @brief SIM7080 device object.
  */
 typedef struct
@@ -48,6 +75,13 @@ typedef struct
                                                                  NOTE: Can be set to -1 when not used. */
         } Reset_Conf;
     #endif
+    SIM7080_Band_t Band;                                    /**< Selected frequency band. */
+    struct
+    {
+        int8_t RSSI;                                        /**< Network RSSI value in dBm. */
+        uint8_t RXQual;                                     /**< RxQUAL values in the table in GSM 05.08 [20] subclause 7.2.4. */
+        SIM7080_Func_t Functionality;                       /**< Current device functionality. */
+    } Connection;
     struct
     {
         QueueHandle_t RxQueue;                              /**< Message receive (Module -> ESP32) queue.
@@ -77,11 +111,13 @@ typedef struct
     #ifdef CONFIG_SIM70XX_RESET_USE_HW
         struct
         {
-            bool Inverted;						            /**< */
+            bool Inverted;						            /**< Set to #true to invert the reset pin. */
             gpio_num_t Pin;						            /**< Reset pin for the module.
                                                                  NOTE: Can be set to -1 when not used. */
         } Reset_Conf;
     #endif
+    SIM7080_Band_t Band;                                    /**< Selected frequency band. */
+    std::string Operator;                                   /**< Selected operator. */
 } SIM7080_Config_t;
 
 #endif /* SIM7080_DEFS_H_ */

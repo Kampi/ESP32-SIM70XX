@@ -20,11 +20,11 @@
 #ifndef SIM7020_CONFIG_FUSION_H_
 #define SIM7020_CONFIG_FUSION_H_
 
-/** @brief          Default configuration for using the module with the Fusion IoT APN.        
- *  @param Serial   
- *  @param Baud     
- *  @param Pin_Rx   
- *  @param Pin_Tx   
+/** @brief          Default configuration for using the module with the 1nce APN.
+ *  @param Serial   Serial interface that should be used by the driver
+ *  @param Baud     Baud rate that should be used by the driver
+ *  @param Pin_Rx   Rx pin for the serial interface
+ *  @param Pin_Tx   Tx pin for the serial interface
  */
 #define SIM7020_DEFAULT_CONF_FUSION(Serial, Baud, Pin_Rx, Pin_Tx)   {                                                       \
                                                                         .Interface = {                                      \
@@ -35,13 +35,13 @@
                                                                             .Baudrate = Baud,                               \
                                                                             .isInitialized = false,                         \
                                                                         },                                                  \
-                                                                        .Band = SIM_BAND_8,                                 \
+                                                                        .Band = SIM7020_BAND_8,                             \
                                                                         .APN = {                                            \
                                                                             .Name = "iot.1nce.net",                         \
                                                                             .Username = "",                                 \
                                                                             .Password = "",                                 \
                                                                         },                                                  \
-                                                                        .OperatorFormat = SIM_FORM_NUMERIC,                 \
+                                                                        .OperatorFormat = SIM7020_FORM_NUMERIC,             \
                                                                         .Operator = "26201",                                \
                                                                     };
 

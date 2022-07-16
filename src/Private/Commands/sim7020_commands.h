@@ -76,7 +76,6 @@
 #define SIM7020_AT_CNVMGET                                      SIM70XX_CMD("AT+CNVMGET", true, 10, 0)
 #define SIM7020_AT_CNVMIVD(Key)                                 SIM70XX_CMD("AT+CNVMIVD=\"" + Key + "\"", true, 10, 1)
 
-
 /**
  * 
  * Used in SIM7020 Power Management driver.

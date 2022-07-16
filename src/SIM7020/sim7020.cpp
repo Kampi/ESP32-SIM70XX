@@ -130,17 +130,16 @@ SIM70XX_Error_t SIM7020_Init(SIM7020_t* const p_Device, const SIM7020_Config_t* 
     SIM70XX_DisableEcho(&p_Device->UART);
     vTaskResume(p_Device->Internal.TaskHandle);
 
-    // Check if the module is ready.
     SIM70XX_ERROR_CHECK(SIM7020_Ping(p_Device));
-    SIM70XX_ERROR_CHECK(SIM7020_PSM_Disable(p_Device, SIM_PSM_DIS));
+    SIM70XX_ERROR_CHECK(SIM7020_PSM_Disable(p_Device, SIM7020_PSM_DIS));
     if(SIM7020_GetFunctionality(p_Device) == SIM70XX_ERR_INVALID_STATE)
     {
 
     }
     SIM70XX_ERROR_CHECK(SIM7020_GetBand(p_Device));
-    SIM70XX_ERROR_CHECK(SIM7020_SetPSD(p_Device, SIM_PDP_IP, p_Config->APN));
+    SIM70XX_ERROR_CHECK(SIM7020_SetPSD(p_Device, SIM7020_PDP_IP, p_Config->APN));
     SIM70XX_ERROR_CHECK(SIM7020_SetBand(p_Device, p_Config->Band));
-    SIM70XX_ERROR_CHECK(SIM7020_SetOperator(p_Device, SIM_MODE_MANUAL, p_Config->OperatorFormat, p_Config->Operator));
+    SIM70XX_ERROR_CHECK(SIM7020_SetOperator(p_Device, SIM7020_MODE_MANUAL, p_Config->OperatorFormat, p_Config->Operator));
     SIM70XX_ERROR_CHECK(SIM7020_Info_GetNetworkRegistrationStatus(p_Device));
     SIM70XX_ERROR_CHECK(SIM7020_Info_GetQuality(p_Device));
     //SIM70XX_ERROR_CHECK(SIM7020_PDP_ReadDynamicParameters(p_Device));
@@ -263,21 +262,21 @@ SIM70XX_Error_t SIM7020_SetPSD(SIM7020_t* const p_Device, SIM7020_PDP_Type_t PDP
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
-    SIM70XX_ERROR_CHECK(SIM7020_SetFunctionality(p_Device, SIM_FUNC_MIN));
+    SIM70XX_ERROR_CHECK(SIM7020_SetFunctionality(p_Device, SIM7020_FUNC_MIN));
 
-    if(PDP == SIM_PDP_IP)
+    if(PDP == SIM7020_PDP_IP)
     {
         CommandStr = "AT*MCGDEFCONT=\"IP\",\"" + APN.Name + "\"";
     }
-    else if(PDP == SIM_PDP_IPV6)
+    else if(PDP == SIM7020_PDP_IPV6)
     {
         CommandStr = "AT*MCGDEFCONT=\"IPV6\",\"" + APN.Name + "\"";
     }
-    else if(PDP == SIM_PDP_IPV4V6)
+    else if(PDP == SIM7020_PDP_IPV4V6)
     {
         CommandStr = "AT*MCGDEFCONT=\"IPV4V6\",\"" + APN.Name + "\"";
     }
-    else if(PDP == SIM_PDP_NO_IP)
+    else if(PDP == SIM7020_PDP_NO_IP)
     {
         CommandStr = "AT*MCGDEFCONT=\"Non-IP\",\"" + APN.Name + "\"";
     }
@@ -302,7 +301,7 @@ SIM70XX_Error_t SIM7020_SetPSD(SIM7020_t* const p_Device, SIM7020_PDP_Type_t PDP
         return Error;
     }
 
-    SIM70XX_ERROR_CHECK(SIM7020_SetFunctionality(p_Device, SIM_FUNC_FULL));
+    SIM70XX_ERROR_CHECK(SIM7020_SetFunctionality(p_Device, SIM7020_FUNC_FULL));
 
     p_Device->PDP_Type = PDP;
 
@@ -325,7 +324,7 @@ SIM70XX_Error_t SIM7020_SetOperator(SIM7020_t* const p_Device, SIM7020_OpMode_t 
 
     CommandStr = "AT+COPS=" + std::to_string(Mode);
 
-    if((Mode == SIM_MODE_MANUAL) || (Mode == SIM_MODE_BOTH))
+    if((Mode == SIM7020_MODE_MANUAL) || (Mode == SIM7020_MODE_BOTH))
     {
         CommandStr += "," + std::to_string(Format) + ",\"" + Operator + "\"";
     }
@@ -360,7 +359,7 @@ SIM70XX_Error_t SIM7020_GetOperator(SIM7020_t* const p_Device, std::vector<SIM70
 
     // The device must be active to check the operators.
     /*
-    Error = SIM7020_SetFunctionality(p_Device, SIM_FUNC_FULL);
+    Error = SIM7020_SetFunctionality(p_Device, SIM7020_FUNC_FULL);
     if(Error)
     {
         return Error;
@@ -489,7 +488,7 @@ SIM70XX_Error_t SIM7020_GetBand(SIM7020_t* const p_Device)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
-    else if(p_Device->Connection.Functionality == SIM_FUNC_MIN)
+    else if(p_Device->Connection.Functionality == SIM7020_FUNC_MIN)
     {
         return SIM70XX_ERR_INVALID_STATE;
     }
@@ -544,7 +543,7 @@ SIM70XX_Error_t SIM7020_SetFunctionality(SIM7020_t* const p_Device, SIM7020_Func
     // Device is in minimum functionality -> Transition into another functionality
     //  Response = OK
     //  Status = +CPIN: READY
-    if(p_Device->Connection.Functionality == SIM_FUNC_MIN)
+    if(p_Device->Connection.Functionality == SIM7020_FUNC_MIN)
     {
         ESP_LOGI(TAG, "Minimum functionality...");
 
@@ -558,7 +557,7 @@ SIM70XX_Error_t SIM7020_SetFunctionality(SIM7020_t* const p_Device, SIM7020_Func
     // Device is in full functionality -> Transition into another functionality
     //  Response = +CPIN: NOT READY
     //  Status = OK
-    else if(p_Device->Connection.Functionality == SIM_FUNC_FULL)
+    else if(p_Device->Connection.Functionality == SIM7020_FUNC_FULL)
     {
         ESP_LOGI(TAG, "Full functionality...");
 

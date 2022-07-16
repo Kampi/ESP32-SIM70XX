@@ -78,6 +78,32 @@ void SIM7080_Deinit(SIM7080_t* const p_Device);
  */
 SIM70XX_Error_t SIM7080_SoftReset(const SIM7080_t* const p_Device, uint32_t Timeout = 10);
 
+/** @brief          Set the frequency band of the module.
+ *  @param p_Device Pointer to SIM7080 device object
+ *  @param Band     Frequency band
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_SetBand(SIM7080_t* const p_Device, SIM7080_Band_t Band);
+
+/** @brief          Get the frequency band of the module.
+ *  @param p_Device Pointer to SIM7080 device object
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_GetBand(SIM7080_t* const p_Device);
+
+/** @brief          Set the device functionality.
+ *  @param p_Device Pointer to SIM7080 device object
+ *  @param Func     Device functionality
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_SetFunctionality(SIM7080_t* const p_Device, SIM7080_Func_t Func);
+
+/** @brief          Get the device functionality.
+ *  @param p_Device Pointer to SIM7080 device object
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_GetFunctionality(SIM7080_t* const p_Device);
+
 /** @brief          Ping the module by sending an empty 'AT'.
  *  @param p_Device Pointer to SIM7080 device object
  *  @return         SIM70XX_ERR_OK when successful

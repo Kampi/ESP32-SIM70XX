@@ -56,65 +56,65 @@
  */
 typedef enum
 {
-    SIM_BAND_1          = 0,                                /**< NB-IoT frequency band 1. */
-    SIM_BAND_3          = 3,                                /**< NB-IoT frequency band 3. */
-    SIM_BAND_5          = 5,                                /**< NB-IoT frequency band 5. */
-    SIM_BAND_8          = 8,                                /**< NB-IoT frequency band 8. */
-    SIM_BAND_20         = 20,                               /**< NB-IoT frequency band 20. */
-    SIM_BAND_28         = 28,                               /**< NB-IoT frequency band 28 */
+    SIM7020_BAND_1          = 0,                            /**< Frequency band 1. */
+    SIM7020_BAND_3          = 3,                            /**< Frequency band 3. */
+    SIM7020_BAND_5          = 5,                            /**< Frequency band 5. */
+    SIM7020_BAND_8          = 8,                            /**< Frequency band 8. */
+    SIM7020_BAND_20         = 20,                           /**< Frequency band 20. */
+    SIM7020_BAND_28         = 28,                           /**< Frequency band 28. */
 } SIM7020_Band_t;
 
-/** @brief 
+/** @brief Phone functionallity definitions.
  */
 typedef enum
 {
-    SIM_FUNC_MIN        = 0,                                /**< Minimum functionality. */
-    SIM_FUNC_FULL       = 1,                                /**< Full functionality. */
-    SIM_FUNC_DIS_RF     = 4,                                /**< Disable phone both transmit and receive RF circuits. */
-    SIM_FUNC_DIS_PHONE  = 7,                                /**< Disable phone SIM only. Transmit and receive circuits still active. */
+    SIM7020_FUNC_MIN        = 0,                            /**< Minimum functionality. */
+    SIM7020_FUNC_FULL       = 1,                            /**< Full functionality. */
+    SIM7020_FUNC_DIS_RF     = 4,                            /**< Disable phone both transmit and receive RF circuits. */
+    SIM7020_FUNC_DIS_PHONE  = 7,                            /**< Disable phone SIM only. Transmit and receive circuits still active. */
 } SIM7020_Func_t;
 
 /** @brief Supported baudrates.
  */
 typedef enum
 {
-    SIM_OP_UNKNOWN      = 0,                                /**< Unknown operator. */
-    SIM_OP_AVAIL,                                           /**< Operator available. */
-    SIM_OP_CUR,                                             /**< Operator current. */
-    SIM_OP_FORBIDDEN,                                       /**< Operator forbidden. */
+    SIM7020_OP_UNKNOWN      = 0,                            /**< Unknown operator. */
+    SIM7020_OP_AVAIL,                                       /**< Operator available. */
+    SIM7020_OP_CUR,                                         /**< Operator current. */
+    SIM7020_OP_FORBIDDEN,                                   /**< Operator forbidden. */
 } SIM7020_OpStat_t;
 
 /** @brief Operator formats.
  */
 typedef enum
 {
-    SIM_FORM_LONG       = 0,                                /**< Long format alphanumeric. */
-    SIM_FORM_SHORT,                                         /**< Short format alphanumeric. */
-    SIM_FORM_NUMERIC,                                       /**< Numeric GSM Location Area Identification number. */
+    SIM7020_FORM_LONG       = 0,                            /**< Long format alphanumeric. */
+    SIM7020_FORM_SHORT,                                     /**< Short format alphanumeric. */
+    SIM7020_FORM_NUMERIC,                                   /**< Numeric GSM Location Area Identification number. */
 } SIM7020_OpForm_t;
 
 /** @brief Operator modes.
  */
 typedef enum
 {
-    SIM_MODE_AUTO       = 0,                                /**< Automatic mode. */
-    SIM_MODE_MANUAL,                                        /**< Manual mode. */
-    SIM_MODE_DEREGISTER,                                    /**< Deregister from network. */
-    SIM_MODE_BOTH       = 4,                                /**< Manual / Automatic. If manual fails, automatic mode is entered. */
+    SIM7020_MODE_AUTO       = 0,                            /**< Automatic mode. */
+    SIM7020_MODE_MANUAL,                                    /**< Manual mode. */
+    SIM7020_MODE_DEREGISTER,                                /**< Deregister from network. */
+    SIM7020_MODE_BOTH       = 4,                            /**< Manual / Automatic. If manual fails, automatic mode is entered. */
 } SIM7020_OpMode_t;
 
 /** @brief Network registration status codes.
  */
 typedef enum
 {
-    SIM_NET_NOT_SEARCHING = 0,                              /**< Not registered, MT is not currently searching an operator to register to. */
-    SIM_NET_REG_HOME,                                       /**< Registered, home network. */
-    SIM_NET_NOT_ATTACHED,                                   /**< Not registered, but MT is currently trying to attach or searching an operator to register to.. */
-    SIM_NET_DENIED,                                         /**< Registration denied. */
-    SIM_NET_UNKNOWN,                                        /**< Unknown. */
-    SIM_NET_ROAMING,                                        /**< Registered, roaming. */
-    SIM_NET_SMS_HOME,                                       /**< Registered for "SMS only", home network (applicable only when <Act> indicates E-UTRAN). */
-    SIM_NET_SMS_ROAMING,                                    /**< Registered for "SMS only", roaming network (applicable only when <Act> indicates E-UTRAN). */
+    SIM7020_NET_NOT_SEARCHING = 0,                          /**< Not registered, MT is not currently searching an operator to register to. */
+    SIM7020_NET_REG_HOME,                                   /**< Registered, home network. */
+    SIM7020_NET_NOT_ATTACHED,                               /**< Not registered, but MT is currently trying to attach or searching an operator to register to.. */
+    SIM7020_NET_DENIED,                                     /**< Registration denied. */
+    SIM7020_NET_UNKNOWN,                                    /**< Unknown. */
+    SIM7020_NET_ROAMING,                                    /**< Registered, roaming. */
+    SIM7020_NET_SMS_HOME,                                   /**< Registered for "SMS only", home network (applicable only when <Act> indicates E-UTRAN). */
+    SIM7020_NET_SMS_ROAMING,                                /**< Registered for "SMS only", roaming network (applicable only when <Act> indicates E-UTRAN). */
 } SIM7020_NetRegistration_t;
 
 /** @brief SIM7020 network status object definition.
@@ -160,7 +160,7 @@ typedef struct
                                                                  NOTE: Can be set to -1 when not used. */
         } Reset_Conf;
     #endif
-    SIM7020_Band_t Band;                                    /**< Selected NB-IoT band. */
+    SIM7020_Band_t Band;                                    /**< Selected frequency band. */
     std::vector<SIM7020_Operator_t> Operators;              /**< */
     std::string Modes;                                      /**< */
     std::string Formats;                                    /**< */
@@ -253,12 +253,12 @@ typedef struct
     #ifdef CONFIG_SIM70XX_RESET_USE_HW
         struct
         {
-            bool Inverted;						            /**< */
+            bool Inverted;						            /**< Set to #true to invert the reset pin. */
             gpio_num_t Pin;						            /**< Reset pin for the module.
                                                                  NOTE: Can be set to -1 when not used. */
         } Reset_Conf;
     #endif
-    SIM7020_Band_t Band;                                    /**< Selected NB-IoT band. */
+    SIM7020_Band_t Band;                                    /**< Selected frequency band. */
     SIM7020_APN_t APN;                                      /**< APN configuration object. */
     SIM7020_OpForm_t OperatorFormat;                        /**< Format for the selected operator. */
     std::string Operator;                                   /**< Selected operator. */

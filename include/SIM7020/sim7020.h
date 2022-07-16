@@ -137,7 +137,7 @@ SIM70XX_Error_t SIM7020_GetOperator(SIM7020_t* const p_Device, std::vector<SIM70
 
 /** @brief          Set the frequency band of the module.
  *  @param p_Device Pointer to SIM7020 device object
- *  @param Band     NB-IoT frequency band
+ *  @param Band     Frequency band
  *  @return         SIM70XX_ERR_OK when successful
  */
 SIM70XX_Error_t SIM7020_SetBand(SIM7020_t* const p_Device, SIM7020_Band_t Band);
