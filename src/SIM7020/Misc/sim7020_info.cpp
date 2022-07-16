@@ -180,7 +180,7 @@ SIM70XX_Error_t SIM7020_Info_GetICCID(const SIM7020_t* const p_Device, std::stri
     return SIM70XX_ERR_FAIL;
 }
 
-SIM70XX_Error_t SIM7020_Info_GetNetworkRegistrationStatus(SIM7020_t* const p_Device )
+SIM70XX_Error_t SIM7020_Info_GetNetworkRegistrationStatus(SIM7020_t* const p_Device)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;
@@ -208,7 +208,7 @@ SIM70XX_Error_t SIM7020_Info_GetNetworkRegistrationStatus(SIM7020_t* const p_Dev
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_Info_GetQuality(SIM7020_t* const p_Device )
+SIM70XX_Error_t SIM7020_Info_GetQuality(SIM7020_t* const p_Device)
 {
     int8_t RSSI;
     uint8_t RXQual;

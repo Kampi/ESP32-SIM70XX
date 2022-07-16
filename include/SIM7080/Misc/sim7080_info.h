@@ -1,5 +1,5 @@
  /*
- * sim7020_info_defs.h
+ * sim7080_info.h
  *
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -17,27 +17,23 @@
  * Errors and commissions should be reported to DanielKampert@kampis-elektroecke.de.
  */
 
-#ifndef SIM7020_INFO_DEFS_H_
-#define SIM7020_INFO_DEFS_H_
+#ifndef SIM7080_INFO_H_
+#define SIM7080_INFO_H_
 
-#include <string>
-#include <stdint.h>
-#include <stdbool.h>
+#include "sim70xx_errors.h"
+#include "Definitions/sim7080_defs.h"
+#include "Definitions/Misc/sim7080_info_defs.h"
 
-/** @brief SIM7020 device information object definition.
+/** @brief          Get the network registration status.
+ *  @param p_Device Pointer to SIM7080 device object
+ *  @return         SIM70XX_ERR_OK when successful
  */
-typedef struct
-{
-    std::string IMEI;                               /**< The International mobile equipment identifier (IMEI) of the attached SIM card.
-                                                         NOTE: Managed by the device driver. */
-    std::string ICCID;                              /**< The Integrated Circuit Card IDentifier (ICCID) of the attached SIM card.
-                                                         NOTE: Managed by the device driver. */
-    std::string Firmware;                           /**< Firmware version from the current device.
-                                                         NOTE: Managed by the device driver. */
-    std::string Manufacturer;                       /**< Manufacturer string.
-                                                         NOTE: Managed by the device driver. */
-    std::string Model;                              /**< Device model.
-                                                         NOTE: Managed by the device driver. */
-} SIM7020_Info_t;
+SIM70XX_Error_t SIM7080_Info_GetNetworkRegistrationStatus(SIM7080_t* const p_Device);
 
-#endif /* SIM7020_INFO_DEFS_H_ */
+/** @brief          Get a signal quality report.
+ *  @param p_Device Pointer to SIM7080 device object
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_Info_GetQuality(SIM7080_t* const p_Device);
+
+#endif /* SIM7080_INFO_H_ */

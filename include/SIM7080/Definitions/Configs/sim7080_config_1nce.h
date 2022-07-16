@@ -36,6 +36,13 @@
                                                                             .isInitialized = false,                         \
                                                                         },                                                  \
                                                                         .Band = SIM7080_BAND_ALL,                           \
+                                                                        .APN = {                                            \
+                                                                            .Name = "iot.1nce.net",                         \
+                                                                            .Username = "",                                 \
+                                                                            .Password = "",                                 \
+                                                                        },                                                  \
+                                                                        .OperatorFormat = SIM_FORM_NUMERIC,                 \
+                                                                        .Operator = "26201",                                \
                                                                     };
 
 #endif /* SIM7080_CONFIG_1NCE_H_ */

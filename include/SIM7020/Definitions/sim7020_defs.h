@@ -74,42 +74,20 @@ typedef enum
     SIM7020_FUNC_DIS_PHONE  = 7,                            /**< Disable phone SIM only. Transmit and receive circuits still active. */
 } SIM7020_Func_t;
 
-/** @brief Supported baudrates.
+/** @brief SIM7020 AcT definitions.
  */
 typedef enum
 {
-    SIM7020_OP_UNKNOWN      = 0,                            /**< Unknown operator. */
-    SIM7020_OP_AVAIL,                                       /**< Operator available. */
-    SIM7020_OP_CUR,                                         /**< Operator current. */
-    SIM7020_OP_FORBIDDEN,                                   /**< Operator forbidden. */
-} SIM7020_OpStat_t;
+    SIM7020_ACT_NB_IOT      = 9,                            /**< NB-IoT. */
+} SIM7020_AcT_t;
 
-/** @brief Operator formats.
- */
-typedef enum
-{
-    SIM7020_FORM_LONG       = 0,                            /**< Long format alphanumeric. */
-    SIM7020_FORM_SHORT,                                     /**< Short format alphanumeric. */
-    SIM7020_FORM_NUMERIC,                                   /**< Numeric GSM Location Area Identification number. */
-} SIM7020_OpForm_t;
-
-/** @brief Operator modes.
- */
-typedef enum
-{
-    SIM7020_MODE_AUTO       = 0,                            /**< Automatic mode. */
-    SIM7020_MODE_MANUAL,                                    /**< Manual mode. */
-    SIM7020_MODE_DEREGISTER,                                /**< Deregister from network. */
-    SIM7020_MODE_BOTH       = 4,                            /**< Manual / Automatic. If manual fails, automatic mode is entered. */
-} SIM7020_OpMode_t;
-
-/** @brief Network registration status codes.
+/** @brief SIM7020 network registration status codes.
  */
 typedef enum
 {
     SIM7020_NET_NOT_SEARCHING = 0,                          /**< Not registered, MT is not currently searching an operator to register to. */
     SIM7020_NET_REG_HOME,                                   /**< Registered, home network. */
-    SIM7020_NET_NOT_ATTACHED,                               /**< Not registered, but MT is currently trying to attach or searching an operator to register to.. */
+    SIM7020_NET_NOT_ATTACHED,                               /**< Not registered, but MT is currently trying to attach or searching an operator to register to. */
     SIM7020_NET_DENIED,                                     /**< Registration denied. */
     SIM7020_NET_UNKNOWN,                                    /**< Unknown. */
     SIM7020_NET_ROAMING,                                    /**< Registered, roaming. */
@@ -136,17 +114,6 @@ typedef struct
     int16_t sc_re_rsrp;                                     /**< Indicating serving cell RSRP value (the modified) in units of dBm (can be negative value). Available only in RRC-IDLE state. */
 } SIM7020_NetState_t;
 
-/** @brief SIM7020 operator object definition.
- */
-typedef struct
-{
-    SIM7020_OpStat_t Stat;                                  /**< Operator status. */
-    std::string Long;                                       /**< Long alphanumeric name. */
-    std::string Short;                                      /**< Short alphanumeric name. */
-    std::string Numeric;                                    /**< Numeric name. */
-    uint8_t Act;                                            /**< 9 = NB-IoT. */
-} SIM7020_Operator_t;
-
 /** @brief SIM7020 device object.
  */
 typedef struct
@@ -155,13 +122,13 @@ typedef struct
     #ifdef CONFIG_SIM70XX_RESET_USE_HW
         struct
         {
-            bool Inverted;						            /**< */
+            bool Inverted;						            /**< Set to #true to invert the reset pin. */
             gpio_num_t Pin;						            /**< Reset pin for the module.
                                                                  NOTE: Can be set to -1 when not used. */
         } Reset_Conf;
     #endif
     SIM7020_Band_t Band;                                    /**< Selected frequency band. */
-    std::vector<SIM7020_Operator_t> Operators;              /**< */
+    std::vector<SIM70XX_Operator_t> Operators;              /**< */
     std::string Modes;                                      /**< */
     std::string Formats;                                    /**< */
     SIM7020_PDP_Type_t PDP_Type;                            /**< The PDP type used by the device. */
@@ -206,7 +173,6 @@ typedef struct
             uint32_t SubTopics;                             /**< Subscribe counter.
                                                                  NOTE: Managed by the device driver. */
         } MQTT;
-
     #endif
     #ifdef CONFIG_SIM70XX_PROT_WITH_COAP
         struct
@@ -236,15 +202,6 @@ typedef struct
     } Internal;
 } SIM7020_t;
 
-/** @brief SIM7020 APN configuration object.
- */
-typedef struct
-{
-    std::string Name;                                       /**< Name of the access point. */
-    std::string Username;                                   /**< Access Point username. */
-    std::string Password;                                   /**< Access Point password. */
-} SIM7020_APN_t;
-
 /** @brief SIM7020 device configuration object.
  */
 typedef struct
@@ -259,8 +216,8 @@ typedef struct
         } Reset_Conf;
     #endif
     SIM7020_Band_t Band;                                    /**< Selected frequency band. */
-    SIM7020_APN_t APN;                                      /**< APN configuration object. */
-    SIM7020_OpForm_t OperatorFormat;                        /**< Format for the selected operator. */
+    SIM70XX_APN_t APN;                                      /**< APN configuration object. */
+    SIM70XX_OpForm_t OperatorFormat;                        /**< Format for the selected operator. */
     std::string Operator;                                   /**< Selected operator. */
 } SIM7020_Config_t;
 

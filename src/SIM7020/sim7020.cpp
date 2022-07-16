@@ -239,7 +239,7 @@ SIM70XX_Error_t SIM7020_SoftReset(const SIM7020_t* const p_Device, uint32_t Time
     return SIM70XX_ERR_FAIL;
 }
 
-SIM70XX_Error_t SIM7020_SetPSD(SIM7020_t* const p_Device, SIM7020_PDP_Type_t PDP, SIM7020_APN_t APN)
+SIM70XX_Error_t SIM7020_SetPSD(SIM7020_t* const p_Device, SIM7020_PDP_Type_t PDP, SIM70XX_APN_t APN)
 {
     std::string CommandStr;
     SIM70XX_TxCmd_t* Command;
@@ -300,7 +300,7 @@ SIM70XX_Error_t SIM7020_SetPSD(SIM7020_t* const p_Device, SIM7020_PDP_Type_t PDP
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_SetOperator(SIM7020_t* const p_Device, SIM7020_OpMode_t Mode, SIM7020_OpForm_t Format, std::string Operator)
+SIM70XX_Error_t SIM7020_SetOperator(SIM7020_t* const p_Device, SIM70XX_OpMode_t Mode, SIM70XX_OpForm_t Format, std::string Operator)
 {
     std::string CommandStr;
     SIM70XX_TxCmd_t* Command;
@@ -316,9 +316,9 @@ SIM70XX_Error_t SIM7020_SetOperator(SIM7020_t* const p_Device, SIM7020_OpMode_t 
 
     CommandStr = "AT+COPS=" + std::to_string(Mode);
 
-    if((Mode == SIM7020_MODE_MANUAL) || (Mode == SIM7020_MODE_BOTH))
+    if((Mode == SIM_MODE_MANUAL) || (Mode == SIM_MODE_BOTH))
     {
-        CommandStr += "," + std::to_string(Format) + ",\"" + Operator + "\"";
+        CommandStr += "," + std::to_string(Format) + ",\"" + Operator + "\"" + "," + std::to_string(SIM7020_ACT_NB_IOT);
     }
 
     SIM70XX_CREATE_CMD(Command);
@@ -332,7 +332,7 @@ SIM70XX_Error_t SIM7020_SetOperator(SIM7020_t* const p_Device, SIM7020_OpMode_t 
     return SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue, NULL, NULL);
 }
 
-SIM70XX_Error_t SIM7020_GetOperator(SIM7020_t* const p_Device, std::vector<SIM7020_Operator_t>* p_Operator, std::string* p_Modes, std::string* p_Formats)
+SIM70XX_Error_t SIM7020_GetOperator(SIM7020_t* const p_Device, std::vector<SIM70XX_Operator_t>* p_Operator, std::string* p_Modes, std::string* p_Formats)
 {
     int End;
     int Start;

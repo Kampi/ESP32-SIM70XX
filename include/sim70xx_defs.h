@@ -44,6 +44,60 @@ typedef enum
     SIM_BAUD_921600     = 921600,                   /**< Baud rate 921600. */
 } SIM70XX_Baud_t;
 
+/** @brief SIM70XX operator statuses definition.
+ */
+typedef enum
+{
+    SIM_OP_UNKNOWN      = 0,                        /**< Unknown operator. */
+    SIM_OP_AVAIL,                                   /**< Operator available. */
+    SIM_OP_CUR,                                     /**< Operator current. */
+    SIM_OP_FORBIDDEN,                               /**< Operator forbidden. */
+} SIM70XX_OpStat_t;
+
+/** @brief SIM70XX operator formats definition.
+ */
+typedef enum
+{
+    SIM_FORM_LONG       = 0,                        /**< Long format alphanumeric. */
+    SIM_FORM_SHORT,                                 /**< Short format alphanumeric. */
+    SIM_FORM_NUMERIC,                               /**< Numeric GSM Location Area Identification number. */
+} SIM70XX_OpForm_t;
+
+/** @brief SIM70XX operator modes definition.
+ */
+typedef enum
+{
+    SIM_MODE_AUTO       = 0,                        /**< Automatic mode. */
+    SIM_MODE_MANUAL,                                /**< Manual mode. */
+    SIM_MODE_DEREGISTER,                            /**< Deregister from network. */
+    SIM_MODE_BOTH       = 4,                        /**< Manual / Automatic. If manual fails, automatic mode is entered. */
+} SIM70XX_OpMode_t;
+
+/** @brief SIM70XX APN configuration object definition.
+ */
+typedef struct
+{
+    std::string Name;                                       /**< Name of the access point. */
+    std::string Username;                                   /**< Access Point username. */
+    std::string Password;                                   /**< Access Point password. */
+} SIM70XX_APN_t;
+
+/** @brief SIM70XX operator object definition.
+ */
+typedef struct
+{
+    SIM70XX_OpStat_t Stat;                          /**< Operator status. */
+    std::string Long;                               /**< Long alphanumeric name. */
+    std::string Short;                              /**< Short alphanumeric name. */
+    std::string Numeric;                            /**< Numeric name. */
+    uint8_t Act;                                    /**< 0 = User-specific GSM (SIM7080)
+                                                         1 = GSM compact (SIM7080)
+                                                         3 = GSM EGPRS (SIM7080)
+                                                         7 = User-specific LTE M1 A GB (SIM7080)
+                                                         9 = User-specific LTE NB S1 (SIM7080)
+                                                         9 = NB-IoT (SIM7020) */
+} SIM70XX_Operator_t;
+
 /** @brief SIM70XX UART configuration object definition.
  */
 typedef struct

@@ -41,7 +41,7 @@
                                                                             .Username = "",                                 \
                                                                             .Password = "",                                 \
                                                                         },                                                  \
-                                                                        .OperatorFormat = SIM7020_FORM_NUMERIC,             \
+                                                                        .OperatorFormat = SIM_FORM_NUMERIC,                 \
                                                                         .Operator = "26201",                                \
                                                                     };
 

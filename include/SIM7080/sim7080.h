@@ -20,6 +20,7 @@
 #ifndef SIM7080_H_
 #define SIM7080_H_
 
+#include "Misc/sim7080_info.h"
 #include "Definitions/sim7080_defs.h"
 #include "sim70xx_tools.h"
 #include "sim70xx_errors.h"
@@ -77,6 +78,16 @@ void SIM7080_Deinit(SIM7080_t* const p_Device);
  *  @return         SIM70XX_ERR_OK when successful
  */
 SIM70XX_Error_t SIM7080_SoftReset(const SIM7080_t* const p_Device, uint32_t Timeout = 10);
+
+/** @brief          Set the operator for the communication.
+ *  @param p_Device Pointer to SIM7080 device object
+ *  @param Mode     Operator selection mode
+ *  @param Format   Operator format
+ *  @param Operator Operator name
+ *  @param AcT      Access technology
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_SetOperator(SIM7080_t* const p_Device, SIM70XX_OpMode_t Mode, SIM70XX_OpForm_t Format, std::string Operator, SIM7080_AcT_t AcT = SIM7080_ACT_USER_LTE_M1);
 
 /** @brief          Set the frequency band of the module.
  *  @param p_Device Pointer to SIM7080 device object

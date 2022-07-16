@@ -56,6 +56,34 @@ typedef enum
     SIM7080_FUNC_OFFLINE    = 7,                            /**< Offline mode. */
 } SIM7080_Func_t;
 
+/** @brief SIM7080 network registration status codes.
+ */
+typedef enum
+{
+    SIM7080_NET_NOT_SEARCHING = 0,                          /**< Not registered, MT is not currently searching an operator to
+                                                                 register to. The GPRS service is disabled, the UE is allowed to attach
+                                                                 for GPRS if requested by the user. */
+    SIM7080_NET_REG_HOME,                                   /**< Registered, home network. */
+    SIM7080_NET_NOT_ATTACHED,                               /**< Not registered, but MT is currently trying to attach or searching an
+                                                                 operator to register to. The GPRS service is enabled, but an allowable
+                                                                 PLMN is currently not available. The UE will start a GPRS attach as
+                                                                 soon as an allowable PLMN is available.
+                                                                 3 Registration denied, The GPRS service */
+    SIM7080_NET_UNKNOWN,                                    /**< Unknown. */
+    SIM7080_NET_ROAMING,                                    /**< Registered, roaming. */
+} SIM7080_NetRegistration_t;
+
+/** @brief SIM7080 AcT definitions.
+ */
+typedef enum
+{
+    SIM7080_ACT_USER_GSM    = 0,                            /**< User-specific GSM. */
+    SIM7080_ACT_GSM         = 1,                            /**< GSM compact. */
+    SIM7080_ACT_EGPRS       = 3,                            /**< GSM EGPRS. */
+    SIM7080_ACT_USER_LTE_M1 = 7,                            /**< User-specific LTE M1 A GB. */
+    SIM7080_ACT_USER_LTE_NB = 9,                            /**< User-specific LTE NB S1. */
+} SIM7080_AcT_t;
+
 /** @brief SIM7080 device object.
  */
 typedef struct
@@ -64,7 +92,7 @@ typedef struct
     #ifdef CONFIG_SIM70XX_RESET_USE_HW
         struct
         {
-            bool Inverted;						            /**< */
+            bool Inverted;						            /**< Set to #true to invert the reset pin. */
             gpio_num_t Pin;						            /**< Reset pin for the module.
                                                                  NOTE: Can be set to -1 when not used. */
         } Reset_Conf;
@@ -74,6 +102,7 @@ typedef struct
     {
         int8_t RSSI;                                        /**< Network RSSI value in dBm. */
         uint8_t RXQual;                                     /**< RxQUAL values in the table in GSM 05.08 [20] subclause 7.2.4. */
+        SIM7080_NetRegistration_t Status;                   /**< Network status. */
         SIM7080_Func_t Functionality;                       /**< Current device functionality. */
     } Connection;
     struct
@@ -111,6 +140,8 @@ typedef struct
         } Reset_Conf;
     #endif
     SIM7080_Band_t Band;                                    /**< Selected frequency band. */
+    SIM70XX_APN_t APN;                                      /**< APN configuration object. */
+    SIM70XX_OpForm_t OperatorFormat;                        /**< Format for the selected operator. */
     std::string Operator;                                   /**< Selected operator. */
 } SIM7080_Config_t;
 

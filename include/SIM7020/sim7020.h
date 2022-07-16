@@ -111,10 +111,10 @@ SIM70XX_Error_t SIM7020_SoftReset(const SIM7020_t* const p_Device, uint32_t Time
 /** @brief          Set the default PSD connection settings.
  *  @param p_Device Pointer to SIM7020 device object
  *  @param PDP      Packet Data Protocol (PDP) type
- *  @param APN      Access Point Name (APN)
+ *  @param APN      Access Point Name (APN) configuration
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_SetPSD(SIM7020_t* const p_Device, SIM7020_PDP_Type_t PDP, SIM7020_APN_t APN);
+SIM70XX_Error_t SIM7020_SetPSD(SIM7020_t* const p_Device, SIM7020_PDP_Type_t PDP, SIM70XX_APN_t APN);
 
 /** @brief          Set the operator for the communication.
  *  @param p_Device Pointer to SIM7020 device object
@@ -123,7 +123,7 @@ SIM70XX_Error_t SIM7020_SetPSD(SIM7020_t* const p_Device, SIM7020_PDP_Type_t PDP
  *  @param Operator Operator name
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_SetOperator(SIM7020_t* const p_Device, SIM7020_OpMode_t Mode, SIM7020_OpForm_t Format, std::string Operator);
+SIM70XX_Error_t SIM7020_SetOperator(SIM7020_t* const p_Device, SIM70XX_OpMode_t Mode, SIM70XX_OpForm_t Format, std::string Operator);
 
 /** @brief              Enable the device and get a list with available operators.
  *                      NOTE: Additional information: https://www.mcc-mnc.com/
@@ -133,7 +133,7 @@ SIM70XX_Error_t SIM7020_SetOperator(SIM7020_t* const p_Device, SIM7020_OpMode_t 
  *  @param p_Formats    Pointer to formats
  *  @return             SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_GetOperator(SIM7020_t* const p_Device, std::vector<SIM7020_Operator_t>* p_Operator, std::string* p_Modes, std::string* p_Formats);
+SIM70XX_Error_t SIM7020_GetOperator(SIM7020_t* const p_Device, std::vector<SIM70XX_Operator_t>* p_Operator, std::string* p_Modes, std::string* p_Formats);
 
 /** @brief          Set the frequency band of the module.
  *  @param p_Device Pointer to SIM7020 device object

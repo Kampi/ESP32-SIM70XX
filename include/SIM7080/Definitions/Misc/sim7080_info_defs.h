@@ -1,5 +1,5 @@
  /*
- * sim7020_info_defs.h
+ * sim7080_info_defs.h
  *
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -17,14 +17,14 @@
  * Errors and commissions should be reported to DanielKampert@kampis-elektroecke.de.
  */
 
-#ifndef SIM7020_INFO_DEFS_H_
-#define SIM7020_INFO_DEFS_H_
+#ifndef SIM7080_INFO_DEFS_H_
+#define SIM7080_INFO_DEFS_H_
 
 #include <string>
 #include <stdint.h>
 #include <stdbool.h>
 
-/** @brief SIM7020 device information object definition.
+/** @brief SIM7080 device information object definition.
  */
 typedef struct
 {
@@ -38,6 +38,6 @@ typedef struct
                                                          NOTE: Managed by the device driver. */
     std::string Model;                              /**< Device model.
                                                          NOTE: Managed by the device driver. */
-} SIM7020_Info_t;
+} SIM7080_Info_t;
 
-#endif /* SIM7020_INFO_DEFS_H_ */
+#endif /* SIM7080_INFO_DEFS_H_ */

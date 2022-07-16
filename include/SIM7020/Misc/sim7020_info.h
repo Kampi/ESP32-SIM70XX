@@ -20,9 +20,9 @@
 #ifndef SIM7020_INFO_H_
 #define SIM7020_INFO_H_
 
-#include "sim7020_defs.h"
 #include "sim70xx_errors.h"
-#include "sim7020_info_defs.h"
+#include "Definitions/sim7020_defs.h"
+#include "Definitions/Misc/sim7020_info_defs.h"
 
 /** @brief          Print the device informations.
  *  @param p_Info   Pointer to device information object

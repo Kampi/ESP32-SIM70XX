@@ -118,9 +118,9 @@ SIM70XX_Error_t SIM7080_Init(SIM7080_t* const p_Device, const SIM7080_Config_t* 
     SIM70XX_ERROR_CHECK(SIM7080_GetBand(p_Device));
     //SIM70XX_ERROR_CHECK(SIM7020_SetPSD(p_Device, SIM_PDP_IP, p_Config->APN));
     SIM70XX_ERROR_CHECK(SIM7080_SetBand(p_Device, p_Config->Band));
-    /*SIM70XX_ERROR_CHECK(SIM7020_SetOperator(p_Device, SIM_MODE_MANUAL, p_Config->OperatorFormat, p_Config->Operator));
-    SIM70XX_ERROR_CHECK(SIM7020_Info_GetNetworkRegistrationStatus(p_Device));
-    SIM70XX_ERROR_CHECK(SIM7020_Info_GetQuality(p_Device));*/
+    SIM70XX_ERROR_CHECK(SIM7080_SetOperator(p_Device, SIM_MODE_MANUAL, p_Config->OperatorFormat, p_Config->Operator));
+    SIM70XX_ERROR_CHECK(SIM7080_Info_GetNetworkRegistrationStatus(p_Device));
+    SIM70XX_ERROR_CHECK(SIM7080_Info_GetQuality(p_Device));
     //SIM70XX_ERROR_CHECK(SIM7020_PDP_ReadDynamicParameters(p_Device));
     //SIM70XX_ERROR_CHECK(SIM7020_PSM_GetEventStatus(p_Device, &p_Device->Internal.isPSMEvent));
 
@@ -224,6 +224,38 @@ SIM70XX_Error_t SIM7080_SoftReset(const SIM7080_t* const p_Device, uint32_t Time
     }
 
     return SIM70XX_ERR_FAIL;
+}
+
+SIM70XX_Error_t SIM7080_SetOperator(SIM7080_t* const p_Device, SIM70XX_OpMode_t Mode, SIM70XX_OpForm_t Format, std::string Operator, SIM7080_AcT_t AcT)
+{
+    std::string CommandStr;
+    SIM70XX_TxCmd_t* Command;
+
+    if(p_Device == NULL)
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+    else if(p_Device->Internal.isInitialized == false)
+    {
+        return SIM70XX_ERR_NOT_INITIALIZED;
+    }
+
+    CommandStr = "AT+COPS=" + std::to_string(Mode);
+
+    if((Mode == SIM_MODE_MANUAL) || (Mode == SIM_MODE_BOTH))
+    {
+        CommandStr += "," + std::to_string(Format) + ",\"" + Operator + "\"" + "," + std::to_string(AcT);
+    }
+
+    SIM70XX_CREATE_CMD(Command);
+    *Command = SIM7080_AT_COPS_W(CommandStr);
+    SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
+    {
+        return SIM70XX_ERR_FAIL;
+    }
+
+    return SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue, NULL, NULL);
 }
 
 SIM70XX_Error_t SIM7080_SetBand(SIM7080_t* const p_Device, SIM7080_Band_t Band)
