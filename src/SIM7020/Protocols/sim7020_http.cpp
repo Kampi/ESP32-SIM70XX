@@ -19,18 +19,18 @@
 
 #include <sdkconfig.h>
 
-#if((CONFIG_SIMXX_DEV == 7020) && (defined CONFIG_SIM70XX_PROT_WITH_HTTP))
+#if((CONFIG_SIMXX_DEV == 7020) && (defined CONFIG_SIM70XX_DRIVER_WITH_HTTP))
 
 #include <esp_log.h>
 
 #include "sim7020.h"
 #include "sim7020_http.h"
 #include "../../Private/Queue/sim70xx_queue.h"
-#include "../../Private/Commands/sim7020_commands.h"
+#include "../../Private/Commands/sim70xx_commands.h"
 
 static const char* TAG = "SIM7020_HTTP";
 
-SIM70XX_Error_t SIM7020_HTTP_Create(const SIM7020_t* const p_Device, std::string Host, SIM7020_HTTP_Socket_t* p_Socket)
+SIM70XX_Error_t SIM7020_HTTP_Create(SIM7020_t* const p_Device, std::string Host, SIM7020_HTTP_Socket_t* p_Socket)
 {
     if(p_Socket == NULL)
     {
@@ -43,7 +43,7 @@ SIM70XX_Error_t SIM7020_HTTP_Create(const SIM7020_t* const p_Device, std::string
     return SIM7020_HTTP_Create(p_Device, p_Socket);
 }
 
-SIM70XX_Error_t SIM7020_HTTP_Create(const SIM7020_t* const p_Device, SIM7020_HTTP_Socket_t* p_Socket)
+SIM70XX_Error_t SIM7020_HTTP_Create(SIM7020_t* const p_Device, SIM7020_HTTP_Socket_t* p_Socket)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;
@@ -125,12 +125,12 @@ SIM70XX_Error_t SIM7020_HTTP_Connect(SIM7020_t* const p_Device, SIM7020_HTTP_Soc
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_HTTP_POST(const SIM7020_t* const p_Device, SIM7020_HTTP_Socket_t* p_Socket, std::string Path, std::string ContentType, std::string Header, std::string Payload, uint16_t* p_ResponseCode)
+SIM70XX_Error_t SIM7020_HTTP_POST(SIM7020_t* const p_Device, SIM7020_HTTP_Socket_t* p_Socket, std::string Path, std::string ContentType, std::string Header, std::string Payload, uint16_t* p_ResponseCode)
 {
     return SIM7020_HTTP_POST(p_Device, p_Socket, Path, ContentType, Header, Payload.c_str(), Payload.length(), p_ResponseCode);
 }
 
-SIM70XX_Error_t SIM7020_HTTP_POST(const SIM7020_t* const p_Device, SIM7020_HTTP_Socket_t* p_Socket, std::string Path, std::string ContentType, std::string Header, const void* p_Buffer, uint32_t Length, uint16_t* p_ResponseCode)
+SIM70XX_Error_t SIM7020_HTTP_POST(SIM7020_t* const p_Device, SIM7020_HTTP_Socket_t* p_Socket, std::string Path, std::string ContentType, std::string Header, const void* p_Buffer, uint32_t Length, uint16_t* p_ResponseCode)
 {
     std::string CommandStr;
     std::string Buffer_Hex;
@@ -160,7 +160,7 @@ SIM70XX_Error_t SIM7020_HTTP_POST(const SIM7020_t* const p_Device, SIM7020_HTTP_
     // Prepare the header packet.
     SIM70XX_Tools_ASCII2Hex(Header.c_str(), Header.length(), &Buffer_Hex);
     Packet = std::to_string(p_Socket->ID) + "," +
-             std::to_string(SIM_HTTP_POST) + "," +
+             std::to_string(SIM7020_HTTP_REQ_POST) + "," +
              std::to_string(Path.length()) + "," +
              "\"" + Path + "\"" + "," +
              std::to_string(Buffer_Hex.length()) + "," +
@@ -272,7 +272,7 @@ SIM70XX_Error_t SIM7020_HTTP_POST(const SIM7020_t* const p_Device, SIM7020_HTTP_
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_HTTP_GET(const SIM7020_t* const p_Device, SIM7020_HTTP_Socket_t* p_Socket, std::string Path, uint8_t** p_Buffer, uint32_t* p_Length, uint16_t* p_ResponseCode)
+SIM70XX_Error_t SIM7020_HTTP_GET(SIM7020_t* const p_Device, SIM7020_HTTP_Socket_t* p_Socket, std::string Path, uint8_t** p_Buffer, uint32_t* p_Length, uint16_t* p_ResponseCode)
 {
     size_t Index;
     uint32_t Now;
@@ -296,7 +296,7 @@ SIM70XX_Error_t SIM7020_HTTP_GET(const SIM7020_t* const p_Device, SIM7020_HTTP_S
     }
 
     CommandStr = "AT+CHTTPSEND=" + std::to_string(p_Socket->ID) + "," +
-                                   std::to_string(SIM_HTTP_GET) + "," +
+                                   std::to_string(SIM7020_HTTP_REQ_GET) + "," +
                                    "\"" + Path + "\"";
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CHTTPSEND(CommandStr);
@@ -407,7 +407,7 @@ SIM70XX_Error_t SIM7020_HTTP_Disconnect(SIM7020_t* const p_Device, SIM7020_HTTP_
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_HTTP_DestroyAllSockets(const SIM7020_t* const p_Device )
+SIM70XX_Error_t SIM7020_HTTP_DestroyAllSockets(SIM7020_t* const p_Device )
 {
     SIM70XX_TxCmd_t* Command;
 
@@ -435,7 +435,7 @@ SIM70XX_Error_t SIM7020_HTTP_DestroyAllSockets(const SIM7020_t* const p_Device )
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_HTTP_Destroy(const SIM7020_t* const p_Device, SIM7020_HTTP_Socket_t* p_Socket)
+SIM70XX_Error_t SIM7020_HTTP_Destroy(SIM7020_t* const p_Device, SIM7020_HTTP_Socket_t* p_Socket)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;

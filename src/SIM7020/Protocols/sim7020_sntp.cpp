@@ -19,16 +19,16 @@
 
 #include <sdkconfig.h>
 
-#if((CONFIG_SIMXX_DEV == 7020) && (defined CONFIG_SIM70XX_PROT_WITH_SNTP))
+#if((CONFIG_SIMXX_DEV == 7020) && (defined CONFIG_SIM70XX_DRIVER_WITH_SNTP))
 
 #include <esp_log.h>
 
 #include "sim7020.h"
 #include "sim7020_sntp.h"
-#include "../Private/include/sim7020_queue.h"
-#include "../Private/include/sim7020_commands.h"
+#include "../../Private/Queue/sim70xx_queue.h"
+#include "../../Private/Commands/sim70xx_commands.h"
 
-SIM70XX_Error_t SIM7020_SNTP_GetNetworkTime(const SIM7020_t* const p_Device, std::string Server, int8_t Timezone, uint8_t Timeout)
+SIM70XX_Error_t SIM7020_SNTP_GetNetworkTime(SIM7020_t* const p_Device, std::string Server, int8_t Timezone, uint8_t Timeout)
 {
     std::string Zone;
     std::string CommandStr;

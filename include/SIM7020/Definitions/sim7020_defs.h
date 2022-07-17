@@ -33,24 +33,31 @@
 
 #include <sdkconfig.h>
 
-#ifdef CONFIG_SIM70XX_PROT_WITH_COAP
+#ifdef CONFIG_SIM70XX_DRIVER_WITH_COAP
     #include "Protocols/sim7020_coap_defs.h"
 #endif
 
-#ifdef CONFIG_SIM70XX_PROT_WITH_HTTP
+#ifdef CONFIG_SIM70XX_DRIVER_WITH_HTTP
     #include "Protocols/sim7020_http_defs.h"
 #endif
 
-#ifdef CONFIG_SIM70XX_PROT_WITH_MQTT
+#ifdef CONFIG_SIM70XX_DRIVER_WITH_MQTT
     #include "Protocols/sim7020_mqtt_defs.h"
 #endif
 
-#ifdef CONFIG_SIM70XX_PROT_WITH_TCPIP
+#ifdef CONFIG_SIM70XX_DRIVER_WITH_TCPIP
     #include "Protocols/sim7020_tcpip_defs.h"
 #endif
 
 #include "sim70xx_defs.h"
 #include "sim7020_pdp_defs.h"
+
+/** @brief SIM7020 SIM card status codes definition.
+ */
+typedef enum
+{
+    SIM7020_SIM_READY       = 0,                            /**< MT is not pending for any password. */
+} SIM7020_SIM_t;
 
 /** @brief Supported frequency bands.
  */
@@ -148,21 +155,21 @@ typedef struct
         SIM7020_NetRegistration_t Status;                   /**< Network status. */
         SIM7020_Func_t Functionality;                       /**< Current device functionality. */
     } Connection;
-    #ifdef CONFIG_SIM70XX_PROT_WITH_TCPIP
+    #ifdef CONFIG_SIM70XX_DRIVER_WITH_TCPIP
         struct
         {
             std::vector<SIM7020_TCP_Socket_t*> Sockets;     /**< List with pointer to active TCP sockets.
                                                                  NOTE: Managed by the device driver. */
         } TCP;
     #endif
-    #ifdef CONFIG_SIM70XX_PROT_WITH_HTTP
+    #ifdef CONFIG_SIM70XX_DRIVER_WITH_HTTP
         struct
         {
             std::vector<SIM7020_HTTP_Socket_t*> Sockets;    /**< List with pointer to active HTTP sockets.
                                                                  NOTE: Managed by the device driver. */
         } HTTP;
     #endif
-    #ifdef CONFIG_SIM70XX_PROT_WITH_MQTT
+    #ifdef CONFIG_SIM70XX_DRIVER_WITH_MQTT
         struct
         {
             std::vector<SIM7020_MQTT_Socket_t*> Sockets;    /**< List with pointer to active MQTT sockets.
@@ -173,7 +180,7 @@ typedef struct
                                                                  NOTE: Managed by the device driver. */
         } MQTT;
     #endif
-    #ifdef CONFIG_SIM70XX_PROT_WITH_COAP
+    #ifdef CONFIG_SIM70XX_DRIVER_WITH_COAP
         struct
         {
             std::vector<SIM7020_CoAP_Socket_t*> Sockets;    /**< List with pointer to active CoAP sockets.

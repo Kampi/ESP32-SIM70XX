@@ -17,17 +17,20 @@
  * Errors and commissions should be reported to DanielKampert@kampis-elektroecke.de.
  */
 
+#include <sdkconfig.h>
+
+#if(CONFIG_SIMXX_DEV == 7020)
+
 #include <esp_log.h>
 
 #include "sim7020.h"
 #include "sim7020_pdp_defs.h"
 #include "../../Private/Queue/sim70xx_queue.h"
-#include "../../Private/Commands/sim7020_commands.h"
-#include "../../Private/Events/SIM7020/sim7020_evt.h"
+#include "../../Private/Commands/sim70xx_commands.h"
 
 static const char* TAG = "SIM7020_PDP";
 
-SIM70XX_Error_t SIM7020_PDP_GetContext(SIM7020_t* const p_Device, SIM7020_PDP_Context_t* p_Context)
+SIM70XX_Error_t SIM7020_PDP_GetContext(SIM7020_t* const p_Device, SIM7020_PDP_Context_t* const p_Context)
 {
     SIM70XX_TxCmd_t* Command;
 
@@ -125,7 +128,7 @@ SIM70XX_Error_t SIM7020_PDP_GetStatus(SIM7020_t* const p_Device, std::vector<SIM
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_PDP_ReadDynamicParameters(SIM7020_t* const p_Device )
+SIM70XX_Error_t SIM7020_PDP_ReadDynamicParameters(SIM7020_t* const p_Device)
 {
     uint8_t Parts;
     uint32_t Index;
@@ -154,7 +157,7 @@ SIM70XX_Error_t SIM7020_PDP_ReadDynamicParameters(SIM7020_t* const p_Device )
 
     // TODO: Wait for the Response event.
 
-    if(p_Device->PDP_Type == SIM_PDP_IPV6)
+    if(p_Device->PDP_Type == SIM7020_PDP_IPV6)
     {
         Parts = 16;
     }
@@ -216,3 +219,5 @@ SIM70XX_Error_t SIM7020_PDP_ReadDynamicParameters(SIM7020_t* const p_Device )
 
     return SIM70XX_ERR_OK;
 }
+
+#endif

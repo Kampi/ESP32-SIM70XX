@@ -36,24 +36,24 @@
 
 #include <sdkconfig.h>
 
-#ifdef CONFIG_SIM70XX_PROT_WITH_TCPIP
+#ifdef CONFIG_SIM70XX_DRIVER_WITH_TCPIP
     #include "Protocols/sim7020_tcpip.h"
     #include "Definitions/Configs/sim7020_config_ping.h"
 #endif
 
-#ifdef CONFIG_SIM70XX_PROT_WITH_SNTP
+#ifdef CONFIG_SIM70XX_DRIVER_WITH_SNTP
     #include "Protocols/sim7020_sntp.h"
 #endif
 
-#ifdef CONFIG_SIM70XX_PROT_WITH_HTTP
+#ifdef CONFIG_SIM70XX_DRIVER_WITH_HTTP
     #include "Protocols/sim7020_http.h"
 #endif
 
-#ifdef CONFIG_SIM70XX_PROT_WITH_MQTT
+#ifdef CONFIG_SIM70XX_DRIVER_WITH_MQTT
     #include "Protocols/sim7020_mqtt.h"
 #endif
 
-#ifdef CONFIG_SIM70XX_PROT_WITH_COAP
+#ifdef CONFIG_SIM70XX_DRIVER_WITH_COAP
     #include "Protocols/sim7020_coap.h"
 #endif
 
@@ -161,6 +161,13 @@ SIM70XX_Error_t SIM7020_SetFunctionality(SIM7020_t* const p_Device, SIM7020_Func
  *  @return         SIM70XX_ERR_OK when successful
  */
 SIM70XX_Error_t SIM7020_GetFunctionality(SIM7020_t* const p_Device);
+
+/** @brief          Get SIM card status.
+ *  @param p_Device Pointer to SIM7020 device object
+ *  @param p_Status Pointer so SIM card status
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7020_GetSIMStatus(SIM7020_t* const p_Device, SIM7020_SIM_t* const p_Status);
 
 /** @brief          Check if the SIM card is ready to use.
  *  @param p_Device Pointer to SIM7020 device object

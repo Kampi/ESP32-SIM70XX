@@ -1,5 +1,5 @@
  /*
- * sim7020_nvram_defs.h
+ * sim7080_http.cpp
  *
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -17,19 +17,17 @@
  * Errors and commissions should be reported to DanielKampert@kampis-elektroecke.de.
  */
 
-#ifndef SIM7020_NVRAM_DEFS_H_
-#define SIM7020_NVRAM_DEFS_H_
+#include <sdkconfig.h>
 
-#include <stdint.h>
-#include <stdbool.h>
+#if((CONFIG_SIMXX_DEV == 7080) && (defined CONFIG_SIM70XX_DRIVER_WITH_HTTP))
 
-/** @brief SIM7020 NVRAM error codes.
- */
-typedef enum
-{
-    SIM7020_NVRAM_ERR_OK        = 0,                /**< Everything ok. */
-    SIM7020_NVRAM_ERR_NOT_FOUND = -4,               /**< Key was not found. */
-    SIM7020_NVRAM_ERR_NO_MEM    = -7,               /**< No memory available. */
-} SIM7020_NVRAM_Error_t;
+#include <esp_log.h>
 
-#endif /* SIM7020_NVRAM_DEFS_H_ */
+#include "sim7080.h"
+#include "sim7080_http.h"
+#include "../../Private/Queue/sim70xx_queue.h"
+#include "../../Private/Commands/sim7080_commands.h"
+
+static const char* TAG = "SIM7080_HTTP";
+
+#endif

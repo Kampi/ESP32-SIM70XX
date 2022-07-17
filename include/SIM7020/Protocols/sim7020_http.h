@@ -30,14 +30,14 @@
  *  @param p_Socket Pointer to HTTP(S) socket object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_HTTP_Create(const SIM7020_t* const p_Device, std::string Host, SIM7020_HTTP_Socket_t* p_Socket);
+SIM70XX_Error_t SIM7020_HTTP_Create(SIM7020_t* const p_Device, std::string Host, SIM7020_HTTP_Socket_t* p_Socket);
 
 /** @brief          Create a HTTP(S) socket.
  *  @param p_Device Pointer to SIM7020 device object
  *  @param p_Socket Pointer to HTTP(S) socket object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_HTTP_Create(const SIM7020_t* const p_Device, SIM7020_HTTP_Socket_t* p_Socket);
+SIM70XX_Error_t SIM7020_HTTP_Create(SIM7020_t* const p_Device, SIM7020_HTTP_Socket_t* p_Socket);
 
 /** @brief          Open a URL and create a HTTP(S) socket.
  *  @param p_Device Pointer to SIM7020 device object
@@ -57,7 +57,7 @@ SIM70XX_Error_t SIM7020_HTTP_Connect(SIM7020_t* const p_Device, SIM7020_HTTP_Soc
  *  @param p_ResponseCode   (Optional) Pointer to response code
  *  @return                 SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_HTTP_POST(const SIM7020_t* const p_Device, SIM7020_HTTP_Socket_t* p_Socket, std::string Path, std::string ContentType, std::string Header, std::string Payload, uint16_t* p_ResponseCode = NULL);
+SIM70XX_Error_t SIM7020_HTTP_POST(SIM7020_t* const p_Device, SIM7020_HTTP_Socket_t* p_Socket, std::string Path, std::string ContentType, std::string Header, std::string Payload, uint16_t* p_ResponseCode = NULL);
 
 /** @brief                  Start a new HTTP(S) post request.
  *  @param p_Device         Pointer to SIM7020 device object
@@ -70,7 +70,7 @@ SIM70XX_Error_t SIM7020_HTTP_POST(const SIM7020_t* const p_Device, SIM7020_HTTP_
  *  @param p_ResponseCode   (Optional) Pointer to response code
  *  @return                 SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_HTTP_POST(const SIM7020_t* const p_Device, SIM7020_HTTP_Socket_t* p_Socket, std::string Path, std::string ContentType, std::string Header, const void* p_Buffer, uint32_t Length, uint16_t* p_ResponseCode = NULL);
+SIM70XX_Error_t SIM7020_HTTP_POST(SIM7020_t* const p_Device, SIM7020_HTTP_Socket_t* p_Socket, std::string Path, std::string ContentType, std::string Header, const void* p_Buffer, uint32_t Length, uint16_t* p_ResponseCode = NULL);
 
 /** @brief                  
  *  @param p_Device         Pointer to SIM7020 device object
@@ -81,7 +81,7 @@ SIM70XX_Error_t SIM7020_HTTP_POST(const SIM7020_t* const p_Device, SIM7020_HTTP_
  *  @param p_ResponseCode   (Optional) Pointer to response code
  *  @return                 SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_HTTP_GET(const SIM7020_t* const p_Device, SIM7020_HTTP_Socket_t* p_Socket, std::string Path, uint8_t** p_Buffer, uint32_t* p_Length, uint16_t* p_ResponseCode = NULL);
+SIM70XX_Error_t SIM7020_HTTP_GET(SIM7020_t* const p_Device, SIM7020_HTTP_Socket_t* p_Socket, std::string Path, uint8_t** p_Buffer, uint32_t* p_Length, uint16_t* p_ResponseCode = NULL);
 
 /** @brief          Disconnect a HTTP(S) socket.
  *  @param p_Device Pointer to SIM7020 device object
@@ -95,13 +95,13 @@ SIM70XX_Error_t SIM7020_HTTP_Disconnect(SIM7020_t* const p_Device, SIM7020_HTTP_
  *  @param p_Socket Pointer to HTTP(S) socket object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_HTTP_Destroy(const SIM7020_t* const p_Device, SIM7020_HTTP_Socket_t* p_Socket);
+SIM70XX_Error_t SIM7020_HTTP_Destroy(SIM7020_t* const p_Device, SIM7020_HTTP_Socket_t* p_Socket);
 
 /** @brief          Destroy all active HTTP(S) sockets.
  *  @param p_Device Pointer to SIM7020 device object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_HTTP_DestroyAllSockets(const SIM7020_t* const p_Device);
+SIM70XX_Error_t SIM7020_HTTP_DestroyAllSockets(SIM7020_t* const p_Device);
 
 /** @brief          Add a key / value pair to the message header.
  *  @param Key      Header key

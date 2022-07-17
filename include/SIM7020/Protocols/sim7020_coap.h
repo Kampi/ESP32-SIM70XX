@@ -32,7 +32,7 @@
  *  @param CID      (Optional) PDP context ID
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_CoAP_Create(const SIM7020_t* const p_Device, std::string Server, uint16_t Port, SIM7020_CoAP_Socket_t* p_Socket, uint8_t CID = 1);
+SIM70XX_Error_t SIM7020_CoAP_Create(SIM7020_t* const p_Device, std::string Server, uint16_t Port, SIM7020_CoAP_Socket_t* p_Socket, uint8_t CID = 1);
 
 /** @brief          Create a CoAP socket.
  *  @param p_Device Pointer to SIM7020 device object
@@ -40,7 +40,7 @@ SIM70XX_Error_t SIM7020_CoAP_Create(const SIM7020_t* const p_Device, std::string
  *  @param p_Socket Pointer to CoAP socket object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_CoAP_Create(const SIM7020_t* const p_Device, SIM7020_CoAP_Socket_t* p_Socket);
+SIM70XX_Error_t SIM7020_CoAP_Create(SIM7020_t* const p_Device, SIM7020_CoAP_Socket_t* p_Socket);
 
 /** @brief          Transmit a CoAP message.
  *  @param p_Device Pointer to SIM7020 device object
@@ -49,7 +49,7 @@ SIM70XX_Error_t SIM7020_CoAP_Create(const SIM7020_t* const p_Device, SIM7020_CoA
  *  @param Length   Data length (maximum 512 bytes)
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_CoAP_Transmit(const SIM7020_t* const p_Device, SIM7020_CoAP_Socket_t* p_Socket, const void* p_Buffer, uint16_t Length);
+SIM70XX_Error_t SIM7020_CoAP_Transmit(SIM7020_t* const p_Device, SIM7020_CoAP_Socket_t* p_Socket, const void* p_Buffer, uint16_t Length);
 
 /** @brief          Close a CoAP connection and release the socket.
  *  @param p_Device Pointer to SIM7020 device object
@@ -57,6 +57,6 @@ SIM70XX_Error_t SIM7020_CoAP_Transmit(const SIM7020_t* const p_Device, SIM7020_C
  *  @param p_Socket Pointer to CoAP socket object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_CoAP_Destroy(const SIM7020_t* const p_Device, SIM7020_CoAP_Socket_t* p_Socket);
+SIM70XX_Error_t SIM7020_CoAP_Destroy(SIM7020_t* const p_Device, SIM7020_CoAP_Socket_t* p_Socket);
 
 #endif /* SIM7020_COAP_H_ */

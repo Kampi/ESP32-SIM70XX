@@ -557,12 +557,12 @@ SIM70XX_Error_t SIM7080_GetFunctionality(SIM7080_t* const p_Device)
     return SIM70XX_ERR_OK;
 }
 
-bool SIM7080_isSIMReady(SIM7080_t* const p_Device)
+SIM70XX_Error_t SIM7080_GetSIMStatus(SIM7080_t* const p_Device, SIM7080_SIM_t* const p_Status)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;
 
-    if(p_Device == NULL)
+    if((p_Device == NULL) || (p_Status == NULL))
     {
         return false;
     }
@@ -581,6 +581,55 @@ bool SIM7080_isSIMReady(SIM7080_t* const p_Device)
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue, &Response));
 
     if(Response.find("READY") != std::string::npos)
+    {
+        *p_Status = SIM7080_SIM_READY;
+    }
+    else if(Response.find("SIM PIN") != std::string::npos)
+    {
+        *p_Status = SIM7080_SIM_WAIT_PIN;
+    }
+    else if(Response.find("SIM PUK") != std::string::npos)
+    {
+        *p_Status = SIM7080_SIM_WAIT_PUK;
+    }
+    else if(Response.find("PH_SIM PIN") != std::string::npos)
+    {
+        *p_Status = SIM7080_SIM_WAIT_PH_PIN;
+    }
+    else if(Response.find("PH_SIM PUK") != std::string::npos)
+    {
+        *p_Status = SIM7080_SIM_WAIT_PH_PUK;
+    }
+    else if(Response.find("PH_SIM NET") != std::string::npos)
+    {
+        *p_Status = SIM7080_SIM_WAIT_NET_PIN;
+    }
+    else if(Response.find("SIM PIN2") != std::string::npos)
+    {
+        *p_Status = SIM7080_SIM_WAIT_PIN2;
+    }
+    else if(Response.find("SIM PUK2") != std::string::npos)
+    {
+        *p_Status = SIM7080_SIM_WAIT_PUK2;
+    }
+    else
+    {
+        return SIM70XX_ERR_FAIL;
+    }
+
+    return SIM70XX_ERR_OK;
+}
+
+bool SIM7080_isSIMReady(SIM7080_t* const p_Device)
+{
+    SIM7080_SIM_t Status;
+
+    if(SIM7080_GetSIMStatus(p_Device, &Status) != SIM70XX_ERR_OK)
+    {
+        return false;
+    }
+
+    if(Status == SIM7080_SIM_READY)
     {
         return true;
     }

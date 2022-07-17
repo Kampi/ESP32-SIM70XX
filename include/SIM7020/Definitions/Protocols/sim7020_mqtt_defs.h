@@ -28,17 +28,17 @@
  */
 typedef enum
 {
-    SIM_MQTT_QOS_0          = 0,                    /**< Quality of service 0. */
-    SIM_MQTT_QOS_1,                                 /**< Quality of service 0. */
-    SIM_MQTT_QOS_2,                                 /**< Quality of service 0. */
+    SIM7020_MQTT_QOS_0          = 0,                /**< Quality of service 0. */
+    SIM7020_MQTT_QOS_1,                             /**< Quality of service 0. */
+    SIM7020_MQTT_QOS_2,                             /**< Quality of service 0. */
 } SIM7020_MQTT_QoS_t;
 
 /** @brief SIM7020 MQTT version options.
  */
 typedef enum
 {
-    SIM_MQTT_31             = 3,                    /**< MQTT version 3.1. */
-    SIM_MQTT_311,                                   /**< MQTT version 3.1.1. */
+    SIM7020_MQTT_31             = 3,                /**< MQTT version 3.1. */
+    SIM7020_MQTT_311,                               /**< MQTT version 3.1.1. */
 } SIM7020_MQTT_Version_t;
 
 /** @brief SIM7020 MQTT last will object.

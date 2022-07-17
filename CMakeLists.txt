@@ -22,6 +22,7 @@ set(COMPONENT_SRCS
     "src/Private/Events/SIM7020/sim7020_evt_http.cpp"
     "src/Private/Events/SIM7020/sim7020_evt_mqtt.cpp"
     "src/Private/Events/SIM7020/sim7020_evt_tcp.cpp"
+    "src/Private/Events/SIM7020/sim7020_evt_psm.cpp"
 
     # Driver internal
     "src/Private/Events/sim70xx_evt.cpp"

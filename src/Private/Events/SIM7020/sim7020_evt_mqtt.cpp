@@ -19,18 +19,18 @@
 
 #include <sdkconfig.h>
 
-#if((CONFIG_SIMXX_DEV == 7020) && (defined CONFIG_SIM70XX_PROT_WITH_MQTT))
+#if((CONFIG_SIMXX_DEV == 7020) && (defined CONFIG_SIM70XX_DRIVER_WITH_MQTT))
 
 #include <esp_log.h>
 
 #include "sim7020.h"
 #include "sim7020_evt.h"
 #include "../../Queue/sim70xx_queue.h"
-#include "../../Commands/sim7020_commands.h"
+#include "../../Commands/sim70xx_commands.h"
 
 static const char* TAG = "SIM7020_Evt_MQTT";
 
-void SIM7020_Evt_MQTT_Pub(const SIM7020_t* const p_Device, std::string* p_Message)
+void SIM7020_Evt_MQTT_Pub(SIM7020_t* const p_Device, std::string* p_Message)
 {
     int Index;
     SIM7020_Pub_t* Packet;

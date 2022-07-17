@@ -20,6 +20,7 @@
 #ifndef SIM70XX_COMMANDS_H_
 #define SIM70XX_COMMANDS_H_
 
+#include <sdkconfig.h>
 #include "../Queue/sim70xx_queue.h"
 
 /** @brief  Create a new command object.
@@ -59,5 +60,11 @@
 #define SIM70XX_AT_CBAND_R                                      SIM70XX_CMD("AT+CBAND?", true, 10, 1)
 #define SIM70XX_AT_CGATT_R                                      SIM70XX_CMD("AT+CGATT?", true, 90, 1)
 #define SIM70XX_AT_CPIN_R                                       SIM70XX_CMD("AT+CPIN?", true, 10, 1)
+
+#if(CONFIG_SIMXX_DEV == 7020)
+    #include "sim7020_commands.h"
+#elif(CONFIG_SIMXX_DEV == 7080)
+    #include "sim7080_commands.h"
+#endif
 
 #endif /* SIM70XX_COMMANDS_H_ */

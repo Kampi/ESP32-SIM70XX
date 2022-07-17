@@ -31,7 +31,7 @@
  *  @param Timeout  (Optional) Message timeout for each Ping response in seconds
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_TCP_Ping(const SIM7020_t* const p_Device, SIM7020_Ping_t* p_Config, std::vector<SIM7020_PingRes_t>* p_Result = NULL, uint32_t Timeout = 60);
+SIM70XX_Error_t SIM7020_TCP_Ping(SIM7020_t* const p_Device, SIM7020_Ping_t* p_Config, std::vector<SIM7020_PingRes_t>* p_Result = NULL, uint32_t Timeout = 60);
 
 /** @brief          Parse a given host name to get the IP address.
  *  @param p_Device Pointer to SIM7020 device object
@@ -42,7 +42,7 @@ SIM70XX_Error_t SIM7020_TCP_Ping(const SIM7020_t* const p_Device, SIM7020_Ping_t
  *  @param Timeout  (Optional) Message timeout for each the request in seconds
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_TCP_ParseDNS(const SIM7020_t* const p_Device, std::string Host, std::string* p_IP, SIM7020_DNS_Err_t* p_Error = NULL, uint32_t Timeout = 60);
+SIM70XX_Error_t SIM7020_TCP_ParseDNS(SIM7020_t* const p_Device, std::string Host, std::string* p_IP, SIM7020_DNS_Err_t* p_Error = NULL, uint32_t Timeout = 60);
 
 /** @brief          Create a TCP socket.
  *  @param p_Device Pointer to SIM7020 device object
@@ -54,21 +54,21 @@ SIM70XX_Error_t SIM7020_TCP_ParseDNS(const SIM7020_t* const p_Device, std::strin
  *  @param Protocol (Optional) Socket protocol
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_TCP_CreateTCP(const SIM7020_t* const p_Device, std::string IP, uint16_t Port, SIM7020_TCP_Socket_t* p_Socket, uint8_t CID = 1, SIM7020_TCP_Domain_t Domain = SIM_TCP_DOMAIN_IPV4, SIM7020_TCP_Protocol_t Protocol = SIM_TCP_PROT_IP);
+SIM70XX_Error_t SIM7020_TCP_CreateTCP(SIM7020_t* const p_Device, std::string IP, uint16_t Port, SIM7020_TCP_Socket_t* p_Socket, uint8_t CID = 1, SIM7020_TCP_Domain_t Domain = SIM7020_TCP_DOMAIN_IPV4, SIM7020_TCP_Protocol_t Protocol = SIM7020_TCP_PROT_IP);
 
 /** @brief          Create a common TCP/IP socket.
  *  @param p_Device Pointer to SIM7020 device object
  *  @param p_Socket Pointer to TCP socket object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_TCP_Create(const SIM7020_t* const p_Device, SIM7020_TCP_Socket_t* p_Socket);
+SIM70XX_Error_t SIM7020_TCP_Create(SIM7020_t* const p_Device, SIM7020_TCP_Socket_t* p_Socket);
 
 /** @brief          Open a TCP connection to a remote server.
  *  @param p_Device Pointer to SIM7020 device object
  *  @param p_Socket Pointer to TCP socket object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_TCP_Connect(const SIM7020_t* const p_Device, SIM7020_TCP_Socket_t* p_Socket);
+SIM70XX_Error_t SIM7020_TCP_Connect(SIM7020_t* const p_Device, SIM7020_TCP_Socket_t* p_Socket);
 
 /** @brief          Transmit a TCP message with a length up to 512 bytes.
  *  @param p_Device Pointer to SIM7020 device object
@@ -77,7 +77,7 @@ SIM70XX_Error_t SIM7020_TCP_Connect(const SIM7020_t* const p_Device, SIM7020_TCP
  *  @param Length   Data length (maximum 512 bytes)
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_TCP_TransmitBytes(const SIM7020_t* const p_Device, SIM7020_TCP_Socket_t* p_Socket, const void* p_Buffer, uint16_t Length);
+SIM70XX_Error_t SIM7020_TCP_TransmitBytes(SIM7020_t* const p_Device, SIM7020_TCP_Socket_t* p_Socket, const void* p_Buffer, uint16_t Length);
 
 /** @brief          Transmit a TCP string message with a length up to 512 characters.
  *  @param p_Device Pointer to SIM7020 device object
@@ -86,13 +86,13 @@ SIM70XX_Error_t SIM7020_TCP_TransmitBytes(const SIM7020_t* const p_Device, SIM70
  *  @param Length   Data length (maximum 512 bytes)
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_TCP_TransmitString(const SIM7020_t* const p_Device, SIM7020_TCP_Socket_t* p_Socket, std::string Data);
+SIM70XX_Error_t SIM7020_TCP_TransmitString(SIM7020_t* const p_Device, SIM7020_TCP_Socket_t* p_Socket, std::string Data);
 
 /** @brief          Close a TCP connection and release the socket.
  *  @param p_Device Pointer to SIM7020 device object
  *  @param p_Socket Pointer to TCP socket object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_TCP_Destroy(const SIM7020_t* const p_Device, SIM7020_TCP_Socket_t* p_Socket);
+SIM70XX_Error_t SIM7020_TCP_Destroy(SIM7020_t* const p_Device, SIM7020_TCP_Socket_t* p_Socket);
 
 #endif /* SIM7020_TCPIP_H_ */

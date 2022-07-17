@@ -29,7 +29,7 @@
  *  @param p_Context    Pointer to SIM7020 PDP context object
  *  @return             SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_PDP_GetContext(SIM7020_t* const p_Device, SIM7020_PDP_Context_t* p_Context);
+SIM70XX_Error_t SIM7020_PDP_GetContext(SIM7020_t* const p_Device, SIM7020_PDP_Context_t* const p_Context);
 
 /** @brief          PDP Context activate or deactivate.
  *  @param p_Device Pointer to SIM7020 device object

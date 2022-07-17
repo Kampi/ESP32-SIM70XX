@@ -19,18 +19,18 @@
 
 #include <sdkconfig.h>
 
-#if((CONFIG_SIMXX_DEV == 7020) && (defined CONFIG_SIM70XX_PROT_WITH_COAP))
+#if((CONFIG_SIMXX_DEV == 7020) && (defined CONFIG_SIM70XX_DRIVER_WITH_COAP))
 
 #include <esp_log.h>
 
 #include "sim7020.h"
 #include "sim7020_coap.h"
-#include "../Private/include/sim7020_queue.h"
-#include "../Private/include/sim7020_commands.h"
+#include "../../Private/Queue/sim70xx_queue.h"
+#include "../../Private/Commands/sim70xx_commands.h"
 
 static const char* TAG = "SIM7020_CoAP";
 
-SIM70XX_Error_t SIM7020_CoAP_Create(const SIM7020_t* const p_Device, std::string Server, uint16_t Port, SIM7020_CoAP_Socket_t* p_Socket, uint8_t CID)
+SIM70XX_Error_t SIM7020_CoAP_Create(SIM7020_t* const p_Device, std::string Server, uint16_t Port, SIM7020_CoAP_Socket_t* p_Socket, uint8_t CID)
 {
     if(p_Socket == NULL)
     {
@@ -44,7 +44,7 @@ SIM70XX_Error_t SIM7020_CoAP_Create(const SIM7020_t* const p_Device, std::string
     return SIM7020_CoAP_Create(p_Device, p_Socket);
 }
 
-SIM70XX_Error_t SIM7020_CoAP_Create(const SIM7020_t* const p_Device, SIM7020_CoAP_Socket_t* p_Socket)
+SIM70XX_Error_t SIM7020_CoAP_Create(SIM7020_t* const p_Device, SIM7020_CoAP_Socket_t* p_Socket)
 {
     std::string Response;
     std::string CommandStr;
@@ -84,7 +84,7 @@ SIM70XX_Error_t SIM7020_CoAP_Create(const SIM7020_t* const p_Device, SIM7020_CoA
     return SIM70XX_ERR_OK;    
 }
 
-SIM70XX_Error_t SIM7020_CoAP_Transmit(const SIM7020_t* const p_Device, SIM7020_CoAP_Socket_t* p_Socket, const void* p_Buffer, uint16_t Length)
+SIM70XX_Error_t SIM7020_CoAP_Transmit(SIM7020_t* const p_Device, SIM7020_CoAP_Socket_t* p_Socket, const void* p_Buffer, uint16_t Length)
 {
     std::string Buffer_Hex;
     std::string CommandStr;
@@ -103,7 +103,7 @@ SIM70XX_Error_t SIM7020_CoAP_Transmit(const SIM7020_t* const p_Device, SIM7020_C
         return SIM70XX_ERR_NOT_CONNECTED;
     }
 
-    SIM7020_ASCII2Hex(p_Buffer, Length, &Buffer_Hex);
+    SIM70XX_Tools_ASCII2Hex(p_Buffer, Length, &Buffer_Hex);
 
     CommandStr = "AT+CCOAPCSEND=" + std::to_string(p_Socket->ID) + "," + std::to_string(Length) + ",\"" + Buffer_Hex + "\"";
     SIM70XX_CREATE_CMD(Command);
@@ -117,7 +117,7 @@ SIM70XX_Error_t SIM7020_CoAP_Transmit(const SIM7020_t* const p_Device, SIM7020_C
     return SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue);   
 }
 
-SIM70XX_Error_t SIM7020_CoAP_Transmit(const SIM7020_t* const p_Device, SIM7020_CoAP_Socket_t* p_Socket, SIM7020_CoAP_Type_t Type, uint8_t FunctionCode)
+SIM70XX_Error_t SIM7020_CoAP_Transmit(SIM7020_t* const p_Device, SIM7020_CoAP_Socket_t* p_Socket, SIM7020_CoAP_Type_t Type, uint8_t FunctionCode)
 {
     std::string CommandStr;
     SIM70XX_TxCmd_t* Command;
@@ -127,7 +127,7 @@ SIM70XX_Error_t SIM7020_CoAP_Transmit(const SIM7020_t* const p_Device, SIM7020_C
     FunctionCode_H = FunctionCode >> 5;
     FunctionCode_L = FunctionCode & 0x1F;
 
-    if((p_Device == NULL) || (p_Socket == NULL) || (Type > SIM_COAP_RST) || (FunctionCode_H == 1) || (FunctionCode_H > 5))
+    if((p_Device == NULL) || (p_Socket == NULL) || (Type > SIM7020_COAP_RST) || (FunctionCode_H == 1) || (FunctionCode_H > 5))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
@@ -148,7 +148,7 @@ SIM70XX_Error_t SIM7020_CoAP_Transmit(const SIM7020_t* const p_Device, SIM7020_C
     return SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue);    
 }
 
-SIM70XX_Error_t SIM7020_CoAP_Destroy(const SIM7020_t* const p_Device, SIM7020_CoAP_Socket_t* p_Socket)
+SIM70XX_Error_t SIM7020_CoAP_Destroy(SIM7020_t* const p_Device, SIM7020_CoAP_Socket_t* p_Socket)
 {
     SIM70XX_TxCmd_t* Command;
 

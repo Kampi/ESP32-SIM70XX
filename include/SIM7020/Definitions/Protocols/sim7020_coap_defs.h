@@ -28,10 +28,10 @@
  */
 typedef enum
 {
-    SIM_COAP_CON            = 0,                    /**< Confirmable message (requires ACK/RST). */
-    SIM_COAP_NON,                                   /**< Non-confirmable message (one-shot message). */
-    SIM_COAP_ACK,                                   /**< ACK, used to acknowledge confirmable messages. */
-    SIM_COAP_RST,                                   /**< Indicates error in received messages. */
+    SIM7020_COAP_CON            = 0,                /**< Confirmable message (requires ACK/RST). */
+    SIM7020_COAP_NON,                               /**< Non-confirmable message (one-shot message). */
+    SIM7020_COAP_ACK,                               /**< ACK, used to acknowledge confirmable messages. */
+    SIM7020_COAP_RST,                               /**< Indicates error in received messages. */
 } SIM7020_CoAP_Type_t;
 
 /** @brief SIM7020 CoAP Socket object.

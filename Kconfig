@@ -54,36 +54,43 @@ menu "SIM70XX"
                 <ToDo>
     endmenu
 
-    menu "Protocols"
-        config SIM70XX_PROT_WITH_COAP
-            bool "Enable the CoAP protocol"
+    menu "Drivers"
+        config SIM70XX_DRIVER_WITH_COAP
+            bool "Enable CoAP support"
             default n
             help
-                Enable this option if you need the support for the CoAP protocol.
+                Enable this option if you want CoAP added to the driver.
 
-        config SIM70XX_PROT_WITH_MQTT
-            bool "Enable the MQTT protocol"
+        config SIM70XX_DRIVER_WITH_MQTT
+            bool "Enable MQTT support"
             default n
             help
-                Enable this option if you need the support for the MQTT protocol.
+                Enable this option if you want MQTT added to the driver.
 
-        config SIM70XX_PROT_WITH_HTTP
-            bool "Enable the HTTP protocol"
+        config SIM70XX_DRIVER_WITH_HTTP
+            bool "Enable HTTP support"
             default y
             help
-                Enable this option if you need the support for the HTTP protocol.
+                Enable this option if you want HTTP added to the driver.
 
-        config SIM70XX_PROT_WITH_TCPIP
-            bool "Enable the TCP/IP protocol"
+        config SIM70XX_DRIVER_WITH_TCPIP
+            bool "Enable TCP/IP support"
             default n
             help
-                Enable this option if you need the support for the TCP/IP protocol.
+                Enable this option if you want TCP/IP added to the driver.
 
-        config SIM70XX_PROT_WITH_SNTP
-            bool "Enable the SNTP protocol"
+        config SIM70XX_DRIVER_WITH_SNTP
+            bool "Enable SNTP support"
             default n
             help
-                Enable this option if you need the support for the SNTP protocol.
+                Enable this option if you want SNTP added to the driver.
+
+        config SIM70XX_DRIVER_WITH_GPS
+            bool "Enable GPS support"
+            depends on SIM70XX_DEV_SIM7080
+            default n
+            help
+                Enable this option if you want GPS added to the driver.
     endmenu
 
     menu "UART"

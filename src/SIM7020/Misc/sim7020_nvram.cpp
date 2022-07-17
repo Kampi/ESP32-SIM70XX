@@ -27,11 +27,11 @@
 #include "sim7020_nvram.h"
 #include "sim70xx_tools.h"
 #include "../../Private/Queue/sim70xx_queue.h"
-#include "../../Private/Commands/sim7020_commands.h"
+#include "../../Private/Commands/sim70xx_commands.h"
 
 static const char* TAG = "SIM7020_NVRAM";
 
-SIM70XX_Error_t SIM7020_NVRAM_Write(const SIM7020_t* const p_Device, std::string Key, const std::string Data, SIM7020_NVRAM_Error_t* p_Error)
+SIM70XX_Error_t SIM7020_NVRAM_Write(SIM7020_t* const p_Device, std::string Key, const std::string Data, SIM7020_NVRAM_Error_t* p_Error)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;
@@ -64,7 +64,7 @@ SIM70XX_Error_t SIM7020_NVRAM_Write(const SIM7020_t* const p_Device, std::string
         *p_Error = Error;
     }
 
-    if(Error != SIM_NVRAM_ERR_OK)
+    if(Error != SIM7020_NVRAM_ERR_OK)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -72,7 +72,7 @@ SIM70XX_Error_t SIM7020_NVRAM_Write(const SIM7020_t* const p_Device, std::string
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_NVRAM_Write(const SIM7020_t* const p_Device, std::string Key, const uint8_t* p_Buffer, uint16_t Length, SIM7020_NVRAM_Error_t* p_Error)
+SIM70XX_Error_t SIM7020_NVRAM_Write(SIM7020_t* const p_Device, std::string Key, const uint8_t* p_Buffer, uint16_t Length, SIM7020_NVRAM_Error_t* p_Error)
 {
     std::string HexString;
 
@@ -81,7 +81,7 @@ SIM70XX_Error_t SIM7020_NVRAM_Write(const SIM7020_t* const p_Device, std::string
     return SIM7020_NVRAM_Write(p_Device, Key, HexString, p_Error);
 }
 
-SIM70XX_Error_t SIM7020_NVRAM_Read(const SIM7020_t* const p_Device, std::string Key, std::string* p_Payload, SIM7020_NVRAM_Error_t* p_Error)
+SIM70XX_Error_t SIM7020_NVRAM_Read(SIM7020_t* const p_Device, std::string Key, std::string* p_Payload, SIM7020_NVRAM_Error_t* p_Error)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;
@@ -116,7 +116,7 @@ SIM70XX_Error_t SIM7020_NVRAM_Read(const SIM7020_t* const p_Device, std::string 
         *p_Error = Error;
     }
 
-    if(Error != SIM_NVRAM_ERR_OK)
+    if(Error != SIM7020_NVRAM_ERR_OK)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -140,7 +140,7 @@ SIM70XX_Error_t SIM7020_NVRAM_Read(const SIM7020_t* const p_Device, std::string 
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_NVRAM_Erase(const SIM7020_t* const p_Device, std::string Key, SIM7020_NVRAM_Error_t* p_Error)
+SIM70XX_Error_t SIM7020_NVRAM_Erase(SIM7020_t* const p_Device, std::string Key, SIM7020_NVRAM_Error_t* p_Error)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;
@@ -172,7 +172,7 @@ SIM70XX_Error_t SIM7020_NVRAM_Erase(const SIM7020_t* const p_Device, std::string
         *p_Error = Error;
     }
 
-    if(Error != SIM_NVRAM_ERR_OK)
+    if(Error != SIM7020_NVRAM_ERR_OK)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -180,7 +180,7 @@ SIM70XX_Error_t SIM7020_NVRAM_Erase(const SIM7020_t* const p_Device, std::string
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_NVRAM_GetKeys(const SIM7020_t* const p_Device, std::vector<std::string>* p_Keys)
+SIM70XX_Error_t SIM7020_NVRAM_GetKeys(SIM7020_t* const p_Device, std::vector<std::string>* p_Keys)
 {
     int32_t Index;
     std::string Response;

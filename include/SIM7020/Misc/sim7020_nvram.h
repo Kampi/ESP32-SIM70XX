@@ -31,7 +31,7 @@
  *  @param p_Error  (Optional) Pointer to NVRAM error code
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_NVRAM_Write(const SIM7020_t* const p_Device, std::string Key, const std::string Data, SIM7020_NVRAM_Error_t* p_Error = NULL);
+SIM70XX_Error_t SIM7020_NVRAM_Write(SIM7020_t* const p_Device, std::string Key, const std::string Data, SIM7020_NVRAM_Error_t* p_Error = NULL);
 
 /** @brief          Write data into the NVRAM.
  *  @param p_Device Pointer to SIM7020 device object
@@ -41,7 +41,7 @@ SIM70XX_Error_t SIM7020_NVRAM_Write(const SIM7020_t* const p_Device, std::string
  *  @param p_Error  (Optional) Pointer to NVRAM error code
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_NVRAM_Write(const SIM7020_t* const p_Device, std::string Key, const uint8_t* p_Buffer, uint16_t Length, SIM7020_NVRAM_Error_t* p_Error = NULL);
+SIM70XX_Error_t SIM7020_NVRAM_Write(SIM7020_t* const p_Device, std::string Key, const uint8_t* p_Buffer, uint16_t Length, SIM7020_NVRAM_Error_t* p_Error = NULL);
 
 /** @brief              Read data from the NVRAM.
  *  @param p_Device     Pointer to SIM7020 device object
@@ -50,7 +50,7 @@ SIM70XX_Error_t SIM7020_NVRAM_Write(const SIM7020_t* const p_Device, std::string
  *  @param p_Error      (Optional) Pointer to NVRAM error code
  *  @return             SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_NVRAM_Read(const SIM7020_t* const p_Device, std::string Key, std::string* p_Payload, SIM7020_NVRAM_Error_t* p_Error = NULL);
+SIM70XX_Error_t SIM7020_NVRAM_Read(SIM7020_t* const p_Device, std::string Key, std::string* p_Payload, SIM7020_NVRAM_Error_t* p_Error = NULL);
 
 /** @brief          Invalidate data from the NVRAM.
  *  @param p_Device Pointer to SIM7020 device object
@@ -58,13 +58,13 @@ SIM70XX_Error_t SIM7020_NVRAM_Read(const SIM7020_t* const p_Device, std::string 
  *  @param p_Error  (Optional) Pointer to NVRAM error code
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_NVRAM_Erase(const SIM7020_t* const p_Device, std::string Key, SIM7020_NVRAM_Error_t* p_Error = NULL);
+SIM70XX_Error_t SIM7020_NVRAM_Erase(SIM7020_t* const p_Device, std::string Key, SIM7020_NVRAM_Error_t* p_Error = NULL);
 
 /** @brief          Get the data item IDs from the NVRAM.
  *  @param p_Device Pointer to SIM7020 device object
  *  @param p_Keys   Pointer to data keys
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_NVRAM_GetKeys(const SIM7020_t* const p_Device, std::vector<std::string>* p_Keys);
+SIM70XX_Error_t SIM7020_NVRAM_GetKeys(SIM7020_t* const p_Device, std::vector<std::string>* p_Keys);
 
 #endif /* SIM7020_NVRAM_H_ */

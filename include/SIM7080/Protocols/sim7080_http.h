@@ -1,5 +1,5 @@
  /*
- * sim7020_nvram_defs.h
+ * sim7080_http.h
  *
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -17,19 +17,11 @@
  * Errors and commissions should be reported to DanielKampert@kampis-elektroecke.de.
  */
 
-#ifndef SIM7020_NVRAM_DEFS_H_
-#define SIM7020_NVRAM_DEFS_H_
+#ifndef SIM7080_HTTP_H_
+#define SIM7080_HTTP_H_
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sim7080_defs.h"
+#include "sim70xx_errors.h"
+#include "sim7080_http_defs.h"
 
-/** @brief SIM7020 NVRAM error codes.
- */
-typedef enum
-{
-    SIM7020_NVRAM_ERR_OK        = 0,                /**< Everything ok. */
-    SIM7020_NVRAM_ERR_NOT_FOUND = -4,               /**< Key was not found. */
-    SIM7020_NVRAM_ERR_NO_MEM    = -7,               /**< No memory available. */
-} SIM7020_NVRAM_Error_t;
-
-#endif /* SIM7020_NVRAM_DEFS_H_ */
+#endif /* SIM7080_HTTP_H_ */

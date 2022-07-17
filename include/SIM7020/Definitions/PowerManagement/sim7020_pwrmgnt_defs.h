@@ -23,13 +23,13 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-/** @brief PSM enable modes.
+/** @brief PSM enable mode definitions.
  */
 typedef enum
 {
-    SIM_PSM_DIS         = 0,                        /**< Disable the use of PSM. */
-    SIM_PSM_EN,                                     /**< Enable the use of PSM. */
-    SIM_PSM_DISC,                                   /**< Disable the use of PSM and discard all parameters for PSM or, if available reset to the manufacturer specific default values. */
+    SIM7020_PSM_DIS         = 0,                    /**< Disable the use of PSM. */
+    SIM7020_PSM_EN,                                 /**< Enable the use of PSM. */
+    SIM7020_PSM_DISC,                               /**< Disable the use of PSM and discard all parameters for PSM or, if available reset to the manufacturer specific default values. */
 } SIM7020_PSM_Enable_t;
 
 #endif /* SIM7020_PWRMGNT_DEFS_H_ */

@@ -35,6 +35,20 @@
 
 #include "sim70xx_defs.h"
 
+/** @brief SIM7080 SIM card status codes definition.
+ */
+typedef enum
+{
+    SIM7080_SIM_READY       = 0,                            /**< MT is not pending for any password. */
+    SIM7080_SIM_WAIT_PIN,                                   /**< MT is waiting SIM PIN to be given. */
+    SIM7080_SIM_WAIT_PUK,                                   /**< MT is waiting for SIM PUK to be given. */
+    SIM7080_SIM_WAIT_PH_PIN,                                /**< ME is waiting for phone to SIM card (antitheft). */
+    SIM7080_SIM_WAIT_PH_PUK,                                /**< ME is waiting for SIM PUK (antitheft). */
+    SIM7080_SIM_WAIT_NET_PIN,                               /**< ME is waiting network personalization password to be given. */
+    SIM7080_SIM_WAIT_PIN2,                                  /**< PIN2, e.g. for editing the FDN book possible only if preceding Command was acknowledged with +CME ERROR:17. */
+    SIM7080_SIM_WAIT_PUK2,                                  /**< Possible only if preceding Command was acknowledged with error +CME ERROR: 18. */
+} SIM7080_SIM_t;
+
 /** @brief SIM7080 preferred network modes.
  */
 typedef enum
@@ -45,7 +59,7 @@ typedef enum
     SIM7080_NETMODE_GSM_LTE = 51,                           /**< GSM and LTE mode only. */
 } SIM7080_NetMode_t;
 
-/** @brief SIM7080 preferred selections between CAT-M and NB-IoT.
+/** @brief SIM7080 preferred selections between CAT-M and NB-IoT
  */
 typedef enum
 {

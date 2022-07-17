@@ -27,30 +27,30 @@
  */
 typedef enum
 {
-    SIM_PDP_IP          = 0,                        /**< Internet Protocol (IETF STD 5). */
-    SIM_PDP_IPV6,                                   /**< Internet Protocol, version 6 (IETF RFC 2460). */
-    SIM_PDP_IPV4V6,                                 /**< Virtual <PDP_type) introduced to handle dual IP stack UE capability(see 3GPP TS 24.301). */
-    SIM_PDP_NO_IP,                                  /**< Transfer of Non-IP data to external packet data Network (see 3GPP TS 24.301). */
+    SIM7020_PDP_IP          = 0,                    /**< Internet Protocol (IETF STD 5). */
+    SIM7020_PDP_IPV6,                               /**< Internet Protocol, version 6 (IETF RFC 2460). */
+    SIM7020_PDP_IPV4V6,                             /**< Virtual <PDP_type) introduced to handle dual IP stack UE capability(see 3GPP TS 24.301). */
+    SIM7020_PDP_NO_IP,                              /**< Transfer of Non-IP data to external packet data Network (see 3GPP TS 24.301). */
 } SIM7020_PDP_Type_t;
 
 /** @brief PDP data compression definitions.
  */
 typedef enum
 {
-    SIM_PDP_DCOMP_OFF   = 0,                        /**< Compression disabled. */
-    SIM_PDP_DCOMP_ON,                               /**< Compression enabled. */
-    SIM_PDP_DCOMP_V42,                              /**< Compression V.42bis. */
+    SIM7020_PDP_DCOMP_OFF   = 0,                    /**< Compression disabled. */
+    SIM7020_PDP_DCOMP_ON,                           /**< Compression enabled. */
+    SIM7020_PDP_DCOMP_V42,                          /**< Compression V.42bis. */
 } SIM7020_PDP_DComp_t;
 
 /** @brief PDP header compression definitions.
  */
 typedef enum
 {
-    SIM_PDP_HCOMP_OFF   = 0,                        /**< Compression disabled. */
-    SIM_PDP_HCOMP_ON,                               /**< Compression enabled. */
-    SIM_PDP_HCOMP_1144,                             /**< RFC1144 (applicable for SNDCP only). */
-    SIM_PDP_HCOMP_2507,                             /**< RFC 2507. */
-    SIM_PDP_HCOMP_3095,                             /**< RFC 3095 (ROHC) (applicable for PDCP only). */
+    SIM7020_PDP_HCOMP_OFF   = 0,                    /**< Compression disabled. */
+    SIM7020_PDP_HCOMP_ON,                           /**< Compression enabled. */
+    SIM7020_PDP_HCOMP_1144,                         /**< RFC1144 (applicable for SNDCP only). */
+    SIM7020_PDP_HCOMP_2507,                         /**< RFC 2507. */
+    SIM7020_PDP_HCOMP_3095,                         /**< RFC 3095 (ROHC) (applicable for PDCP only). */
 } SIM7020_PDP_HComp_t;
 
 /** @brief SIM7020 PDP Context object definition.

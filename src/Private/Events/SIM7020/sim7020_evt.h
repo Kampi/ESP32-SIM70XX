@@ -33,21 +33,21 @@
 
 #include <sdkconfig.h>
 
-#ifdef CONFIG_SIM70XX_PROT_WITH_MQTT
+#ifdef CONFIG_SIM70XX_DRIVER_WITH_MQTT
     /** @brief              Handle asynchronous MQTT publish events.
      *  @param p_Device     Pointer to device
      *  @param p_Message    Pointer to message string
      */
-    void SIM7020_Evt_MQTT_Pub(const SIM7020_t* const p_Device, std::string* p_Message);
+    void SIM7020_Evt_MQTT_Pub(SIM7020_t* const p_Device, std::string* p_Message);
 
     /** @brief              Handle asynchronous MQTT disconnect events.
      *  @param p_Device     Pointer to device
      *  @param p_Message    Pointer to message string
      */
-    void SIM7020_Evt_MQTT_Disconnect(const SIM7020_t* const p_Device, std::string* p_Message);
+    void SIM7020_Evt_MQTT_Disconnect(SIM7020_t* const p_Device, std::string* p_Message);
 #endif
 
-#ifdef CONFIG_SIM70XX_PROT_WITH_HTTP
+#ifdef CONFIG_SIM70XX_DRIVER_WITH_HTTP
     /** @brief              Handle asynchronous HTTP events.
      *  @param p_Device     Pointer to device
      *  @param p_Message    Pointer to message string
@@ -62,12 +62,12 @@
  */
 void SIM7020_Evt_HandlePSM(SIM7020_t* const p_Device, std::string* p_Message, bool isPSM);
 
-#ifdef CONFIG_SIM70XX_PROT_WITH_TCPIP
+#ifdef CONFIG_SIM70XX_DRIVER_WITH_TCPIP
     /** @brief              Handle asynchronous TCP/IP disconnect events.
      *  @param p_Device     Pointer to device
      *  @param p_Message    Pointer to message string
      */
-    void SIM7020_Evt_TCP_Disconnect(const SIM7020_t* const p_Device, std::string* p_Message);
+    void SIM7020_Evt_TCP_Disconnect(SIM7020_t* const p_Device, std::string* p_Message);
 #endif
 
 #endif /* SIM7020_EVT_H_ */

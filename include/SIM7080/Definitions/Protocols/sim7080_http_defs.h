@@ -1,5 +1,5 @@
  /*
- * sim7020_http_defs.h
+ * sim7080_http_defs.h
  *
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -17,38 +17,34 @@
  * Errors and commissions should be reported to DanielKampert@kampis-elektroecke.de.
  */
 
-#ifndef SIM7020_HTTP_DEFS_H_
-#define SIM7020_HTTP_DEFS_H_
+#ifndef SIM7080_HTTP_DEFS_H_
+#define SIM7080_HTTP_DEFS_H_
 
 #include <string>
 #include <stdint.h>
 #include <stdbool.h>
 
-/** @brief 
- */
-#define SIM7020_HTTP_MAX_PAYLOAD                    20000UL
-
-/** @brief SIM7020 HTTP error code definitions.
+/** @brief SIM7080 HTTP error codes.
  */
 typedef enum
 {
-    SIM7020_HTTP_ERR_DC         = -1,               /**< Device disconnected. */
-    SIM7020_HTTP_ERR_CLOSED     = -2,               /**< Connection was closed by a remote host. */
-    SIM7020_HTTP_ERR_UNKNOWN    = -3,               /**< An unknown error occurred. */
-    SIM7020_HTTP_ERR_PROTOCOL   = -4,               /**< A protocol error occurred. */
-    SIM7020_HTTP_ERR_HOSTNAME   = -5,               /**< Could not resolve the hostname. */
-    SIM7020_HTTP_ERR_URL        = -6,               /**< A URL parse error occurred. */
-} SIM7020_HTTP_Error_t;
+    SIM7080_HTTP_ERR_DC         = -1,               /**< Device disconnected. */
+    SIM7080_HTTP_ERR_CLOSED     = -2,               /**< Connection was closed by a remote host. */
+    SIM7080_HTTP_ERR_UNKNOWN    = -3,               /**< An unknown error occurred. */
+    SIM7080_HTTP_ERR_PROTOCOL   = -4,               /**< A protocol error occurred. */
+    SIM7080_HTTP_ERR_HOSTNAME   = -5,               /**< Could not resolve the hostname. */
+    SIM7080_HTTP_ERR_URL        = -6,               /**< A URL parse error occurred. */
+} SIM7080_HTTP_Error_t;
 
-/** @brief SIM7020 HTTP request method definitions.
+/** @brief SIM7080 HTTP methods.
  */
 typedef enum
 {
-    SIM7020_HTTP_REQ_GET         = 0,                /**< HTTP GET method. */
-    SIM7020_HTTP_REQ_POST,                           /**< HTTP POST method. */
-    SIM7020_HTTP_REQ_PUT,                            /**< HTTP PUT method. */
-    SIM7020_HTTP_REQ_DELETE,                         /**< HTTP DELETE method. */
-} SIM7020_HTTP_Method_t;
+    SIM7080_HTTP_GET            = 0,                /**< HTTP GET method. */
+    SIM7080_HTTP_POST,                              /**< HTTP POST method. */
+    SIM7080_HTTP_PUT,                               /**< HTTP PUT method. */
+    SIM7080_HTTP_DELETE,                            /**< HTTP DELETE method. */
+} SIM7080_HTTP_Method_t;
 
 /** @brief SIM7020 HTTP Socket object.
  */
@@ -62,8 +58,8 @@ typedef struct
                                                          NOTE: Handled by the device driver. */
     bool isCreated;                                 /**< #true when the socket is created.
                                                          NOTE: Handled by the device driver. */
-    SIM7020_HTTP_Error_t Error;                     /**< Socket error.
+    SIM7080_HTTP_Error_t Error;                     /**< Socket error.
                                                          NOTE: Handled by the device driver. */
-} SIM7020_HTTP_Socket_t;
+} SIM7080_HTTP_Socket_t;
 
-#endif /* SIM7020_HTTP_DEFS_H_ */
+#endif /* SIM7080_HTTP_DEFS_H_ */

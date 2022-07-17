@@ -27,7 +27,7 @@
 #include "../Private/UART/sim70xx_uart.h"
 #include "../Private/Events/sim70xx_evt.h"
 #include "../Private/Queue/sim70xx_queue.h"
-#include "../Private/Commands/sim7020_commands.h"
+#include "../Private/Commands/sim70xx_commands.h"
 
 #ifdef CONFIG_SIM70XX_TASK_CORE_AFFINITY
     #ifndef CONFIG_SIM70XX_TASK_COM_CORE
@@ -131,8 +131,8 @@ SIM70XX_Error_t SIM7020_Init(SIM7020_t* const p_Device, const SIM7020_Config_t* 
 
     SIM70XX_ERROR_CHECK(SIM7020_SetFunctionality(p_Device, SIM7020_FUNC_MIN));    // TODO: Check this
     SIM70XX_ERROR_CHECK(SIM7020_SetPSD(p_Device, SIM7020_PDP_IP, p_Config->APN));
-    SIM70XX_ERROR_CHECK(SIM7020_SetOperator(p_Device, SIM7020_MODE_MANUAL, p_Config->OperatorFormat, p_Config->Operator));
-    SIM70XX_ERROR_CHECK(SIM7080_SetFunctionality(p_Device, SIM7080_FUNC_FULL));    // TODO: Check this
+    SIM70XX_ERROR_CHECK(SIM7020_SetOperator(p_Device, SIM_MODE_MANUAL, p_Config->OperatorFormat, p_Config->Operator));
+    SIM70XX_ERROR_CHECK(SIM7020_SetFunctionality(p_Device, SIM7020_FUNC_FULL));    // TODO: Check this
     SIM70XX_ERROR_CHECK(SIM7020_SetBand(p_Device, p_Config->Band));
 
     SIM70XX_ERROR_CHECK(SIM7020_Info_GetNetworkRegistrationStatus(p_Device));
@@ -493,7 +493,7 @@ SIM70XX_Error_t SIM7020_GetBand(SIM7020_t* const p_Device, SIM7020_Band_t* p_Ban
 
     *p_Band = (SIM7020_Band_t)std::stoi(Response);
 
-    ESP_LOGD(TAG, "Band: %u", p_Device->Band);
+    ESP_LOGD(TAG, "Band: %u", *p_Band);
 
     return SIM70XX_ERR_OK;
 }
@@ -593,12 +593,12 @@ SIM70XX_Error_t SIM7020_GetFunctionality(SIM7020_t* const p_Device)
     return SIM70XX_ERR_OK;
 }
 
-bool SIM7020_isSIMReady(SIM7020_t* const p_Device)
+SIM70XX_Error_t SIM7020_GetSIMStatus(SIM7020_t* const p_Device, SIM7020_SIM_t* const p_Status)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;
 
-    if(p_Device == NULL)
+    if((p_Device == NULL) || (p_Status == NULL))
     {
         return false;
     }
@@ -618,10 +618,31 @@ bool SIM7020_isSIMReady(SIM7020_t* const p_Device)
 
     if(Response.find("READY") != std::string::npos)
     {
+        *p_Status = SIM7020_SIM_READY;
+    }
+    else
+    {
+        return SIM70XX_ERR_FAIL;
+    }
+
+    return SIM70XX_ERR_OK;
+}
+
+bool SIM7020_isSIMReady(SIM7020_t* const p_Device)
+{
+    SIM7020_SIM_t Status;
+
+    if(SIM7020_GetSIMStatus(p_Device, &Status) != SIM70XX_ERR_OK)
+    {
+        return false;
+    }
+
+    if(Status == SIM7020_SIM_READY)
+    {
         return true;
     }
 
-    return false;   
+    return false;      
 }
 
 bool SIM7020_isAttached(SIM7020_t* const p_Device)

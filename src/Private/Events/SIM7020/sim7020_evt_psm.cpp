@@ -1,5 +1,5 @@
  /*
- * sim7020_nvram_defs.h
+ * sim7020_evt_psm.cpp
  *
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -17,19 +17,22 @@
  * Errors and commissions should be reported to DanielKampert@kampis-elektroecke.de.
  */
 
-#ifndef SIM7020_NVRAM_DEFS_H_
-#define SIM7020_NVRAM_DEFS_H_
+#include <sdkconfig.h>
 
-#include <stdint.h>
-#include <stdbool.h>
+#if(CONFIG_SIMXX_DEV == 7020)
 
-/** @brief SIM7020 NVRAM error codes.
- */
-typedef enum
+#include <esp_log.h>
+
+#include "sim7020.h"
+#include "sim7020_evt.h"
+#include "../../Queue/sim70xx_queue.h"
+#include "../../Commands/sim70xx_commands.h"
+
+static const char* TAG = "SIM7020_Evt_TCP";
+
+void SIM7020_Evt_HandlePSM(SIM7020_t* const p_Device, std::string* p_Message, bool isPSM)
 {
-    SIM7020_NVRAM_ERR_OK        = 0,                /**< Everything ok. */
-    SIM7020_NVRAM_ERR_NOT_FOUND = -4,               /**< Key was not found. */
-    SIM7020_NVRAM_ERR_NO_MEM    = -7,               /**< No memory available. */
-} SIM7020_NVRAM_Error_t;
+    delete p_Message;
+}
 
-#endif /* SIM7020_NVRAM_DEFS_H_ */
+#endif

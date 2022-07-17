@@ -160,13 +160,13 @@ static void SIM70XX_Evt_Task(void* p_Arg)
                 {
                     SIM70XX_PSM_EVENT(Device, Message, true);
                 }
-                #ifdef CONFIG_SIM70XX_PROT_WITH_TCPIP
+                #ifdef CONFIG_SIM70XX_DRIVER_WITH_TCPIP
                     else if(Message->find("+CSOERR") != std::string::npos)
                     {
                         SIM70XX_TCP_DISCONNECT_EVENT(Device, Message);
                     }
                 #endif
-                #ifdef CONFIG_SIM70XX_PROT_WITH_MQTT
+                #ifdef CONFIG_SIM70XX_DRIVER_WITH_MQTT
                     else if(Message->find("+CMQPUB") != std::string::npos)
                     {
                         SIM70XX_MQTT_PUB_EVENT(Device, Message);
@@ -177,7 +177,7 @@ static void SIM70XX_Evt_Task(void* p_Arg)
                         SIM70XX_MQTT_DISCONNECT_EVENT(Device, Message);
                     }
                 #endif
-                #ifdef CONFIG_SIM70XX_PROT_WITH_HTTP
+                #ifdef CONFIG_SIM70XX_DRIVER_WITH_HTTP
                     else if(Message->find("+CHTTPERR") != std::string::npos)
                     {
                         SIM70XX_HTTP_EVENT(Device, Message);

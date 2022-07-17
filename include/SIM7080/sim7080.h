@@ -144,6 +144,13 @@ SIM70XX_Error_t SIM7080_SetFunctionality(SIM7080_t* const p_Device, SIM7080_Func
  */
 SIM70XX_Error_t SIM7080_GetFunctionality(SIM7080_t* const p_Device);
 
+/** @brief          Get SIM card status.
+ *  @param p_Device Pointer to SIM7080 device object
+ *  @param p_Status Pointer so SIM card status
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_GetSIMStatus(SIM7080_t* const p_Device, SIM7080_SIM_t* const p_Status);
+
 /** @brief          Check if the SIM card is ready to use.
  *  @param p_Device Pointer to SIM7080 device object
  *  @return         #true when the SIM card is ready

@@ -19,18 +19,18 @@
 
 #include <sdkconfig.h>
 
-#if((CONFIG_SIMXX_DEV == 7020) && (defined CONFIG_SIM70XX_PROT_WITH_TCPIP))
+#if((CONFIG_SIMXX_DEV == 7020) && (defined CONFIG_SIM70XX_DRIVER_WITH_TCPIP))
 
 #include <esp_log.h>
 
 #include "sim7020.h"
 #include "sim7020_tcpip.h"
-#include "../Private/include/sim7020_queue.h"
-#include "../Private/include/sim7020_commands.h"
+#include "../../Private/Queue/sim70xx_queue.h"
+#include "../../Private/Commands/sim70xx_commands.h"
 
 static const char* TAG = "SIM7020_TCPIP";
 
-SIM70XX_Error_t SIM7020_TCP_ParseDNS(const SIM7020_t* const p_Device, std::string Host, std::string* p_IP, SIM7020_DNS_Err_t* p_Error, uint32_t Timeout)
+SIM70XX_Error_t SIM7020_TCP_ParseDNS(SIM7020_t* const p_Device, std::string Host, std::string* p_IP, SIM7020_DNS_Err_t* p_Error, uint32_t Timeout)
 {
     uint32_t Now;
     uint8_t DNS_Error;

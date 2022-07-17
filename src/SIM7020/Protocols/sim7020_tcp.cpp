@@ -19,18 +19,18 @@
 
 #include <sdkconfig.h>
 
-#if((CONFIG_SIMXX_DEV == 7020) && (defined CONFIG_SIM70XX_PROT_WITH_TCPIP))
+#if((CONFIG_SIMXX_DEV == 7020) && (defined CONFIG_SIM70XX_DRIVER_WITH_TCPIP))
 
 #include <esp_log.h>
 
 #include "sim7020.h"
 #include "sim7020_tcpip.h"
-#include "../Private/include/sim7020_queue.h"
-#include "../Private/include/sim7020_commands.h"
+#include "../../Private/Queue/sim70xx_queue.h"
+#include "../../Private/Commands/sim70xx_commands.h"
 
 static const char* TAG = "SIM7020_TCPIP";
 
-SIM70XX_Error_t SIM7020_TCP_CreateTCP(const SIM7020_t* const p_Device, std::string IP, uint16_t Port, SIM7020_TCP_Socket_t* p_Socket, uint8_t CID, SIM7020_TCP_Domain_t Domain, SIM7020_TCP_Protocol_t Protocol)
+SIM70XX_Error_t SIM7020_TCP_CreateTCP(SIM7020_t* const p_Device, std::string IP, uint16_t Port, SIM7020_TCP_Socket_t* p_Socket, uint8_t CID, SIM7020_TCP_Domain_t Domain, SIM7020_TCP_Protocol_t Protocol)
 {
     if(p_Socket == NULL)
     {
@@ -42,19 +42,19 @@ SIM70XX_Error_t SIM7020_TCP_CreateTCP(const SIM7020_t* const p_Device, std::stri
     p_Socket->Timeout = 60;
     p_Socket->CID = CID;
     p_Socket->Domain = Domain;
-    p_Socket->Type = SIM_TCP_TYPE_TCP;
+    p_Socket->Type = SIM7020_TCP_TYPE_TCP;
     p_Socket->Protocol = Protocol;
 
     return SIM7020_TCP_Create(p_Device, p_Socket);
 }
 
-SIM70XX_Error_t SIM7020_TCP_Create(const SIM7020_t* const p_Device, SIM7020_TCP_Socket_t* p_Socket)
+SIM70XX_Error_t SIM7020_TCP_Create(SIM7020_t* const p_Device, SIM7020_TCP_Socket_t* p_Socket)
 {
     std::string Response;
     std::string CommandStr;
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Device == NULL) || (p_Socket == NULL) || (p_Socket->Type == 0) || (p_Socket->Type > SIM_TCP_TYPE_RAW) || (p_Socket->Domain < SIM_TCP_DOMAIN_IPV4) || (p_Socket->Domain > SIM_TCP_DOMAIN_IPV6) || (p_Socket->Protocol < SIM_TCP_PROT_IP) || (p_Socket->Protocol > SIM_TCP_PROT_ICMP) || (p_Socket->CID > 10))
+    if((p_Device == NULL) || (p_Socket == NULL) || (p_Socket->Type == 0) || (p_Socket->Type > SIM7020_TCP_TYPE_RAW) || (p_Socket->Domain < SIM7020_TCP_DOMAIN_IPV4) || (p_Socket->Domain > SIM7020_TCP_DOMAIN_IPV6) || (p_Socket->Protocol < SIM7020_TCP_PROT_IP) || (p_Socket->Protocol > SIM7020_TCP_PROT_ICMP) || (p_Socket->CID > 10))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
@@ -85,7 +85,7 @@ SIM70XX_Error_t SIM7020_TCP_Create(const SIM7020_t* const p_Device, SIM7020_TCP_
     return SIM70XX_ERR_OK;    
 }
 
-SIM70XX_Error_t SIM7020_TCP_Connect(const SIM7020_t* const p_Device, SIM7020_TCP_Socket_t* p_Socket)
+SIM70XX_Error_t SIM7020_TCP_Connect(SIM7020_t* const p_Device, SIM7020_TCP_Socket_t* p_Socket)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;
@@ -121,12 +121,12 @@ SIM70XX_Error_t SIM7020_TCP_Connect(const SIM7020_t* const p_Device, SIM7020_TCP
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_TCP_TransmitBytes(const SIM7020_t* const p_Device, SIM7020_TCP_Socket_t* p_Socket, const void* p_Buffer, uint16_t Length)
+SIM70XX_Error_t SIM7020_TCP_TransmitBytes(SIM7020_t* const p_Device, SIM7020_TCP_Socket_t* p_Socket, const void* p_Buffer, uint16_t Length)
 {
     std::string Buffer_Hex;
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Device == NULL) || (p_Socket == NULL) || (Length > 512) || (p_Socket->Type != SIM_TCP_TYPE_TCP))
+    if((p_Device == NULL) || (p_Socket == NULL) || (Length > 512) || (p_Socket->Type != SIM7020_TCP_TYPE_TCP))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
@@ -152,11 +152,11 @@ SIM70XX_Error_t SIM7020_TCP_TransmitBytes(const SIM7020_t* const p_Device, SIM70
     return SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue);   
 }
 
-SIM70XX_Error_t SIM7020_TCP_TransmitString(const SIM7020_t* const p_Device, SIM7020_TCP_Socket_t* p_Socket, std::string Data)
+SIM70XX_Error_t SIM7020_TCP_TransmitString(SIM7020_t* const p_Device, SIM7020_TCP_Socket_t* p_Socket, std::string Data)
 {
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Device == NULL) || (p_Socket == NULL) || (Data.length() > 512) || (p_Socket->Type != SIM_TCP_TYPE_TCP))
+    if((p_Device == NULL) || (p_Socket == NULL) || (Data.length() > 512) || (p_Socket->Type != SIM7020_TCP_TYPE_TCP))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
@@ -180,7 +180,7 @@ SIM70XX_Error_t SIM7020_TCP_TransmitString(const SIM7020_t* const p_Device, SIM7
     return SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue);   
 }
 
-SIM70XX_Error_t SIM7020_TCP_Destroy(const SIM7020_t* const p_Device, SIM7020_TCP_Socket_t* p_Socket)
+SIM70XX_Error_t SIM7020_TCP_Destroy(SIM7020_t* const p_Device, SIM7020_TCP_Socket_t* p_Socket)
 {
     SIM70XX_TxCmd_t* Command;
 

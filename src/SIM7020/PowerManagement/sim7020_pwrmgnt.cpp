@@ -28,9 +28,9 @@
 #include "sim7020.h"
 #include "sim7020_pwrmgnt.h"
 #include "../../Private/Queue/sim70xx_queue.h"
-#include "../../Private/Commands/sim7020_commands.h"
+#include "../../Private/Commands/sim70xx_commands.h"
 
-SIM70XX_Error_t SIM7020_PSM_Enable(const SIM7020_t* const p_Device, uint8_t Base_T, uint8_t Value_T, uint8_t Base_A, uint8_t Value_A, bool UseRetention)
+SIM70XX_Error_t SIM7020_PSM_Enable(SIM7020_t* const p_Device, uint8_t Base_T, uint8_t Value_T, uint8_t Base_A, uint8_t Value_A, bool UseRetention)
 {
     uint8_t TAU;
     uint8_t Value;
@@ -70,11 +70,11 @@ SIM70XX_Error_t SIM7020_PSM_Enable(const SIM7020_t* const p_Device, uint8_t Base
     return SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue);
 }
 
-SIM70XX_Error_t SIM7020_PSM_Disable(const SIM7020_t* const p_Device, SIM7020_PSM_Enable_t Mode)
+SIM70XX_Error_t SIM7020_PSM_Disable(SIM7020_t* const p_Device, SIM7020_PSM_Enable_t Mode)
 {
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Device == NULL) || (Mode == SIM_PSM_EN))
+    if((p_Device == NULL) || (Mode == SIM7020_PSM_EN))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
@@ -94,7 +94,7 @@ SIM70XX_Error_t SIM7020_PSM_Disable(const SIM7020_t* const p_Device, SIM7020_PSM
     return SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue);
 }
 
-SIM70XX_Error_t SIM7020_PSM_GetMode(const SIM7020_t* const p_Device, SIM7020_PSM_Enable_t* p_Mode)
+SIM70XX_Error_t SIM7020_PSM_GetMode(SIM7020_t* const p_Device, SIM7020_PSM_Enable_t* p_Mode)
 {
     if((p_Device == NULL) || (p_Mode == NULL))
     {
@@ -108,7 +108,7 @@ SIM70XX_Error_t SIM7020_PSM_GetMode(const SIM7020_t* const p_Device, SIM7020_PSM
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_PSM_GetEventStatus(const SIM7020_t* const p_Device, bool* p_Enable)
+SIM70XX_Error_t SIM7020_PSM_GetEventStatus(SIM7020_t* const p_Device, bool* p_Enable)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;
@@ -137,7 +137,7 @@ SIM70XX_Error_t SIM7020_PSM_GetEventStatus(const SIM7020_t* const p_Device, bool
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_PSM_SetEventStatus(const SIM7020_t* const p_Device, bool Enable)
+SIM70XX_Error_t SIM7020_PSM_SetEventStatus(SIM7020_t* const p_Device, bool Enable)
 {
     SIM70XX_TxCmd_t* Command;
 

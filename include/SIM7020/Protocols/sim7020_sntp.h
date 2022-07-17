@@ -31,6 +31,6 @@
  *  @param Timeout  (Optional) Message timeout for each Ping response in seconds
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_SNTP_GetNetworkTime(const SIM7020_t* const p_Device, std::string Server, int8_t Timezone, uint8_t Timeout = 60);
+SIM70XX_Error_t SIM7020_SNTP_GetNetworkTime(SIM7020_t* const p_Device, std::string Server, int8_t Timezone, uint8_t Timeout = 60);
 
 #endif /* SIM7020_SNTP_H_ */

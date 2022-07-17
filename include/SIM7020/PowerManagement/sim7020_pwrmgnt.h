@@ -33,34 +33,34 @@
  *  @param UseRetention (Optional) Use socket scene retention
  *  @return             SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_PSM_Enable(const SIM7020_t* const p_Device, uint8_t Base_T, uint8_t Value_T, uint8_t Base_A, uint8_t Value_A, bool UseRetention = false);
+SIM70XX_Error_t SIM7020_PSM_Enable(SIM7020_t* const p_Device, uint8_t Base_T, uint8_t Value_T, uint8_t Base_A, uint8_t Value_A, bool UseRetention = false);
 
 /** @brief          Disable the power saving mode (PSM).
  *  @param p_Device Pointer to SIM7020 device object
  *  @param Mode     PSM mode
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_PSM_Disable(const SIM7020_t* const p_Device, SIM7020_PSM_Enable_t Mode);
+SIM70XX_Error_t SIM7020_PSM_Disable(SIM7020_t* const p_Device, SIM7020_PSM_Enable_t Mode);
 
 /** @brief          Get the current power saving mode (PSM).
  *  @param p_Device Pointer to SIM7020 device object
  *  @param p_Mode   Pointer to PSM mode
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_PSM_GetMode(const SIM7020_t* const p_Device, SIM7020_PSM_Enable_t* p_Mode);
+SIM70XX_Error_t SIM7020_PSM_GetMode(SIM7020_t* const p_Device, SIM7020_PSM_Enable_t* p_Mode);
 
 /** @brief          Get the status of the PSM event notifications.
  *  @param p_Device Pointer to SIM7020 device object
  *  @param p_Enable Event notification status
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_PSM_GetEventStatus(const SIM7020_t* const p_Device, bool* p_Enable);
+SIM70XX_Error_t SIM7020_PSM_GetEventStatus(SIM7020_t* const p_Device, bool* p_Enable);
 
 /** @brief          Set the status of the PSM event notifications.
  *  @param p_Device Pointer to SIM7020 device object
  *  @param Enable   Enable / Disable event notifications
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_PSM_SetEventStatus(const SIM7020_t* const p_Device, bool Enable);
+SIM70XX_Error_t SIM7020_PSM_SetEventStatus(SIM7020_t* const p_Device, bool Enable);
 
 #endif /* SIM7020_PWRMGNT_H_ */

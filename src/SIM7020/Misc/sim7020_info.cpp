@@ -25,11 +25,11 @@
 
 #include "sim7020.h"
 #include "../../Private/Queue/sim70xx_queue.h"
-#include "../../Private/Commands/sim7020_commands.h"
+#include "../../Private/Commands/sim70xx_commands.h"
 
 static const char* TAG = "SIM7020_Info";
 
-void SIM7020_Info_Print(const SIM7020_Info_t* p_Info)
+void SIM7020_Info_Print(SIM7020_Info_t* const p_Info)
 {
     ESP_LOGI(TAG, "Device information:");
     ESP_LOGI(TAG, "     Manufacturer: %s", p_Info->Manufacturer.c_str());
@@ -39,7 +39,7 @@ void SIM7020_Info_Print(const SIM7020_Info_t* p_Info)
     ESP_LOGI(TAG, "     ICCID: %s", p_Info->ICCID.c_str());
 }
 
-SIM70XX_Error_t SIM7020_Info_GetDeviceInformation(const SIM7020_t* const p_Device, SIM7020_Info_t* p_Info)
+SIM70XX_Error_t SIM7020_Info_GetDeviceInformation(SIM7020_t* const p_Device, SIM7020_Info_t* const p_Info)
 {
     if((p_Device == NULL) || (p_Info == NULL))
     {
@@ -60,7 +60,7 @@ SIM70XX_Error_t SIM7020_Info_GetDeviceInformation(const SIM7020_t* const p_Devic
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_Info_GetManufacturer(const SIM7020_t* const p_Device, std::string* p_Manufacturer)
+SIM70XX_Error_t SIM7020_Info_GetManufacturer(SIM7020_t* const p_Device, std::string* const p_Manufacturer)
 {
     SIM70XX_TxCmd_t* Command;
 
@@ -84,7 +84,7 @@ SIM70XX_Error_t SIM7020_Info_GetManufacturer(const SIM7020_t* const p_Device, st
     return SIM70XX_ERR_FAIL;
 }
 
-SIM70XX_Error_t SIM7020_Info_GetModel(const SIM7020_t* const p_Device, std::string* p_Model)
+SIM70XX_Error_t SIM7020_Info_GetModel(SIM7020_t* const p_Device, std::string* const p_Model)
 {
     SIM70XX_TxCmd_t* Command;
 
@@ -108,7 +108,7 @@ SIM70XX_Error_t SIM7020_Info_GetModel(const SIM7020_t* const p_Device, std::stri
     return SIM70XX_ERR_FAIL;  
 }
 
-SIM70XX_Error_t SIM7020_Info_GetFW(const SIM7020_t* const p_Device, std::string* p_Firmware)
+SIM70XX_Error_t SIM7020_Info_GetFW(SIM7020_t* const p_Device, std::string* const p_Firmware)
 {
     SIM70XX_TxCmd_t* Command;
 
@@ -132,7 +132,7 @@ SIM70XX_Error_t SIM7020_Info_GetFW(const SIM7020_t* const p_Device, std::string*
     return SIM70XX_ERR_FAIL;
 }
 
-SIM70XX_Error_t SIM7020_Info_GetIMEI(const SIM7020_t* const p_Device, std::string* p_IMEI)
+SIM70XX_Error_t SIM7020_Info_GetIMEI(SIM7020_t* const p_Device, std::string* const p_IMEI)
 {
     SIM70XX_TxCmd_t* Command;
 
@@ -156,7 +156,7 @@ SIM70XX_Error_t SIM7020_Info_GetIMEI(const SIM7020_t* const p_Device, std::strin
     return SIM70XX_ERR_FAIL;
 }
 
-SIM70XX_Error_t SIM7020_Info_GetICCID(const SIM7020_t* const p_Device, std::string* p_ICCID)
+SIM70XX_Error_t SIM7020_Info_GetICCID(SIM7020_t* const p_Device, std::string* const p_ICCID)
 {
     SIM70XX_TxCmd_t* Command;
 
@@ -275,7 +275,7 @@ SIM70XX_Error_t SIM7020_Info_GetQuality(SIM7020_t* const p_Device)
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_Info_GetNetworkStatus(const SIM7020_t* const p_Device, SIM7020_NetState_t* p_Status)
+SIM70XX_Error_t SIM7020_Info_GetNetworkStatus(SIM7020_t* const p_Device, SIM7020_NetState_t* const p_Status)
 {
     size_t Index;
     std::string Response;
