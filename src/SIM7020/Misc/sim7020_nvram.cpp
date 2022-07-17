@@ -19,7 +19,7 @@
 
 #include <sdkconfig.h>
 
-#if(CONFIG_SIMXX_DEV == 7020)
+#if((CONFIG_SIMXX_DEV == 7020) && (defined CONFIG_SIM70XX_DRIVER_WITH_NVRAM))
 
 #include <esp_log.h>
 

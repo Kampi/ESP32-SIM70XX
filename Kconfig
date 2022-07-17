@@ -51,46 +51,66 @@ menu "SIM70XX"
             range 8 32
             default 16
             help
-                <ToDo>
+                Event queue length for the communication task.
     endmenu
 
     menu "Drivers"
         config SIM70XX_DRIVER_WITH_COAP
             bool "Enable CoAP support"
+            depends on (SIM70XX_DEV_SIM7080 || SIM70XX_DEV_SIM7020)
             default n
             help
-                Enable this option if you want CoAP added to the driver.
+                Enable this option if you want CoAP support added to the driver.
 
         config SIM70XX_DRIVER_WITH_MQTT
             bool "Enable MQTT support"
+            depends on (SIM70XX_DEV_SIM7080 || SIM70XX_DEV_SIM7020)
             default n
             help
-                Enable this option if you want MQTT added to the driver.
+                Enable this option if you want MQTT support added to the driver.
 
         config SIM70XX_DRIVER_WITH_HTTP
             bool "Enable HTTP support"
-            default y
+            depends on (SIM70XX_DEV_SIM7080 || SIM70XX_DEV_SIM7020)
+            default n
             help
-                Enable this option if you want HTTP added to the driver.
+                Enable this option if you want HTTP support added to the driver.
 
         config SIM70XX_DRIVER_WITH_TCPIP
             bool "Enable TCP/IP support"
+            depends on (SIM70XX_DEV_SIM7080 || SIM70XX_DEV_SIM7020)
             default n
             help
-                Enable this option if you want TCP/IP added to the driver.
+                Enable this option if you want TCP/IP support added to the driver.
 
         config SIM70XX_DRIVER_WITH_SNTP
             bool "Enable SNTP support"
+            depends on (SIM70XX_DEV_SIM7080 || SIM70XX_DEV_SIM7020)
             default n
             help
-                Enable this option if you want SNTP added to the driver.
+                Enable this option if you want SNTP support added to the driver.
 
         config SIM70XX_DRIVER_WITH_GPS
             bool "Enable GPS support"
             depends on SIM70XX_DEV_SIM7080
             default n
             help
-                Enable this option if you want GPS added to the driver.
+                Enable this option if you want GPS support added to the driver.
+
+        config SIM70XX_DRIVER_WITH_FS
+            bool "Enable File System support"
+            depends on SIM70XX_DEV_SIM7080
+            default n
+            help
+                Enable this option if you want File System support added to the driver.
+
+        config SIM70XX_DRIVER_WITH_NVRAM
+            bool "Enable NVRAM support"
+            depends on SIM70XX_DEV_SIM7020
+            default n
+            help
+                Enable this option if you want NWR support added to the driver.
+
     endmenu
 
     menu "UART"

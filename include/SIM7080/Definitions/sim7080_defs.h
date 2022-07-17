@@ -89,6 +89,14 @@ typedef enum
     SIM7080_FUNC_OFFLINE    = 7,                            /**< Offline mode. */
 } SIM7080_Func_t;
 
+/** @brief SIM7080 phone functionallity reset definitions.
+ */
+typedef enum
+{
+    SIM7080_RESET_NO        = 0,                            /**< Do not Reset the MT before setting it to <fun> power level. */
+    SIM7080_RESET_RESET     = 1,                            /**< Reset the MT before setting it to <fun> power level. */
+} SIM7080_Reset_t;
+
 /** @brief SIM7080 network registration status codes.
  */
 typedef enum
@@ -137,6 +145,13 @@ typedef struct
         SIM7080_NetRegistration_t Status;                   /**< Network status. */
         SIM7080_Func_t Functionality;                       /**< Current device functionality. */
     } Connection;
+    #ifdef CONFIG_SIM70XX_DRIVER_WITH_FS
+        struct
+        {
+            uint32_t Free;                                  /**< Free space on the file system.
+                                                                 NOTE: Managed by the device driver. */                 
+        } FS;
+    #endif
     struct
     {
         QueueHandle_t RxQueue;                              /**< Message receive (Module -> ESP32) queue.
@@ -146,12 +161,6 @@ typedef struct
         QueueHandle_t EventQueue;                           /**< Asynchronous event queue.
                                                                  NOTE: Managed by the device driver. */
         bool isInitialized;                                 /**< #true when the module is initialized and ready to use.
-                                                                 NOTE: Managed by the device driver. */
-        bool isPSM;                                         /**< #true when the module has entered PSM.
-                                                                 NOTE: Managed by the device driver. */
-        bool isPSMEvent;                                    /**< #true when PSM event notifications are enabled.
-                                                                 NOTE: Managed by the device driver. */
-        bool isActive;                                      /**< #true when the device is active and ready to use.
                                                                  NOTE: Managed by the device driver. */
         TaskHandle_t TaskHandle;                            /**< Handle of the receive task.
                                                                  NOTE: Managed by the device driver. */

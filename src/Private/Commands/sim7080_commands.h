@@ -42,4 +42,15 @@
  */
 #define SIM7080_AT_CSQ                                          SIM70XX_CMD("AT+CSQ", true, 1, 1)
 
+/**
+ * 
+ * Used in SIM7080 file system driver.
+ * 
+ */
+#define SIM7080_AT_CFSINIT                                      SIM70XX_CMD("AT+CFSINIT", false, 10, 1)
+#define SIM7080_AT_CFSDFILE(Index, Name)                        SIM70XX_CMD("AT+CFSDFILE=" + std::to_string(Index) + ",\"" + Name + "\"", false, 10, 1)
+#define SIM7080_AT_CFSREN(Index, Old, New)                      SIM70XX_CMD("AT+CFSREN=" + std::to_string(Index) + ",\"" + Old + "\",\"" + New + "\"", false, 10, 1)
+#define SIM7080_AT_CFSGFRS                                      SIM70XX_CMD("AT+CFSGFRS?", true, 10, 1)
+#define SIM7080_AT_CFSTERM                                      SIM70XX_CMD("AT+CFSTERM", false, 10, 1)
+
 #endif /* SIM7080_COMMANDS_H_ */

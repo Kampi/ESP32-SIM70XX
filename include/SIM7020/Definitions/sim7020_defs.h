@@ -81,6 +81,15 @@ typedef enum
     SIM7020_FUNC_DIS_PHONE  = 7,                            /**< Disable phone SIM only. Transmit and receive circuits still active. */
 } SIM7020_Func_t;
 
+/** @brief SIM7020 phone functionallity reset definitions.
+ */
+typedef enum
+{
+    SIM7020_RESET_NO        = 0,                            /**< Do not Reset the MT before setting it to <fun> power level. */
+    SIM7020_RESET_RESET     = 1,                            /**< Reset the MT before setting it to <fun> power level. */
+    SIM7020_RESET_AFTER     = 2,                            /**< Set it to <fun> power level now, and reset the MT after rebooting. */
+} SIM7020_Reset_t;
+
 /** @brief SIM7020 AcT definitions.
  */
 typedef enum

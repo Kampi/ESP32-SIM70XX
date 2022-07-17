@@ -5,6 +5,7 @@ set(COMPONENT_SRCS
     # SIM7080
     "src/SIM7080/sim7080.cpp"
     "src/SIM7080/Misc/sim7080_info.cpp"
+    "src/SIM7080/Misc/sim7080_fs.cpp"
 
     # SIM7020
     "src/SIM7020/sim7020.cpp"
@@ -35,6 +36,9 @@ set(COMPONENT_ADD_INCLUDEDIRS
 
     # SIM7080
     "include/SIM7080"
+	"include/SIM7080/Misc"
+	"include/SIM7080/Protocols"
+	"include/SIM7080/Definitions"
 
     # SIM7020
     "include/SIM7020"

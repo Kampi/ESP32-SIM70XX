@@ -123,6 +123,12 @@ SIM70XX_Error_t SIM7020_Init(SIM7020_t* const p_Device, const SIM7020_Config_t* 
     vTaskResume(p_Device->Internal.TaskHandle);
 
     SIM70XX_ERROR_CHECK(SIM7020_Ping(p_Device));
+    if(SIM7020_isSIMReady(p_Device) == false)
+    {
+        ESP_LOGE(TAG, "SIM not ready!");
+    }
+    ESP_LOGI(TAG, "SIM ready!");
+
     SIM70XX_ERROR_CHECK(SIM7020_PSM_Disable(p_Device, SIM7020_PSM_DIS));
     if(SIM7020_GetFunctionality(p_Device) == SIM70XX_ERR_INVALID_STATE)
     {
@@ -498,7 +504,7 @@ SIM70XX_Error_t SIM7020_GetBand(SIM7020_t* const p_Device, SIM7020_Band_t* p_Ban
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_SetFunctionality(SIM7020_t* const p_Device, SIM7020_Func_t Func)
+SIM70XX_Error_t SIM7020_SetFunctionality(SIM7020_t* const p_Device, SIM7020_Func_t Func, SIM7020_Reset_t Reset)
 {
     std::string Status;
     std::string Response;
@@ -519,7 +525,7 @@ SIM70XX_Error_t SIM7020_SetFunctionality(SIM7020_t* const p_Device, SIM7020_Func
     }
 
     SIM70XX_CREATE_CMD(Command);
-    *Command = SIM70XX_AT_CFUN_W(Func);
+    *Command = SIM70XX_AT_CFUN_W(Func, Reset);
     SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
     if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
     {

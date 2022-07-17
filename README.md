@@ -9,7 +9,7 @@
 
 ## ToDo
 
-[ ] Add CFUN rst for SIM7080 and SIM7020
+[ ] 
 
 ## Maintainer
 

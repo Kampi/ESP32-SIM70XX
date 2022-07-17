@@ -22,7 +22,6 @@
 
 #include "Misc/sim7020_pdp.h"
 #include "Misc/sim7020_info.h"
-#include "Misc/sim7020_nvram.h"
 #include "Definitions/sim7020_defs.h"
 #include "PowerManagement/sim7020_pwrmgnt.h"
 #include "sim70xx_tools.h"
@@ -35,6 +34,10 @@
 #include "Definitions/Configs/sim7020_config_fusion.h"
 
 #include <sdkconfig.h>
+
+#ifdef CONFIG_SIM70XX_DRIVER_WITH_NVRAM
+    #include "Misc/sim7020_nvram.h"
+#endif
 
 #ifdef CONFIG_SIM70XX_DRIVER_WITH_TCPIP
     #include "Protocols/sim7020_tcpip.h"
@@ -152,9 +155,10 @@ SIM70XX_Error_t SIM7020_GetBand(SIM7020_t* const p_Device, SIM7020_Band_t* p_Ban
 /** @brief          Set the device functionality.
  *  @param p_Device Pointer to SIM7020 device object
  *  @param Func     Device functionality
+ *  @param Reset    (Optional) Reset the MT before setting the function
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_SetFunctionality(SIM7020_t* const p_Device, SIM7020_Func_t Func);
+SIM70XX_Error_t SIM7020_SetFunctionality(SIM7020_t* const p_Device, SIM7020_Func_t Func, SIM7020_Reset_t Reset = SIM7020_RESET_NO);
 
 /** @brief          Get the device functionality.
  *  @param p_Device Pointer to SIM7020 device object

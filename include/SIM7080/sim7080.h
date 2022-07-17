@@ -33,13 +33,17 @@
 
 #include <sdkconfig.h>
 
+#ifdef CONFIG_SIM70XX_DRIVER_WITH_FS
+    #include "Misc/sim7080_fs.h"
+#endif
+
 /** @brief          Initialize the communication interface and the SIM7080 module.
  *  @param p_Device Pointer to SIM7080 device object
  *  @param p_Config Pointer to SIM7080 device configuration object
  *  @param Timeout  Reset timeout
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_Init(SIM7080_t* const p_Device, const SIM7080_Config_t* const p_Config, uint32_t Timeout);
+SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t* const p_Config, uint32_t Timeout);
 
 /** @brief          Initialize the communication interface and the SIM7080 module.
  *  @param p_Device Pointer to SIM7080 device object
@@ -48,7 +52,7 @@ SIM70XX_Error_t SIM7080_Init(SIM7080_t* const p_Device, const SIM7080_Config_t* 
  *                  NOTE: Use this parameter if you want to change the baudrate of the module before the module initialization begins.
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_Init(SIM7080_t* const p_Device, const SIM7080_Config_t* const p_Config, SIM70XX_Baud_t Old);
+SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t* const p_Config, SIM70XX_Baud_t Old);
 
 /** @brief          Initialize the communication interface and the SIM7080 module.
  *  @param p_Device Pointer to SIM7080 device object
@@ -58,7 +62,7 @@ SIM70XX_Error_t SIM7080_Init(SIM7080_t* const p_Device, const SIM7080_Config_t* 
  *                  NOTE: Use this parameter if you want to change the baudrate of the module before the module initialization begins.
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_Init(SIM7080_t* const p_Device, const SIM7080_Config_t* const p_Config, uint32_t Timeout = 10, SIM70XX_Baud_t Old = SIM_BAUD_AUTO);
+SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t* const p_Config, uint32_t Timeout = 10, SIM70XX_Baud_t Old = SIM_BAUD_AUTO);
 
 /** @brief          Deinitialize the SIM7080 module.
  *  @param p_Device Pointer to SIM7080 device object
@@ -134,9 +138,10 @@ SIM70XX_Error_t SIM7080_GetSelection(SIM7080_t* const p_Device, SIM7080_Sel_t* p
 /** @brief          Set the device functionality.
  *  @param p_Device Pointer to SIM7080 device object
  *  @param Func     Device functionality
+ *  @param Reset    (Optional) Reset the MT before setting the function
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_SetFunctionality(SIM7080_t* const p_Device, SIM7080_Func_t Func);
+SIM70XX_Error_t SIM7080_SetFunctionality(SIM7080_t* const p_Device, SIM7080_Func_t Func, SIM7080_Reset_t Reset = SIM7080_RESET_NO);
 
 /** @brief          Get the device functionality.
  *  @param p_Device Pointer to SIM7080 device object

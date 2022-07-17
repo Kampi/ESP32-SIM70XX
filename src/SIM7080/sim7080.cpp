@@ -31,17 +31,17 @@
 
 static const char* TAG = "SIM7080";
 
-SIM70XX_Error_t SIM7080_Init(SIM7080_t* const p_Device, const SIM7080_Config_t* const p_Config, uint32_t Timeout)
+SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t* const p_Config, uint32_t Timeout)
 {
     return SIM7080_Init(p_Device, p_Config, Timeout, SIM_BAUD_AUTO);
 }
 
-SIM70XX_Error_t SIM7080_Init(SIM7080_t* const p_Device, const SIM7080_Config_t* const p_Config, SIM70XX_Baud_t Old)
+SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t* const p_Config, SIM70XX_Baud_t Old)
 {
     return SIM7080_Init(p_Device, p_Config, 10, Old);
 }
 
-SIM70XX_Error_t SIM7080_Init(SIM7080_t* const p_Device, const SIM7080_Config_t* const p_Config, uint32_t Timeout, SIM70XX_Baud_t Old)
+SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t* const p_Config, uint32_t Timeout, SIM70XX_Baud_t Old)
 {
     std::string Response;
 
@@ -110,12 +110,23 @@ SIM70XX_Error_t SIM7080_Init(SIM7080_t* const p_Device, const SIM7080_Config_t* 
     vTaskResume(p_Device->Internal.TaskHandle);
 
     SIM70XX_ERROR_CHECK(SIM7080_Ping(p_Device));
-
     if(SIM7080_isSIMReady(p_Device) == false)
     {
         ESP_LOGE(TAG, "SIM not ready!");
     }
     ESP_LOGI(TAG, "SIM ready!");
+
+    #ifdef CONFIG_SIM70XX_DRIVER_WITH_FS
+        SIM70XX_ERROR_CHECK(SIM7080_FS_GetFree(p_Device, &p_Device->FS.Free));
+    #endif
+
+    uint32_t Free;
+    SIM7080_FS_GetFree(p_Device, &Free);
+    ESP_LOGI(TAG, "Free: %u", Free);
+    while(1)
+    {
+        vTaskDelay(10000);
+    }
 
     SIM70XX_ERROR_CHECK(SIM7080_SetFunctionality(p_Device, SIM7080_FUNC_MIN));
     SIM70XX_ERROR_CHECK(SIM7080_SetMode(p_Device, p_Config->Mode));
@@ -123,13 +134,6 @@ SIM70XX_Error_t SIM7080_Init(SIM7080_t* const p_Device, const SIM7080_Config_t* 
     SIM70XX_ERROR_CHECK(SIM7080_SetOperator(p_Device, SIM_MODE_MANUAL, p_Config->OperatorFormat, p_Config->Operator));
     SIM70XX_ERROR_CHECK(SIM7080_SetFunctionality(p_Device, SIM7080_FUNC_FULL));
     SIM70XX_ERROR_CHECK(SIM7080_SetBand(p_Device, p_Config->Band));
-
-    do
-    {
-        ESP_LOGI(TAG, "Waiting...");
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
-    } while(SIM7080_isAttached(p_Device) == false);
-    ESP_LOGI(TAG, "Connected...");
 
     SIM70XX_ERROR_CHECK(SIM7080_Info_GetNetworkRegistrationStatus(p_Device));
     SIM70XX_ERROR_CHECK(SIM7080_Info_GetQuality(p_Device));
@@ -462,7 +466,7 @@ SIM70XX_Error_t SIM7080_GetSelection(SIM7080_t* const p_Device, SIM7080_Sel_t* p
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7080_SetFunctionality(SIM7080_t* const p_Device, SIM7080_Func_t Func)
+SIM70XX_Error_t SIM7080_SetFunctionality(SIM7080_t* const p_Device, SIM7080_Func_t Func, SIM7080_Reset_t Reset)
 {
     std::string Status;
     std::string Response;
@@ -483,7 +487,7 @@ SIM70XX_Error_t SIM7080_SetFunctionality(SIM7080_t* const p_Device, SIM7080_Func
     }
 
     SIM70XX_CREATE_CMD(Command);
-    *Command = SIM70XX_AT_CFUN_W(Func);
+    *Command = SIM70XX_AT_CFUN_W(Func, Reset);
     SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
     if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
     {
@@ -654,11 +658,10 @@ bool SIM7080_isAttached(SIM7080_t* const p_Device)
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM70XX_AT_CGATT_R;
     SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
+    if((SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false) || (SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue, &Response) != SIM70XX_ERR_OK))
     {
         return false;
     }
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue, &Response));
 
     return (bool)std::stoi(Response);
 }
