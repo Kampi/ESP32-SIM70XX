@@ -127,7 +127,6 @@ typedef struct
                                                                  NOTE: Can be set to -1 when not used. */
         } Reset_Conf;
     #endif
-    SIM7020_Band_t Band;                                    /**< Selected frequency band. */
     std::vector<SIM70XX_Operator_t> Operators;              /**< */
     std::string Modes;                                      /**< */
     std::string Formats;                                    /**< */

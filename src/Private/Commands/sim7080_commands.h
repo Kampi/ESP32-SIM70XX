@@ -27,10 +27,10 @@
  * Used in SIM7080 device driver.
  * 
  */
-#define SIM7080_AT_CFUN_R                                       SIM70XX_CMD("AT+CFUN?", true, 10, 1)
-#define SIM7080_AT_CFUN_W(Func)                                 SIM70XX_CMD("AT+CFUN=" + std::to_string(Func), true, 60, 1)
-#define SIM7080_AT_CBAND_W(Band)                                SIM70XX_CMD("AT+CBAND=" + std::to_string(Band), false, 10, 1)
-#define SIM7080_AT_CBAND_R                                      SIM70XX_CMD("AT+CBAND?", true, 10, 1)
+#define SIM7080_AT_CNMP_W(Mode)                                 SIM70XX_CMD("AT+CNMP=" + std::to_string(Mode), false, 10, 1)
+#define SIM7080_AT_CNMP_R                                       SIM70XX_CMD("AT+CNMP?", true, 10, 1)
+#define SIM7080_AT_CMNB_W(Sel)                                  SIM70XX_CMD("AT+CMNB=" + std::to_string(Sel), false, 10, 1)
+#define SIM7080_AT_CMNB_R                                       SIM70XX_CMD("AT+CMNB?", true, 10, 1)
 #define SIM7080_AT_CGREG                                        SIM70XX_CMD("AT+CGREG?", true, 10, 1)
 #define SIM7080_AT_COPS_W(Command)                              SIM70XX_CMD(Command, false, 300, 1)
 #define SIM7080_AT_COPS_R                                       SIM70XX_CMD("AT+COPS=?", true, 300, 1)

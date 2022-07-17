@@ -35,7 +35,26 @@
 
 #include "sim70xx_defs.h"
 
-/** @brief Supported frequency bands.
+/** @brief SIM7080 preferred network modes.
+ */
+typedef enum
+{
+    SIM7080_NETMODE_AUTO    = 2,                            /**< Automatic mode selection. */
+    SIM7080_NETMODE_GSM     = 13,                           /**< GSM only mode. */
+    SIM7080_NETMODE_LTE     = 38,                           /**< LTE mode only. */
+    SIM7080_NETMODE_GSM_LTE = 51,                           /**< GSM and LTE mode only. */
+} SIM7080_NetMode_t;
+
+/** @brief SIM7080 preferred selections between CAT-M and NB-IoT.
+ */
+typedef enum
+{
+    SIM7080_SEL_CAT         = 1,                            /**< Select CAT-M. */
+    SIM7080_SEL_NB          = 2,                            /**< Select NB-IoT. */
+    SIM7080_SEL_BOTH        = 3,                            /**< Select CAT-M and NB-IoT. */
+} SIM7080_Sel_t;
+
+/** @brief SIM7080 supported frequency bands.
  */
 typedef enum
 {
@@ -44,7 +63,7 @@ typedef enum
     SIM7080_BAND_ALL        = 255,                          /**< All band mode. */
 } SIM7080_Band_t;
 
-/** @brief Phone functionallity definitions.
+/** @brief SIM7080 phone functionallity definitions.
  */
 typedef enum
 {
@@ -97,7 +116,6 @@ typedef struct
                                                                  NOTE: Can be set to -1 when not used. */
         } Reset_Conf;
     #endif
-    SIM7080_Band_t Band;                                    /**< Selected frequency band. */
     struct
     {
         int8_t RSSI;                                        /**< Network RSSI value in dBm. */
@@ -143,6 +161,8 @@ typedef struct
     SIM70XX_APN_t APN;                                      /**< APN configuration object. */
     SIM70XX_OpForm_t OperatorFormat;                        /**< Format for the selected operator. */
     std::string Operator;                                   /**< Selected operator. */
+    SIM7080_NetMode_t Mode;                                 /**< Preferred network mode selection. */
+    SIM7080_Sel_t Selection;                                /**< Preffered selection between CAT-M and NB-IoT. */
 } SIM7080_Config_t;
 
 #endif /* SIM7080_DEFS_H_ */

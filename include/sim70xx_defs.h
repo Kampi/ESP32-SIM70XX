@@ -77,9 +77,9 @@ typedef enum
  */
 typedef struct
 {
-    std::string Name;                                       /**< Name of the access point. */
-    std::string Username;                                   /**< Access Point username. */
-    std::string Password;                                   /**< Access Point password. */
+    std::string Name;                               /**< Name of the access point. */
+    std::string Username;                           /**< Access Point username. */
+    std::string Password;                           /**< Access Point password. */
 } SIM70XX_APN_t;
 
 /** @brief SIM70XX operator object definition.

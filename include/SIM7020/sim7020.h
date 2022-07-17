@@ -144,9 +144,10 @@ SIM70XX_Error_t SIM7020_SetBand(SIM7020_t* const p_Device, SIM7020_Band_t Band);
 
 /** @brief          Get the frequency band of the module.
  *  @param p_Device Pointer to SIM7020 device object
+ *  @param p_Band   Pointer to freuquency band
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_GetBand(SIM7020_t* const p_Device);
+SIM70XX_Error_t SIM7020_GetBand(SIM7020_t* const p_Device, SIM7020_Band_t* p_Band);
 
 /** @brief          Set the device functionality.
  *  @param p_Device Pointer to SIM7020 device object
@@ -161,7 +162,19 @@ SIM70XX_Error_t SIM7020_SetFunctionality(SIM7020_t* const p_Device, SIM7020_Func
  */
 SIM70XX_Error_t SIM7020_GetFunctionality(SIM7020_t* const p_Device);
 
-/** @brief          Check if the SIM7020 module is initialized.
+/** @brief          Check if the SIM card is ready to use.
+ *  @param p_Device Pointer to SIM7020 device object
+ *  @return         #true when the SIM card is ready
+ */
+bool SIM7020_isSIMReady(SIM7020_t* const p_Device);
+
+/** @brief          Check if the module is connected with the GPRS service
+ *  @param p_Device Pointer to SIM7020 device object
+ *  @return         #true when the module is connected to the GPRS service
+ */
+bool SIM7020_isAttached(SIM7020_t* const p_Device);
+
+/** @brief          Check if the module is initialized.
  *  @param p_Device Pointer to SIM7020 device object
  *  @return         #true when the module is initialized
  */

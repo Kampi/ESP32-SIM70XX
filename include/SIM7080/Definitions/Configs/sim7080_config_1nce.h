@@ -43,6 +43,8 @@
                                                                         },                                                  \
                                                                         .OperatorFormat = SIM_FORM_NUMERIC,                 \
                                                                         .Operator = "26201",                                \
+                                                                        .Mode = SIM7080_NETMODE_LTE,                        \
+                                                                        .Selection = SIM7080_SEL_BOTH,                      \
                                                                     };
 
 #endif /* SIM7080_CONFIG_1NCE_H_ */

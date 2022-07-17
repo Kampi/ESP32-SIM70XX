@@ -98,9 +98,38 @@ SIM70XX_Error_t SIM7080_SetBand(SIM7080_t* const p_Device, SIM7080_Band_t Band);
 
 /** @brief          Get the frequency band of the module.
  *  @param p_Device Pointer to SIM7080 device object
+ *  @param p_Band   Pointer to freuquency band
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_GetBand(SIM7080_t* const p_Device);
+SIM70XX_Error_t SIM7080_GetBand(SIM7080_t* const p_Device, SIM7080_Band_t* p_Band);
+
+/** @brief          Set the preferred network mode.
+ *  @param p_Device Pointer to SIM7080 device object
+ *  @param Mode     Preferred mode selection
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_SetMode(SIM7080_t* const p_Device, SIM7080_NetMode_t Mode);
+
+/** @brief          Get the preferred network mode.
+ *  @param p_Device Pointer to SIM7080 device object
+ *  @param p_Mode   Pointer to preferred mode selection
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_GetMode(SIM7080_t* const p_Device, SIM7080_NetMode_t* p_Mode);
+
+/** @brief              Set the preffered selection between CAT-M and NB-IoT.
+ *  @param p_Device     Pointer to SIM7080 device object
+ *  @param Selection    Preferred selection
+ *  @return             SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_SetSelection(SIM7080_t* const p_Device, SIM7080_Sel_t Selection);
+
+/** @brief                  Get the preffered selection between CAT-M and NB-IoT.
+ *  @param p_Device         Pointer to SIM7080 device object
+ *  @param p_Selection      Pointer to referred selection
+ *  @return                 SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_GetSelection(SIM7080_t* const p_Device, SIM7080_Sel_t* p_Selection);
 
 /** @brief          Set the device functionality.
  *  @param p_Device Pointer to SIM7080 device object
@@ -114,6 +143,24 @@ SIM70XX_Error_t SIM7080_SetFunctionality(SIM7080_t* const p_Device, SIM7080_Func
  *  @return         SIM70XX_ERR_OK when successful
  */
 SIM70XX_Error_t SIM7080_GetFunctionality(SIM7080_t* const p_Device);
+
+/** @brief          Check if the SIM card is ready to use.
+ *  @param p_Device Pointer to SIM7080 device object
+ *  @return         #true when the SIM card is ready
+ */
+bool SIM7080_isSIMReady(SIM7080_t* const p_Device);
+
+/** @brief          Check if the module is connected with the GPRS service.
+ *  @param p_Device Pointer to SIM7080 device object
+ *  @return         #true when the module is connected to the GPRS service
+ */
+bool SIM7080_isAttached(SIM7080_t* const p_Device);
+
+/** @brief          Check if the module is initialized.
+ *  @param p_Device Pointer to SIM7080 device object
+ *  @return         #true when the module is initialized
+ */
+bool SIM7080_isInitialized(SIM7080_t* const p_Device);
 
 /** @brief          Ping the module by sending an empty 'AT'.
  *  @param p_Device Pointer to SIM7080 device object
