@@ -162,6 +162,8 @@ typedef struct
                                                                  NOTE: Managed by the device driver. */
         bool isInitialized;                                 /**< #true when the module is initialized and ready to use.
                                                                  NOTE: Managed by the device driver. */
+        bool isActive;                                      /**< #true when the device is active and ready to use.
+                                                                 NOTE: Managed by the device driver. */
         TaskHandle_t TaskHandle;                            /**< Handle of the receive task.
                                                                  NOTE: Managed by the device driver. */
     } Internal;

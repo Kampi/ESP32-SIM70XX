@@ -30,20 +30,20 @@
  *  @param p_Config Pointer to SIM70XX UART configuration object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM70XX_UART_Init(SIM70XX_UART_Conf_t* p_Config);
+SIM70XX_Error_t SIM70XX_UART_Init(SIM70XX_UART_Conf_t& p_Config);
 
 /** @brief          Deinitialize the UART interface.
  *  @param p_Config Pointer to SIM70XX UART configuration object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM70XX_UART_Deinit(SIM70XX_UART_Conf_t* p_Config);
+SIM70XX_Error_t SIM70XX_UART_Deinit(SIM70XX_UART_Conf_t& p_Config);
 
 /** @brief          Send a command over the UART interface.
  *  @param p_Config Pointer to SIM70XX UART configuration object
  *  @param Command  Command string
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM70XX_UART_SendCommand(const SIM70XX_UART_Conf_t* p_Config, std::string Command);
+SIM70XX_Error_t SIM70XX_UART_SendCommand(SIM70XX_UART_Conf_t& p_Config, std::string Command);
 
 /** @brief          Read a number of bytes from the UART interface.
  *  @param p_Config Pointer to SIM70XX UART configuration object
@@ -51,30 +51,30 @@ SIM70XX_Error_t SIM70XX_UART_SendCommand(const SIM70XX_UART_Conf_t* p_Config, st
  *  @param Size     Number of bytes to read
  *  @return         Number of bytes read
  */
-size_t SIM70XX_UART_Read(const SIM70XX_UART_Conf_t* p_Config, uint8_t* p_Buffer, size_t Size);
+size_t SIM70XX_UART_Read(SIM70XX_UART_Conf_t& p_Config, uint8_t* p_Buffer, size_t Size);
 
 /** @brief              Receive a string from the UART interface until a termination character is received.
  *  @param p_Config     Pointer to SIM70XX UART configuration object
  *  @param Terminator   Termination character
  *  @return             Received string
  */
-std::string SIM70XX_UART_ReadStringUntil(const SIM70XX_UART_Conf_t* p_Config, char Terminator);
+std::string SIM70XX_UART_ReadStringUntil(SIM70XX_UART_Conf_t& p_Config, char Terminator);
 
 /** @brief          Receive a string from the UART interface.
  *  @param p_Config Pointer to SIM70XX UART configuration object
  *  @return         Received string
  */
-std::string SIM70XX_UART_ReadString(const SIM70XX_UART_Conf_t* p_Config);
+std::string SIM70XX_UART_ReadString(SIM70XX_UART_Conf_t& p_Config);
 
 /** @brief              Flush the UART receive buffer.
  *  @param p_Config     Pointer to SIM70XX UART configuration object
  */
-void SIM70XX_UART_Flush(const SIM70XX_UART_Conf_t* p_Config);
+void SIM70XX_UART_Flush(SIM70XX_UART_Conf_t& p_Config);
 
 /** @brief          Get the number of available bytes from the receive buffer.
  *  @param p_Config Pointer to SIM70XX UART configuration object
  *  @return         Number of bytes available
  */
-int SIM70XX_UART_Available(const SIM70XX_UART_Conf_t* p_Config);
+int SIM70XX_UART_Available(SIM70XX_UART_Conf_t& p_Config);
 
 #endif /* SIM70XX_UART_H_ */

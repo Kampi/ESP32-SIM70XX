@@ -25,15 +25,15 @@
 #include "Definitions/Misc/sim7080_info_defs.h"
 
 /** @brief          Get the network registration status.
- *  @param p_Device Pointer to SIM7080 device object
+ *  @param p_Device SIM7080 device object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_Info_GetNetworkRegistrationStatus(SIM7080_t* const p_Device);
+SIM70XX_Error_t SIM7080_Info_GetNetworkRegistrationStatus(SIM7080_t& p_Device);
 
 /** @brief          Get a signal quality report.
- *  @param p_Device Pointer to SIM7080 device object
+ *  @param p_Device SIM7080 device object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_Info_GetQuality(SIM7080_t* const p_Device);
+SIM70XX_Error_t SIM7080_Info_GetQuality(SIM7080_t& p_Device);
 
 #endif /* SIM7080_INFO_H_ */

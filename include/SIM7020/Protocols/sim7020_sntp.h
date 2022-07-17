@@ -25,12 +25,12 @@
 #include "sim7020_sntp_defs.h"
 
 /** @brief          Get the network time by using an SNTP server instance.
- *  @param p_Device Pointer to SIM7020 device object
+ *  @param p_Device SIM7020 device object
  *  @param Server   NTP server address
  *  @param Timezone Current timezone
  *  @param Timeout  (Optional) Message timeout for each Ping response in seconds
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_SNTP_GetNetworkTime(SIM7020_t* const p_Device, std::string Server, int8_t Timezone, uint8_t Timeout = 60);
+SIM70XX_Error_t SIM7020_SNTP_GetNetworkTime(SIM7020_t& p_Device, std::string Server, int8_t Timezone, uint8_t Timeout = 60);
 
 #endif /* SIM7020_SNTP_H_ */

@@ -30,7 +30,7 @@
 
 static const char* TAG = "SIM7020_MQTT";
 
-SIM70XX_Error_t SIM7020_MQTT_Create(SIM7020_t* const p_Device, std::string Broker, uint16_t Port, SIM7020_MQTT_Socket_t* p_Socket, uint8_t CID)
+SIM70XX_Error_t SIM7020_MQTT_Create(SIM7020_t& p_Device, std::string Broker, uint16_t Port, SIM7020_MQTT_Socket_t* p_Socket, uint8_t CID)
 {
     if(p_Socket == NULL)
     {
@@ -46,17 +46,17 @@ SIM70XX_Error_t SIM7020_MQTT_Create(SIM7020_t* const p_Device, std::string Broke
     return SIM7020_MQTT_Create(p_Device, p_Socket);
 }
 
-SIM70XX_Error_t SIM7020_MQTT_Create(SIM7020_t* const p_Device, SIM7020_MQTT_Socket_t* p_Socket)
+SIM70XX_Error_t SIM7020_MQTT_Create(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* p_Socket)
 {
     std::string Response;
     std::string CommandStr;
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Device == NULL) || (p_Socket == NULL) || (p_Socket->Timeout > 60000) || (p_Socket->BufferSize < 20) || (p_Socket->BufferSize > 1132) || (p_Socket->Broker.length() > 50) || (p_Socket->CID > 10))
+    if((p_Socket == NULL) || (p_Socket->Timeout > 60000) || (p_Socket->BufferSize < 20) || (p_Socket->BufferSize > 1132) || (p_Socket->Broker.length() > 50) || (p_Socket->CID > 10))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
-    else if(p_Device->Internal.isInitialized == false)
+    else if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
@@ -64,27 +64,27 @@ SIM70XX_Error_t SIM7020_MQTT_Create(SIM7020_t* const p_Device, SIM7020_MQTT_Sock
     CommandStr = "AT+CMQNEW=\"" + p_Socket->Broker + "\"," + "\"" + std::to_string(p_Socket->Port) + "\"," + std::to_string(p_Socket->Timeout) + "," + std::to_string(p_Socket->BufferSize) + "," + std::to_string(p_Socket->CID);
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CMQNEW(CommandStr);
-    SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue, &Response));
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
     p_Socket->ID = (uint8_t)std::stoi(Response);
 
     // Everything okay. The socket is active now.
     ESP_LOGI(TAG, "Socket %u opened...", p_Socket->ID);
 
-    p_Device->MQTT.Sockets.push_back(p_Socket);
+    p_Device.MQTT.Sockets.push_back(p_Socket);
     p_Socket->isConnected = false;
     p_Socket->isCreated = true;
-    p_Device->MQTT.SubTopics = 0;
+    p_Device.MQTT.SubTopics = 0;
 
     return SIM70XX_ERR_OK;    
 }
 
-SIM70XX_Error_t SIM7020_MQTT_Connect(SIM7020_t* const p_Device, std::string Client, SIM7020_MQTT_Socket_t* p_Socket, SIM7020_MQTT_Version_t Version)
+SIM70XX_Error_t SIM7020_MQTT_Connect(SIM7020_t& p_Device, std::string Client, SIM7020_MQTT_Socket_t* p_Socket, SIM7020_MQTT_Version_t Version)
 {
     if(p_Socket == NULL)
     {
@@ -100,18 +100,18 @@ SIM70XX_Error_t SIM7020_MQTT_Connect(SIM7020_t* const p_Device, std::string Clie
     return SIM7020_MQTT_Connect(p_Device, p_Socket);
 }
 
-SIM70XX_Error_t SIM7020_MQTT_Connect(SIM7020_t* const p_Device, SIM7020_MQTT_Socket_t* p_Socket)
+SIM70XX_Error_t SIM7020_MQTT_Connect(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* p_Socket)
 {
     std::string Response;
     std::string CommandStr;
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Device == NULL) || (p_Socket == NULL) || (p_Socket->Version < SIM7020_MQTT_31) || (p_Socket->Version > SIM7020_MQTT_311) || (p_Socket->ClientID.length() == 0) || (p_Socket->ClientID.length() > 120) || (p_Socket->KeepAlive > 64800) || 
+    if((p_Socket == NULL) || (p_Socket->Version < SIM7020_MQTT_31) || (p_Socket->Version > SIM7020_MQTT_311) || (p_Socket->ClientID.length() == 0) || (p_Socket->ClientID.length() > 120) || (p_Socket->KeepAlive > 64800) || 
         (p_Socket->WillFlag && ((p_Socket->LastWill.Topic.length() == 0) || (p_Socket->LastWill.Message.length() == 0))) || ((p_Socket->Username.length() > 100) && (p_Socket->Passwort.length() > 100)))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
-    else if(p_Device->Internal.isInitialized == false)
+    else if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
@@ -139,35 +139,35 @@ SIM70XX_Error_t SIM7020_MQTT_Connect(SIM7020_t* const p_Device, SIM7020_MQTT_Soc
 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CMQCON(CommandStr);
-    SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue));
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
 
     p_Socket->isConnected = true;
 
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_MQTT_Publish(SIM7020_t* const p_Device, SIM7020_MQTT_Socket_t* p_Socket, std::string Topic, SIM7020_MQTT_QoS_t QoS, std::string Message, bool Retained, bool Dup)
+SIM70XX_Error_t SIM7020_MQTT_Publish(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* p_Socket, std::string Topic, SIM7020_MQTT_QoS_t QoS, std::string Message, bool Retained, bool Dup)
 {
     return SIM7020_MQTT_Publish(p_Device, p_Socket, Topic, QoS, Message.c_str(), Message.length(), Retained, Dup);
 }
 
-SIM70XX_Error_t SIM7020_MQTT_Publish(SIM7020_t* const p_Device, SIM7020_MQTT_Socket_t* p_Socket, std::string Topic, SIM7020_MQTT_QoS_t QoS, const void* p_Buffer, uint32_t Length, bool Retained, bool Dup)
+SIM70XX_Error_t SIM7020_MQTT_Publish(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* p_Socket, std::string Topic, SIM7020_MQTT_QoS_t QoS, const void* p_Buffer, uint32_t Length, bool Retained, bool Dup)
 {
     std::string Buffer_Hex;
     std::string Response;
     std::string CommandStr;
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Device == NULL) || (p_Socket == NULL) || (p_Buffer == NULL) || (Topic.length() > 128) || (QoS < SIM7020_MQTT_QOS_0) || (QoS > SIM7020_MQTT_QOS_2) || (Length < 2) || (Length > 1000))
+    if((p_Socket == NULL) || (p_Buffer == NULL) || (Topic.length() > 128) || (QoS < SIM7020_MQTT_QOS_0) || (QoS > SIM7020_MQTT_QOS_2) || (Length < 2) || (Length > 1000))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
-    else if(p_Device->Internal.isInitialized == false)
+    else if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
@@ -180,25 +180,25 @@ SIM70XX_Error_t SIM7020_MQTT_Publish(SIM7020_t* const p_Device, SIM7020_MQTT_Soc
     CommandStr = "AT+CMQPUB=" + std::to_string(p_Socket->ID) + ",\"" + Topic + "\"," + std::to_string(1) + "," + std::to_string(Retained) + "," + std::to_string(Dup) + "," + std::to_string(Length * 2) + ",\"" + Buffer_Hex + "\"";
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CMQCON(CommandStr);
-    SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
 
-    return SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue);
+    return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
 }
 
-SIM70XX_Error_t SIM7020_MQTT_Subscribe(SIM7020_t* const p_Device, SIM7020_MQTT_Socket_t* p_Socket, std::string Topic, SIM7020_MQTT_QoS_t QoS)
+SIM70XX_Error_t SIM7020_MQTT_Subscribe(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* p_Socket, std::string Topic, SIM7020_MQTT_QoS_t QoS)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Device == NULL) || (p_Socket == NULL) || (Topic.length() > 128) || (QoS < SIM7020_MQTT_QOS_0) || (QoS > SIM7020_MQTT_QOS_2))
+    if((p_Socket == NULL) || (Topic.length() > 128) || (QoS < SIM7020_MQTT_QOS_0) || (QoS > SIM7020_MQTT_QOS_2))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
-    else if(p_Device->Internal.isInitialized == false)
+    else if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
@@ -209,41 +209,41 @@ SIM70XX_Error_t SIM7020_MQTT_Subscribe(SIM7020_t* const p_Device, SIM7020_MQTT_S
 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CMQSUB(p_Socket->ID, Topic, QoS);
-    SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue, &Response));
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    if(p_Device->MQTT.SubQueue == NULL)
+    if(p_Device.MQTT.SubQueue == NULL)
     {
-        p_Device->MQTT.SubQueue = xQueueCreate(CONFIG_SIM70XX_QUEUE_LENGTH, sizeof(SIM7020_Pub_t*));
+        p_Device.MQTT.SubQueue = xQueueCreate(CONFIG_SIM70XX_QUEUE_LENGTH, sizeof(SIM7020_Pub_t*));
     }
 
-    p_Device->MQTT.SubTopics++;
+    p_Device.MQTT.SubTopics++;
 
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_MQTT_GetMessage(SIM7020_t* const p_Device, SIM7020_Pub_t* p_Message)
+SIM70XX_Error_t SIM7020_MQTT_GetMessage(SIM7020_t& p_Device, SIM7020_Pub_t* p_Message)
 {
     SIM7020_Pub_t* Packet;
 
-    if((p_Device == NULL) || (p_Message == NULL) || (p_Device->MQTT.SubQueue == NULL))
+    if((p_Message == NULL) || (p_Device.MQTT.SubQueue == NULL))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
-    else if(p_Device->Internal.isInitialized == false)
+    else if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
-    else if(uxQueueMessagesWaiting(p_Device->MQTT.SubQueue) == 0)
+    else if(uxQueueMessagesWaiting(p_Device.MQTT.SubQueue) == 0)
     {
         return SIM70XX_ERR_QUEUE_EMPTY;
     }
 
-    if(xQueueReceive(p_Device->MQTT.SubQueue, &Packet, 0) != pdTRUE)
+    if(xQueueReceive(p_Device.MQTT.SubQueue, &Packet, 0) != pdTRUE)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -255,15 +255,15 @@ SIM70XX_Error_t SIM7020_MQTT_GetMessage(SIM7020_t* const p_Device, SIM7020_Pub_t
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_MQTT_Unsubscribe(SIM7020_t* const p_Device, SIM7020_MQTT_Socket_t* p_Socket, std::string Topic)
+SIM70XX_Error_t SIM7020_MQTT_Unsubscribe(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* p_Socket, std::string Topic)
 {
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Device == NULL) || (p_Socket == NULL) || (Topic.length() > 128))
+    if((p_Socket == NULL) || (Topic.length() > 128))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
-    else if(p_Device->Internal.isInitialized == false)
+    else if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
@@ -274,23 +274,23 @@ SIM70XX_Error_t SIM7020_MQTT_Unsubscribe(SIM7020_t* const p_Device, SIM7020_MQTT
 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CMQUNSUB(p_Socket->ID, Topic);
-    SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue));
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
 
-    if(p_Device->MQTT.SubTopics > 0)
+    if(p_Device.MQTT.SubTopics > 0)
     {
-        p_Device->MQTT.SubTopics--;
+        p_Device.MQTT.SubTopics--;
 
         // Remove the queue when no subscribed topics left.
-        if(p_Device->MQTT.SubTopics == 0)
+        if(p_Device.MQTT.SubTopics == 0)
         {
-            if(p_Device->MQTT.SubQueue != NULL)
+            if(p_Device.MQTT.SubQueue != NULL)
             {
-                vQueueDelete(p_Device->MQTT.SubQueue);
+                vQueueDelete(p_Device.MQTT.SubQueue);
             }
         }
     }
@@ -298,15 +298,15 @@ SIM70XX_Error_t SIM7020_MQTT_Unsubscribe(SIM7020_t* const p_Device, SIM7020_MQTT
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_MQTT_Destroy(SIM7020_t* const p_Device, SIM7020_MQTT_Socket_t* p_Socket)
+SIM70XX_Error_t SIM7020_MQTT_Destroy(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* p_Socket)
 {
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Device == NULL) || (p_Socket == NULL))
+    if(p_Socket == NULL)
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
-    else if(p_Device->Internal.isInitialized == false)
+    else if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
@@ -317,18 +317,18 @@ SIM70XX_Error_t SIM7020_MQTT_Destroy(SIM7020_t* const p_Device, SIM7020_MQTT_Soc
 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CMQDISCON(p_Socket->ID);
-    SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue));
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
 
-    p_Device->MQTT.SubTopics = 0;
+    p_Device.MQTT.SubTopics = 0;
     p_Socket->isConnected = false;
-    if(p_Device->MQTT.SubQueue != NULL)
+    if(p_Device.MQTT.SubQueue != NULL)
     {
-        vQueueDelete(p_Device->MQTT.SubQueue);
+        vQueueDelete(p_Device.MQTT.SubQueue);
     }
 
     return SIM70XX_ERR_OK;

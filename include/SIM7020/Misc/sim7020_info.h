@@ -30,64 +30,64 @@
 void SIM7020_Info_Print(SIM7020_Info_t* const p_Info);
 
 /** @brief          Read the device information.
- *  @param p_Device Pointer to SIM7020 device object
+ *  @param p_Device SIM7020 device object
  *  @param p_Info   Pointer to device information object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_Info_GetDeviceInformation(SIM7020_t* const p_Device, SIM7020_Info_t* const p_Info);
+SIM70XX_Error_t SIM7020_Info_GetDeviceInformation(SIM7020_t& p_Device, SIM7020_Info_t* const p_Info);
 
 /** @brief                  Get the manufacturer of the device.
- *  @param p_Device         Pointer to SIM7020 device object
+ *  @param p_Device         SIM7020 device object
  *  @param p_Manufacturer   Pointer to manufacturer string
  *  @return                 SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_Info_GetManufacturer(SIM7020_t* const p_Device, std::string* const p_Manufacturer);
+SIM70XX_Error_t SIM7020_Info_GetManufacturer(SIM7020_t& p_Device, std::string* const p_Manufacturer);
 
 /** @brief              Get the device model.
- *  @param p_Device     Pointer to SIM7020 device object
+ *  @param p_Device     SIM7020 device object
  *  @param p_Model      Pointer to model string
  *  @return             SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_Info_GetModel(SIM7020_t* const p_Device, std::string* const p_Model);
+SIM70XX_Error_t SIM7020_Info_GetModel(SIM7020_t& p_Device, std::string* const p_Model);
 
 /** @brief              Get the version number of the SIM7020 device firmware.
- *  @param p_Device     Pointer to SIM7020 device object
+ *  @param p_Device     SIM7020 device object
  *  @param p_Firmware   Pointer to firmware string
  *  @return             SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_Info_GetFW(SIM7020_t* const p_Device, std::string* const p_Firmware);
+SIM70XX_Error_t SIM7020_Info_GetFW(SIM7020_t& p_Device, std::string* const p_Firmware);
 
 /** @brief          Get the IMEI of the attached SIM card.
- *  @param p_Device Pointer to SIM7020 device object
+ *  @param p_Device SIM7020 device object
  *  @param p_IMEI   Pointer to IMEI string
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_Info_GetIMEI(SIM7020_t* const p_Device, std::string* const p_IMEI);
+SIM70XX_Error_t SIM7020_Info_GetIMEI(SIM7020_t& p_Device, std::string* const p_IMEI);
 
 /** @brief          Get the ICCID of the attached SIM card.
- *  @param p_Device Pointer to SIM7020 device object
+ *  @param p_Device SIM7020 device object
  *  @param p_ICCID  Pointer to ICCID string
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_Info_GetICCID(SIM7020_t* const p_Device, std::string* const p_ICCID);
+SIM70XX_Error_t SIM7020_Info_GetICCID(SIM7020_t& p_Device, std::string* const p_ICCID);
 
 /** @brief          Get the network registration status.
- *  @param p_Device Pointer to SIM7020 device object
+ *  @param p_Device SIM7020 device object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_Info_GetNetworkRegistrationStatus(SIM7020_t* const p_Device);
+SIM70XX_Error_t SIM7020_Info_GetNetworkRegistrationStatus(SIM7020_t& p_Device);
 
 /** @brief          Get a signal quality report.
- *  @param p_Device Pointer to SIM7020 device object
+ *  @param p_Device SIM7020 device object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_Info_GetQuality(SIM7020_t* const p_Device);
+SIM70XX_Error_t SIM7020_Info_GetQuality(SIM7020_t& p_Device);
 
 /** @brief          Get the network status.
- *  @param p_Device Pointer to SIM7020 device object
+ *  @param p_Device SIM7020 device object
  *  @param p_Status Pointer to SIM7020 network status object
  *  @return         SIM7020_OK when successful
  */
-SIM70XX_Error_t SIM7020_Info_GetNetworkStatus(SIM7020_t* const p_Device, SIM7020_NetState_t* p_Status);
+SIM70XX_Error_t SIM7020_Info_GetNetworkStatus(SIM7020_t& p_Device, SIM7020_NetState_t* p_Status);
 
 #endif /* SIM7020_INFO_H_ */

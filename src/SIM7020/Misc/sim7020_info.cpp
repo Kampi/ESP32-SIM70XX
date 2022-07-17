@@ -39,13 +39,13 @@ void SIM7020_Info_Print(SIM7020_Info_t* const p_Info)
     ESP_LOGI(TAG, "     ICCID: %s", p_Info->ICCID.c_str());
 }
 
-SIM70XX_Error_t SIM7020_Info_GetDeviceInformation(SIM7020_t* const p_Device, SIM7020_Info_t* const p_Info)
+SIM70XX_Error_t SIM7020_Info_GetDeviceInformation(SIM7020_t& p_Device, SIM7020_Info_t* const p_Info)
 {
-    if((p_Device == NULL) || (p_Info == NULL))
+    if(p_Info == NULL)
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
-    else if(p_Device->Internal.isInitialized == false)
+    else if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
@@ -60,155 +60,151 @@ SIM70XX_Error_t SIM7020_Info_GetDeviceInformation(SIM7020_t* const p_Device, SIM
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_Info_GetManufacturer(SIM7020_t* const p_Device, std::string* const p_Manufacturer)
+SIM70XX_Error_t SIM7020_Info_GetManufacturer(SIM7020_t& p_Device, std::string* const p_Manufacturer)
 {
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Device == NULL) || (p_Manufacturer == NULL))
+    if(p_Manufacturer == NULL)
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
-    else if(p_Device->Internal.isInitialized == false)
+    else if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CGMI;
-    SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout))
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout))
     {
-        return SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue, p_Manufacturer);
+        return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, p_Manufacturer);
     }
 
     return SIM70XX_ERR_FAIL;
 }
 
-SIM70XX_Error_t SIM7020_Info_GetModel(SIM7020_t* const p_Device, std::string* const p_Model)
+SIM70XX_Error_t SIM7020_Info_GetModel(SIM7020_t& p_Device, std::string* const p_Model)
 {
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Device == NULL) || (p_Model == NULL))
+    if(p_Model == NULL)
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
-    else if(p_Device->Internal.isInitialized == false)
+    else if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CGMM;
-    SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout))
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout))
     {
-        return SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue, p_Model);
+        return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, p_Model);
     }
 
     return SIM70XX_ERR_FAIL;  
 }
 
-SIM70XX_Error_t SIM7020_Info_GetFW(SIM7020_t* const p_Device, std::string* const p_Firmware)
+SIM70XX_Error_t SIM7020_Info_GetFW(SIM7020_t& p_Device, std::string* const p_Firmware)
 {
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Device == NULL) || (p_Firmware == NULL))
+    if(p_Firmware == NULL)
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
-    else if(p_Device->Internal.isInitialized == false)
+    else if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CGMR;
-    SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout))
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout))
     {
-        return SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue, p_Firmware);
+        return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, p_Firmware);
     }
 
     return SIM70XX_ERR_FAIL;
 }
 
-SIM70XX_Error_t SIM7020_Info_GetIMEI(SIM7020_t* const p_Device, std::string* const p_IMEI)
+SIM70XX_Error_t SIM7020_Info_GetIMEI(SIM7020_t& p_Device, std::string* const p_IMEI)
 {
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Device == NULL) || (p_IMEI == NULL))
+    if(p_IMEI == NULL)
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
-    else if(p_Device->Internal.isInitialized == false)
+    else if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CGSN;
-    SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout))
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout))
     {
-        return SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue, p_IMEI);
+        return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, p_IMEI);
     }
 
     return SIM70XX_ERR_FAIL;
 }
 
-SIM70XX_Error_t SIM7020_Info_GetICCID(SIM7020_t* const p_Device, std::string* const p_ICCID)
+SIM70XX_Error_t SIM7020_Info_GetICCID(SIM7020_t& p_Device, std::string* const p_ICCID)
 {
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Device == NULL) || (p_ICCID == NULL))
+    if(p_ICCID == NULL)
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
-    else if(p_Device->Internal.isInitialized == false)
+    else if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CCID;
-    SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout))
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout))
     {
-        return SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue, p_ICCID);
+        return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, p_ICCID);
     }
 
     return SIM70XX_ERR_FAIL;
 }
 
-SIM70XX_Error_t SIM7020_Info_GetNetworkRegistrationStatus(SIM7020_t* const p_Device)
+SIM70XX_Error_t SIM7020_Info_GetNetworkRegistrationStatus(SIM7020_t& p_Device)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;
 
-    if(p_Device == NULL)
-    {
-        return SIM70XX_ERR_INVALID_ARG;
-    }
-    else if(p_Device->Internal.isInitialized == false)
+    if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CGREG;
-    SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue, &Response));
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    p_Device->Connection.Status = (SIM7020_NetRegistration_t)std::stoi(Response.substr(Response.find(",") + 1));
+    p_Device.Connection.Status = (SIM7020_NetRegistration_t)std::stoi(Response.substr(Response.find(",") + 1));
 
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_Info_GetQuality(SIM7020_t* const p_Device)
+SIM70XX_Error_t SIM7020_Info_GetQuality(SIM7020_t& p_Device)
 {
     int8_t RSSI;
     uint8_t RXQual;
@@ -216,23 +212,19 @@ SIM70XX_Error_t SIM7020_Info_GetQuality(SIM7020_t* const p_Device)
     std::string Response;
     SIM70XX_TxCmd_t* Command;
 
-    if(p_Device == NULL)
-    {
-        return SIM70XX_ERR_INVALID_ARG;
-    }
-    else if(p_Device->Internal.isInitialized == false)
+    if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CSQ;
-    SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue, &Response));
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
     Index = Response.find(",");
     if(Index == std::string::npos)
@@ -245,27 +237,27 @@ SIM70XX_Error_t SIM7020_Info_GetQuality(SIM7020_t* const p_Device)
 
     if(RSSI == 0)
     {
-        p_Device->Connection.RSSI = -110;
+        p_Device.Connection.RSSI = -110;
     }
     else if(RSSI == 1)
     {
-        p_Device->Connection.RSSI = -108;
+        p_Device.Connection.RSSI = -108;
     }
     else if(RSSI == 2)
     {
-        p_Device->Connection.RSSI = -106;
+        p_Device.Connection.RSSI = -106;
     }
     // Simple approach to convert the return value from the modem into a RSSI value.
     else if((RSSI >= 3) || (RSSI <= 30))
     {
-        p_Device->Connection.RSSI = -105 + (2 * (RSSI - 3));
+        p_Device.Connection.RSSI = -105 + (2 * (RSSI - 3));
     }
     else
     {
-        p_Device->Connection.RSSI = 0;
+        p_Device.Connection.RSSI = 0;
     }
 
-    p_Device->Connection.RXQual = RXQual;
+    p_Device.Connection.RXQual = RXQual;
 
     if((RSSI == 0) && (RXQual == 0))
     {
@@ -275,29 +267,29 @@ SIM70XX_Error_t SIM7020_Info_GetQuality(SIM7020_t* const p_Device)
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_Info_GetNetworkStatus(SIM7020_t* const p_Device, SIM7020_NetState_t* const p_Status)
+SIM70XX_Error_t SIM7020_Info_GetNetworkStatus(SIM7020_t& p_Device, SIM7020_NetState_t* const p_Status)
 {
     size_t Index;
     std::string Response;
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Device == NULL) || (p_Status == NULL))
+    if(p_Status == NULL)
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
-    else if(p_Device->Internal.isInitialized == false)
+    else if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CENG_R;
-    SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue, &Response));
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
     Index = Response.find(",");
     if(Index == std::string::npos)

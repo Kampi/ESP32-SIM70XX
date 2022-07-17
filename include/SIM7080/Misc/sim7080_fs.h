@@ -25,25 +25,25 @@
 #include "Misc/sim7080_fs_defs.h"
 
 /** @brief          Delete a file.
- *  @param p_Device Pointer to SIM7080 device object
+ *  @param p_Device SIM7080 device object
  *  @param Name     File name
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_FS_Delete(SIM7080_t* const p_Device, std::string File);
+SIM70XX_Error_t SIM7080_FS_Delete(SIM7080_t& p_Device, std::string File);
 
 /** @brief          Rename a file.
- *  @param p_Device Pointer to SIM7080 device object
+ *  @param p_Device SIM7080 device object
  *  @param Old      Old file name
  *  @param New      New file name
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_FS_Rename(SIM7080_t* const p_Device, std::string Old, std::string New);
+SIM70XX_Error_t SIM7080_FS_Rename(SIM7080_t& p_Device, std::string Old, std::string New);
 
 /** @brief          Get the free size of the file system.
- *  @param p_Device Pointer to SIM7080 device object
+ *  @param p_Device SIM7080 device object
  *  @param p_Free   Pointer to free file system size (bytes)
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_FS_GetFree(SIM7080_t* const p_Device, uint32_t* const p_Free);
+SIM70XX_Error_t SIM7080_FS_GetFree(SIM7080_t& p_Device, uint32_t* const p_Free);
 
 #endif /* SIM7080_FS_H_ */

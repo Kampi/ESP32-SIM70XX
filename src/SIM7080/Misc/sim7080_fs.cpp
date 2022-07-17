@@ -31,81 +31,73 @@
 
 static const char* TAG = "SIM7080_FS";
 
-SIM70XX_Error_t SIM7080_FS_Delete(SIM7080_t* const p_Device, std::string File)
+SIM70XX_Error_t SIM7080_FS_Delete(SIM7080_t& p_Device, std::string File)
 {
     SIM70XX_TxCmd_t* Command;
 
-    if(p_Device == NULL)
-    {
-        return SIM70XX_ERR_INVALID_ARG;
-    }
-    else if(p_Device->Internal.isInitialized == false)
+    if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
-    return SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue);
+    return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
 }
 
-SIM70XX_Error_t SIM7080_FS_Rename(SIM7080_t* const p_Device, std::string Old, std::string New)
+SIM70XX_Error_t SIM7080_FS_Rename(SIM7080_t& p_Device, std::string Old, std::string New)
 {
     SIM70XX_TxCmd_t* Command;
 
-    if(p_Device == NULL)
-    {
-        return SIM70XX_ERR_INVALID_ARG;
-    }
-    else if(p_Device->Internal.isInitialized == false)
+    if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
-    return SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue);
+    return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
 }
 
-SIM70XX_Error_t SIM7080_FS_GetFree(SIM7080_t* const p_Device, uint32_t* const p_Free)
+SIM70XX_Error_t SIM7080_FS_GetFree(SIM7080_t& p_Device, uint32_t* const p_Free)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Device == NULL) || (p_Free == NULL))
+    if(p_Free == NULL)
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
-    else if(p_Device->Internal.isInitialized == false)
+    else if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CFSINIT;
-    SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue));
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CFSGFRS;
-    SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue, &Response));
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
     *p_Free = std::stoi(Response);
 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CFSTERM;
-    SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
 
-    return SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue);
+    return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
 }
 
 #endif

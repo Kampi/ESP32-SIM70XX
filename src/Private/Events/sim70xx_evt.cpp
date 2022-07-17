@@ -113,7 +113,7 @@ static void SIM70XX_Evt_Task(void* p_Arg)
 
                 // Transmit the command. The command has the layout
                 //  Command<CR><LF>
-                SIM70XX_UART_SendCommand(&Device->UART, CmdObj->Command);
+                SIM70XX_UART_SendCommand(Device->UART, CmdObj->Command);
 
                 // Flush the string, because the data aren´t needed anymore.
                 CmdObj->Command.clear();
@@ -129,15 +129,15 @@ static void SIM70XX_Evt_Task(void* p_Arg)
         if(Messages == 0)
         {
             // New data available?
-            if(SIM70XX_UART_Available(&Device->UART) > 2)
+            if(SIM70XX_UART_Available(Device->UART) > 2)
             {
                 std::string* Message = new std::string();
 
                 // Get the response string.
                 do
                 {
-                    Message->append(SIM70XX_UART_ReadString(&Device->UART));
-                } while(SIM70XX_UART_Available(&Device->UART));
+                    Message->append(SIM70XX_UART_ReadString(Device->UART));
+                } while(SIM70XX_UART_Available(Device->UART));
 
                 ESP_LOGI(TAG, "Event: %s", Message->c_str());
 
@@ -199,7 +199,7 @@ static void SIM70XX_Evt_Task(void* p_Arg)
 
             ESP_LOGD(TAG, "Active commands: %u", ActiveCommands.size());
 
-            SIM70XX_UART_ReadStringUntil(&Device->UART, '\n');
+            SIM70XX_UART_ReadStringUntil(Device->UART, '\n');
 
             // Get the data from the command. The transmission has the following layout
             //  <CR><LF>+<Command>: <Data><CR><LF>
@@ -214,7 +214,7 @@ static void SIM70XX_Evt_Task(void* p_Arg)
 
                     // Read a new line from the serial interface.
                     // NOTE: The trailing \n is removed from the response!
-                    Line = std::string(SIM70XX_UART_ReadStringUntil(&Device->UART, '\n'));
+                    Line = std::string(SIM70XX_UART_ReadStringUntil(Device->UART, '\n'));
 
                     // Remove the line ending.
                     Index = Line.find("\r");
@@ -294,7 +294,7 @@ static void SIM70XX_Evt_Task(void* p_Arg)
                 {
                     // Read a new line from the serial interface.
                     // NOTE: The trailing \n is removed from the response!
-                    (*it)->Status.append(SIM70XX_UART_ReadStringUntil(&Device->UART, '\n'));
+                    (*it)->Status.append(SIM70XX_UART_ReadStringUntil(Device->UART, '\n'));
 
                     // Abort when a timeout occurs.
                     if((SIM70XX_Tools_GetmsTimer() - Now) > (*it)->Timeout)

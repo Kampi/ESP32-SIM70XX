@@ -65,21 +65,21 @@ static const char* TAG = "SIM70XX_UART";
  *  @param p_Config Pointer to SIM70XX UART configuration object
  *  @return         Received character
  */
-static uint8_t SIM7020_UART_Get(const SIM70XX_UART_Conf_t* p_Config)
+static uint8_t SIM7020_UART_Get(SIM70XX_UART_Conf_t& p_Config)
 {
     uint8_t c;
 
-    if((p_Config == NULL) || (p_Config->Lock == NULL) || (p_Config->isInitialized == false))
+    if((p_Config.Lock == NULL) || (p_Config.isInitialized == false))
     {
         return 0;
     }
 
-    xSemaphoreTake(p_Config->Lock, portMAX_DELAY);
-    if(uart_read_bytes(p_Config->Interface, &c, sizeof(uint8_t), 20 / portTICK_RATE_MS) == 0)
+    xSemaphoreTake(p_Config.Lock, portMAX_DELAY);
+    if(uart_read_bytes(p_Config.Interface, &c, sizeof(uint8_t), 20 / portTICK_RATE_MS) == 0)
     {
         c = 0;
     }
-    xSemaphoreGive(p_Config->Lock);
+    xSemaphoreGive(p_Config.Lock);
 
     return c;
 }
@@ -88,7 +88,7 @@ static uint8_t SIM7020_UART_Get(const SIM70XX_UART_Conf_t* p_Config)
  *  @param p_Config Pointer to SIM70XX UART configuration object
  *  @return         Received character or -1 when no bytes available
  */
-static int SIM70XX_UART_Read(const SIM70XX_UART_Conf_t* p_Config)
+static int SIM70XX_UART_Read(SIM70XX_UART_Conf_t& p_Config)
 {
     if(SIM70XX_UART_Available(p_Config))
     {
@@ -103,7 +103,7 @@ static int SIM70XX_UART_Read(const SIM70XX_UART_Conf_t* p_Config)
  *  @param Timeout  (Optional) Read timeout
  *  @return         Received character or -1 when no character received
  */
-static int SIM7020_UART_TimedRead(const SIM70XX_UART_Conf_t* p_Config, uint32_t Timeout = 1000)
+static int SIM7020_UART_TimedRead(SIM70XX_UART_Conf_t& p_Config, uint32_t Timeout = 1000)
 {
     int c;
     unsigned long Now;
@@ -121,95 +121,83 @@ static int SIM7020_UART_TimedRead(const SIM70XX_UART_Conf_t* p_Config, uint32_t 
     return -1;
 }
 
-SIM70XX_Error_t SIM70XX_UART_Init(SIM70XX_UART_Conf_t* p_Config)
+SIM70XX_Error_t SIM70XX_UART_Init(SIM70XX_UART_Conf_t& p_Config)
 {
-    if(p_Config == NULL)
-    {
-        return SIM70XX_ERR_INVALID_ARG;
-    }
-    else if(p_Config->isInitialized)
+    if(p_Config.isInitialized)
     {
         SIM70XX_ERROR_CHECK(SIM70XX_UART_Deinit(p_Config));
     }
 
-    p_Config->isInitialized = false;
+    p_Config.isInitialized = false;
 
-    _UART_Config.baud_rate = p_Config->Baudrate;
+    _UART_Config.baud_rate = p_Config.Baudrate;
 
-    if((uart_driver_install(p_Config->Interface, CONFIG_SIM70XX_UART_BUFFER_SIZE * 2, 0, 0, NULL, 0) ||
-        uart_param_config(p_Config->Interface, &_UART_Config) ||
-        uart_set_pin(p_Config->Interface, p_Config->Tx, p_Config->Rx, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE)) != ESP_OK)
+    if((uart_driver_install(p_Config.Interface, CONFIG_SIM70XX_UART_BUFFER_SIZE * 2, 0, 0, NULL, 0) ||
+        uart_param_config(p_Config.Interface, &_UART_Config) ||
+        uart_set_pin(p_Config.Interface, p_Config.Tx, p_Config.Rx, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE)) != ESP_OK)
     {
         return SIM70XX_ERR_INVALID_STATE;
     }
 
-    p_Config->Lock = xSemaphoreCreateMutex();
-    if(p_Config->Lock == NULL)
+    p_Config.Lock = xSemaphoreCreateMutex();
+    if(p_Config.Lock == NULL)
     {
         return SIM70XX_ERR_NO_MEM;
     }
 
     ESP_LOGI(TAG, "UART initialized...");
 
-    p_Config->isInitialized = true;
+    p_Config.isInitialized = true;
 
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM70XX_UART_Deinit(SIM70XX_UART_Conf_t* p_Config)
+SIM70XX_Error_t SIM70XX_UART_Deinit(SIM70XX_UART_Conf_t& p_Config)
 {
-    if(p_Config == NULL)
-    {
-        return SIM70XX_ERR_INVALID_ARG;
-    }
-    else if(p_Config->isInitialized == false)
+    if(p_Config.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
-    if(uart_is_driver_installed(p_Config->Interface))
+    if(uart_is_driver_installed(p_Config.Interface))
     {
-        uart_flush(p_Config->Interface);
-        uart_driver_delete(p_Config->Interface);
+        uart_flush(p_Config.Interface);
+        uart_driver_delete(p_Config.Interface);
     }
 
-    vSemaphoreDelete(p_Config->Lock);
+    vSemaphoreDelete(p_Config.Lock);
 
-    _GPIO_Config.pin_bit_mask = ((1ULL << p_Config->Rx) | (1ULL << p_Config->Tx));
+    _GPIO_Config.pin_bit_mask = ((1ULL << p_Config.Rx) | (1ULL << p_Config.Tx));
     gpio_config(&_GPIO_Config);
-    gpio_set_level(p_Config->Rx, true);
-    gpio_set_level(p_Config->Tx, true);
+    gpio_set_level(p_Config.Rx, true);
+    gpio_set_level(p_Config.Tx, true);
 
     ESP_LOGI(TAG, "UART deinitialized...");
 
-    p_Config->isInitialized = false;
+    p_Config.isInitialized = false;
 
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM70XX_UART_SendCommand(const SIM70XX_UART_Conf_t* p_Config, std::string Command)
+SIM70XX_Error_t SIM70XX_UART_SendCommand(SIM70XX_UART_Conf_t& p_Config, std::string Command)
 {
-    if(p_Config == NULL)
-    {
-        return SIM70XX_ERR_INVALID_ARG;
-    }
-    else if(p_Config->isInitialized == false)
+    if(p_Config.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
-    uart_write_bytes(p_Config->Interface, (const char*)Command.c_str(), Command.length());
-    uart_write_bytes(p_Config->Interface, "\r\n", 2);
+    uart_write_bytes(p_Config.Interface, (const char*)Command.c_str(), Command.length());
+    uart_write_bytes(p_Config.Interface, "\r\n", 2);
 
     return SIM70XX_ERR_OK;
 }
 
-std::string SIM70XX_UART_ReadStringUntil(const SIM70XX_UART_Conf_t* p_Config, char Terminator)
+std::string SIM70XX_UART_ReadStringUntil(SIM70XX_UART_Conf_t& p_Config, char Terminator)
 {
     int c;
     std::string Return;
 
-    if((p_Config == NULL) || (p_Config->isInitialized == false))
+    if(p_Config.isInitialized == false)
     {
         return std::string();
     }
@@ -224,12 +212,12 @@ std::string SIM70XX_UART_ReadStringUntil(const SIM70XX_UART_Conf_t* p_Config, ch
     return Return;
 }
 
-std::string SIM70XX_UART_ReadString(const SIM70XX_UART_Conf_t* p_Config)
+std::string SIM70XX_UART_ReadString(SIM70XX_UART_Conf_t& p_Config)
 {
     int c;
     std::string Return;
 
-    if((p_Config == NULL) || (p_Config->isInitialized == false))
+    if(p_Config.isInitialized == false)
     {
         return std::string();
     }
@@ -244,30 +232,28 @@ std::string SIM70XX_UART_ReadString(const SIM70XX_UART_Conf_t* p_Config)
     return Return;
 }
 
-void SIM70XX_UART_Flush(const SIM70XX_UART_Conf_t* p_Config)
+void SIM70XX_UART_Flush(SIM70XX_UART_Conf_t& p_Config)
 {
-    assert(p_Config);
-
-    if((p_Config == NULL) || (p_Config->isInitialized == false))
+    if(p_Config.isInitialized == false)
     {
         return;
     }
 
-    uart_flush(p_Config->Interface);
+    uart_flush(p_Config.Interface);
 }
 
-int SIM70XX_UART_Available(const SIM70XX_UART_Conf_t* p_Config)
+int SIM70XX_UART_Available(SIM70XX_UART_Conf_t& p_Config)
 {
     size_t Avail;
 
-    if((p_Config == NULL) || (p_Config->Lock == NULL) || (p_Config->isInitialized == false))
+    if((p_Config.Lock == NULL) || (p_Config.isInitialized == false))
     {
         return 0;
     }
 
-    xSemaphoreTake(p_Config->Lock, portMAX_DELAY);
-    uart_get_buffered_data_len(p_Config->Interface, &Avail);
-    xSemaphoreGive(p_Config->Lock);
+    xSemaphoreTake(p_Config.Lock, portMAX_DELAY);
+    uart_get_buffered_data_len(p_Config.Interface, &Avail);
+    xSemaphoreGive(p_Config.Lock);
 
     return Avail;
 }

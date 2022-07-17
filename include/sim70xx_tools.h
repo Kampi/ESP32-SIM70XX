@@ -72,12 +72,12 @@ unsigned long IRAM_ATTR SIM70XX_Tools_GetmsTimer(void);
  *  @param p_Config Pointer to SIM70XX UART configuration object
  *  @return         #true when the module is active
  */
-bool SIM70XX_isActive(SIM70XX_UART_Conf_t* const p_Config);
+bool SIM70XX_isActive(SIM70XX_UART_Conf_t& p_Config);
 
 /** @brief          Disable the echo mode of the SIM70XX module.
  *  @param p_Config Pointer to SIM70XX UART configuration object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM70XX_DisableEcho(SIM70XX_UART_Conf_t* const p_Config);
+SIM70XX_Error_t SIM70XX_DisableEcho(SIM70XX_UART_Conf_t& p_Config);
 
 #endif /* SIM70XX_TOOLS_H_ */

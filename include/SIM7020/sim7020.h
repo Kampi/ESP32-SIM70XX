@@ -65,150 +65,156 @@
  */
 #define SIM7020_CMD_BUFFER                                      2048
 
+/** @brief          Check if the module is initialized.
+ *  @param p_Device SIM7020 device object
+ *  @return         #true when the module is initialized
+ */
+inline __attribute__((always_inline)) bool SIM7020_isInitialized(SIM7020_t& p_Device)
+{
+    return p_Device.Internal.isInitialized;
+}
+
+/** @brief          Check if the module has entered PSM.
+ *  @param p_Device SIM7020 device object
+ *  @return         #true when the device has entered PSM
+ */
+inline __attribute__((always_inline)) bool SIM7020_isPSM(SIM7020_t& p_Device)
+{
+    return p_Device.Internal.isPSM;
+}
+
 /** @brief          Initialize the communication interface and the SIM7020 module.
- *  @param p_Device Pointer to SIM7020 device object
- *  @param p_Config Pointer to SIM7020 device configuration object
+ *  @param p_Device SIM7020 device object
+ *  @param p_Config SIM7020 device configuration object
  *  @param Timeout  Reset timeout
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_Init(SIM7020_t* const p_Device, const SIM7020_Config_t* const p_Config, uint32_t Timeout);
+SIM70XX_Error_t SIM7020_Init(SIM7020_t& p_Device, SIM7020_Config_t& p_Config, uint32_t Timeout);
 
 /** @brief          Initialize the communication interface and the SIM7020 module.
- *  @param p_Device Pointer to SIM7020 device object
- *  @param p_Config Pointer to SIM7020 device configuration object
+ *  @param p_Device SIM7020 device object
+ *  @param p_Config SIM7020 device configuration object
  *  @param Old      Old baudrate configuration
  *                  NOTE: Use this parameter if you want to change the baudrate of the module before the module initialization begins.
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_Init(SIM7020_t* const p_Device, const SIM7020_Config_t* const p_Config, SIM70XX_Baud_t Old);
+SIM70XX_Error_t SIM7020_Init(SIM7020_t& p_Device, SIM7020_Config_t& p_Config, SIM70XX_Baud_t Old);
 
 /** @brief          Initialize the communication interface and the SIM7020 module.
- *  @param p_Device Pointer to SIM7020 device object
- *  @param p_Config Pointer to SIM7020 device configuration object
+ *  @param p_Device SIM7020 device object
+ *  @param p_Config SIM7020 device configuration object
  *  @param Timeout  (Optional) Reset timeout
  *  @param Old      (Optional) Old baudrate configuration
  *                  NOTE: Use this parameter if you want to change the baudrate of the module before the module initialization begins.
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_Init(SIM7020_t* const p_Device, const SIM7020_Config_t* const p_Config, uint32_t Timeout = 10, SIM70XX_Baud_t Old = SIM_BAUD_AUTO);
+SIM70XX_Error_t SIM7020_Init(SIM7020_t& p_Device, SIM7020_Config_t& p_Config, uint32_t Timeout = 10, SIM70XX_Baud_t Old = SIM_BAUD_AUTO);
 
 /** @brief          Deinitialize the SIM7020 module.
- *  @param p_Device Pointer to SIM7020 device object
+ *  @param p_Device SIM7020 device object
  */
-void SIM7020_Deinit(SIM7020_t* const p_Device);
+void SIM7020_Deinit(SIM7020_t& p_Device);
 
 #ifdef CONFIG_SIM70XX_RESET_USE_HW
     /** @brief          Perform a hardware reset of the module.
-     *  @param p_Device Pointer to SIM7020 device object
+     *  @param p_Device SIM7020 device object
      */
-    void SIM7020_HardReset(SIM7020_t* const p_Device);
+    void SIM7020_HardReset(SIM7020_t& p_Device);
 #endif
 
 /** @brief          Perform a software reset of the device.
- *  @param p_Device Pointer to SIM7020 device object
+ *  @param p_Device SIM7020 device object
  *  @param Timeout  (Optional) Timeout for the device reset in seconds
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_SoftReset(const SIM7020_t* const p_Device, uint32_t Timeout = 10);
+SIM70XX_Error_t SIM7020_SoftReset(SIM7020_t& p_Device, uint32_t Timeout = 10);
 
 /** @brief          Set the default PSD connection settings.
- *  @param p_Device Pointer to SIM7020 device object
+ *  @param p_Device SIM7020 device object
  *  @param PDP      Packet Data Protocol (PDP) type
  *  @param APN      Access Point Name (APN) configuration
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_SetPSD(SIM7020_t* const p_Device, SIM7020_PDP_Type_t PDP, SIM70XX_APN_t APN);
+SIM70XX_Error_t SIM7020_SetPSD(SIM7020_t& p_Device, SIM7020_PDP_Type_t PDP, SIM70XX_APN_t APN);
 
 /** @brief          Set the operator for the communication.
- *  @param p_Device Pointer to SIM7020 device object
+ *  @param p_Device SIM7020 device object
  *  @param Mode     Operator selection mode
  *  @param Format   Operator format
  *  @param Operator Operator name
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_SetOperator(SIM7020_t* const p_Device, SIM70XX_OpMode_t Mode, SIM70XX_OpForm_t Format, std::string Operator);
+SIM70XX_Error_t SIM7020_SetOperator(SIM7020_t& p_Device, SIM70XX_OpMode_t Mode, SIM70XX_OpForm_t Format, std::string Operator);
 
 /** @brief              Enable the device and get a list with available operators.
  *                      NOTE: Additional information: https://www.mcc-mnc.com/
- *  @param p_Device     Pointer to SIM7020 device object
+ *  @param p_Device     SIM7020 device object
  *  @param p_Operator   Pointer to list with operators
  *  @param p_Modes      Pointer to modes
  *  @param p_Formats    Pointer to formats
  *  @return             SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_GetOperator(SIM7020_t* const p_Device, std::vector<SIM70XX_Operator_t>* p_Operator, std::string* p_Modes, std::string* p_Formats);
+SIM70XX_Error_t SIM7020_GetOperator(SIM7020_t& p_Device, std::vector<SIM70XX_Operator_t>* p_Operator, std::string* p_Modes, std::string* p_Formats);
 
 /** @brief          Set the frequency band of the module.
- *  @param p_Device Pointer to SIM7020 device object
+ *  @param p_Device SIM7020 device object
  *  @param Band     Frequency band
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_SetBand(SIM7020_t* const p_Device, SIM7020_Band_t Band);
+SIM70XX_Error_t SIM7020_SetBand(SIM7020_t& p_Device, SIM7020_Band_t Band);
 
 /** @brief          Get the frequency band of the module.
- *  @param p_Device Pointer to SIM7020 device object
+ *  @param p_Device SIM7020 device object
  *  @param p_Band   Pointer to freuquency band
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_GetBand(SIM7020_t* const p_Device, SIM7020_Band_t* p_Band);
+SIM70XX_Error_t SIM7020_GetBand(SIM7020_t& p_Device, SIM7020_Band_t* p_Band);
 
 /** @brief          Set the device functionality.
- *  @param p_Device Pointer to SIM7020 device object
+ *  @param p_Device SIM7020 device object
  *  @param Func     Device functionality
  *  @param Reset    (Optional) Reset the MT before setting the function
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_SetFunctionality(SIM7020_t* const p_Device, SIM7020_Func_t Func, SIM7020_Reset_t Reset = SIM7020_RESET_NO);
+SIM70XX_Error_t SIM7020_SetFunctionality(SIM7020_t& p_Device, SIM7020_Func_t Func, SIM7020_Reset_t Reset = SIM7020_RESET_NO);
 
 /** @brief          Get the device functionality.
- *  @param p_Device Pointer to SIM7020 device object
+ *  @param p_Device SIM7020 device object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_GetFunctionality(SIM7020_t* const p_Device);
+SIM70XX_Error_t SIM7020_GetFunctionality(SIM7020_t& p_Device);
 
 /** @brief          Get SIM card status.
- *  @param p_Device Pointer to SIM7020 device object
+ *  @param p_Device SIM7020 device object
  *  @param p_Status Pointer so SIM card status
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_GetSIMStatus(SIM7020_t* const p_Device, SIM7020_SIM_t* const p_Status);
+SIM70XX_Error_t SIM7020_GetSIMStatus(SIM7020_t& p_Device, SIM7020_SIM_t* const p_Status);
 
 /** @brief          Check if the SIM card is ready to use.
- *  @param p_Device Pointer to SIM7020 device object
+ *  @param p_Device SIM7020 device object
  *  @return         #true when the SIM card is ready
  */
-bool SIM7020_isSIMReady(SIM7020_t* const p_Device);
+bool SIM7020_isSIMReady(SIM7020_t& p_Device);
 
 /** @brief          Check if the module is connected with the GPRS service
- *  @param p_Device Pointer to SIM7020 device object
+ *  @param p_Device SIM7020 device object
  *  @return         #true when the module is connected to the GPRS service
  */
-bool SIM7020_isAttached(SIM7020_t* const p_Device);
-
-/** @brief          Check if the module is initialized.
- *  @param p_Device Pointer to SIM7020 device object
- *  @return         #true when the module is initialized
- */
-bool SIM7020_isInitialized(SIM7020_t* const p_Device);
-
-/** @brief          Check if the module has entered PSM.
- *  @param p_Device Pointer to SIM7020 device object
- *  @return         #true when the device has entered PSM
- */
-bool SIM7020_isPSM(SIM7020_t* const p_Device);
+bool SIM7020_isAttached(SIM7020_t& p_Device);
 
 /** @brief          Ping the module by sending an empty 'AT'.
- *  @param p_Device Pointer to SIM7020 device object
+ *  @param p_Device SIM7020 device object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_Ping(SIM7020_t* const p_Device);
+SIM70XX_Error_t SIM7020_Ping(SIM7020_t& p_Device);
 
 /** @brief          Change the baudrate settings of the module.
- *  @param p_Device Pointer to SIM7020 device object
+ *  @param p_Device SIM7020 device object
  *  @param Old      Old baudrate
  *  @param New      New baudrate
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_SetBaudrate(SIM7020_t* const p_Device, SIM70XX_Baud_t Old, SIM70XX_Baud_t New);
+SIM70XX_Error_t SIM7020_SetBaudrate(SIM7020_t& p_Device, SIM70XX_Baud_t Old, SIM70XX_Baud_t New);
 
 #endif /* SIM7020_H_ */

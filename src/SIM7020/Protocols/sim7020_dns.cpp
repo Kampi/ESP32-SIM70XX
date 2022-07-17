@@ -30,33 +30,33 @@
 
 static const char* TAG = "SIM7020_TCPIP";
 
-SIM70XX_Error_t SIM7020_TCP_ParseDNS(SIM7020_t* const p_Device, std::string Host, std::string* p_IP, SIM7020_DNS_Err_t* p_Error, uint32_t Timeout)
+SIM70XX_Error_t SIM7020_TCP_ParseDNS(SIM7020_t& p_Device, std::string Host, std::string* p_IP, SIM7020_DNS_Err_t* p_Error, uint32_t Timeout)
 {
     uint32_t Now;
     uint8_t DNS_Error;
     std::string Response;
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Device == NULL) || (p_IP == NULL))
+    if(p_IP == NULL)
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
-    else if(p_Device->Internal.isInitialized == false)
+    else if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CDNSGIP(Host);
-    SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Timeout) == false)
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue));
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
 
     Now = SIM70XX_Tools_GetmsTimer();
-    while(SIM70XX_Queue_isEvent(p_Device->Internal.EventQueue, "+CDNSGIP", &Response) == false)
+    while(SIM70XX_Queue_isEvent(p_Device.Internal.EventQueue, "+CDNSGIP", &Response) == false)
     {
         if((SIM70XX_Tools_GetmsTimer() - Now) > (Timeout * 1000UL))
         {

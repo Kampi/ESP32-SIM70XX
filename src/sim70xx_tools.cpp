@@ -130,11 +130,11 @@ unsigned long IRAM_ATTR SIM70XX_Tools_GetmsTimer(void)
     return (unsigned long)(esp_timer_get_time() / 1000ULL);
 }
 
-bool SIM70XX_isActive(SIM70XX_UART_Conf_t* const p_Config)
+bool SIM70XX_isActive(SIM70XX_UART_Conf_t& p_Config)
 {
     std::string Response;
 
-    if((p_Config == NULL) || (SIM70XX_UART_Init(p_Config) != SIM70XX_ERR_OK) || (SIM70XX_UART_SendCommand(p_Config, "AT") != SIM70XX_ERR_OK))
+    if((SIM70XX_UART_Init(p_Config) != SIM70XX_ERR_OK) || (SIM70XX_UART_SendCommand(p_Config, "AT") != SIM70XX_ERR_OK))
     {
         return false;
     }
@@ -156,15 +156,11 @@ bool SIM70XX_isActive(SIM70XX_UART_Conf_t* const p_Config)
     return false;
 }
 
-SIM70XX_Error_t SIM70XX_DisableEcho(SIM70XX_UART_Conf_t* const p_Config)
+SIM70XX_Error_t SIM70XX_DisableEcho(SIM70XX_UART_Conf_t& p_Config)
 {
     std::string Response;
 
-    if(p_Config == NULL)
-    {
-        return SIM70XX_ERR_INVALID_ARG;
-    }
-    else if(p_Config->isInitialized == false)
+    if(p_Config.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }

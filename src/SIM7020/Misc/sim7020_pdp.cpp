@@ -30,80 +30,80 @@
 
 static const char* TAG = "SIM7020_PDP";
 
-SIM70XX_Error_t SIM7020_PDP_GetContext(SIM7020_t* const p_Device, SIM7020_PDP_Context_t* const p_Context)
+SIM70XX_Error_t SIM7020_PDP_GetContext(SIM7020_t& p_Device, SIM7020_PDP_Context_t* const p_Context)
 {
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Device == NULL) || (p_Context == NULL))
+    if(p_Context == NULL)
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
-    else if(p_Device->Internal.isInitialized == false)
+    else if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CGDCONT_R;
-    SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
 
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue));
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
 
     // TODO: Get the informations from the input
 
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_PDP_Switch(SIM7020_t* const p_Device, bool Enable, uint8_t Context)
+SIM70XX_Error_t SIM7020_PDP_Switch(SIM7020_t& p_Device, bool Enable, uint8_t Context)
 {
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Device == NULL) || (Context > 10))
+    if(Context > 10)
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
-    else if(p_Device->Internal.isInitialized == false)
+    else if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CGACT_W(Context, Enable);
-    SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
 
-    return SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue);
+    return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
 }
 
-SIM70XX_Error_t SIM7020_PDP_GetStatus(SIM7020_t* const p_Device, std::vector<SIM7020_PDP_Status_t>* p_Status)
+SIM70XX_Error_t SIM7020_PDP_GetStatus(SIM7020_t& p_Device, std::vector<SIM7020_PDP_Status_t>* p_Status)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Device == NULL) || (p_Status == NULL))
+    if(p_Status == NULL)
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
-    else if(p_Device->Internal.isInitialized == false)
+    else if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CGACT_R;
-    SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue, &Response));
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
     do
     {
@@ -128,7 +128,7 @@ SIM70XX_Error_t SIM7020_PDP_GetStatus(SIM7020_t* const p_Device, std::vector<SIM
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_PDP_ReadDynamicParameters(SIM7020_t* const p_Device)
+SIM70XX_Error_t SIM7020_PDP_ReadDynamicParameters(SIM7020_t& p_Device)
 {
     uint8_t Parts;
     uint32_t Index;
@@ -137,27 +137,23 @@ SIM70XX_Error_t SIM7020_PDP_ReadDynamicParameters(SIM7020_t* const p_Device)
     std::string Response;
     SIM70XX_TxCmd_t* Command;
 
-    if(p_Device == NULL)
-    {
-        return SIM70XX_ERR_INVALID_ARG;
-    }
-    else if(p_Device->Internal.isInitialized == false)
+    if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CGCONTRDP;
-    SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue));
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
 
     // TODO: Wait for the Response event.
 
-    if(p_Device->PDP_Type == SIM7020_PDP_IPV6)
+    if(p_Device.PDP_Type == SIM7020_PDP_IPV6)
     {
         Parts = 16;
     }
@@ -178,12 +174,12 @@ SIM70XX_Error_t SIM7020_PDP_ReadDynamicParameters(SIM7020_t* const p_Device)
         Index = Dummy.find(".");
         Octett = Dummy.substr(0, Index);
         Dummy.erase(0, Index + 1);
-        p_Device->PDP.IP += Octett + ".";
+        p_Device.PDP.IP += Octett + ".";
     }
     Index = Dummy.find(".");
     Octett = Dummy.substr(0, Index);
     Dummy.erase(0, Index + 1);
-    p_Device->PDP.IP += Octett;
+    p_Device.PDP.IP += Octett;
 
     // Filter the subnet mask.
     for(uint8_t i = 0; i < (Parts - 1); i++)
@@ -191,31 +187,31 @@ SIM70XX_Error_t SIM7020_PDP_ReadDynamicParameters(SIM7020_t* const p_Device)
         Index = Dummy.find(".");
         Octett = Dummy.substr(0, Index);
         Dummy.erase(0, Index + 1);
-        p_Device->PDP.Subnet += Octett + ".";
+        p_Device.PDP.Subnet += Octett + ".";
     }
     Index = Dummy.find(".");
     Octett = Dummy.substr(0, Index);
-    p_Device->PDP.Subnet += Octett;
+    p_Device.PDP.Subnet += Octett;
 
     // Get the operator.
     Dummy = Response.substr(Response.find_last_of(",") + 1);
     Response.replace(Response.find("," + Dummy), std::string("," + Dummy).size(), "");
     Dummy.replace(Dummy.find("\""), std::string("\"").size(), "");
-    p_Device->PDP.APN += Dummy;
+    p_Device.PDP.APN += Dummy;
 
     // Get the CID.
     Dummy = Response.substr(Response.find_last_of(",") + 1);
     Response.replace(Response.find("," + Dummy), std::string("," + Dummy).size(), "");
-    p_Device->PDP.CID = std::stoi(Dummy);
+    p_Device.PDP.CID = std::stoi(Dummy);
 
     // Get the Baerer.
-    p_Device->PDP.Baerer = std::stoi(Response);
+    p_Device.PDP.Baerer = std::stoi(Response);
 
-    ESP_LOGD(TAG, "IP: %s", p_Device->PDP.IP.c_str());
-    ESP_LOGD(TAG, "Subnet: %s", p_Device->PDP.Subnet.c_str());
-    ESP_LOGD(TAG, "Operator: %s", p_Device->PDP.APN.c_str());
-    ESP_LOGD(TAG, "CID: %u", p_Device->PDP.CID);
-    ESP_LOGD(TAG, "Baerer: %u", p_Device->PDP.Baerer);
+    ESP_LOGD(TAG, "IP: %s", p_Device.PDP.IP.c_str());
+    ESP_LOGD(TAG, "Subnet: %s", p_Device.PDP.Subnet.c_str());
+    ESP_LOGD(TAG, "Operator: %s", p_Device.PDP.APN.c_str());
+    ESP_LOGD(TAG, "CID: %u", p_Device.PDP.CID);
+    ESP_LOGD(TAG, "Baerer: %u", p_Device.PDP.Baerer);
 
     return SIM70XX_ERR_OK;
 }

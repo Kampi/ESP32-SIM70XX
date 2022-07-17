@@ -30,17 +30,17 @@
 #include "../../Private/Queue/sim70xx_queue.h"
 #include "../../Private/Commands/sim70xx_commands.h"
 
-SIM70XX_Error_t SIM7020_PSM_Enable(SIM7020_t* const p_Device, uint8_t Base_T, uint8_t Value_T, uint8_t Base_A, uint8_t Value_A, bool UseRetention)
+SIM70XX_Error_t SIM7020_PSM_Enable(SIM7020_t& p_Device, uint8_t Base_T, uint8_t Value_T, uint8_t Base_A, uint8_t Value_A, bool UseRetention)
 {
     uint8_t TAU;
     uint8_t Value;
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Device == NULL) || (Base_T > 6) || (Value_T > 31) || (Base_A > 6) || (Value_A > 31))
+    if((Base_T > 6) || (Value_T > 31) || (Base_A > 6) || (Value_A > 31))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
-    else if(p_Device->Internal.isInitialized == false)
+    else if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
@@ -51,56 +51,56 @@ SIM70XX_Error_t SIM7020_PSM_Enable(SIM7020_t* const p_Device, uint8_t Base_T, ui
     SIM70XX_CREATE_CMD(Command);
     // TODO: FIX ME
     //*Command = SIM7020_AT_CPSMS_EN(std::to_string(std::bitset<8>(TAU)), std::to_string(std::bitset<8>(Value)));
-    SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
 
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue));
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_RETENTION(UseRetention);
-    SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
 
-    return SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue);
+    return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
 }
 
-SIM70XX_Error_t SIM7020_PSM_Disable(SIM7020_t* const p_Device, SIM7020_PSM_Enable_t Mode)
+SIM70XX_Error_t SIM7020_PSM_Disable(SIM7020_t& p_Device, SIM7020_PSM_Enable_t Mode)
 {
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Device == NULL) || (Mode == SIM7020_PSM_EN))
+    if(Mode == SIM7020_PSM_EN)
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
-    else if(p_Device->Internal.isInitialized == false)
+    else if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CPSMS_DIS(Mode);
-    SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
 
-    return SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue);
+    return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
 }
 
-SIM70XX_Error_t SIM7020_PSM_GetMode(SIM7020_t* const p_Device, SIM7020_PSM_Enable_t* p_Mode)
+SIM70XX_Error_t SIM7020_PSM_GetMode(SIM7020_t& p_Device, SIM7020_PSM_Enable_t* p_Mode)
 {
-    if((p_Device == NULL) || (p_Mode == NULL))
+    if(p_Mode == NULL)
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
-    else if(p_Device->Internal.isInitialized == false)
+    else if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
@@ -108,61 +108,57 @@ SIM70XX_Error_t SIM7020_PSM_GetMode(SIM7020_t* const p_Device, SIM7020_PSM_Enabl
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_PSM_GetEventStatus(SIM7020_t* const p_Device, bool* p_Enable)
+SIM70XX_Error_t SIM7020_PSM_GetEventStatus(SIM7020_t& p_Device, bool* p_Enable)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Device == NULL) || (p_Enable == NULL))
+    if(p_Enable == NULL)
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
-    else if(p_Device->Internal.isInitialized == false)
+    else if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CPSMSTATUS_R;
-    SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
 
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue, &Response));
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
     *p_Enable = (bool)std::stoi(Response);
 
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_PSM_SetEventStatus(SIM7020_t* const p_Device, bool Enable)
+SIM70XX_Error_t SIM7020_PSM_SetEventStatus(SIM7020_t& p_Device, bool Enable)
 {
     SIM70XX_TxCmd_t* Command;
 
-    if(p_Device == NULL)
-    {
-        return SIM70XX_ERR_INVALID_ARG;
-    }
-    else if(p_Device->Internal.isInitialized == false)
+    if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
-    else if(p_Device->Internal.isPSMEvent == Enable)
+    else if(p_Device.Internal.isPSMEvent == Enable)
     {
         return SIM70XX_ERR_OK;
     }
 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CPSMSTATUS_W(Enable);
-    SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
 
-    return SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue);
+    return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
 }
 
 #endif

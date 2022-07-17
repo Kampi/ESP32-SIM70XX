@@ -30,7 +30,7 @@
 
 static const char* TAG = "SIM7020_TCPIP";
 
-SIM70XX_Error_t SIM7020_TCP_Ping(SIM7020_t* const p_Device, SIM7020_Ping_t* p_Config, std::vector<SIM7020_PingRes_t>* p_Result, uint32_t Timeout)
+SIM70XX_Error_t SIM7020_TCP_Ping(SIM7020_t& p_Device, SIM7020_Ping_t& p_Config, std::vector<SIM7020_PingRes_t>* p_Result, uint32_t Timeout)
 {
     uint8_t Pings;
     std::string Status;
@@ -39,11 +39,7 @@ SIM70XX_Error_t SIM7020_TCP_Ping(SIM7020_t* const p_Device, SIM7020_Ping_t* p_Co
     SIM70XX_Error_t Error = SIM70XX_ERR_OK;
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Device == NULL) || (p_Config == NULL))
-    {
-        return SIM70XX_ERR_INVALID_ARG;
-    }
-    else if(p_Device->Internal.isInitialized == false)
+    if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
@@ -53,48 +49,48 @@ SIM70XX_Error_t SIM7020_TCP_Ping(SIM7020_t* const p_Device, SIM7020_Ping_t* p_Co
         p_Result->clear();
     }
 
-    if(p_Config->Retries <= -1)
+    if(p_Config.Retries <= -1)
     {
-        p_Config->Retries = 4;
+        p_Config.Retries = 4;
     }
     else
     {
-        p_Config->Retries = std::min(p_Config->Retries, 100);
+        p_Config.Retries = std::min(p_Config.Retries, 100);
     }
 
-    if(p_Config->DataLength <= -1)
+    if(p_Config.DataLength <= -1)
     {
-        p_Config->DataLength = 32;
+        p_Config.DataLength = 32;
     }
     else
     {
-        p_Config->DataLength = std::min(p_Config->DataLength, (int16_t)5120);
+        p_Config.DataLength = std::min(p_Config.DataLength, (int16_t)5120);
     }
 
-    if(p_Config->Timeout <= -1)
+    if(p_Config.Timeout <= -1)
     {
-        p_Config->Timeout = 100;
+        p_Config.Timeout = 100;
     }
     else
     {
-        p_Config->Timeout = std::min(p_Config->Timeout, (int16_t)600);
+        p_Config.Timeout = std::min(p_Config.Timeout, (int16_t)600);
     }
 
-    CommandStr = "AT+CIPPING=\"" + p_Config->IP + "\"," + std::to_string(p_Config->Retries) + "," + std::to_string(p_Config->DataLength) + "," + std::to_string(p_Config->Timeout);
+    CommandStr = "AT+CIPPING=\"" + p_Config.IP + "\"," + std::to_string(p_Config.Retries) + "," + std::to_string(p_Config.DataLength) + "," + std::to_string(p_Config.Timeout);
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CIPPING(CommandStr);
-    SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue, &Response));
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
     Pings = 0;
     do
     {
         // Wait for a ping response.
-        if(SIM70XX_Queue_isEvent(p_Device->Internal.EventQueue, "+CIPPING: ", &Response))
+        if(SIM70XX_Queue_isEvent(p_Device.Internal.EventQueue, "+CIPPING: ", &Response))
         {
             do
             {
@@ -134,13 +130,13 @@ SIM70XX_Error_t SIM7020_TCP_Ping(SIM7020_t* const p_Device, SIM7020_Ping_t* p_Co
 
                 Pings++;
 
-                ESP_LOGD(TAG, "Ping %u / %u", Pings, p_Config->Retries);
+                ESP_LOGD(TAG, "Ping %u / %u", Pings, p_Config.Retries);
                 ESP_LOGD(TAG, "     Response: %s", Response.c_str());
             } while(Response.find("+CIPPING") != std::string::npos);
         }
 
         vTaskDelay(100 / portTICK_PERIOD_MS);
-    } while(Pings != p_Config->Retries);
+    } while(Pings != p_Config.Retries);
 
     ESP_LOGD(TAG, "Ping successful");
 

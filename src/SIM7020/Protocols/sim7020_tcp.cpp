@@ -30,7 +30,7 @@
 
 static const char* TAG = "SIM7020_TCPIP";
 
-SIM70XX_Error_t SIM7020_TCP_CreateTCP(SIM7020_t* const p_Device, std::string IP, uint16_t Port, SIM7020_TCP_Socket_t* p_Socket, uint8_t CID, SIM7020_TCP_Domain_t Domain, SIM7020_TCP_Protocol_t Protocol)
+SIM70XX_Error_t SIM7020_TCP_CreateTCP(SIM7020_t& p_Device, std::string IP, uint16_t Port, SIM7020_TCP_Socket_t* p_Socket, uint8_t CID, SIM7020_TCP_Domain_t Domain, SIM7020_TCP_Protocol_t Protocol)
 {
     if(p_Socket == NULL)
     {
@@ -48,17 +48,17 @@ SIM70XX_Error_t SIM7020_TCP_CreateTCP(SIM7020_t* const p_Device, std::string IP,
     return SIM7020_TCP_Create(p_Device, p_Socket);
 }
 
-SIM70XX_Error_t SIM7020_TCP_Create(SIM7020_t* const p_Device, SIM7020_TCP_Socket_t* p_Socket)
+SIM70XX_Error_t SIM7020_TCP_Create(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket)
 {
     std::string Response;
     std::string CommandStr;
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Device == NULL) || (p_Socket == NULL) || (p_Socket->Type == 0) || (p_Socket->Type > SIM7020_TCP_TYPE_RAW) || (p_Socket->Domain < SIM7020_TCP_DOMAIN_IPV4) || (p_Socket->Domain > SIM7020_TCP_DOMAIN_IPV6) || (p_Socket->Protocol < SIM7020_TCP_PROT_IP) || (p_Socket->Protocol > SIM7020_TCP_PROT_ICMP) || (p_Socket->CID > 10))
+    if((p_Socket == NULL) || (p_Socket->Type == 0) || (p_Socket->Type > SIM7020_TCP_TYPE_RAW) || (p_Socket->Domain < SIM7020_TCP_DOMAIN_IPV4) || (p_Socket->Domain > SIM7020_TCP_DOMAIN_IPV6) || (p_Socket->Protocol < SIM7020_TCP_PROT_IP) || (p_Socket->Protocol > SIM7020_TCP_PROT_ICMP) || (p_Socket->CID > 10))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
-    else if(p_Device->Internal.isInitialized == false)
+    else if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
@@ -66,35 +66,35 @@ SIM70XX_Error_t SIM7020_TCP_Create(SIM7020_t* const p_Device, SIM7020_TCP_Socket
     CommandStr = "AT+CSOC=" + std::to_string(p_Socket->Domain) + "," + std::to_string(p_Socket->Type) + "," + std::to_string(p_Socket->CID);
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CSOC(CommandStr);
-    SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, p_Socket->Timeout) == false)
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, p_Socket->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue, &Response));
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
     p_Socket->ID = (uint8_t)std::stoi(Response);
 
     // Everything okay. The socket is active now.
     ESP_LOGI(TAG, "Socket %u opened...", p_Socket->ID);
 
-    p_Device->TCP.Sockets.push_back(p_Socket);
+    p_Device.TCP.Sockets.push_back(p_Socket);
     p_Socket->isConnected = false;
     p_Socket->isCreated = true;
 
     return SIM70XX_ERR_OK;    
 }
 
-SIM70XX_Error_t SIM7020_TCP_Connect(SIM7020_t* const p_Device, SIM7020_TCP_Socket_t* p_Socket)
+SIM70XX_Error_t SIM7020_TCP_Connect(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Device == NULL) || (p_Socket == NULL))
+    if(p_Socket == NULL)
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
-    else if(p_Device->Internal.isInitialized == false)
+    else if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
@@ -109,28 +109,28 @@ SIM70XX_Error_t SIM7020_TCP_Connect(SIM7020_t* const p_Device, SIM7020_TCP_Socke
 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CSOCON(p_Socket->ID, p_Socket->Port, p_Socket->IP);
-    SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, p_Socket->Timeout) == false)
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, p_Socket->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue, &Response));
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
     p_Socket->isConnected = true;
 
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_TCP_TransmitBytes(SIM7020_t* const p_Device, SIM7020_TCP_Socket_t* p_Socket, const void* p_Buffer, uint16_t Length)
+SIM70XX_Error_t SIM7020_TCP_TransmitBytes(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket, const void* p_Buffer, uint16_t Length)
 {
     std::string Buffer_Hex;
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Device == NULL) || (p_Socket == NULL) || (Length > 512) || (p_Socket->Type != SIM7020_TCP_TYPE_TCP))
+    if((p_Socket == NULL) || (Length > 512) || (p_Socket->Type != SIM7020_TCP_TYPE_TCP))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
-    else if(p_Device->Internal.isInitialized == false)
+    else if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
@@ -143,24 +143,24 @@ SIM70XX_Error_t SIM7020_TCP_TransmitBytes(SIM7020_t* const p_Device, SIM7020_TCP
 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CCSOSEND_BYTES(p_Socket->ID, Length, Buffer_Hex);
-    SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
 
-    return SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue);   
+    return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);   
 }
 
-SIM70XX_Error_t SIM7020_TCP_TransmitString(SIM7020_t* const p_Device, SIM7020_TCP_Socket_t* p_Socket, std::string Data)
+SIM70XX_Error_t SIM7020_TCP_TransmitString(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket, std::string Data)
 {
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Device == NULL) || (p_Socket == NULL) || (Data.length() > 512) || (p_Socket->Type != SIM7020_TCP_TYPE_TCP))
+    if((p_Socket == NULL) || (Data.length() > 512) || (p_Socket->Type != SIM7020_TCP_TYPE_TCP))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
-    else if(p_Device->Internal.isInitialized == false)
+    else if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
@@ -171,24 +171,24 @@ SIM70XX_Error_t SIM7020_TCP_TransmitString(SIM7020_t* const p_Device, SIM7020_TC
 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CCSOSEND_STRING(p_Socket->ID, Data);
-    SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
 
-    return SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue);   
+    return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);   
 }
 
-SIM70XX_Error_t SIM7020_TCP_Destroy(SIM7020_t* const p_Device, SIM7020_TCP_Socket_t* p_Socket)
+SIM70XX_Error_t SIM7020_TCP_Destroy(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket)
 {
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Device == NULL) || (p_Socket == NULL))
+    if(p_Socket == NULL)
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
-    else if(p_Device->Internal.isInitialized == false)
+    else if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
@@ -199,12 +199,12 @@ SIM70XX_Error_t SIM7020_TCP_Destroy(SIM7020_t* const p_Device, SIM7020_TCP_Socke
 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CSOCL(p_Socket->ID);
-    SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue));
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
 
     p_Socket->isConnected = false;
 

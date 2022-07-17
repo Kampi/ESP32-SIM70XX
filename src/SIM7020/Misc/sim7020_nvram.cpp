@@ -31,17 +31,17 @@
 
 static const char* TAG = "SIM7020_NVRAM";
 
-SIM70XX_Error_t SIM7020_NVRAM_Write(SIM7020_t* const p_Device, std::string Key, const std::string Data, SIM7020_NVRAM_Error_t* p_Error)
+SIM70XX_Error_t SIM7020_NVRAM_Write(SIM7020_t& p_Device, std::string Key, const std::string Data, SIM7020_NVRAM_Error_t* p_Error)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;
     SIM7020_NVRAM_Error_t Error;
 
-    if((p_Device == NULL) || (Key.length() < 1) || (Key.length() > 20) || (Data.length() < 1) || (Data.length() > 1024))
+    if((Key.length() < 1) || (Key.length() > 20) || (Data.length() < 1) || (Data.length() > 1024))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
-    else if(p_Device->Internal.isInitialized == false)
+    else if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
@@ -50,12 +50,12 @@ SIM70XX_Error_t SIM7020_NVRAM_Write(SIM7020_t* const p_Device, std::string Key, 
 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CNVMW(Key, Data, Data.length());
-    SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue, &Response));
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
     Error = (SIM7020_NVRAM_Error_t)std::stoi(Response);
 
@@ -72,7 +72,7 @@ SIM70XX_Error_t SIM7020_NVRAM_Write(SIM7020_t* const p_Device, std::string Key, 
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_NVRAM_Write(SIM7020_t* const p_Device, std::string Key, const uint8_t* p_Buffer, uint16_t Length, SIM7020_NVRAM_Error_t* p_Error)
+SIM70XX_Error_t SIM7020_NVRAM_Write(SIM7020_t& p_Device, std::string Key, const uint8_t* p_Buffer, uint16_t Length, SIM7020_NVRAM_Error_t* p_Error)
 {
     std::string HexString;
 
@@ -81,17 +81,17 @@ SIM70XX_Error_t SIM7020_NVRAM_Write(SIM7020_t* const p_Device, std::string Key, 
     return SIM7020_NVRAM_Write(p_Device, Key, HexString, p_Error);
 }
 
-SIM70XX_Error_t SIM7020_NVRAM_Read(SIM7020_t* const p_Device, std::string Key, std::string* p_Payload, SIM7020_NVRAM_Error_t* p_Error)
+SIM70XX_Error_t SIM7020_NVRAM_Read(SIM7020_t& p_Device, std::string Key, std::string* p_Payload, SIM7020_NVRAM_Error_t* p_Error)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;
     SIM7020_NVRAM_Error_t Error;
 
-    if((p_Device == NULL) || (p_Payload == NULL) || (Key.length() < 1) || (Key.length() > 20))
+    if((p_Payload == NULL) || (Key.length() < 1) || (Key.length() > 20))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
-    else if(p_Device->Internal.isInitialized == false)
+    else if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
@@ -100,12 +100,12 @@ SIM70XX_Error_t SIM7020_NVRAM_Read(SIM7020_t* const p_Device, std::string Key, s
 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CNVMR(Key);
-    SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue, &Response));
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
     // Filter out the error code.
     Error = (SIM7020_NVRAM_Error_t)std::stoi(Response.substr(0, Response.find(",")));
@@ -140,29 +140,29 @@ SIM70XX_Error_t SIM7020_NVRAM_Read(SIM7020_t* const p_Device, std::string Key, s
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_NVRAM_Erase(SIM7020_t* const p_Device, std::string Key, SIM7020_NVRAM_Error_t* p_Error)
+SIM70XX_Error_t SIM7020_NVRAM_Erase(SIM7020_t& p_Device, std::string Key, SIM7020_NVRAM_Error_t* p_Error)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;
     SIM7020_NVRAM_Error_t Error;
 
-    if((p_Device == NULL) || (Key.length() < 1) || (Key.length() > 20))
+    if((Key.length() < 1) || (Key.length() > 20))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
-    else if(p_Device->Internal.isInitialized == false)
+    else if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CNVMIVD(Key);
-    SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue, &Response));
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
     // Filter out the error code.
     Error = (SIM7020_NVRAM_Error_t)std::stoi(Response.substr(0, Response.find(",")));
@@ -180,17 +180,17 @@ SIM70XX_Error_t SIM7020_NVRAM_Erase(SIM7020_t* const p_Device, std::string Key, 
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_NVRAM_GetKeys(SIM7020_t* const p_Device, std::vector<std::string>* p_Keys)
+SIM70XX_Error_t SIM7020_NVRAM_GetKeys(SIM7020_t& p_Device, std::vector<std::string>* p_Keys)
 {
     int32_t Index;
     std::string Response;
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Device == NULL) || (p_Keys == NULL))
+    if((p_Keys == NULL))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
-    else if(p_Device->Internal.isInitialized == false)
+    else if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
@@ -199,12 +199,12 @@ SIM70XX_Error_t SIM7020_NVRAM_GetKeys(SIM7020_t* const p_Device, std::vector<std
 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CNVMGET;
-    SIM70XX_PUSH_QUEUE(p_Device->Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device->Internal.RxQueue, &p_Device->Internal.isActive, Command->Timeout) == false)
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device->Internal.RxQueue, &Response));
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
     // Split the response into the different keys.
     do
