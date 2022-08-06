@@ -31,9 +31,10 @@
 #include <stdbool.h>
 #include <algorithm>
 
-#include <sdkconfig.h>
-
 #include "sim70xx_defs.h"
+#include "Misc/sim7080_pdp_defs.h"
+
+#include <sdkconfig.h>
 
 /** @brief SIM7080 SIM card status codes definition.
  */
@@ -63,10 +64,9 @@ typedef enum
  */
 typedef enum
 {
-    SIM7080_SEL_CAT         = 1,                            /**< Select CAT-M. */
-    SIM7080_SEL_NB          = 2,                            /**< Select NB-IoT. */
-    SIM7080_SEL_BOTH        = 3,                            /**< Select CAT-M and NB-IoT. */
-} SIM7080_Sel_t;
+    SIM7080_MODE_CAT        = 1,                            /**< Select CAT-M. */
+    SIM7080_MODE_NB         = 2,                            /**< Select NB-IoT. */
+} SIM7080_Mode_t;
 
 /** @brief SIM7080 supported frequency bands.
  */
@@ -130,14 +130,7 @@ typedef enum
 typedef struct
 {
     SIM70XX_UART_Conf_t UART;                               /**< UART configuration object. */
-    #ifdef CONFIG_SIM70XX_RESET_USE_HW
-        struct
-        {
-            bool Inverted;						            /**< Set to #true to invert the reset pin. */
-            gpio_num_t Pin;						            /**< Reset pin for the module.
-                                                                 NOTE: Can be set to -1 when not used. */
-        } Reset_Conf;
-    #endif
+    SIM7080_PDP_Type_t PDP_Type;                            /**< The PDP type used by the device. */
     struct
     {
         int8_t RSSI;                                        /**< Network RSSI value in dBm. */
@@ -174,20 +167,13 @@ typedef struct
 typedef struct
 {
     SIM70XX_UART_Conf_t UART;                               /**< UART configuration object. */
-    #ifdef CONFIG_SIM70XX_RESET_USE_HW
-        struct
-        {
-            bool Inverted;						            /**< Set to #true to invert the reset pin. */
-            gpio_num_t Pin;						            /**< Reset pin for the module.
-                                                                 NOTE: Can be set to -1 when not used. */
-        } Reset_Conf;
-    #endif
     SIM7080_Band_t Band;                                    /**< Selected frequency band. */
     SIM70XX_APN_t APN;                                      /**< APN configuration object. */
     SIM70XX_OpForm_t OperatorFormat;                        /**< Format for the selected operator. */
     std::string Operator;                                   /**< Selected operator. */
-    SIM7080_NetMode_t Mode;                                 /**< Preferred network mode selection. */
-    SIM7080_Sel_t Selection;                                /**< Preffered selection between CAT-M and NB-IoT. */
+    SIM7080_NetMode_t NetMode;                              /**< Preferred network mode selection. */
+    SIM7080_Mode_t Mode;                                    /**< Prefered mode selection between CAT-M and NB-IoT. */
+    std::vector<uint8_t> Bandlist;                          /**< List with used frequency bands. */
 } SIM7080_Config_t;
 
 #endif /* SIM7080_DEFS_H_ */

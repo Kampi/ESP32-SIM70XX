@@ -4,6 +4,7 @@ set(COMPONENT_SRCS
 
     # SIM7080
     "src/SIM7080/sim7080.cpp"
+    "src/SIM7080/Misc/sim7080_pdp.cpp"
     "src/SIM7080/Misc/sim7080_info.cpp"
     "src/SIM7080/Misc/sim7080_fs.cpp"
 

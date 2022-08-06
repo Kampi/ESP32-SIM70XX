@@ -33,14 +33,32 @@
 #define SIM7080_AT_CMNB_R                                       SIM70XX_CMD("AT+CMNB?", true, 10, 1)
 #define SIM7080_AT_CGREG                                        SIM70XX_CMD("AT+CGREG?", true, 10, 1)
 #define SIM7080_AT_COPS_W(Command)                              SIM70XX_CMD(Command, false, 300, 1)
-#define SIM7080_AT_COPS_R                                       SIM70XX_CMD("AT+COPS=?", true, 300, 1)
+#define SIM7080_AT_COPS_R                                       SIM70XX_CMD("AT+COPS?", true, 300, 1)
+#define SIM7080_AT_CGDCONT_W(Command)                           SIM70XX_CMD(Command, false, 10, 1)
+#define SIM7080_AT_CSQ                                          SIM70XX_CMD("AT+CSQ", true, 1, 1)
+#define SIM70XX_AT_CBANDCFG_R                                   SIM70XX_CMD("AT+CBANDCFG?", true, 1, 2)
+#define SIM70XX_AT_CBANDCFG_W(Mode, Bandlist)                   SIM70XX_CMD(std::string("AT+CBANDCFG=") + Mode + "," + Bandlist, false, 1, 1)
 
 /**
  * 
  * Used in SIM7080 device information driver.
  * 
  */
+#define SIM7080_AT_CGMI                                         SIM70XX_CMD("AT+CGMI", true, 1, 1)
+#define SIM7080_AT_CGMM                                         SIM70XX_CMD("AT+CGMM", true, 1, 1)
+#define SIM7080_AT_CGMR                                         SIM70XX_CMD("AT+CGMR", true, 1, 1)
+#define SIM7080_AT_CGOI                                         SIM70XX_CMD("AT+CGOI", true, 1, 1)
+#define SIM7080_AT_CGSN                                         SIM70XX_CMD("AT+CGSN", true, 1, 1)
+#define SIM7080_AT_CIMI                                         SIM70XX_CMD("AT+CIMI", true, 1, 1)
+#define SIM7080_AT_CCID                                         SIM70XX_CMD("AT+CCID", true, 1, 1)
+#define SIM7080_AT_CGMR                                         SIM70XX_CMD("AT+CGMR", true, 1, 1)
+#define SIM7080_AT_CGCONTRDP_W(ID)                              SIM70XX_CMD("AT+CGCONTRDP=" + std::to_string(ID), true, 60, 1)
+#define SIM7080_AT_CGCONTRDP                                    SIM70XX_CMD("AT+CGCONTRDP", true, 300, 1)
+#define SIM7080_AT_CGREG                                        SIM70XX_CMD("AT+CGREG?", true, 10, 1)
 #define SIM7080_AT_CSQ                                          SIM70XX_CMD("AT+CSQ", true, 1, 1)
+#define SIM7080_AT_CPSI                                         SIM70XX_CMD("AT+CPSI?", true, 1, 1)
+#define SIM7080_AT_CENG_R                                       SIM70XX_CMD("AT+CENG?", true, 1, 1)
+#define SIM7080_AT_CENG_W(Mode)                                 SIM70XX_CMD("AT+CENG=" + std::to_String(Mode), false, 1, 1)
 
 /**
  * 

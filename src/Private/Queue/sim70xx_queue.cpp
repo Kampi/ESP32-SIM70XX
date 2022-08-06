@@ -42,6 +42,8 @@ SIM70XX_Error_t SIM70XX_Queue_PopItem(QueueHandle_t Queue, std::string* p_Respon
         return SIM70XX_ERR_QUEUE_EMPTY;
     }
 
+    ESP_LOGD(TAG, "Items in queue before: %u", MessagesInQueue);
+
     Rx = new SIM70XX_CmdResp_t();
 
     // Get the next item from the queue.
@@ -52,6 +54,9 @@ SIM70XX_Error_t SIM70XX_Queue_PopItem(QueueHandle_t Queue, std::string* p_Respon
         Error = SIM70XX_ERR_INVALID_RESPONSE;
         goto SIM7020_Wait_Exit;
     }
+
+    MessagesInQueue = uxQueueMessagesWaiting(Queue);
+    ESP_LOGD(TAG, "Items in queue after: %u", MessagesInQueue);
 
     if(Rx->isError)
     {

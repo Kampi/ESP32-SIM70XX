@@ -29,6 +29,157 @@
 
 static const char* TAG = "SIM7080_Info";
 
+void SIM7080_Info_Print(SIM7080_Info_t* const p_Info)
+{
+    ESP_LOGI(TAG, "Device information:");
+    ESP_LOGI(TAG, "     Manufacturer: %s", p_Info->Manufacturer.c_str());
+    ESP_LOGI(TAG, "     Firmware: %s", p_Info->Firmware.c_str());
+    ESP_LOGI(TAG, "     Model: %s", p_Info->Model.c_str());
+    ESP_LOGI(TAG, "     IMEI: %s",p_Info->IMEI.c_str());
+    ESP_LOGI(TAG, "     ICCID: %s", p_Info->ICCID.c_str());
+}
+
+SIM70XX_Error_t SIM7080_Info_GetDeviceInformation(SIM7080_t& p_Device, SIM7080_Info_t* const p_Info)
+{
+    if(p_Info == NULL)
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+    else if(p_Device.Internal.isInitialized == false)
+    {
+        return SIM70XX_ERR_NOT_INITIALIZED;
+    }
+
+    SIM70XX_ERROR_CHECK(SIM7080_Info_GetManufacturer(p_Device, &p_Info->Manufacturer));
+    SIM70XX_ERROR_CHECK(SIM7080_Info_GetModel(p_Device, &p_Info->Model));
+    SIM70XX_ERROR_CHECK(SIM7080_Info_GetFW(p_Device, &p_Info->Firmware));
+    SIM70XX_ERROR_CHECK(SIM7080_Info_GetIMEI(p_Device, &p_Info->IMEI));
+    SIM70XX_ERROR_CHECK(SIM7080_Info_GetICCID(p_Device, &p_Info->ICCID));
+    SIM70XX_ERROR_CHECK(SIM7080_Info_GetFW(p_Device, &p_Info->Firmware));
+
+    return SIM70XX_ERR_OK;
+}
+
+SIM70XX_Error_t SIM7080_Info_GetManufacturer(SIM7080_t& p_Device, std::string* const p_Manufacturer)
+{
+    SIM70XX_TxCmd_t* Command;
+
+    if(p_Manufacturer == NULL)
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+    else if(p_Device.Internal.isInitialized == false)
+    {
+        return SIM70XX_ERR_NOT_INITIALIZED;
+    }
+
+    SIM70XX_CREATE_CMD(Command);
+    *Command = SIM7080_AT_CGMI;
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout))
+    {
+        return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, p_Manufacturer);
+    }
+
+    return SIM70XX_ERR_FAIL;
+}
+
+SIM70XX_Error_t SIM7080_Info_GetModel(SIM7080_t& p_Device, std::string* const p_Model)
+{
+    SIM70XX_TxCmd_t* Command;
+
+    if(p_Model == NULL)
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+    else if(p_Device.Internal.isInitialized == false)
+    {
+        return SIM70XX_ERR_NOT_INITIALIZED;
+    }
+
+    SIM70XX_CREATE_CMD(Command);
+    *Command = SIM7080_AT_CGMM;
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout))
+    {
+        return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, p_Model);
+    }
+
+    return SIM70XX_ERR_FAIL;  
+}
+
+SIM70XX_Error_t SIM7080_Info_GetFW(SIM7080_t& p_Device, std::string* const p_Firmware)
+{
+    SIM70XX_TxCmd_t* Command;
+
+    if(p_Firmware == NULL)
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+    else if(p_Device.Internal.isInitialized == false)
+    {
+        return SIM70XX_ERR_NOT_INITIALIZED;
+    }
+
+    SIM70XX_CREATE_CMD(Command);
+    *Command = SIM7080_AT_CGMR;
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout))
+    {
+        return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, p_Firmware);
+    }
+
+    return SIM70XX_ERR_FAIL;
+}
+
+SIM70XX_Error_t SIM7080_Info_GetIMEI(SIM7080_t& p_Device, std::string* const p_IMEI)
+{
+    SIM70XX_TxCmd_t* Command;
+
+    if(p_IMEI == NULL)
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+    else if(p_Device.Internal.isInitialized == false)
+    {
+        return SIM70XX_ERR_NOT_INITIALIZED;
+    }
+
+    SIM70XX_CREATE_CMD(Command);
+    *Command = SIM7080_AT_CGSN;
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout))
+    {
+        return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, p_IMEI);
+    }
+
+    return SIM70XX_ERR_FAIL;
+}
+
+SIM70XX_Error_t SIM7080_Info_GetICCID(SIM7080_t& p_Device, std::string* const p_ICCID)
+{
+    SIM70XX_TxCmd_t* Command;
+
+    if(p_ICCID == NULL)
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+    else if(p_Device.Internal.isInitialized == false)
+    {
+        return SIM70XX_ERR_NOT_INITIALIZED;
+    }
+
+    SIM70XX_CREATE_CMD(Command);
+    *Command = SIM7080_AT_CCID;
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout))
+    {
+        return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, p_ICCID);
+    }
+
+    return SIM70XX_ERR_FAIL;
+}
+
 SIM70XX_Error_t SIM7080_Info_GetNetworkRegistrationStatus(SIM7080_t& p_Device)
 {
     std::string Response;
@@ -75,43 +226,37 @@ SIM70XX_Error_t SIM7080_Info_GetQuality(SIM7080_t& p_Device)
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    Index = Response.find(",");
-    if(Index == std::string::npos)
+    // TODO: Implement me
+
+    return SIM70XX_ERR_OK;
+}
+
+SIM70XX_Error_t SIM7080_Info_GetEquipmentInfo(SIM7080_t& p_Device, SIM7080_UEInfo_t* p_Info)
+{
+    std::string Response;
+    SIM70XX_TxCmd_t* Command;
+
+    if(p_Info == NULL)
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+    else if(p_Device.Internal.isInitialized == false)
+    {
+        return SIM70XX_ERR_NOT_INITIALIZED;
+    }
+
+    SIM70XX_CREATE_CMD(Command);
+    *Command = SIM7080_AT_CPSI;
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    RSSI = std::stoi(Response.substr(0, Index));
-    RXQual = std::stoi(Response.substr(Response.find_last_of(",") + 1));
-
-    // TODO: Calc correct values
-    if(RSSI == 0)
+    if(Response.find("NO SERVICE,Online") != std::string::npos)
     {
-        p_Device.Connection.RSSI = -110;
-    }
-    else if(RSSI == 1)
-    {
-        p_Device.Connection.RSSI = -108;
-    }
-    else if(RSSI == 2)
-    {
-        p_Device.Connection.RSSI = -106;
-    }
-    // Simple approach to convert the return value from the modem into a RSSI value.
-    else if((RSSI >= 3) || (RSSI <= 30))
-    {
-        p_Device.Connection.RSSI = -105 + (2 * (RSSI - 3));
-    }
-    else
-    {
-        p_Device.Connection.RSSI = 0;
-    }
-
-    p_Device.Connection.RXQual = RXQual;
-
-    if((RSSI == 0) && (RXQual == 0))
-    {
-        return SIM70XX_ERR_FAIL;
+        return SIM70XX_ERR_NOT_READY;
     }
 
     return SIM70XX_ERR_OK;

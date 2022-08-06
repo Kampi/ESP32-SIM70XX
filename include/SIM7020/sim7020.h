@@ -33,8 +33,6 @@
 #include "Definitions/Configs/sim7020_config_1nce.h"
 #include "Definitions/Configs/sim7020_config_fusion.h"
 
-#include <sdkconfig.h>
-
 #ifdef CONFIG_SIM70XX_DRIVER_WITH_NVRAM
     #include "Misc/sim7020_nvram.h"
 #endif

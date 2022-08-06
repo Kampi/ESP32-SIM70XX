@@ -31,8 +31,6 @@
 #include <stdbool.h>
 #include <algorithm>
 
-#include <sdkconfig.h>
-
 #ifdef CONFIG_SIM70XX_DRIVER_WITH_COAP
     #include "Protocols/sim7020_coap_defs.h"
 #endif
@@ -51,6 +49,8 @@
 
 #include "sim70xx_defs.h"
 #include "sim7020_pdp_defs.h"
+
+#include <sdkconfig.h>
 
 /** @brief SIM7020 SIM card status codes definition.
  */

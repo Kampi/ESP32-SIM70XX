@@ -119,11 +119,7 @@ SIM70XX_Error_t SIM7020_Init(SIM7020_t& p_Device, SIM7020_Config_t& p_Config, ui
     vTaskResume(p_Device.Internal.TaskHandle);
 
     SIM70XX_ERROR_CHECK(SIM7020_Ping(p_Device));
-    if(SIM7020_isSIMReady(p_Device) == false)
-    {
-        ESP_LOGE(TAG, "SIM not ready!");
-    }
-    ESP_LOGI(TAG, "SIM ready!");
+    SIM70XX_ERROR_CHECK(SIM7020_GetFunctionality(p_Device))
 
     SIM70XX_ERROR_CHECK(SIM7020_PSM_Disable(p_Device, SIM7020_PSM_DIS));
     if(SIM7020_GetFunctionality(p_Device) == SIM70XX_ERR_INVALID_STATE)
@@ -132,7 +128,7 @@ SIM70XX_Error_t SIM7020_Init(SIM7020_t& p_Device, SIM7020_Config_t& p_Config, ui
     }
 
     SIM70XX_ERROR_CHECK(SIM7020_SetFunctionality(p_Device, SIM7020_FUNC_MIN));    // TODO: Check this
-    SIM70XX_ERROR_CHECK(SIM7020_SetPSD(p_Device, SIM7020_PDP_IP, p_Config.APN));
+    SIM70XX_ERROR_CHECK(SIM7020_PDP_Define(p_Device, SIM7020_PDP_IP, p_Config.APN)); // TODO: CHange
     SIM70XX_ERROR_CHECK(SIM7020_SetOperator(p_Device, SIM_MODE_MANUAL, p_Config.OperatorFormat, p_Config.Operator));
     SIM70XX_ERROR_CHECK(SIM7020_SetFunctionality(p_Device, SIM7020_FUNC_FULL));    // TODO: Check this
     SIM70XX_ERROR_CHECK(SIM7020_SetBand(p_Device, p_Config.Band));
@@ -512,7 +508,7 @@ SIM70XX_Error_t SIM7020_SetFunctionality(SIM7020_t& p_Device, SIM7020_Func_t Fun
     //  Status = +CPIN: READY
     if(p_Device.Connection.Functionality == SIM7020_FUNC_MIN)
     {
-        ESP_LOGI(TAG, "Minimum functionality...");
+        ESP_LOGI(TAG, "Last: Minimum functionality...");
 
         if(Response.find("OK") != std::string::npos)
         {
@@ -526,7 +522,7 @@ SIM70XX_Error_t SIM7020_SetFunctionality(SIM7020_t& p_Device, SIM7020_Func_t Fun
     //  Status = OK
     else if(p_Device.Connection.Functionality == SIM7020_FUNC_FULL)
     {
-        ESP_LOGI(TAG, "Full functionality...");
+        ESP_LOGI(TAG, "Last: Full functionality...");
 
         if(Status.find("OK") != std::string::npos)
         {

@@ -46,7 +46,7 @@ typedef int SIM70XX_Error_t;
  */
 #define SIM70XX_ERR_NOT_INITIALIZED                             SIM70XX_ERR_BASE + 2
 
-/** @brief Module not ready.
+/** @brief Module or connection not ready.
  */
 #define SIM70XX_ERR_NOT_READY                                   SIM70XX_ERR_BASE + 3
 
@@ -58,7 +58,7 @@ typedef int SIM70XX_Error_t;
  */
 #define SIM70XX_ERR_FAIL                                        SIM70XX_ERR_BASE + 5
 
-/** @brief When the number of JOIN attemps has expired.
+/** @brief When the device reports a timeout.
  */
 #define SIM70XX_ERR_TIMEOUT                                     SIM70XX_ERR_BASE + 6
 

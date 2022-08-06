@@ -40,4 +40,12 @@ typedef struct
                                                          NOTE: Managed by the device driver. */
 } SIM7080_Info_t;
 
+/** @brief SIM7080 UE system information object definition.
+ */
+typedef struct sim7080_info_defs
+{
+    bool isGSMCell;                                 /**< #true when the module is camping on a GSM cell.
+                                                         NOTE: Managed by the device driver. */
+} SIM7080_UEInfo_t;
+
 #endif /* SIM7080_INFO_DEFS_H_ */

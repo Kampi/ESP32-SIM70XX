@@ -1,5 +1,5 @@
  /*
- * sim7020_pdp.h
+ * sim7080_pdp.h
  *
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -17,39 +17,20 @@
  * Errors and commissions should be reported to DanielKampert@kampis-elektroecke.de.
  */
 
-#ifndef SIM7020_PDP_H_
-#define SIM7020_PDP_H_
+#ifndef SIM7080_PDP_H_
+#define SIM7080_PDP_H_
 
-#include "sim7020_defs.h"
 #include "sim70xx_errors.h"
-#include "Definitions/Misc/sim7020_pdp_defs.h"
+#include "Definitions/sim7080_defs.h"
+#include "Definitions/Misc/sim7080_pdp_defs.h"
 
-/** @brief              Get the PDP contexte.
- *  @param p_Device     SIM7020 device object
- *  @param p_Context    Pointer to SIM7020 PDP context object
- *  @return             SIM70XX_ERR_OK when successful
- */
-SIM70XX_Error_t SIM7020_PDP_GetContext(SIM7020_t& p_Device, SIM7020_PDP_Context_t* const p_Context);
-
-/** @brief          PDP Context activate or deactivate.
- *  @param p_Device SIM7020 device object
- *  @param Enable   Enable / Disable
- *  @param Context  (Optional) PDP context ID
+/** @brief          Define the PDP context.
+ *  @param p_Device SIM7080 device object
+ *  @param PDP      Packet Data Protocol (PDP) type
+ *  @param APN      Access Point Name (APN) configuration
+ *  @param CID      (Optional) PDP context ID
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_PDP_Switch(SIM7020_t& p_Device, bool Enable, uint8_t Context = 1);
+SIM70XX_Error_t SIM7080_PDP_Define(SIM7080_t& p_Device, SIM7080_PDP_Type_t PDP, SIM70XX_APN_t APN, uint8_t CID = 1);
 
-/** @brief          Get the status of all PDP contextes.
- *  @param p_Device SIM7020 device object
- *  @param p_Status Pointer to PDP Context status list
- *  @return         SIM70XX_ERR_OK when successful
- */
-SIM70XX_Error_t SIM7020_PDP_GetStatus(SIM7020_t& p_Device, std::vector<SIM7020_PDP_Status_t>* p_Status);
-
-/** @brief          Read the dynamic PDP (Packet Data Protocol) context parameters.
- *  @param p_Device SIM7020 device object
- *  @return         SIM70XX_ERR_OK when successful
- */
-SIM70XX_Error_t SIM7020_PDP_ReadDynamicParameters(SIM7020_t& p_Device);
-
-#endif /* SIM7020_PDP_H_ */
+#endif /* SIM7080_PDP_H_ */

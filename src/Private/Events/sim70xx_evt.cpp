@@ -139,7 +139,7 @@ static void SIM70XX_Evt_Task(void* p_Arg)
                     Message->append(SIM70XX_UART_ReadString(Device->UART));
                 } while(SIM70XX_UART_Available(Device->UART));
 
-                ESP_LOGI(TAG, "Event: %s", Message->c_str());
+                ESP_LOGD(TAG, "Event: %s", Message->c_str());
 
                 // Shutdown message was received.
                 if(Message->find("NORMAL POWER DOWN") != std::string::npos)
@@ -253,9 +253,10 @@ static void SIM70XX_Evt_Task(void* p_Arg)
                         }
 
                         // Add the received line to the response when the number of lines is 0.
-                        if((*it)->Lines == 0)
+                        if((*it)->Lines > 1)
                         {
                             (*it)->Response += Line + '\n';
+                            (*it)->Lines--;
                         }
                         // Abort when all lines are received.
                         else
@@ -280,7 +281,7 @@ static void SIM70XX_Evt_Task(void* p_Arg)
                         break;
                     }
 
-                    vTaskDelay(10 / portTICK_PERIOD_MS);
+                    vTaskDelay(20 / portTICK_PERIOD_MS);
                 } while(true);
             }
 
@@ -306,7 +307,7 @@ static void SIM70XX_Evt_Task(void* p_Arg)
                         break;
                     }
 
-                    vTaskDelay(10 / portTICK_PERIOD_MS);
+                    vTaskDelay(20 / portTICK_PERIOD_MS);
                 } while((*it)->Status.length() < 2);
 
                 // Remove the line endings.
@@ -329,7 +330,7 @@ static void SIM70XX_Evt_Task(void* p_Arg)
             ActiveCommands.erase(it++);
         }
 
-        vTaskDelay(10 / portTICK_PERIOD_MS);
+        vTaskDelay(20 / portTICK_PERIOD_MS);
     }
 }
 

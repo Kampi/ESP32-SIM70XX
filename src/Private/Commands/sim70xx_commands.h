@@ -21,10 +21,12 @@
 #define SIM70XX_COMMANDS_H_
 
 #include <sdkconfig.h>
+
 #include "../Queue/sim70xx_queue.h"
 
-/** @brief  Create a new command object.
- *          An error is generated when no memory is available for allocation.
+/** @brief      Create a new command object.
+ *              An error is generated when no memory is available for allocation.
+ *  @param AT   Pointer to command object
  */
 #define SIM70XX_CREATE_CMD(AT)                                  do                                  \
                                                                 {                                   \
@@ -50,13 +52,13 @@
 
 /**
  * 
- * Common commands.
+ * Common commands for all modules.
  * 
  */
 #define SIM70XX_AT                                              SIM70XX_CMD("AT", false, 1, 1)
 #define SIM70XX_AT_CBAND_W(Band)                                SIM70XX_CMD("AT+CBAND=" + std::to_string(Band), false, 10, 1)
 #define SIM70XX_AT_CFUN_R                                       SIM70XX_CMD("AT+CFUN?", true, 10, 1)
-#define SIM70XX_AT_CFUN_W(Func, Reset)                          SIM70XX_CMD("AT+CFUN=" + std::to_string(Func) + "," + std::to_string(Reset), true, 60, 1)
+#define SIM70XX_AT_CFUN_W(Func, Reset)                          SIM70XX_CMD("AT+CFUN=" + std::to_string(Func) + "," + std::to_string(Reset), true, 300, 1)
 #define SIM70XX_AT_CBAND_R                                      SIM70XX_CMD("AT+CBAND?", true, 10, 1)
 #define SIM70XX_AT_CGATT_R                                      SIM70XX_CMD("AT+CGATT?", true, 90, 1)
 #define SIM70XX_AT_CPIN_R                                       SIM70XX_CMD("AT+CPIN?", true, 10, 1)
