@@ -43,7 +43,6 @@ SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t& p_Conf
 
 SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t& p_Config, uint32_t Timeout, SIM70XX_Baud_t Old)
 {
-    bool isAttached;
     std::string Response;
 
     if(p_Device.Internal.isInitialized)
@@ -93,18 +92,20 @@ SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t& p_Conf
 	SIM70XX_ERROR_CHECK(SIM7080_SoftReset(p_Device, Timeout));
 
     vTaskSuspend(p_Device.Internal.TaskHandle);
-    SIM70XX_DisableEcho(p_Device.UART);
+    SIM70XX_Tools_DisableEcho(p_Device.UART);
     vTaskResume(p_Device.Internal.TaskHandle);
 
     SIM70XX_ERROR_CHECK(SIM7080_Ping(p_Device));
     SIM70XX_ERROR_CHECK(SIM7080_GetFunctionality(p_Device));
 
-    if(p_Device.Connection.Functionality != SIM7080_FUNC_MIN)
-    {
-        SIM70XX_ERROR_CHECK(SIM7080_SetFunctionality(p_Device, SIM7080_FUNC_MIN));
-    }
-    SIM70XX_ERROR_CHECK(SIM7080_PDP_Define(p_Device, SIM7080_PDP_IP, p_Config.APN));
     SIM70XX_ERROR_CHECK(SIM7080_SetFunctionality(p_Device, SIM7080_FUNC_FULL));
+
+    #ifdef CONFIG_SIM70XX_DRIVER_WITH_FS
+        SIM70XX_ERROR_CHECK(SIM7080_FS_GetFree(p_Device, &p_Device.FS.Free));
+    #endif
+
+    SIM70XX_ERROR_CHECK(SIM7080_SetNetMode(p_Device, p_Config.NetMode));
+    SIM70XX_ERROR_CHECK(SIM7080_SetSelectedMode(p_Device, p_Config.Mode));
 
     if(p_Config.Mode == (SIM7080_MODE_CAT | SIM7080_MODE_NB))
     {
@@ -116,27 +117,6 @@ SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t& p_Conf
         SIM70XX_ERROR_CHECK(SIM7080_SetBandConfig(p_Device, p_Config.Mode, p_Config.Bandlist));
     }
 
-    isAttached = false;
-    do
-    {
-        isAttached = SIM7080_isAttached(p_Device);
-        ESP_LOGI(TAG, "Attached: %u", isAttached);
-        vTaskDelay(10000 / portTICK_PERIOD_MS);
-    } while(isAttached == false);
-
-    SIM7080_UEInfo_t Info;
-    SIM70XX_ERROR_CHECK(SIM7080_Info_GetQuality(p_Device));
-    SIM70XX_ERROR_CHECK(SIM7080_Info_GetEquipmentInfo(p_Device, &Info));
-
-    SIM70XX_ERROR_CHECK(SIM7080_SetNetMode(p_Device, p_Config.NetMode));
-    SIM70XX_ERROR_CHECK(SIM7080_SetSelectedMode(p_Device, p_Config.Mode));
-
-    #ifdef CONFIG_SIM70XX_DRIVER_WITH_FS
-        SIM70XX_ERROR_CHECK(SIM7080_FS_GetFree(p_Device, &p_Device.FS.Free));
-    #endif
-
-    ESP_LOGI(TAG, "Done");
-
     return SIM70XX_ERR_OK;
 }
 
@@ -147,7 +127,7 @@ void SIM7080_Deinit(SIM7080_t& p_Device)
     vTaskDelete(p_Device.Internal.TaskHandle);
     p_Device.Internal.TaskHandle = NULL;
 
-    // Delete the queues.
+    // Delete the message queues.
     vQueueDelete(p_Device.Internal.RxQueue);
     vQueueDelete(p_Device.Internal.TxQueue);
     vQueueDelete(p_Device.Internal.EventQueue);
@@ -210,6 +190,37 @@ SIM70XX_Error_t SIM7080_SoftReset(SIM7080_t& p_Device, uint32_t Timeout)
     return SIM70XX_ERR_FAIL;
 }
 
+SIM70XX_Error_t SIM7080_AutoAPN(SIM7080_t& p_Device, SIM70XX_APN_t APN)
+{
+    // TODO
+    return SIM70XX_ERR_OK;
+}
+
+SIM70XX_Error_t SIM7080_ManualAPN(SIM7080_t& p_Device, SIM70XX_APN_t APN, uint8_t CID)
+{
+    bool isAttached;
+
+    if(p_Device.Connection.Functionality != SIM7080_FUNC_MIN)
+    {
+        SIM70XX_ERROR_CHECK(SIM7080_SetFunctionality(p_Device, SIM7080_FUNC_MIN));
+    }
+    SIM70XX_ERROR_CHECK(SIM7080_PDP_Define(p_Device, SIM7080_PDP_IP, APN));
+    SIM70XX_ERROR_CHECK(SIM7080_SetFunctionality(p_Device, SIM7080_FUNC_FULL));
+
+    isAttached = false;
+    do
+    {
+        isAttached = SIM7080_isAttached(p_Device);
+        ESP_LOGD(TAG, "Attached: %u", isAttached);
+        vTaskDelay(10000 / portTICK_PERIOD_MS);
+    } while(isAttached == false);
+
+    SIM70XX_ERROR_CHECK(SIM7080_GetCurrentOperator(p_Device));
+    SIM70XX_ERROR_CHECK(SIM7080_PDP_Action(p_Device, 0, SIM7080_PDP_ENABLE));
+
+    return SIM70XX_ERR_OK;
+}
+
 SIM70XX_Error_t SIM7080_SetOperator(SIM7080_t& p_Device, SIM70XX_OpMode_t Mode, SIM70XX_OpForm_t Format, std::string Operator, SIM7080_AcT_t AcT)
 {
     std::string CommandStr;
@@ -235,7 +246,7 @@ SIM70XX_Error_t SIM7080_SetOperator(SIM7080_t& p_Device, SIM70XX_OpMode_t Mode, 
         return SIM70XX_ERR_FAIL;
     }
 
-    return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, NULL, NULL);
+    return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
 }
 
 SIM70XX_Error_t SIM7080_GetCurrentOperator(SIM7080_t& p_Device)
@@ -255,7 +266,7 @@ SIM70XX_Error_t SIM7080_GetCurrentOperator(SIM7080_t& p_Device)
         return SIM70XX_ERR_FAIL;
     }
 
-    return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, NULL, NULL);
+    return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
 }
 
 SIM70XX_Error_t SIM7080_SetBandConfig(SIM7080_t& p_Device, SIM7080_Mode_t Mode, std::vector<uint8_t> Bands)
@@ -268,8 +279,6 @@ SIM70XX_Error_t SIM7080_SetBandConfig(SIM7080_t& p_Device, SIM7080_Mode_t Mode, 
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
-
-    SIM70XX_CREATE_CMD(Command);
 
     for(uint8_t i = 0; i < (Bands.size() - 1); i++)
     {
@@ -286,6 +295,7 @@ SIM70XX_Error_t SIM7080_SetBandConfig(SIM7080_t& p_Device, SIM7080_Mode_t Mode, 
         ModeStr = "CAT-M";
     }
 
+    SIM70XX_CREATE_CMD(Command);
     *Command = SIM70XX_AT_CBANDCFG_W(ModeStr, Bandlist);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
     if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
@@ -315,7 +325,7 @@ SIM70XX_Error_t SIM7080_GetBandConfig(SIM7080_t& p_Device, SIM7080_Mode_t Mode, 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM70XX_AT_CBANDCFG_R;
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout, 2) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -520,6 +530,8 @@ SIM70XX_Error_t SIM7080_SetFunctionality(SIM7080_t& p_Device, SIM7080_Func_t Fun
         return SIM70XX_ERR_OK;
     }
 
+    p_Device.Internal.isSMSReady = false;
+
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM70XX_AT_CFUN_W(Func, Reset);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
@@ -536,6 +548,8 @@ SIM70XX_Error_t SIM7080_SetFunctionality(SIM7080_t& p_Device, SIM7080_Func_t Fun
     //  Status = +CPIN: READY
     if(p_Device.Connection.Functionality == SIM7080_FUNC_MIN)
     {
+        std::string Event;
+
         ESP_LOGI(TAG, "Last: Minimum functionality...");
 
         if(Response.find("OK") != std::string::npos)
@@ -543,6 +557,11 @@ SIM70XX_Error_t SIM7080_SetFunctionality(SIM7080_t& p_Device, SIM7080_Func_t Fun
             p_Device.Connection.Functionality = Func;
 
             Error = SIM70XX_ERR_OK;
+        }
+
+        while(p_Device.Internal.isSMSReady == false)
+        {
+            vTaskDelay(100 / portTICK_PERIOD_MS);
         }
     }
     // Device is in full functionality -> Transition into another functionality
@@ -610,7 +629,7 @@ SIM70XX_Error_t SIM7080_GetSIMStatus(SIM7080_t& p_Device, SIM7080_SIM_t* const p
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
     if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
-        return false;
+        return SIM70XX_ERR_FAIL;
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 

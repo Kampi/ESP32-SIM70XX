@@ -85,9 +85,8 @@ typedef struct
  *  @param p_Status     (Optional) Pointer to response status string
  *  @return             SIM70XX_ERR_OK when successful
  *                      SIM70XX_ERR_INVALID_ARG when an invalid argument is passed into the function
- *                      SIM70XX_ERR_INVALID_STATE when the device is not initialized
  *                      SIM70XX_ERR_QUEUE_EMPTY when the receive queue is empty
- *                      SIM70XX_ERR_INVALID_RESPONSE when the item can not be popped from the queue
+ *                      SIM70XX_ERR_QUEUE_ERR when the item can not be popped from the queue
  *                      SIM70XX_ERR_FAIL when the device has reported an error
  *                      SIM70XX_ERR_TIMEOUT when a communication timeout has occured
  */
@@ -103,10 +102,9 @@ uint32_t SIM70XX_Queue_GetItems(QueueHandle_t Queue);
  *  @param Queue    Message queue
  *  @param p_Active Pointer to active state of the device
  *  @param Timeout  (Optional) Wait timeout in seconds
- *  @param Items    (Optional) Number of items to wait for
  *  @return         #true when the items are placed in the queue
  */
-bool SIM70XX_Queue_Wait(QueueHandle_t Queue, bool* p_Active, uint32_t Timeout = 1, uint32_t Items = 1);
+bool SIM70XX_Queue_Wait(QueueHandle_t Queue, bool* p_Active, uint32_t Timeout = 1);
 
 /** @brief          Reset the recieve queue and discard all items.
  *  @param Queue    Message queue

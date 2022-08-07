@@ -25,7 +25,7 @@
 
 #include "sim7080.h"
 #include "../../Private/Queue/sim70xx_queue.h"
-#include "../../Private/Commands/sim7080_commands.h"
+#include "../../Private/Commands/sim70xx_commands.h"
 
 static const char* TAG = "SIM7080_Info";
 
@@ -204,7 +204,7 @@ SIM70XX_Error_t SIM7080_Info_GetNetworkRegistrationStatus(SIM7080_t& p_Device)
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7080_Info_GetQuality(SIM7080_t& p_Device)
+SIM70XX_Error_t SIM7080_Info_GetQuality(SIM7080_t& p_Device, SIM70XX_Qual_t* p_Report)
 {
     int8_t RSSI;
     uint8_t RXQual;
@@ -215,6 +215,10 @@ SIM70XX_Error_t SIM7080_Info_GetQuality(SIM7080_t& p_Device)
     if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
+    }
+    else if(p_Report == NULL)
+    {
+        return SIM70XX_ERR_INVALID_ARG;
     }
 
     SIM70XX_CREATE_CMD(Command);
@@ -227,6 +231,9 @@ SIM70XX_Error_t SIM7080_Info_GetQuality(SIM7080_t& p_Device)
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
     // TODO: Implement me
+    Index = Response.find(",");
+    RSSI = std::stoi(Response.substr(0, Index));
+    RXQual = std::stoi(Response.substr(Response.find_last_of(",") + 1));
 
     return SIM70XX_ERR_OK;
 }
@@ -257,6 +264,30 @@ SIM70XX_Error_t SIM7080_Info_GetEquipmentInfo(SIM7080_t& p_Device, SIM7080_UEInf
     if(Response.find("NO SERVICE,Online") != std::string::npos)
     {
         return SIM70XX_ERR_NOT_READY;
+    }
+
+    p_Info->SystemMode = SIM70XX_Tools_SubstringSplitErase(&Response);
+    p_Info->OperationMode = SIM70XX_Tools_SubstringSplitErase(&Response);
+    p_Info->MCC = SIM70XX_Tools_SubstringSplitErase(&Response);
+    p_Info->MNC = SIM70XX_Tools_SubstringSplitErase(&Response);
+
+    if(p_Info->SystemMode == "GSM")
+    {
+        p_Info->GSM.LAC = SIM70XX_Tools_SubstringSplitErase(&Response);
+        // TODO
+    }
+    else
+    {
+        p_Info->CAT.TAC = SIM70XX_Tools_SubstringSplitErase(&Response);
+        p_Info->CAT.SCellID = std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
+        p_Info->CAT.Band = SIM70XX_Tools_SubstringSplitErase(&Response);
+        p_Info->CAT.earfcn = std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
+        p_Info->CAT.dlbw = std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
+        p_Info->CAT.ulbw = std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
+        p_Info->CAT.RSRQ = std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
+        p_Info->CAT.RSRP = std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
+        p_Info->CAT.RSSI = std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
+        p_Info->CAT.RSSNR = std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
     }
 
     return SIM70XX_ERR_OK;

@@ -136,7 +136,7 @@ SIM70XX_Error_t SIM70XX_UART_Init(SIM70XX_UART_Conf_t& p_Config)
         uart_param_config(p_Config.Interface, &_UART_Config) ||
         uart_set_pin(p_Config.Interface, p_Config.Tx, p_Config.Rx, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE)) != ESP_OK)
     {
-        return SIM70XX_ERR_INVALID_STATE;
+        return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
     p_Config.Lock = xSemaphoreCreateMutex();
@@ -175,6 +175,18 @@ SIM70XX_Error_t SIM70XX_UART_Deinit(SIM70XX_UART_Conf_t& p_Config)
     ESP_LOGI(TAG, "UART deinitialized...");
 
     p_Config.isInitialized = false;
+
+    return SIM70XX_ERR_OK;
+}
+
+SIM70XX_Error_t SIM70XX_UART_Send(SIM70XX_UART_Conf_t& p_Config, std::string Data)
+{
+    if(p_Config.isInitialized == false)
+    {
+        return SIM70XX_ERR_NOT_INITIALIZED;
+    }
+
+    uart_write_bytes(p_Config.Interface, (const char*)Data.c_str(), Data.length());
 
     return SIM70XX_ERR_OK;
 }

@@ -40,12 +40,45 @@ typedef struct
                                                          NOTE: Managed by the device driver. */
 } SIM7080_Info_t;
 
+/** @brief SIM7080 UE system GSM cell information object definition.
+ */
+typedef struct
+{
+    std::string LAC;                        /**< Location Area Code (hexadecimal digits). */
+    uint32_t CellID;                        /**< Service-cell Identify. */
+    uint32_t RF_Num;                        /**< AFRCN for service-cell. */
+    int32_t RxLev;                          /**< */
+} SIM7080_GSM_Cell_t;
+
+/** @brief SIM7080 UE system CAT-M or NB-IoT cell information object definition.
+ */
+typedef struct
+{
+    std::string TAC;                        /**< Tracing Area Code. */
+    uint32_t SCellID;                       /**< Serving Cell ID. */
+    std::string Band;                       /**< Frequency Band of active set. */
+    uint32_t earfcn;                        /**< E-UTRA absolute radio frequency channel number for searchingCAT-M or NB-IOT cells. */
+    uint32_t dlbw;                          /**< Transmission bandwidth configuration of the serving cell onthedownlink. */
+    uint32_t ulbw;                          /**< Transmission bandwidth configuration of the serving cell on theuplink. */
+    int32_t RSRQ;                           /**< Current reference signal received power. Available for CAT-M or NB-IOT. */
+    int32_t RSRP;                           /**< Current reference signal receive quality as measured by L1. */
+    int32_t RSSI;                           /**< Current Received signal strength indicator. */
+    int32_t RSSNR;                          /**< Average reference signal signal-to-noise ratio of the servingcell.
+                                                 The value of SINR can be calculated according to <RSSNR>, the formula is as below:
+                                                    SINR = 2 * <RSSNR> - 20
+                                                 The range of SINR is from -20 to 30. */
+} SIM7080_CAT_Cell_t;
+
 /** @brief SIM7080 UE system information object definition.
  */
-typedef struct sim7080_info_defs
+typedef struct
 {
-    bool isGSMCell;                                 /**< #true when the module is camping on a GSM cell.
-                                                         NOTE: Managed by the device driver. */
+    SIM7080_GSM_Cell_t GSM;                         /**< GSM cell informations. */
+    SIM7080_CAT_Cell_t CAT;                         /**< CAT-M or NB-IoT cell informations. */
+    std::string SystemMode;                         /**< System mode. */
+    std::string OperationMode;                      /**< UE operation mode. */
+    std::string MCC;                                /**< Mobile Country Code (first part of the PLMN code). */
+    std::string MNC;                                /**< Mobile Network Code (second part of the PLMN code). */
 } SIM7080_UEInfo_t;
 
 #endif /* SIM7080_INFO_DEFS_H_ */

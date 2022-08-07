@@ -232,6 +232,18 @@ SIM70XX_Error_t SIM7020_SoftReset(SIM7020_t& p_Device, uint32_t Timeout)
     return SIM70XX_ERR_FAIL;
 }
 
+SIM70XX_Error_t SIM7020_AutoAPN(SIM7020_t& p_Device, SIM70XX_APN_t APN)
+{
+    // TODO:
+    return SIM70XX_ERR_OK;
+}
+
+SIM70XX_Error_t SIM7080_ManualAPN(SIM7080_t& p_Device, SIM70XX_APN_t APN, uint8_t CID)
+{
+    // TODO:
+    return SIM70XX_ERR_OK;
+}
+
 SIM70XX_Error_t SIM7020_SetPSD(SIM7020_t& p_Device, SIM7020_PDP_Type_t PDP, SIM70XX_APN_t APN)
 {
     std::string CommandStr;
@@ -314,7 +326,7 @@ SIM70XX_Error_t SIM7020_SetOperator(SIM7020_t& p_Device, SIM70XX_OpMode_t Mode, 
         return SIM70XX_ERR_FAIL;
     }
 
-    return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, NULL, NULL);
+    return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
 }
 
 SIM70XX_Error_t SIM7020_GetOperator(SIM7020_t& p_Device, std::vector<SIM70XX_Operator_t>* p_Operator, std::string* p_Modes, std::string* p_Formats)

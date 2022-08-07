@@ -26,8 +26,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "sim70xx_defs.h"
 #include "sim70xx_errors.h"
-#include "Definitions/sim7020_defs.h"
 
 /** @brief  Get the version number of the SIM70XX library.
  *  @return Library version
@@ -72,12 +72,20 @@ unsigned long IRAM_ATTR SIM70XX_Tools_GetmsTimer(void);
  *  @param p_Config Pointer to SIM70XX UART configuration object
  *  @return         #true when the module is active
  */
-bool SIM70XX_isActive(SIM70XX_UART_Conf_t& p_Config);
+bool SIM70XX_Tools_isActive(SIM70XX_UART_Conf_t& p_Config);
 
 /** @brief          Disable the echo mode of the SIM70XX module.
  *  @param p_Config Pointer to SIM70XX UART configuration object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM70XX_DisableEcho(SIM70XX_UART_Conf_t& p_Config);
+SIM70XX_Error_t SIM70XX_Tools_DisableEcho(SIM70XX_UART_Conf_t& p_Config);
+
+/** @brief              Get a substring from the input string. The substring is delimited by the given delimiter.
+ *  @param p_Input      Pointer to input string
+ *                      NOTE: The input string will be modified!
+ *  @param Delimiter    Substring delimiter
+ *  @return             Substring
+ */
+std::string SIM70XX_Tools_SubstringSplitErase(std::string* p_Input, std::string Delimiter = ",");
 
 #endif /* SIM70XX_TOOLS_H_ */

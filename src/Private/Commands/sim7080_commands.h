@@ -37,7 +37,8 @@
 #define SIM7080_AT_CGDCONT_W(Command)                           SIM70XX_CMD(Command, false, 10, 1)
 #define SIM7080_AT_CSQ                                          SIM70XX_CMD("AT+CSQ", true, 1, 1)
 #define SIM70XX_AT_CBANDCFG_R                                   SIM70XX_CMD("AT+CBANDCFG?", true, 1, 2)
-#define SIM70XX_AT_CBANDCFG_W(Mode, Bandlist)                   SIM70XX_CMD(std::string("AT+CBANDCFG=") + Mode + "," + Bandlist, false, 1, 1)
+#define SIM70XX_AT_CBANDCFG_W(Mode, Bandlist)                   SIM70XX_CMD(std::string("AT+CBANDCFG=") + Mode + "," + Bandlist, false, 10, 1)
+#define SIM7080_AT_CNACT_W(CID, Action)                         SIM70XX_CMD("AT+CNACT=" + std::to_string(CID) + "," + std::to_string(Action), true, 300, 1)
 
 /**
  * 
@@ -62,6 +63,13 @@
 
 /**
  * 
+ * Used in SIM7080 TCP driver.
+ * 
+ */
+#define SIM7080_AT_SNPING(Command, Items)                       SIM70XX_CMD(Command, true, 60, Items)
+
+/**
+ * 
  * Used in SIM7080 file system driver.
  * 
  */
@@ -70,5 +78,20 @@
 #define SIM7080_AT_CFSREN(Index, Old, New)                      SIM70XX_CMD("AT+CFSREN=" + std::to_string(Index) + ",\"" + Old + "\",\"" + New + "\"", false, 10, 1)
 #define SIM7080_AT_CFSGFRS                                      SIM70XX_CMD("AT+CFSGFRS?", true, 10, 1)
 #define SIM7080_AT_CFSTERM                                      SIM70XX_CMD("AT+CFSTERM", false, 10, 1)
+
+/**
+ * 
+ * Used in SIM7080 E-Mail driver.
+ * 
+ */
+#define SIM7080_AT_EMAILCID(ID)                                 SIM70XX_CMD("AT+EMAILCID=" + std::to_string(ID), false, 1, 1)
+#define SIM7080_AT_EMAILTO(Timeout)                             SIM70XX_CMD("AT+EMAILTO=" + std::to_string(Timeout), false, 1, 1)
+#define SIM7080_AT_SMTPSRV(Address, Port)                       SIM70XX_CMD("AT+SMTPSRV=\"" + Address + "\"," + std::to_string(Port), false, 1, 1)
+#define SIM7080_AT_SMTPAUTH(User, Password)                     SIM70XX_CMD("AT+SMTPAUTH=1,\"" + User + "\",\"" + Password + "\"", false, 1, 1)
+#define SIM7080_AT_SMTPFROM(Address, Name)                      SIM70XX_CMD("AT+SMTPFROM=\"" + Address + "\",\"" + Name + "\"", false, 1, 1)
+#define SIM7080_AT_SMTPRCPT(Type, Address, Name)                SIM70XX_CMD("AT+SMTPRCPT=" + std::to_string(Type) + ",0,\"" + Address + "\",\"" + Name + "\"", false, 1, 1)
+#define SIM7080_AT_SMTPSUB(Subject)                             SIM70XX_CMD("AT+SMTPSUB=" + Subject, false, 1, 1)
+#define SIM7080_AT_SMTPBODY(Size)                               SIM70XX_CMD("AT+SMTPBODY=" + std::to_string(Size), false, 1, 1)
+#define SIM7080_AT_SMTPSEND                                     SIM70XX_CMD("AT+SMTPSEND", true, 300, 1)
 
 #endif /* SIM7080_COMMANDS_H_ */

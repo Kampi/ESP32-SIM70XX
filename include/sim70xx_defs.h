@@ -82,6 +82,14 @@ typedef struct
     std::string Password;                           /**< Access Point password. */
 } SIM70XX_APN_t;
 
+/** @brief SIM70XX signal quality report object definition.
+ */
+typedef struct
+{
+    int8_t RSSI;                                    /**< Network RSSI value in dBm. */
+    uint8_t RXQual;                                 /**< RxQUAL values in the table in GSM 05.08 [20] subclause 7.2.4. */
+} SIM70XX_Qual_t;
+
 /** @brief SIM70XX operator object definition.
  */
 typedef struct

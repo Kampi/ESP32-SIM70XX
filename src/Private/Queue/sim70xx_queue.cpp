@@ -51,7 +51,7 @@ SIM70XX_Error_t SIM70XX_Queue_PopItem(QueueHandle_t Queue, std::string* p_Respon
     {
         ESP_LOGE(TAG, "     Can not fetch item!");
 
-        Error = SIM70XX_ERR_INVALID_RESPONSE;
+        Error = SIM70XX_ERR_QUEUE_ERR;
         goto SIM7020_Wait_Exit;
     }
 
@@ -100,7 +100,7 @@ uint32_t SIM70XX_Queue_GetItems(QueueHandle_t Queue)
     return uxQueueMessagesWaiting(Queue);
 }
 
-bool SIM70XX_Queue_Wait(QueueHandle_t Queue, bool* p_Active, uint32_t Timeout, uint32_t Items)
+bool SIM70XX_Queue_Wait(QueueHandle_t Queue, bool* p_Active, uint32_t Timeout)
 {
     uint32_t Now;
     uint32_t ItemsInQueue;
@@ -129,7 +129,7 @@ bool SIM70XX_Queue_Wait(QueueHandle_t Queue, bool* p_Active, uint32_t Timeout, u
         }
 
         vTaskDelay(10 / portTICK_PERIOD_MS);
-    } while(ItemsInQueue != Items);
+    } while(ItemsInQueue == 0);
 
     return true;
 }
@@ -163,7 +163,7 @@ bool SIM70XX_Queue_isEvent(QueueHandle_t Queue, std::string Filter, std::string*
         // Get a new item from the queue to check if the searched event has occured.
         if(xQueuePeek(Queue, &Message, portMAX_DELAY) == pdTRUE)
         {
-            ESP_LOGD(TAG, "Got event from queue: %s", Message->c_str());
+            ESP_LOGI(TAG, "Got event from queue: %s", Message->c_str());
 
             // Check if the filter match the item.
             if(Message->find(Filter) != std::string::npos)

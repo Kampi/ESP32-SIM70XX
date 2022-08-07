@@ -133,8 +133,6 @@ typedef struct
     SIM7080_PDP_Type_t PDP_Type;                            /**< The PDP type used by the device. */
     struct
     {
-        int8_t RSSI;                                        /**< Network RSSI value in dBm. */
-        uint8_t RXQual;                                     /**< RxQUAL values in the table in GSM 05.08 [20] subclause 7.2.4. */
         SIM7080_NetRegistration_t Status;                   /**< Network status. */
         SIM7080_Func_t Functionality;                       /**< Current device functionality. */
     } Connection;
@@ -156,6 +154,8 @@ typedef struct
         bool isInitialized;                                 /**< #true when the module is initialized and ready to use.
                                                                  NOTE: Managed by the device driver. */
         bool isActive;                                      /**< #true when the device is active and ready to use.
+                                                                 NOTE: Managed by the device driver. */
+        bool isSMSReady;                                    /**< #true when the device reports SMS ready.
                                                                  NOTE: Managed by the device driver. */
         TaskHandle_t TaskHandle;                            /**< Handle of the receive task.
                                                                  NOTE: Managed by the device driver. */

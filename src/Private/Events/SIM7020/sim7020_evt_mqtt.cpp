@@ -32,7 +32,6 @@ static const char* TAG = "SIM7020_Evt_MQTT";
 
 void SIM7020_Evt_MQTT_Pub(SIM7020_t* const p_Device, std::string* p_Message)
 {
-    int Index;
     SIM7020_Pub_t* Packet;
 
     ESP_LOGI(TAG, "MQTT subscribe event!");
@@ -45,29 +44,19 @@ void SIM7020_Evt_MQTT_Pub(SIM7020_t* const p_Device, std::string* p_Message)
     p_Message->replace(p_Message->find("+CMQPUB: "), std::string("+CMQPUB: ").size(), "");
 
     // Get the socket ID.
-    Index = p_Message->find(",");
-    Packet->ID = std::stoi(p_Message->substr(0, Index));
-    p_Message->erase(0, Index + 1);
+    Packet->ID = std::stoi(SIM70XX_Tools_SubstringSplitErase(p_Message));
 
     // Get the message topic.
-    Index = p_Message->find(",");
-    Packet->Topic = p_Message->substr(0, Index);
-    p_Message->erase(0, Index + 1);
+    Packet->Topic = SIM70XX_Tools_SubstringSplitErase(p_Message);
 
     // Get the quality of service.
-    Index = p_Message->find(",");
-    Packet->QoS = (SIM7020_MQTT_QoS_t)std::stoi(p_Message->substr(0, Index));
-    p_Message->erase(0, Index + 1);
+    Packet->QoS = (SIM7020_MQTT_QoS_t)std::stoi(SIM70XX_Tools_SubstringSplitErase(p_Message));
 
     // Get the retained flag.
-    Index = p_Message->find(",");
-    Packet->Retained = (bool)std::stoi(p_Message->substr(0, Index));
-    p_Message->erase(0, Index + 1);
+    Packet->Retained = (bool)std::stoi(SIM70XX_Tools_SubstringSplitErase(p_Message));
 
     // Get the duplicate flag.
-    Index = p_Message->find(",");
-    Packet->Dup = (bool)std::stoi(p_Message->substr(0, Index));
-    p_Message->erase(0, Index + 1);
+    Packet->Dup = (bool)std::stoi(SIM70XX_Tools_SubstringSplitErase(p_Message));
 
     // Skip the length.
     Index = p_Message->find(",");

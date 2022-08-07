@@ -94,12 +94,10 @@ SIM70XX_Error_t SIM7020_TCP_Ping(SIM7020_t& p_Device, SIM7020_Ping_t& p_Config, 
         {
             do
             {
-                int32_t Index;
                 std::string Temp;
                 SIM7020_PingRes_t Result;
 
-                Temp = Response.substr(0, Response.find("\n"));
-                Response.erase(0, Response.find("\n") + 1);
+                Temp = SIM70XX_Tools_SubstringSplitErase(&Response);
 
                 // TODO: Kann hier crashen (wahrscheinlich Index)
                 Temp.replace(Temp.find("\r"), std::string("\r").size(), "");
@@ -107,24 +105,16 @@ SIM70XX_Error_t SIM7020_TCP_Ping(SIM7020_t& p_Device, SIM7020_Ping_t& p_Config, 
                 Temp.replace(Temp.find("+CIPPING: "), std::string("+CIPPING: ").size(), "");
 
                 // Filter out the reply ID.
-                Index = Temp.find(",");
-                Temp.substr(0, Index);
-                Temp.erase(0, Index + 1);
+                SIM70XX_Tools_SubstringSplitErase(&Temp);
 
                 // Filter out the IP address.
-                Index = Temp.find(",");
-                Result.IP = Temp.substr(0, Index);
-                Temp.erase(0, Index + 1);
+                Result.IP =  SIM70XX_Tools_SubstringSplitErase(&Temp);
 
                 // Filter out the reply time.
-                Index = Temp.find(",");
-                Result.ReplyTime = std::stoi(Temp.substr(0, Index));
-                Temp.erase(0, Index + 1);
+                Result.ReplyTime = std::stoi(SIM70XX_Tools_SubstringSplitErase(&Temp));
 
                 // Filter out the time to live.
-                Index = Temp.find(",");
-                Result.TTL = std::stoi(Temp.substr(0, Index));
-                Temp.erase(0, Index + 1);
+                Result.TTL = std::stoi(SIM70XX_Tools_SubstringSplitErase(&Temp));
 
                 p_Result->push_back(Result);
 

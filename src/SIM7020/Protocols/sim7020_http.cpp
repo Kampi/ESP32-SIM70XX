@@ -274,7 +274,6 @@ SIM70XX_Error_t SIM7020_HTTP_POST(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_
 
 SIM70XX_Error_t SIM7020_HTTP_GET(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_Socket, std::string Path, uint8_t** p_Buffer, uint32_t* p_Length, uint16_t* p_ResponseCode)
 {
-    size_t Index;
     uint32_t Now;
     uint16_t ResponseCode;
     std::string Response;
@@ -332,18 +331,13 @@ SIM70XX_Error_t SIM7020_HTTP_GET(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_S
 
     // Get the additional data flag.
     // TODO: Must be implemented
-    Index = Response.find(",");
-    isAdditionalData = (bool)std::stoi(Response.substr(0, Index));
-    Response.erase(0, Index + 1);
+    isAdditionalData = (bool)std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
 
     // Remove the total length.
-    Index = Response.find(",");
-    Response.erase(0, Index + 1);
+    SIM70XX_Tools_SubstringSplitErase(&Response);
 
     // Get the payload length.
-    Index = Response.find(",");
-    *p_Length = (uint32_t)std::stoi(Response.substr(0, Index));
-    Response.erase(0, Index + 1);
+    *p_Length = (uint32_t)std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
 
     *p_Buffer = (uint8_t*)malloc(*p_Length);
 

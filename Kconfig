@@ -85,7 +85,7 @@ menu "SIM70XX"
 
         config SIM70XX_DRIVER_WITH_SNTP
             bool "Enable SNTP support"
-            depends on (SIM70XX_DEV_SIM7080 || SIM70XX_DEV_SIM7020)
+            depends on SIM70XX_DEV_SIM7020
             default n
             help
                 Enable this option if you want SNTP support added to the driver.
@@ -103,6 +103,13 @@ menu "SIM70XX"
             default n
             help
                 Enable this option if you want File System support added to the driver.
+
+        config SIM70XX_DRIVER_WITH_EMAIL
+            bool "Enable E-Mail support"
+            depends on SIM70XX_DEV_SIM7080
+            default n
+            help
+                Enable this option if you want E-Mail support added to the driver.
 
         config SIM70XX_DRIVER_WITH_NVRAM
             bool "Enable NVRAM support"

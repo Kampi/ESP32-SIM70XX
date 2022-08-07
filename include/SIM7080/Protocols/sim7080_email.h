@@ -1,5 +1,5 @@
  /*
- * sim7080_pdp.h
+ * sim7080_email.h
  *
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -17,28 +17,39 @@
  * Errors and commissions should be reported to DanielKampert@kampis-elektroecke.de.
  */
 
-#ifndef SIM7080_PDP_H_
-#define SIM7080_PDP_H_
+#ifndef SIM7080_EMAIL_H_
+#define SIM7080_EMAIL_H_
 
+#include "sim7080_defs.h"
 #include "sim70xx_errors.h"
-#include "Definitions/sim7080_defs.h"
-#include "Definitions/Misc/sim7080_pdp_defs.h"
+#include "sim7080_email_defs.h"
 
-/** @brief          Define the PDP context.
+/** @brief          Send a text E-Mail.
  *  @param p_Device SIM7080 device object
- *  @param PDP      Packet Data Protocol (PDP) type
- *  @param APN      Access Point Name (APN) configuration
- *  @param CID      (Optional) PDP context ID
+ *  @param p_Config SIM7080 E-Mail configuration object
+ *  @param p_Sender E-Mail sender
+ *  @param p_To     To recipient
+ *  @param Subject  E-Mail subject
+ *  @param Body     E-Mail body
+ *  @param p_Error  (Optional) Pointer to E-Mail transmission error code
+ *  @param CID      (Optional) E-Mail CID
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_PDP_Define(SIM7080_t& p_Device, SIM7080_PDP_Type_t PDP, SIM70XX_APN_t APN, uint8_t CID = 1);
+SIM70XX_Error_t SIM7080_EMail_SendText(SIM7080_t& p_Device, SIM7080_EMail_Config_t& p_Config, SIM7080_EMail_User_t& p_Sender, SIM7080_EMail_User_t& p_To, std::string Subject, std::string Body, SIM7080_EMail_Error_t* p_Error = NULL, uint8_t CID = 0);
 
-/** @brief          Execute a PDP action for a specific PDP context.
+/** @brief          Send a text E-Mail.
  *  @param p_Device SIM7080 device object
- *  @param CID      PDP context ID
- *  @param Action   PDP action
+ *  @param p_Config SIM7080 E-Mail configuration object
+ *  @param p_Sender E-Mail sender
+ *  @param p_To     To recipient
+ *  @param Subject  E-Mail subject
+ *  @param Body     E-Mail body
+ *  @param p_CC     (Optional) CC recipent
+ *  @param p_BCC    (Optional) BCC recipient
+ *  @param p_Error  (Optional) Pointer to E-Mail transmission error code
+ *  @param CID      (Optional) E-Mail CID
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_PDP_Action(SIM7080_t& p_Device, uint8_t CID, SIM7080_PDP_Action_t Action);
+SIM70XX_Error_t SIM7080_EMail_SendText(SIM7080_t& p_Device, SIM7080_EMail_Config_t& p_Config, SIM7080_EMail_User_t& p_Sender, SIM7080_EMail_User_t& p_To, std::string Subject, std::string Body, SIM7080_EMail_User_t* p_CC, SIM7080_EMail_User_t* p_BCC, SIM7080_EMail_Error_t* p_Error = NULL, uint8_t CID = 0);
 
-#endif /* SIM7080_PDP_H_ */
+#endif /* SIM7080_EMAIL_H_ */

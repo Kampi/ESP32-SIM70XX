@@ -26,7 +26,7 @@
 #include "sim7080.h"
 #include "sim7080_http.h"
 #include "../../Private/Queue/sim70xx_queue.h"
-#include "../../Private/Commands/sim7080_commands.h"
+#include "../../Private/Commands/sim70xx_commands.h"
 
 static const char* TAG = "SIM7080_HTTP";
 

@@ -160,6 +160,12 @@ static void SIM70XX_Evt_Task(void* p_Arg)
                 {
                     SIM70XX_PSM_EVENT(Device, Message, true);
                 }
+                #if(CONFIG_SIMXX_DEV == 7080)
+                    else if(Message->find("SMS Ready") != std::string::npos)
+                    {
+                        Device->Internal.isSMSReady = true;
+                    }
+                #endif
                 #ifdef CONFIG_SIM70XX_DRIVER_WITH_TCPIP
                     else if(Message->find("+CSOERR") != std::string::npos)
                     {
@@ -261,7 +267,7 @@ static void SIM70XX_Evt_Task(void* p_Arg)
                         // Abort when all lines are received.
                         else
                         {
-                            (*it)->Response = Line;
+                            (*it)->Response += Line;
 
                             break;
                         }

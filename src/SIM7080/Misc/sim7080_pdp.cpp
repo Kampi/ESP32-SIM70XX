@@ -87,4 +87,31 @@ SIM70XX_Error_t SIM7080_PDP_Define(SIM7080_t& p_Device, SIM7080_PDP_Type_t PDP, 
     return SIM70XX_ERR_OK;
 }
 
+SIM70XX_Error_t SIM7080_PDP_Action(SIM7080_t& p_Device, uint8_t CID, SIM7080_PDP_Action_t Action)
+{
+    SIM70XX_Error_t Error;
+    SIM70XX_TxCmd_t* Command;
+
+    if(p_Device.Internal.isInitialized == false)
+    {
+        return SIM70XX_ERR_NOT_INITIALIZED;
+    }
+    else if(CID > 3)
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+
+    SIM70XX_CREATE_CMD(Command);
+    *Command = SIM7080_AT_CNACT_W(CID, Action);
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    {
+        return SIM70XX_ERR_FAIL;
+    }
+
+    Error = SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
+
+    return Error;
+}
+
 #endif

@@ -78,10 +78,11 @@ SIM70XX_Error_t SIM7080_Info_GetICCID(SIM7080_t& p_Device, std::string* const p_
 SIM70XX_Error_t SIM7080_Info_GetNetworkRegistrationStatus(SIM7080_t& p_Device);
 
 /** @brief          Get a signal quality report.
- *  @param p_Device SIM7080 device object
+ *  @param p_Device SIM7020 device object
+ *  @param p_Report Pointer to quality report object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_Info_GetQuality(SIM7080_t& p_Device);
+SIM70XX_Error_t SIM7080_Info_GetQuality(SIM7080_t& p_Device, SIM70XX_Qual_t* const p_Report);
 
 /** @brief          Get the User Equipment informations.
  *  @param p_Device SIM7080 device object

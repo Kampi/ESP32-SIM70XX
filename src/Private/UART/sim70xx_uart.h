@@ -38,6 +38,13 @@ SIM70XX_Error_t SIM70XX_UART_Init(SIM70XX_UART_Conf_t& p_Config);
  */
 SIM70XX_Error_t SIM70XX_UART_Deinit(SIM70XX_UART_Conf_t& p_Config);
 
+/** @brief          Send a command data the UART interface.
+ *  @param p_Config Pointer to SIM70XX UART configuration object
+ *  @param Data     Data string
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM70XX_UART_Send(SIM70XX_UART_Conf_t& p_Config, std::string Data);
+
 /** @brief          Send a command over the UART interface.
  *  @param p_Config Pointer to SIM70XX UART configuration object
  *  @param Command  Command string

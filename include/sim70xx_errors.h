@@ -34,7 +34,7 @@ typedef int SIM70XX_Error_t;
  */
 #define SIM70XX_ERR_BASE                                        CONFIG_SIM70XX_MISC_ERROR_BASE
 
-/** @brief No error.
+/** @brief The device has not reported a error.
  */
 #define SIM70XX_ERR_OK                                          SIM70XX_ERR_BASE + 0
 
@@ -42,33 +42,33 @@ typedef int SIM70XX_Error_t;
  */
 #define SIM70XX_ERR_INVALID_ARG                                 SIM70XX_ERR_BASE + 1
 
-/** @brief Device is not initialized.
+/** @brief The module or the module interface is not initialized. Please call the module initialization function "SIM70xy_Init" first!
  */
 #define SIM70XX_ERR_NOT_INITIALIZED                             SIM70XX_ERR_BASE + 2
 
-/** @brief Module or connection not ready.
+/** @brief The Module or the module interface connection is not ready.
  */
 #define SIM70XX_ERR_NOT_READY                                   SIM70XX_ERR_BASE + 3
 
-/** @brief The when the interface is not initialized.
+/** @brief The module is in the wrong device state.
  */
 #define SIM70XX_ERR_INVALID_STATE                               SIM70XX_ERR_BASE + 4
 
-/** @brief When an event happens, when the status is not "OK" or when the device is busy.
+/** @brief When the status response from the module is not "OK" or when the module is busy.
  */
 #define SIM70XX_ERR_FAIL                                        SIM70XX_ERR_BASE + 5
 
-/** @brief When the device reports a timeout.
+/** @brief When the module reports a timeout.
  */
 #define SIM70XX_ERR_TIMEOUT                                     SIM70XX_ERR_BASE + 6
 
-/** @brief When a send confirmation failed or when the device is busy.
- */
-#define SIM70XX_ERR_INVALID_RESPONSE                            SIM70XX_ERR_BASE + 7
-
 /** @brief When the receive task can not get started or when the communication queues can not be created.
  */
-#define SIM70XX_ERR_NO_MEM                                      SIM70XX_ERR_BASE + 8
+#define SIM70XX_ERR_NO_MEM                                      SIM70XX_ERR_BASE + 7
+
+/** @brief Common message queue error.
+ */
+#define SIM70XX_ERR_QUEUE_ERR                                   SIM70XX_ERR_BASE + 8
 
 /** @brief The message queue is full and no more items can be places on the queue.
  */

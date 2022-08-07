@@ -159,8 +159,6 @@ typedef struct
     } PDP;
     struct
     {
-        int8_t RSSI;                                        /**< Network RSSI value in dBm. */
-        uint8_t RXQual;                                     /**< RxQUAL values in the table in GSM 05.08 [20] subclause 7.2.4. */
         SIM7020_NetRegistration_t Status;                   /**< Network status. */
         SIM7020_Func_t Functionality;                       /**< Current device functionality. */
     } Connection;

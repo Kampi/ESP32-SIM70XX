@@ -130,7 +130,7 @@ unsigned long IRAM_ATTR SIM70XX_Tools_GetmsTimer(void)
     return (unsigned long)(esp_timer_get_time() / 1000ULL);
 }
 
-bool SIM70XX_isActive(SIM70XX_UART_Conf_t& p_Config)
+bool SIM70XX_Tools_isActive(SIM70XX_UART_Conf_t& p_Config)
 {
     std::string Response;
 
@@ -156,7 +156,7 @@ bool SIM70XX_isActive(SIM70XX_UART_Conf_t& p_Config)
     return false;
 }
 
-SIM70XX_Error_t SIM70XX_DisableEcho(SIM70XX_UART_Conf_t& p_Config)
+SIM70XX_Error_t SIM70XX_Tools_DisableEcho(SIM70XX_UART_Conf_t& p_Config)
 {
     std::string Response;
 
@@ -186,4 +186,18 @@ SIM70XX_Error_t SIM70XX_DisableEcho(SIM70XX_UART_Conf_t& p_Config)
     }
 
     return SIM70XX_ERR_OK;
+}
+
+std::string SIM70XX_Tools_SubstringSplitErase(std::string* p_Input, std::string Delimiter)
+{
+    size_t Index;
+    std::string Result;
+
+    assert(p_Input);
+
+    Index = p_Input->find(",");
+    Result = p_Input->substr(0, Index);
+    p_Input->erase(0, Index + 1);
+
+    return Result;
 }

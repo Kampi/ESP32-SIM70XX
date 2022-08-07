@@ -204,7 +204,7 @@ SIM70XX_Error_t SIM7020_Info_GetNetworkRegistrationStatus(SIM7020_t& p_Device)
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_Info_GetQuality(SIM7020_t& p_Device)
+SIM70XX_Error_t SIM7020_Info_GetQuality(SIM7020_t& p_Device, SIM70XX_Qual_t* p_Report)
 {
     int8_t RSSI;
     uint8_t RXQual;
@@ -215,6 +215,10 @@ SIM70XX_Error_t SIM7020_Info_GetQuality(SIM7020_t& p_Device)
     if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
+    }
+    else if(p_Report == NULL)
+    {
+        return SIM70XX_ERR_INVALID_ARG;
     }
 
     SIM70XX_CREATE_CMD(Command);
@@ -227,39 +231,34 @@ SIM70XX_Error_t SIM7020_Info_GetQuality(SIM7020_t& p_Device)
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
     Index = Response.find(",");
-    if(Index == std::string::npos)
-    {
-        return SIM70XX_ERR_FAIL;
-    }
-
     RSSI = std::stoi(Response.substr(0, Index));
     RXQual = std::stoi(Response.substr(Response.find_last_of(",") + 1));
 
     if(RSSI == 0)
     {
-        p_Device.Connection.RSSI = -110;
+        p_Report->RSSI = -110;
     }
     else if(RSSI == 1)
     {
-        p_Device.Connection.RSSI = -108;
+        p_Report->RSSI= -108;
     }
     else if(RSSI == 2)
     {
-        p_Device.Connection.RSSI = -106;
+        p_Report->RSSI= -106;
     }
     // Simple approach to convert the return value from the modem into a RSSI value.
     else if((RSSI >= 3) || (RSSI <= 30))
     {
-        p_Device.Connection.RSSI = -105 + (2 * (RSSI - 3));
+        p_Report->RSSI= -105 + (2 * (RSSI - 3));
     }
     else
     {
-        p_Device.Connection.RSSI = 0;
+        p_Report->RSSI= 0;
     }
 
-    p_Device.Connection.RXQual = RXQual;
+    p_Report->RXQual = RXQual;
 
-    if((RSSI == 0) && (RXQual == 0))
+    if((p_Report->RSSI== 0) && (p_Report->RXQual == 0))
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -269,7 +268,6 @@ SIM70XX_Error_t SIM7020_Info_GetQuality(SIM7020_t& p_Device)
 
 SIM70XX_Error_t SIM7020_Info_GetNetworkStatus(SIM7020_t& p_Device, SIM7020_NetState_t* const p_Status)
 {
-    size_t Index;
     std::string Response;
     SIM70XX_TxCmd_t* Command;
 
@@ -297,55 +295,18 @@ SIM70XX_Error_t SIM7020_Info_GetNetworkStatus(SIM7020_t& p_Device, SIM7020_NetSt
         return SIM70XX_ERR_FAIL;
     }
 
-    p_Status->sc_earfcn = std::stoi(Response.substr(0, Index));
-    Response.erase(0, Index + 1);
-
-    Index = Response.find(",");
-    p_Status->sc_earfcn_offset = (int8_t)std::stoi(Response.substr(0, Index));
-    Response.erase(0, Index + 1);
-
-    Index = Response.find(",");
-    p_Status->sc_pci = std::stoi(Response.substr(0, Index));
-    Response.erase(0, Index + 1);
-
-    Index = Response.find(",");
-    p_Status->sc_cellid = Response.substr(0, Index);
-    p_Status->sc_cellid.erase(std::remove(p_Status->sc_cellid.begin(), p_Status->sc_cellid.end(), '"'), p_Status->sc_cellid.end());
-    Response.erase(0, Index + 1);
-
-    Index = Response.find(",");
-    p_Status->sc_rsrp = (int16_t)std::stoi(Response.substr(0, Index));
-    Response.erase(0, Index + 1);
-
-    Index = Response.find(",");
-    p_Status->sc_rsrq = (int16_t)std::stoi(Response.substr(0, Index));
-    Response.erase(0, Index + 1);
-
-    Index = Response.find(",");
-    p_Status->sc_rssi = (int16_t)std::stoi(Response.substr(0, Index));
-    Response.erase(0, Index + 1);
-
-    Index = Response.find(",");
-    p_Status->sc_snr = (int16_t)std::stoi(Response.substr(0, Index));
-    Response.erase(0, Index + 1);
-
-    Index = Response.find(",");
-    p_Status->sc_band = std::stoi(Response.substr(0, Index));
-    Response.erase(0, Index + 1);
-
-    Index = Response.find(",");
-    p_Status->sc_tac = Response.substr(0, Index);
-    p_Status->sc_tac.erase(std::remove(p_Status->sc_tac.begin(), p_Status->sc_tac.end(), '"'), p_Status->sc_tac.end());
-    Response.erase(0, Index + 1);
-
-    Index = Response.find(",");
-    p_Status->sc_ecl = std::stoi(Response.substr(0, Index));
-    Response.erase(0, Index + 1);
-
-    Index = Response.find(",");
-    p_Status->sc_tx_pwr = (int16_t)std::stoi(Response.substr(0, Index));
-    Response.erase(0, Index + 1);
-
+    p_Status->sc_earfcn = std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
+    p_Status->sc_earfcn_offset = (int8_t)std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
+    p_Status->sc_pci = std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
+    p_Status->sc_cellid = SIM70XX_Tools_SubstringSplitErase(&Response);
+    p_Status->sc_rsrp = (int16_t)std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
+    p_Status->sc_rsrq = (int16_t)std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
+    p_Status->sc_rssi = (int16_t)std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
+    p_Status->sc_snr = (int16_t)std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
+    p_Status->sc_band = std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
+    p_Status->sc_tac = SIM70XX_Tools_SubstringSplitErase(&Response);
+    p_Status->sc_ecl = std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
+    p_Status->sc_tx_pwr = (int16_t)std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
     p_Status->sc_re_rsrp = (int16_t)std::stoi(Response);
 
     ESP_LOGI(TAG, "sc_earfcn: %u", p_Status->sc_earfcn);

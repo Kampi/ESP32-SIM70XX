@@ -20,13 +20,13 @@
 #ifndef SIM7080_CONFIG_1NCE_H_
 #define SIM7080_CONFIG_1NCE_H_
 
-/** @brief          Default configuration for using the module with the 1nce APN.
+/** @brief          Default NB-IoT configuration for using the SIM7080 module with the 1nce APN.
  *  @param Serial   Serial interface that should be used by the driver
  *  @param Baud     Baud rate that should be used by the driver
  *  @param Pin_Rx   Rx pin for the serial interface
  *  @param Pin_Tx   Tx pin for the serial interface
  */
-#define SIM7080_DEFAULT_CONF_1NCE(Serial, Baud, Pin_Rx, Pin_Tx)     {                                                       \
+#define SIM70XX_DEFAULT_CONF_1NCE(Serial, Baud, Pin_Rx, Pin_Tx)     {                                                       \
                                                                         .UART = {                                           \
                                                                             .Rx = Pin_Rx,                                   \
                                                                             .Tx = Pin_Tx,                                   \

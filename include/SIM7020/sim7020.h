@@ -127,6 +127,21 @@ void SIM7020_Deinit(SIM7020_t& p_Device);
  */
 SIM70XX_Error_t SIM7020_SoftReset(SIM7020_t& p_Device, uint32_t Timeout = 10);
 
+/** @brief          Automatically set an enable a APN.
+ *  @param p_Device SIM7020 device object
+ *  @param APN      APN configuration object
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7020_AutoAPN(SIM7020_t& p_Device, SIM70XX_APN_t APN);
+
+/** @brief          Manually set an enable a APN.
+ *  @param p_Device SIM7020 device object
+ *  @param APN      APN configuration object
+ *  @param CID      (Optional) PDP context ID
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7020_ManualAPN(SIM7020_t& p_Device, SIM70XX_APN_t APN, uint8_t CID = 0);
+
 /** @brief          Set the default PSD connection settings.
  *  @param p_Device SIM7020 device object
  *  @param PDP      Packet Data Protocol (PDP) type

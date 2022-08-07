@@ -131,7 +131,6 @@ SIM70XX_Error_t SIM7020_PDP_GetStatus(SIM7020_t& p_Device, std::vector<SIM7020_P
 SIM70XX_Error_t SIM7020_PDP_ReadDynamicParameters(SIM7020_t& p_Device)
 {
     uint8_t Parts;
-    uint32_t Index;
     std::string Dummy;
     std::string Octett;
     std::string Response;
@@ -171,26 +170,19 @@ SIM70XX_Error_t SIM7020_PDP_ReadDynamicParameters(SIM7020_t& p_Device)
     // Filter out the IP address.
     for(uint8_t i = 0; i < (Parts - 1); i++)
     {
-        Index = Dummy.find(".");
-        Octett = Dummy.substr(0, Index);
-        Dummy.erase(0, Index + 1);
+        Octett = SIM70XX_Tools_SubstringSplitErase(&Dummy);
         p_Device.PDP.IP += Octett + ".";
     }
-    Index = Dummy.find(".");
-    Octett = Dummy.substr(0, Index);
-    Dummy.erase(0, Index + 1);
+    Octett = SIM70XX_Tools_SubstringSplitErase(&Dummy);
     p_Device.PDP.IP += Octett;
 
     // Filter the subnet mask.
     for(uint8_t i = 0; i < (Parts - 1); i++)
     {
-        Index = Dummy.find(".");
-        Octett = Dummy.substr(0, Index);
-        Dummy.erase(0, Index + 1);
+        Octett = SIM70XX_Tools_SubstringSplitErase(&Dummy);
         p_Device.PDP.Subnet += Octett + ".";
     }
-    Index = Dummy.find(".");
-    Octett = Dummy.substr(0, Index);
+    Octett = SIM70XX_Tools_SubstringSplitErase(&Dummy);
     p_Device.PDP.Subnet += Octett;
 
     // Get the operator.

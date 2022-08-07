@@ -20,13 +20,13 @@
 #ifndef SIM7020_CONFIG_FUSION_H_
 #define SIM7020_CONFIG_FUSION_H_
 
-/** @brief          Default configuration for using the module with the 1nce APN.
+/** @brief          Default configuration for using the SIM7020 module with the 1nce APN.
  *  @param Serial   Serial interface that should be used by the driver
  *  @param Baud     Baud rate that should be used by the driver
  *  @param Pin_Rx   Rx pin for the serial interface
  *  @param Pin_Tx   Tx pin for the serial interface
  */
-#define SIM7020_DEFAULT_CONF_FUSION(Serial, Baud, Pin_Rx, Pin_Tx)   {                                                       \
+#define SIM70XX_DEFAULT_CONF_FUSION(Serial, Baud, Pin_Rx, Pin_Tx)   {                                                       \
                                                                         .Interface = {                                      \
                                                                             .Rx = Pin_Rx,                                   \
                                                                             .Tx = Pin_Tx,                                   \

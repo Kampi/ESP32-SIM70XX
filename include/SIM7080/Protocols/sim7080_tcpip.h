@@ -1,5 +1,5 @@
  /*
- * sim7020_config_ping.h
+ * sim7080_tcpip.h
  *
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -17,17 +17,13 @@
  * Errors and commissions should be reported to DanielKampert@kampis-elektroecke.de.
  */
 
-#ifndef SIM7020_CONFIG_PING_H_
-#define SIM7020_CONFIG_PING_H_
+#ifndef SIM7080_TCPIP_H_
+#define SIM7080_TCPIP_H_
 
-/** @brief          Default Ping configuration for the SIM7020 module.
- *  @param Server   Destination server
- */
-#define SIM70XX_DEFAULT_PING(Server)                                {                                                       \
-                                                                        .IP = Server,                                       \
-                                                                        .Retries = 4,                                       \
-                                                                        .DataLength = -1,                                   \
-                                                                        .Timeout = 100,                                     \
-                                                                    };
+#include "sim7080_defs.h"
+#include "sim70xx_errors.h"
+#include "sim7080_tcpip_defs.h"
 
-#endif /* SIM7020_CONFIG_PING_H_ */
+SIM70XX_Error_t SIM7080_TCP_Ping4(SIM7080_t& p_Device);
+
+#endif /* SIM7080_TCPIP_H_ */
