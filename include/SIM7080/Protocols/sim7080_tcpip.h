@@ -24,6 +24,13 @@
 #include "sim70xx_errors.h"
 #include "sim7080_tcpip_defs.h"
 
-SIM70XX_Error_t SIM7080_TCP_Ping4(SIM7080_t& p_Device);
+/** @brief          Perform a ping.
+ *  @param p_Device SIM7080 device object
+ *  @param p_Config Pointer to Ping configuration object
+ *  @param p_Result Pointer to list with ping results
+ *  @param IPv6     (Optional) Set to #true to perform an IPv6 ping
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_TCP_Ping(SIM7080_t& p_Device, SIM7080_Ping_t& p_Config, std::vector<SIM7080_PingRes_t>* p_Result, bool IPv6 = false);
 
 #endif /* SIM7080_TCPIP_H_ */

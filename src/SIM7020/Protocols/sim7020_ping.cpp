@@ -23,6 +23,8 @@
 
 #include <esp_log.h>
 
+#include <algorithm>
+
 #include "sim7020.h"
 #include "sim7020_tcpip.h"
 #include "../../Private/Queue/sim70xx_queue.h"
@@ -30,7 +32,7 @@
 
 static const char* TAG = "SIM7020_TCPIP";
 
-SIM70XX_Error_t SIM7020_TCP_Ping(SIM7020_t& p_Device, SIM7020_Ping_t& p_Config, std::vector<SIM7020_PingRes_t>* p_Result, uint32_t Timeout)
+SIM70XX_Error_t SIM7020_TCP_Ping(SIM7020_t& p_Device, SIM7020_Ping_t& p_Config, std::vector<SIM7020_PingRes_t>* p_Result)
 {
     uint8_t Pings;
     std::string Status;
@@ -44,10 +46,9 @@ SIM70XX_Error_t SIM7020_TCP_Ping(SIM7020_t& p_Device, SIM7020_Ping_t& p_Config, 
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
-    if(p_Result != NULL)
-    {
-        p_Result->clear();
-    }
+    // TODO: Add Parameter check
+
+    p_Result->clear();
 
     if(p_Config.Retries <= -1)
     {
@@ -75,6 +76,8 @@ SIM70XX_Error_t SIM7020_TCP_Ping(SIM7020_t& p_Device, SIM7020_Ping_t& p_Config, 
     {
         p_Config.Timeout = std::min(p_Config.Timeout, (int16_t)600);
     }
+
+    // TODO: Copy implementation from SIM7080?
 
     CommandStr = "AT+CIPPING=\"" + p_Config.IP + "\"," + std::to_string(p_Config.Retries) + "," + std::to_string(p_Config.DataLength) + "," + std::to_string(p_Config.Timeout);
     SIM70XX_CREATE_CMD(Command);
@@ -127,8 +130,6 @@ SIM70XX_Error_t SIM7020_TCP_Ping(SIM7020_t& p_Device, SIM7020_Ping_t& p_Config, 
 
         vTaskDelay(100 / portTICK_PERIOD_MS);
     } while(Pings != p_Config.Retries);
-
-    ESP_LOGD(TAG, "Ping successful");
 
     return Error;
 }

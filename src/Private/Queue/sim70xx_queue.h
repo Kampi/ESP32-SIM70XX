@@ -49,7 +49,6 @@
                                                                     }                                                           \
                                                                 } while(0);
 
-
 /** @brief SIM70XX Tx command (ESP32 -> Module) object definition.
  */
 typedef struct
@@ -57,8 +56,7 @@ typedef struct
     std::string Command;                            /**< AT command string. */
     bool recData;                                   /**< Set to #true to receive data from the command. */
     uint32_t Timeout;                               /**< Response timeout in seconds. */
-    uint8_t Lines;                                  /**< Number of response lines.
-                                                         NOTE: Set to 0 to receive until a empty line is received. */
+    uint16_t Lines;                                 /**< Number of response lines. */
 } SIM70XX_TxCmd_t;
 
 /** @brief  Command response object for the communication task

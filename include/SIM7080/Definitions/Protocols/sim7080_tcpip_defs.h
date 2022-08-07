@@ -24,4 +24,25 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+/** @brief SIM7080 ping configuration object.
+ */
+typedef struct
+{
+    std::string IP;                                 /**< IP address of the remote host. */
+    int16_t Retries;                                /**< The number of Ping Echo Request to send.
+                                                         NOTE: -1 will use the default value (4). Minimum 1, Maximum 500. */
+    int16_t Size;                                   /**< Number of data bytes to send, range: 1~1400.
+                                                         NOTE: -1 will use the default value (32). Minimum 1, Maximum 1400. */
+    int32_t Timeout;                                /**< The timeout, in units of 100ms, waiting for a single Echo Reply.
+                                                         NOTE: -1 will use the default value (100). Minimum 0, Maximum 60000. */
+} SIM7080_Ping_t;
+
+/** @brief SIM7080 Ping response object.
+ */
+typedef struct
+{
+    std::string IP;                                 /**< IP address of the remote host. */
+    uint16_t ReplyTime;                             /**< Time, in units of 100ms, required to receive the response. */
+} SIM7080_PingRes_t;
+
 #endif /* SIM7080_TCPIP_DEFS_H_ */

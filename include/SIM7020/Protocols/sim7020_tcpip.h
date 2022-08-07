@@ -26,12 +26,11 @@
 
 /** @brief          Perform a ping.
  *  @param p_Device SIM7020 device object
- *  @param p_Config Pointer to Ping configuration object
- *  @param p_Result (Optional) Pointer to list with Ping results
- *  @param Timeout  (Optional) Message timeout for each Ping response in seconds
+ *  @param p_Config Pointer to SIM7020 ping configuration object
+ *  @param p_Result Pointer to list with Ping results
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_TCP_Ping(SIM7020_t& p_Device, SIM7020_Ping_t& p_Config, std::vector<SIM7020_PingRes_t>* p_Result = NULL, uint32_t Timeout = 60);
+SIM70XX_Error_t SIM7020_TCP_Ping(SIM7020_t& p_Device, SIM7020_Ping_t& p_Config, std::vector<SIM7020_PingRes_t>* p_Result);
 
 /** @brief          Parse a given host name to get the IP address.
  *  @param p_Device SIM7020 device object

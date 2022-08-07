@@ -23,11 +23,11 @@
 /** @brief          Default Ping configuration for the SIM7080 module.
  *  @param Server   Destination server
  */
-#define SIM70XX_DEFAULT_PING(Server)                                {                                                       \
-                                                                        .IP = Server,                                       \
-                                                                        .Retries = 4,                                       \
-                                                                        .DataLength = -1,                                   \
-                                                                        .Timeout = 100,                                     \
+#define SIM7080_DEFAULT_PING(Server)                                {                                                       \
+                                                                        .IP         = Server,                               \
+                                                                        .Retries    = 4,                                    \
+                                                                        .Size       = -1,                                   \
+                                                                        .Timeout    = 100,                                  \
                                                                     };
 
 #endif /* SIM7080_CONFIG_PING_H_ */

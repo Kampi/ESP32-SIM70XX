@@ -76,12 +76,12 @@ typedef enum
     SIM7020_DNS_ERR_COMMON  = 8,                    /**< Common DNS error. */
 } SIM7020_DNS_Err_t;
 
-/** @brief SIM7020 Ping configuration object.
+/** @brief SIM7020 ping configuration object.
  */
 typedef struct
 {
     std::string IP;                                 /**< IP address of the remote host. */
-    int Retries;                                    /**< The number of Ping Echo Request to send.
+    int8_t Retries;                                 /**< The number of Ping Echo Request to send.
                                                          NOTE: -1 will use the default value (4). Minimum 1, Maximum 100. */
     int16_t DataLength;                             /**< The length of Ping Echo Request data.
                                                          NOTE: -1 will use the default value (32). Minimum 0, Maximum 5120. */
@@ -89,7 +89,7 @@ typedef struct
                                                          NOTE: -1 will use the default value (100). Minimum 0, Maximum 600. */
 } SIM7020_Ping_t;
 
-/** @brief SIM7020 Ping response object.
+/** @brief SIM7020 ping response object.
  */
 typedef struct
 {
