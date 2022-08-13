@@ -34,40 +34,40 @@
 #include <sdkconfig.h>
 
 #ifdef CONFIG_SIM70XX_DRIVER_WITH_MQTT
-    /** @brief              Handle asynchronous MQTT publish events.
+    /** @brief              MQTT publish event handler.
      *  @param p_Device     Pointer to device
      *  @param p_Message    Pointer to message string
      */
-    void SIM7020_Evt_MQTT_Pub(SIM7020_t* const p_Device, std::string* p_Message);
+    void SIM7020_Evt_on_MQTT_Pub(SIM7020_t* const p_Device, std::string* p_Message);
 
-    /** @brief              Handle asynchronous MQTT disconnect events.
+    /** @brief              MQTT disconnect event handler.
      *  @param p_Device     Pointer to device
      *  @param p_Message    Pointer to message string
      */
-    void SIM7020_Evt_MQTT_Disconnect(SIM7020_t* const p_Device, std::string* p_Message);
+    void SIM7020_Evt_on_MQTT_Disconnect(SIM7020_t* const p_Device, std::string* p_Message);
 #endif
 
 #ifdef CONFIG_SIM70XX_DRIVER_WITH_HTTP
-    /** @brief              Handle asynchronous HTTP events.
+    /** @brief              HTTP event handler.
      *  @param p_Device     Pointer to device
      *  @param p_Message    Pointer to message string
      */
-    void SIM7020_Evt_HTTP(SIM7020_t* const p_Device, std::string* p_Message);
+    void SIM7020_Evt_on_HTTP_Event(SIM7020_t* const p_Device, std::string* p_Message);
 #endif
 
-/** @brief              Handle asynchronous HTTP events.
+/** @brief              Power management event handler.
  *  @param p_Device     Pointer to device
  *  @param p_Message    Pointer to message string
  *  @param isPSM        PSM mode entered or leaved flag
  */
-void SIM7020_Evt_HandlePSM(SIM7020_t* const p_Device, std::string* p_Message, bool isPSM);
+void SIM7020_Evt_on_PSM_Event(SIM7020_t* const p_Device, std::string* p_Message, bool isPSM);
 
 #ifdef CONFIG_SIM70XX_DRIVER_WITH_TCPIP
-    /** @brief              Handle asynchronous TCP/IP disconnect events.
+    /** @brief              TCP/IP disconnect event handler.
      *  @param p_Device     Pointer to device
      *  @param p_Message    Pointer to message string
      */
-    void SIM7020_Evt_TCP_Disconnect(SIM7020_t* const p_Device, std::string* p_Message);
+    void SIM7020_Evt_on_TCP_Disconnect(SIM7020_t* const p_Device, std::string* p_Message);
 #endif
 
 #endif /* SIM7020_EVT_H_ */

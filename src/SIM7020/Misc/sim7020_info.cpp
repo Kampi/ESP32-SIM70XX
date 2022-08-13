@@ -268,6 +268,7 @@ SIM70XX_Error_t SIM7020_Info_GetQuality(SIM7020_t& p_Device, SIM70XX_Qual_t* p_R
 
 SIM70XX_Error_t SIM7020_Info_GetNetworkStatus(SIM7020_t& p_Device, SIM7020_NetState_t* const p_Status)
 {
+    size_t Index;
     std::string Response;
     SIM70XX_TxCmd_t* Command;
 

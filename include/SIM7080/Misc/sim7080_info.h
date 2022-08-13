@@ -21,8 +21,8 @@
 #define SIM7080_INFO_H_
 
 #include "sim70xx_errors.h"
-#include "Definitions/sim7080_defs.h"
-#include "Definitions/Misc/sim7080_info_defs.h"
+#include "sim7080_defs.h"
+#include "sim7080_info_defs.h"
 
 /** @brief          Print the device informations.
  *  @param p_Info   Pointer to device information object
@@ -80,6 +80,7 @@ SIM70XX_Error_t SIM7080_Info_GetNetworkRegistrationStatus(SIM7080_t& p_Device);
 /** @brief          Get a signal quality report.
  *  @param p_Device SIM7020 device object
  *  @param p_Report Pointer to quality report object
+ *                  NOTE: Value 99 is returned when the signal can not be measured
  *  @return         SIM70XX_ERR_OK when successful
  */
 SIM70XX_Error_t SIM7080_Info_GetQuality(SIM7080_t& p_Device, SIM70XX_Qual_t* const p_Report);

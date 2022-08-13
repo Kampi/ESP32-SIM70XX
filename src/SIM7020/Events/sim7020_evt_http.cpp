@@ -1,5 +1,5 @@
  /*
- * sim7020_evt_tcp.cpp
+ * SIM7020_Evt_HTTP.cpp
  *
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -19,45 +19,46 @@
 
 #include <sdkconfig.h>
 
-#if((CONFIG_SIMXX_DEV == 7020) && (defined CONFIG_SIM70XX_DRIVER_WITH_TCPIP))
+#if((CONFIG_SIMXX_DEV == 7020) && (defined CONFIG_SIM70XX_DRIVER_WITH_HTTP))
 
 #include <esp_log.h>
 
 #include "sim7020.h"
 #include "sim7020_evt.h"
-#include "../../Queue/sim70xx_queue.h"
-#include "../../Commands/sim70xx_commands.h"
+#include "../../Private/Queue/sim70xx_queue.h"
+#include "../../Private/Commands/sim70xx_commands.h"
 
-static const char* TAG = "SIM7020_Evt_TCP";
+static const char* TAG = "SIM7020_Evt_HTTP";
 
-void SIM7020_Evt_TCP_Disconnect(SIM7020_t* const p_Device, std::string* p_Message)
+void SIM7020_Evt_on_HTTP_Event(SIM7020_t* const p_Device, std::string* p_Message)
 {
     int Index;
     uint8_t ID;
-    SIM7020_TCP_Error_t TCP_Error;
+    SIM7020_HTTP_Error_t HTTP_Error;
 
-    ESP_LOGI(TAG, "TCP disconnect event!");
+    ESP_LOGI(TAG, "HTTP disconnect event!");
 
     // Get the socket ID and the error code.
-    p_Message->replace(p_Message->find("\n"), std::string("\n").size(), "");
-    p_Message->replace(p_Message->find("\r"), std::string("\r").size(), "");
+    SIMXX_TOOLS_REMOVE_LINEEND((*p_Message));
+
     Index = p_Message->find(",");
-    ID = std::stoi(p_Message->substr(Index - 1, Index));
-    TCP_Error = (SIM7020_TCP_Error_t)std::stoi(p_Message->substr(Index));
-
-    // Iterate through the list of active sockets and close the socket with the given ID.
-    for(std::vector<SIM7020_TCP_Socket_t*>::iterator it = p_Device->TCP.Sockets.begin(); it != p_Device->TCP.Sockets.end(); ++it)
+    if(Index != std::string::npos)
     {
-        if((*it)->ID == ID)
-        {
-            (*it)->isConnected = false;
+        ID = std::stoi(p_Message->substr(Index - 1, 1));
+        HTTP_Error = (SIM7020_HTTP_Error_t)std::stoi(p_Message->substr(Index + 1));
 
-            ESP_LOGI(TAG, "Disconnect socket %u", ID);
-            ESP_LOGI(TAG, "Error: %i", TCP_Error);
+        // Iterate through the list of active sockets and close the socket with the given ID.
+        for(std::vector<SIM7020_HTTP_Socket_t*>::iterator it = p_Device->HTTP.Sockets.begin(); it != p_Device->HTTP.Sockets.end(); ++it)
+        {
+            if((*it)->ID == ID)
+            {
+                (*it)->isConnected = false;
+
+                ESP_LOGI(TAG, "Disconnect socket %u", ID);
+                ESP_LOGI(TAG, "Error: %i", HTTP_Error);
+            }
         }
     }
-
-    delete p_Message;
 }
 
 #endif

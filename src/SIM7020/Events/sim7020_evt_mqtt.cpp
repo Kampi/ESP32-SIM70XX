@@ -25,22 +25,22 @@
 
 #include "sim7020.h"
 #include "sim7020_evt.h"
-#include "../../Queue/sim70xx_queue.h"
-#include "../../Commands/sim70xx_commands.h"
+#include "../../Private/Queue/sim70xx_queue.h"
+#include "../../Private/Commands/sim70xx_commands.h"
 
 static const char* TAG = "SIM7020_Evt_MQTT";
 
-void SIM7020_Evt_MQTT_Pub(SIM7020_t* const p_Device, std::string* p_Message)
+void SIM7020_Evt_on_MQTT_Pub(SIM7020_t* const p_Device, std::string* p_Message)
 {
+    size_t Index;
     SIM7020_Pub_t* Packet;
 
     ESP_LOGI(TAG, "MQTT subscribe event!");
 
     Packet = new SIM7020_Pub_t();
 
-    // Remove the command.
-    p_Message->replace(p_Message->find("\n"), std::string("\n").size(), "");
-    p_Message->replace(p_Message->find("\r"), std::string("\r").size(), "");
+    SIMXX_TOOLS_REMOVE_LINEEND((*p_Message));
+
     p_Message->replace(p_Message->find("+CMQPUB: "), std::string("+CMQPUB: ").size(), "");
 
     // Get the socket ID.
@@ -73,24 +73,19 @@ void SIM7020_Evt_MQTT_Pub(SIM7020_t* const p_Device, std::string* p_Message)
     {
         delete Packet;
     }
-
-    delete p_Message;
 }
 
-void SIM7020_Evt_MQTT_Disconnect(SIM7020_t* const p_Device, std::string* p_Message)
+void SIM7020_Evt_on_MQTT_Disconnect(SIM7020_t* const p_Device, std::string* p_Message)
 {
     int Index;
 
     ESP_LOGI(TAG, "MQTT socket disconnect event!");
 
-    p_Message->replace(p_Message->find("\n"), std::string("\n").size(), "");
-    p_Message->replace(p_Message->find("\r"), std::string("\r").size(), "");
+    SIMXX_TOOLS_REMOVE_LINEEND((*p_Message));
 
     Index = p_Message->find(":");
 
     // TODO: Event
-
-    delete p_Message;
 }
 
 #endif

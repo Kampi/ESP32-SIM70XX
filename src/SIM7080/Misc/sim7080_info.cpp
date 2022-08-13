@@ -206,8 +206,6 @@ SIM70XX_Error_t SIM7080_Info_GetNetworkRegistrationStatus(SIM7080_t& p_Device)
 
 SIM70XX_Error_t SIM7080_Info_GetQuality(SIM7080_t& p_Device, SIM70XX_Qual_t* p_Report)
 {
-    int8_t RSSI;
-    uint8_t RXQual;
     size_t Index;
     std::string Response;
     SIM70XX_TxCmd_t* Command;
@@ -230,10 +228,14 @@ SIM70XX_Error_t SIM7080_Info_GetQuality(SIM7080_t& p_Device, SIM70XX_Qual_t* p_R
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    // TODO: Implement me
+    // TODO: Implement RSSI calculation
+
     Index = Response.find(",");
-    RSSI = std::stoi(Response.substr(0, Index));
-    RXQual = std::stoi(Response.substr(Response.find_last_of(",") + 1));
+    p_Report->RSSI = std::stoi(Response.substr(0, Index));
+    p_Report->RXQual = std::stoi(Response.substr(Response.find_last_of(",") + 1));
+
+    ESP_LOGD(TAG, "RSSI: %u", p_Report->RSSI);
+    ESP_LOGD(TAG, "RXQual: %u", p_Report->RXQual);
 
     return SIM70XX_ERR_OK;
 }
@@ -261,7 +263,9 @@ SIM70XX_Error_t SIM7080_Info_GetEquipmentInfo(SIM7080_t& p_Device, SIM7080_UEInf
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    if(Response.find("NO SERVICE,Online") != std::string::npos)
+    ESP_LOGI(TAG, "Response: %s", Response.c_str());
+
+    if(Response.find("NO SERVICE") != std::string::npos)
     {
         return SIM70XX_ERR_NOT_READY;
     }

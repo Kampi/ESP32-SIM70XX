@@ -82,9 +82,9 @@ typedef int SIM70XX_Error_t;
  */
 #define SIM70XX_ERR_NOT_CREATED                                 SIM70XX_ERR_BASE + 11
 
-/** @brief Socket not connected.
+/** @brief Not connected error.
  */
-#define SIM70XX_ERR_NOT_CONNECTED                               SIM70XX_ERR_BASE + 11
+#define SIM70XX_ERR_NOT_CONNECTED                               SIM70XX_ERR_BASE + 12
 
 /** @brief      Generic error check macro.
  *  @param Func Function call

@@ -1,5 +1,5 @@
  /*
- * sim7020_sntp_defs.h
+ * sim7020_ntp.h
  *
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -17,11 +17,20 @@
  * Errors and commissions should be reported to DanielKampert@kampis-elektroecke.de.
  */
 
-#ifndef SIM7020_SNTP_DEFS_H_
-#define SIM7020_SNTP_DEFS_H_
+#ifndef SIM7020_NTP_H_
+#define SIM7020_NTP_H_
 
-#include <string>
-#include <stdint.h>
-#include <stdbool.h>
+#include "sim7020_defs.h"
+#include "sim70xx_errors.h"
+#include "sim7020_ntp_defs.h"
 
-#endif /* SIM7020_SNTP_DEFS_H_ */
+/** @brief          Get the network time by using an SNTP server instance.
+ *  @param p_Device SIM7020 device object
+ *  @param Server   NTP server address
+ *  @param Timezone Current timezone
+ *  @param Timeout  (Optional) Message timeout for each Ping response in seconds
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7020_NTP_GetNetworkTime(SIM7020_t& p_Device, std::string Server, int8_t Timezone, uint8_t Timeout = 60);
+
+#endif /* SIM7020_NTP_H_ */

@@ -20,11 +20,11 @@
 #ifndef SIM7080_CONFIG_PING_H_
 #define SIM7080_CONFIG_PING_H_
 
-/** @brief          Default Ping configuration for the SIM7080 module.
+/** @brief          Default ping configuration for the SIM7080 module.
  *  @param Server   Destination server
  */
 #define SIM7080_DEFAULT_PING(Server)                                {                                                       \
-                                                                        .IP         = Server,                               \
+                                                                        .Host       = Server,                               \
                                                                         .Retries    = 4,                                    \
                                                                         .Size       = -1,                                   \
                                                                         .Timeout    = 100,                                  \

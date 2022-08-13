@@ -28,24 +28,15 @@
 
 #if(CONFIG_SIMXX_DEV == 7020)
     #include "sim7020.h"
-    #include "SIM7020/sim7020_evt.h"
-
-    #define SIM70XX_PSM_EVENT(Device, Message, isPSM)           SIM7020_Evt_HandlePSM(Device, Message, isPSM)
-    #define SIM70XX_TCP_DISCONNECT_EVENT(Device, Message)       SIM7020_Evt_TCP_Disconnect(Device, Message)
-    #define SIM70XX_MQTT_PUB_EVENT(Device, Message)             SIM7020_Evt_MQTT_Pub(Device, Message)
-    #define SIM70XX_MQTT_DISCONNECT_EVENT(Device, Message)      SIM7020_Evt_MQTT_Disconnect(Device, Message)
-    #define SIM70XX_HTTP_EVENT(Device, Message)                 SIM7020_Evt_HTTP(Device, Message)
 #elif(CONFIG_SIMXX_DEV == 7080)
-    #include "sim7080.h"
-    #include "SIM7080/sim7080_evt.h"
-
-    #define SIM70XX_PSM_EVENT(Device, Message, isPSM)           
-    #define SIM70XX_TCP_DISCONNECT_EVENT(Device, Message)       
-    #define SIM70XX_MQTT_PUB_EVENT(Device, Message)             
-    #define SIM70XX_MQTT_DISCONNECT_EVENT(Device, Message)      
-    #define SIM70XX_HTTP_EVENT(Device, Message)                 
+    #include "sim7080.h"          
 #endif
 
+/** @brief              Device specific event message filter.
+ *  @param p_Device     Pointer to device object
+ *  @param p_Message    Pointer to event message
+ */
+extern void SIM70XX_Evt_MessageFilter(void* p_Device, std::string* p_Message);
 
 /** @brief          Start the SIM70XX event task.
  *  @param p_Handle Pointer to task handle

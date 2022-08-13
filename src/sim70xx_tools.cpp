@@ -132,6 +132,7 @@ unsigned long IRAM_ATTR SIM70XX_Tools_GetmsTimer(void)
 
 bool SIM70XX_Tools_isActive(SIM70XX_UART_Conf_t& p_Config)
 {
+    bool Result;
     std::string Response;
 
     if((SIM70XX_UART_Init(p_Config) != SIM70XX_ERR_OK) || (SIM70XX_UART_SendCommand(p_Config, "AT") != SIM70XX_ERR_OK))
@@ -139,21 +140,22 @@ bool SIM70XX_Tools_isActive(SIM70XX_UART_Conf_t& p_Config)
         return false;
     }
 
-    SIM70XX_UART_ReadStringUntil(p_Config, '\n');
-    Response = SIM70XX_UART_ReadStringUntil(p_Config, '\n');
+    Result = false;
+    do
+    {
+        Response = SIM70XX_UART_ReadStringUntil(p_Config);
+        if(Response.find("OK") != std::string::npos)
+        {
+            Result = true;
+        }
+    } while(Response.length() > 0);
+
     if(SIM70XX_UART_Deinit(p_Config) != SIM70XX_ERR_OK)
     {
         return false;
     }
 
-    ESP_LOGI(TAG, "Response from 'AT': %s", Response.c_str());
-
-    if(Response.find("OK") != std::string::npos)
-    {
-        return true;
-    }
-
-    return false;
+    return Result;
 }
 
 SIM70XX_Error_t SIM70XX_Tools_DisableEcho(SIM70XX_UART_Conf_t& p_Config)
@@ -169,16 +171,16 @@ SIM70XX_Error_t SIM70XX_Tools_DisableEcho(SIM70XX_UART_Conf_t& p_Config)
     //  AT<CR><LF>
     //  OK<CR><LF><CR><LF>
     SIM70XX_UART_SendCommand(p_Config, "AT");
-    Response = SIM70XX_UART_ReadStringUntil(p_Config, '\n');
-    SIM70XX_UART_ReadStringUntil(p_Config, '\n');
+    Response = SIM70XX_UART_ReadStringUntil(p_Config);
+    SIM70XX_UART_ReadStringUntil(p_Config);
     if(Response.find("AT") != std::string::npos)
     {
         ESP_LOGI(TAG, "Echo mode enabled. Disable echo mode...");
 
         // Disable echo mode.
         SIM70XX_UART_SendCommand(p_Config, "ATE0");
-        SIM70XX_UART_ReadStringUntil(p_Config, '\n');
-        SIM70XX_UART_ReadStringUntil(p_Config, '\n');
+        SIM70XX_UART_ReadStringUntil(p_Config);
+        SIM70XX_UART_ReadStringUntil(p_Config);
     }
     else
     {

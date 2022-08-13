@@ -1,5 +1,5 @@
  /*
- * sim7020_config_ping.h
+ * sim7020_evt_tcp.cpp
  *
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -17,17 +17,44 @@
  * Errors and commissions should be reported to DanielKampert@kampis-elektroecke.de.
  */
 
-#ifndef SIM7020_CONFIG_PING_H_
-#define SIM7020_CONFIG_PING_H_
+#include <sdkconfig.h>
 
-/** @brief          Default ping configuration for the SIM7020 module.
- *  @param Server   Destination server
- */
-#define SIM7020_DEFAULT_PING(Server)                                {                                                       \
-                                                                        .Host = Server,                                     \
-                                                                        .Retries    = 4,                                    \
-                                                                        .DataLength = -1,                                   \
-                                                                        .Timeout    = 100,                                  \
-                                                                    };
+#if((CONFIG_SIMXX_DEV == 7020) && (defined CONFIG_SIM70XX_DRIVER_WITH_TCPIP))
 
-#endif /* SIM7020_CONFIG_PING_H_ */
+#include <esp_log.h>
+
+#include "sim7020.h"
+#include "sim7020_evt.h"
+#include "../../Private/Queue/sim70xx_queue.h"
+#include "../../Private/Commands/sim70xx_commands.h"
+
+static const char* TAG = "SIM7020_Evt_TCP";
+
+void SIM7020_Evt_on_TCP_Disconnect(SIM7020_t* const p_Device, std::string* p_Message)
+{
+    size_t Index;
+    uint8_t ID;
+    SIM7020_TCP_Error_t TCP_Error;
+
+    ESP_LOGI(TAG, "TCP disconnect event!");
+
+    SIMXX_TOOLS_REMOVE_LINEEND((*p_Message));
+
+    Index = p_Message->find(",");
+    ID = std::stoi(p_Message->substr(Index - 1, Index));
+    TCP_Error = (SIM7020_TCP_Error_t)std::stoi(p_Message->substr(Index));
+
+    // Iterate through the list of active sockets and close the socket with the given ID.
+    for(std::vector<SIM7020_TCP_Socket_t*>::iterator it = p_Device->TCP.Sockets.begin(); it != p_Device->TCP.Sockets.end(); ++it)
+    {
+        if((*it)->ID == ID)
+        {
+            (*it)->isConnected = false;
+
+            ESP_LOGI(TAG, "Disconnect socket %u", ID);
+            ESP_LOGI(TAG, "Error: %i", TCP_Error);
+        }
+    }
+}
+
+#endif

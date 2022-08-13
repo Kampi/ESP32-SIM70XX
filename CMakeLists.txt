@@ -4,11 +4,17 @@ set(COMPONENT_SRCS
 
     # SIM7080
     "src/SIM7080/sim7080.cpp"
+    "src/SIM7080/Protocols/sim7080_ntp.cpp"
+    "src/SIM7080/Protocols/sim7080_dns.cpp"
+    "src/SIM7080/Protocols/sim7080_tcp_client.cpp"
     "src/SIM7080/Protocols/sim7080_ping.cpp"
     "src/SIM7080/Protocols/sim7080_email.cpp"
-    "src/SIM7080/Misc/sim7080_pdp.cpp"
+    "src/SIM7080/PDP/sim7080_pdp_gprs.cpp"
+    "src/SIM7080/PDP/sim7080_pdp_ip.cpp"
     "src/SIM7080/Misc/sim7080_info.cpp"
     "src/SIM7080/Misc/sim7080_fs.cpp"
+    "src/SIM7080/Events/sim7080_evt.cpp"
+    "src/SIM7080/Events/sim7080_evt_tcp.cpp"
 
     # SIM7020
     "src/SIM7020/sim7020.cpp"
@@ -17,16 +23,17 @@ set(COMPONENT_SRCS
     "src/SIM7020/Protocols/sim7020_http.cpp"
     "src/SIM7020/Protocols/sim7020_mqtt.cpp"
     "src/SIM7020/Protocols/sim7020_ping.cpp"
-    "src/SIM7020/Protocols/sim7020_sntp.cpp"
+    "src/SIM7020/Protocols/sim7020_ntp.cpp"
     "src/SIM7020/Protocols/sim7020_tcp.cpp"
     "src/SIM7020/PowerManagement/sim7020_pwrmgnt.cpp"
     "src/SIM7020/Misc/sim7020_info.cpp"
     "src/SIM7020/Misc/sim7020_nvram.cpp"
-    "src/SIM7020/Misc/sim7020_pdp.cpp"
-    "src/Private/Events/SIM7020/sim7020_evt_http.cpp"
-    "src/Private/Events/SIM7020/sim7020_evt_mqtt.cpp"
-    "src/Private/Events/SIM7020/sim7020_evt_tcp.cpp"
-    "src/Private/Events/SIM7020/sim7020_evt_psm.cpp"
+    "src/SIM7020/PDP/sim7020_pdp.cpp"
+    "src/SIM7020/PDP/sim7020_pdp_gprs.cpp"
+    "src/SIM7020/Events/sim7020_evt_http.cpp"
+    "src/SIM7020/Events/sim7020_evt_mqtt.cpp"
+    "src/SIM7020/Events/sim7020_evt_tcp.cpp"
+    "src/SIM7020/Events/sim7020_evt_psm.cpp"
 
     # Driver internal
     "src/Private/Events/sim70xx_evt.cpp"
@@ -39,18 +46,24 @@ set(COMPONENT_ADD_INCLUDEDIRS
 
     # SIM7080
     "include/SIM7080"
+	"include/SIM7080/PDP"
 	"include/SIM7080/Misc"
 	"include/SIM7080/Protocols"
 	"include/SIM7080/Definitions"
+	"include/SIM7080/Definitions/PDP"
+	"include/SIM7080/Definitions/Misc"
+	"include/SIM7080/Definitions/Configs"
 	"include/SIM7080/Definitions/Protocols"
 	"include/SIM7080/Protocols"
 
     # SIM7020
     "include/SIM7020"
+	"include/SIM7020/PDP"
 	"include/SIM7020/Misc"
 	"include/SIM7020/Protocols"
 	"include/SIM7020/Definitions"
 	"include/SIM7020/PowerManagement"
+	"include/SIM7020/Definitions/PDP"
 	"include/SIM7020/Definitions/Misc"
 	"include/SIM7020/Definitions/Configs"
 	"include/SIM7020/Definitions/Protocols"

@@ -38,7 +38,9 @@
 #define SIM7080_AT_CSQ                                          SIM70XX_CMD("AT+CSQ", true, 1, 1)
 #define SIM70XX_AT_CBANDCFG_R                                   SIM70XX_CMD("AT+CBANDCFG?", true, 1, 2)
 #define SIM70XX_AT_CBANDCFG_W(Mode, Bandlist)                   SIM70XX_CMD(std::string("AT+CBANDCFG=") + Mode + "," + Bandlist, false, 10, 1)
-#define SIM7080_AT_CNACT_W(CID, Action)                         SIM70XX_CMD("AT+CNACT=" + std::to_string(CID) + "," + std::to_string(Action), true, 300, 1)
+#define SIM7080_AT_CNCFG_W(Command)                             SIM70XX_CMD(std::string("AT+CNCFG=") + Command, false, 1, 1)
+#define SIM7080_AT_CNACT_W(PDP, Action)                         SIM70XX_CMD("AT+CNACT=" + std::to_string(PDP) + "," + std::to_string(Action), true, 300, 1)
+#define SIM7080_AT_CNACT_R                                      SIM70XX_CMD("AT+CNACT?", true, 10, 4)
 
 /**
  * 
@@ -67,6 +69,11 @@
  * 
  */
 #define SIM7080_AT_SNPING(Command, Items)                       SIM70XX_CMD(Command, true, 60, Items)
+#define SIM7080_AT_CDNSGIP(Host)                                SIM70XX_CMD("AT+CDNSGIP=\"" + Host + "\"", false, 1, 1)
+#define SIM7080_AT_CAOPEN(ID, PDP, Type, Address, Port)         SIM70XX_CMD("AT+CAOPEN=" + std::to_string(ID) + "," + std::to_string(PDP) + "," + "\"" + Type + "\",\"" + Address + "\"," + std::to_string(Port), true, 0, 1)
+#define SIM7080_AT_CASEND(ID, Size)                             SIM70XX_CMD("AT+CASEND=" + std::to_string(ID) + "," + std::to_string(Size), false, 10, 1)
+#define SIM7080_AT_CARECV(ID, Size)                             SIM70XX_CMD("AT+CARECV=" + std::to_string(ID) + "," + std::to_string(Size), true, 10, 1)
+#define SIM7020_AT_CACLOSE(ID)                                  SIM70XX_CMD("AT+CACLOSE=" + std::to_string(ID), false, 1, 1)
 
 /**
  * 
@@ -92,6 +99,6 @@
 #define SIM7080_AT_SMTPRCPT(Type, Address, Name)                SIM70XX_CMD("AT+SMTPRCPT=" + std::to_string(Type) + ",0,\"" + Address + "\",\"" + Name + "\"", false, 1, 1)
 #define SIM7080_AT_SMTPSUB(Subject)                             SIM70XX_CMD("AT+SMTPSUB=" + Subject, false, 1, 1)
 #define SIM7080_AT_SMTPBODY(Size)                               SIM70XX_CMD("AT+SMTPBODY=" + std::to_string(Size), false, 1, 1)
-#define SIM7080_AT_SMTPSEND                                     SIM70XX_CMD("AT+SMTPSEND", true, 300, 1)
+#define SIM7080_AT_SMTPSEND                                     SIM70XX_CMD("AT+SMTPSEND", false, 300, 1)
 
 #endif /* SIM7080_COMMANDS_H_ */

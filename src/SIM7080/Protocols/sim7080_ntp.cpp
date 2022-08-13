@@ -1,5 +1,5 @@
  /*
- * sim7080_pdp.h
+ * sim7080_ntp.cpp
  *
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -17,28 +17,17 @@
  * Errors and commissions should be reported to DanielKampert@kampis-elektroecke.de.
  */
 
-#ifndef SIM7080_PDP_H_
-#define SIM7080_PDP_H_
+#include <sdkconfig.h>
 
-#include "sim70xx_errors.h"
-#include "Definitions/sim7080_defs.h"
-#include "Definitions/Misc/sim7080_pdp_defs.h"
+#if((CONFIG_SIMXX_DEV == 7080) && (defined CONFIG_SIM70XX_DRIVER_WITH_NTP))
 
-/** @brief          Define the PDP context.
- *  @param p_Device SIM7080 device object
- *  @param PDP      Packet Data Protocol (PDP) type
- *  @param APN      Access Point Name (APN) configuration
- *  @param CID      (Optional) PDP context ID
- *  @return         SIM70XX_ERR_OK when successful
- */
-SIM70XX_Error_t SIM7080_PDP_Define(SIM7080_t& p_Device, SIM7080_PDP_Type_t PDP, SIM70XX_APN_t APN, uint8_t CID = 1);
+#include <esp_log.h>
 
-/** @brief          Execute a PDP action for a specific PDP context.
- *  @param p_Device SIM7080 device object
- *  @param CID      PDP context ID
- *  @param Action   PDP action
- *  @return         SIM70XX_ERR_OK when successful
- */
-SIM70XX_Error_t SIM7080_PDP_Action(SIM7080_t& p_Device, uint8_t CID, SIM7080_PDP_Action_t Action);
+#include "sim7080.h"
+#include "sim7080_ntp.h"
+#include "../../Private/Queue/sim70xx_queue.h"
+#include "../../Private/Commands/sim70xx_commands.h"
 
-#endif /* SIM7080_PDP_H_ */
+static const char* TAG = "SIM7080_NTP";
+
+#endif

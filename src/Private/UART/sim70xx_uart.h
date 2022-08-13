@@ -40,10 +40,11 @@ SIM70XX_Error_t SIM70XX_UART_Deinit(SIM70XX_UART_Conf_t& p_Config);
 
 /** @brief          Send a command data the UART interface.
  *  @param p_Config Pointer to SIM70XX UART configuration object
- *  @param Data     Data string
+ *  @param p_Data   Pointer to data
+ *  @param Size     Byte count
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM70XX_UART_Send(SIM70XX_UART_Conf_t& p_Config, std::string Data);
+SIM70XX_Error_t SIM70XX_UART_Send(SIM70XX_UART_Conf_t& p_Config, const void* p_Data, size_t Size);
 
 /** @brief          Send a command over the UART interface.
  *  @param p_Config Pointer to SIM70XX UART configuration object
@@ -60,12 +61,19 @@ SIM70XX_Error_t SIM70XX_UART_SendCommand(SIM70XX_UART_Conf_t& p_Config, std::str
  */
 size_t SIM70XX_UART_Read(SIM70XX_UART_Conf_t& p_Config, uint8_t* p_Buffer, size_t Size);
 
+/** @brief          Read a character from the serial interface.
+ *  @param p_Config Pointer to SIM70XX UART configuration object
+ *  @return         Received character or -1 when no bytes available
+ */
+int SIM70XX_UART_Read(SIM70XX_UART_Conf_t& p_Config);
+
 /** @brief              Receive a string from the UART interface until a termination character is received.
  *  @param p_Config     Pointer to SIM70XX UART configuration object
- *  @param Terminator   Termination character
+ *  @param Terminator   (Optional) Termination character
+ *  @param Timeout      (Optional) Timeout in milliseconds
  *  @return             Received string
  */
-std::string SIM70XX_UART_ReadStringUntil(SIM70XX_UART_Conf_t& p_Config, char Terminator);
+std::string SIM70XX_UART_ReadStringUntil(SIM70XX_UART_Conf_t& p_Config, char Terminator = '\n', uint32_t Timeout = 1000U);
 
 /** @brief          Receive a string from the UART interface.
  *  @param p_Config Pointer to SIM70XX UART configuration object
@@ -82,6 +90,6 @@ void SIM70XX_UART_Flush(SIM70XX_UART_Conf_t& p_Config);
  *  @param p_Config Pointer to SIM70XX UART configuration object
  *  @return         Number of bytes available
  */
-int SIM70XX_UART_Available(SIM70XX_UART_Conf_t& p_Config);
+size_t SIM70XX_UART_Available(SIM70XX_UART_Conf_t& p_Config);
 
 #endif /* SIM70XX_UART_H_ */

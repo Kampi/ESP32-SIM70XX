@@ -160,8 +160,8 @@ SIM70XX_Error_t SIM7080_SoftReset(SIM7080_t& p_Device, uint32_t Timeout)
         // Reset the module.
         // NOTE: Echo mode is enabled after a reset!
         SIM70XX_UART_SendCommand(p_Device.UART, "ATZ");
-        Response = SIM70XX_UART_ReadStringUntil(p_Device.UART, '\n');
-        Response = SIM70XX_UART_ReadStringUntil(p_Device.UART, '\n');
+        Response = SIM70XX_UART_ReadStringUntil(p_Device.UART);
+        Response = SIM70XX_UART_ReadStringUntil(p_Device.UART);
         ESP_LOGI(TAG, "Response: %s", Response.c_str());
 
         // Check if the reset was successful.
@@ -190,35 +190,66 @@ SIM70XX_Error_t SIM7080_SoftReset(SIM7080_t& p_Device, uint32_t Timeout)
     return SIM70XX_ERR_FAIL;
 }
 
-SIM70XX_Error_t SIM7080_AutoAPN(SIM7080_t& p_Device, SIM70XX_APN_t APN)
+SIM70XX_Error_t SIM7080_IP_AutoAPN(SIM7080_t& p_Device, SIM70XX_APN_t APN, uint8_t PDP, uint32_t Timeout)
 {
-    // TODO
-    return SIM70XX_ERR_OK;
-}
-
-SIM70XX_Error_t SIM7080_ManualAPN(SIM7080_t& p_Device, SIM70XX_APN_t APN, uint8_t CID)
-{
+    unsigned long Now;
     bool isAttached;
+
+    if(PDP > 3)
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
 
     if(p_Device.Connection.Functionality != SIM7080_FUNC_MIN)
     {
         SIM70XX_ERROR_CHECK(SIM7080_SetFunctionality(p_Device, SIM7080_FUNC_MIN));
     }
-    SIM70XX_ERROR_CHECK(SIM7080_PDP_Define(p_Device, SIM7080_PDP_IP, APN));
     SIM70XX_ERROR_CHECK(SIM7080_SetFunctionality(p_Device, SIM7080_FUNC_FULL));
 
     isAttached = false;
+    Now = SIM70XX_Tools_GetmsTimer();
     do
     {
-        isAttached = SIM7080_isAttached(p_Device);
-        ESP_LOGD(TAG, "Attached: %u", isAttached);
-        vTaskDelay(10000 / portTICK_PERIOD_MS);
-    } while(isAttached == false);
+        SIM70XX_Qual_t Report;
+
+        SIM70XX_ERROR_CHECK(SIM7080_Info_GetQuality(p_Device, &Report));
+        if(Report.RSSI != 99)
+        {
+            isAttached = SIM7080_PGP_GRPS_isAttached(p_Device);
+        }
+
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    } while((isAttached == false) && ((SIM70XX_Tools_GetmsTimer() - Now) < (Timeout * 1000)));
+
+    if(isAttached == false)
+    {
+        return SIM70XX_ERR_TIMEOUT;
+    }
 
     SIM70XX_ERROR_CHECK(SIM7080_GetCurrentOperator(p_Device));
-    SIM70XX_ERROR_CHECK(SIM7080_PDP_Action(p_Device, 0, SIM7080_PDP_ENABLE));
+    SIM70XX_ERROR_CHECK(SIM7080_PDP_IP_Configure(p_Device, SIM7080_PDP_IP_IP, APN, PDP));
 
-    return SIM70XX_ERR_OK;
+    return SIM7080_PDP_IP_Action(p_Device, PDP, SIM7080_PDP_ENABLE);
+}
+
+SIM70XX_Error_t SIM7080_IP_ManualAPN(SIM7080_t& p_Device, SIM70XX_APN_t APN, uint8_t PDP, uint32_t Timeout)
+{
+    if(PDP > 3)
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+
+    if(p_Device.Connection.Functionality != SIM7080_FUNC_MIN)
+    {
+        SIM70XX_ERROR_CHECK(SIM7080_SetFunctionality(p_Device, SIM7080_FUNC_MIN));
+    }
+
+    // TODO: Needs check. It doesn´t work
+
+    SIM70XX_ERROR_CHECK(SIM7080_PDP_GPRS_Define(p_Device, SIM7080_PDP_GPRS_IP, APN, PDP));
+    SIM70XX_ERROR_CHECK(SIM7080_SetFunctionality(p_Device, SIM7080_FUNC_FULL));
+
+    return SIM7080_IP_AutoAPN(p_Device, APN, PDP, Timeout);
 }
 
 SIM70XX_Error_t SIM7080_SetOperator(SIM7080_t& p_Device, SIM70XX_OpMode_t Mode, SIM70XX_OpForm_t Format, std::string Operator, SIM7080_AcT_t AcT)
@@ -530,8 +561,6 @@ SIM70XX_Error_t SIM7080_SetFunctionality(SIM7080_t& p_Device, SIM7080_Func_t Fun
         return SIM70XX_ERR_OK;
     }
 
-    p_Device.Internal.isSMSReady = false;
-
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM70XX_AT_CFUN_W(Func, Reset);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
@@ -543,13 +572,12 @@ SIM70XX_Error_t SIM7080_SetFunctionality(SIM7080_t& p_Device, SIM7080_Func_t Fun
     // NOTE: Do not use the error macro, because the response and status depends on the current state of the device.
     Error = SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response, &Status);
 
-    // Device is in minimum functionality -> Transition into another functionality
-    //  Response = OK
-    //  Status = +CPIN: READY
+    // Device is in minimum functionality -> Transition into another functionality. Responses:
+    //  OK
+    //  +CPIN: READY
+    //  SMS Ready
     if(p_Device.Connection.Functionality == SIM7080_FUNC_MIN)
     {
-        std::string Event;
-
         ESP_LOGI(TAG, "Last: Minimum functionality...");
 
         if(Response.find("OK") != std::string::npos)
@@ -559,7 +587,7 @@ SIM70XX_Error_t SIM7080_SetFunctionality(SIM7080_t& p_Device, SIM7080_Func_t Fun
             Error = SIM70XX_ERR_OK;
         }
 
-        while(p_Device.Internal.isSMSReady == false)
+        while(SIM70XX_Queue_isEvent(p_Device.Internal.EventQueue, "SMS Ready", &Response) == false)
         {
             vTaskDelay(100 / portTICK_PERIOD_MS);
         }
@@ -579,7 +607,7 @@ SIM70XX_Error_t SIM7080_SetFunctionality(SIM7080_t& p_Device, SIM7080_Func_t Fun
         }
     }
 
-    ESP_LOGI(TAG, "Set functionality: %u", p_Device.Connection.Functionality);
+    ESP_LOGI(TAG, "Functionality: %u", p_Device.Connection.Functionality);
 
     return Error;
 }
@@ -688,27 +716,6 @@ bool SIM7080_isSIMReady(SIM7080_t& p_Device)
     }
 
     return false;   
-}
-
-bool SIM7080_isAttached(SIM7080_t& p_Device)
-{
-    std::string Response;
-    SIM70XX_TxCmd_t* Command;
-
-    if(p_Device.Internal.isInitialized == false)
-    {
-        return false;
-    }
-
-    SIM70XX_CREATE_CMD(Command);
-    *Command = SIM70XX_AT_CGATT_R;
-    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if((SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false) || (SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response) != SIM70XX_ERR_OK))
-    {
-        return false;
-    }
-
-    return (bool)std::stoi(Response);
 }
 
 SIM70XX_Error_t SIM7080_Ping(SIM7080_t& p_Device)

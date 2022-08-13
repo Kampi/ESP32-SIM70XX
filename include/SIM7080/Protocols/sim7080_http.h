@@ -24,4 +24,28 @@
 #include "sim70xx_errors.h"
 #include "sim7080_http_defs.h"
 
+/** @brief                  Start a new HTTP(S) post request.
+ *  @param p_Device         SIM7080 device object
+ *  @param Path             Request path
+ *  @param ContentType      Content type
+ *  @param Header           Request header
+ *  @param Payload          Payload string
+ *  @param p_ResponseCode   (Optional) Pointer to response code
+ *  @return                 SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_HTTP_POST(SIM7080_t& p_Device, SIM7080_HTTP_Socket_t* p_Socket, std::string Path, std::string ContentType, std::string Header, std::string Payload, uint16_t* p_ResponseCode = NULL);
+
+/** @brief                  Start a new HTTP(S) post request.
+ *  @param p_Device         SIM7080 device object
+ *  @param p_Socket         Pointer to HTTP(S) socket object
+ *  @param Path             Request path
+ *  @param ContentType      Content type
+ *  @param Header           Request header
+ *  @param p_Buffer         Pointer to data buffer
+ *  @param Length           Buffer length
+ *  @param p_ResponseCode   (Optional) Pointer to response code
+ *  @return                 SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_HTTP_POST(SIM7080_t& p_Device, SIM7080_HTTP_Socket_t* p_Socket, std::string Path, std::string ContentType, std::string Header, const void* p_Buffer, uint32_t Length, uint16_t* p_ResponseCode = NULL);
+
 #endif /* SIM7080_HTTP_H_ */

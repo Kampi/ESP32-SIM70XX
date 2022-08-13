@@ -20,29 +20,33 @@
 #ifndef SIM7080_H_
 #define SIM7080_H_
 
-#include "Misc/sim7080_pdp.h"
-#include "Misc/sim7080_info.h"
-#include "Definitions/sim7080_defs.h"
+#include "sim7080_pdp.h"
+#include "sim7080_info.h"
+#include "sim7080_defs.h"
 #include "sim70xx_tools.h"
 #include "sim70xx_errors.h"
 
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "Definitions/Configs/sim7080_config_1nce.h"
-#include "Definitions/Configs/sim7080_config_fusion.h"
+#include "sim7080_config_1nce.h"
+#include "sim7080_config_fusion.h"
 
 #ifdef CONFIG_SIM70XX_DRIVER_WITH_FS
-    #include "Misc/sim7080_fs.h"
+    #include "sim7080_fs.h"
 #endif
 
 #ifdef CONFIG_SIM70XX_DRIVER_WITH_TCPIP
-    #include "Protocols/sim7080_tcpip.h"
-    #include "Definitions/Configs/sim7080_config_ping.h"
+    #include "sim7080_tcpip.h"
+    #include "sim7080_config_ping.h"
+#endif
+
+#ifdef CONFIG_SIM70XX_DRIVER_WITH_NTP
+    #include "sim7080_ntp.h"
 #endif
 
 #ifdef CONFIG_SIM70XX_DRIVER_WITH_EMAIL
-    #include "Protocols/sim7080_email.h"
+    #include "sim7080_email.h"
 #endif
 
 /** @brief          Check if the module is initialized.
@@ -91,22 +95,25 @@ void SIM7080_Deinit(SIM7080_t& p_Device);
  *  @param Timeout  (Optional) Timeout for the device reset in seconds
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_SoftReset(SIM7080_t& p_Device, uint32_t Timeout = 10);
+SIM70XX_Error_t SIM7080_SoftReset(SIM7080_t& p_Device, uint32_t Timeout = 60);
 
-/** @brief          Automatically set an enable a APN.
+/** @brief          Automatically set an enable an IP APN.
  *  @param p_Device SIM7080 device object
  *  @param APN      APN configuration object
+ *  @param PDP      (Optional) PDP context ID
+ *  @param Timeout  (Optional) Wait for connection timeout in seconds
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_AutoAPN(SIM7080_t& p_Device, SIM70XX_APN_t APN);
+SIM70XX_Error_t SIM7080_IP_AutoAPN(SIM7080_t& p_Device, SIM70XX_APN_t APN, uint8_t PDP = 0, uint32_t Timeout = 60);
 
-/** @brief          Manually set an enable a APN.
+/** @brief          Manually set an enable an IP APN.
  *  @param p_Device SIM7080 device object
  *  @param APN      APN configuration object
- *  @param CID      (Optional) PDP context ID
+ *  @param PDP      (Optional) PDP context ID
+ *  @param Timeout  (Optional) Wait for connection timeout in seconds
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_ManualAPN(SIM7080_t& p_Device, SIM70XX_APN_t APN, uint8_t CID = 0);
+SIM70XX_Error_t SIM7080_IP_ManualAPN(SIM7080_t& p_Device, SIM70XX_APN_t APN, uint8_t PDP = 0, uint32_t Timeout = 10);
 
 /** @brief          Set the operator for the communication.
  *  @param p_Device SIM7080 device object
@@ -208,12 +215,6 @@ SIM70XX_Error_t SIM7080_GetSIMStatus(SIM7080_t& p_Device, SIM7080_SIM_t* const p
  *  @return         #true when the SIM card is ready
  */
 bool SIM7080_isSIMReady(SIM7080_t& p_Device);
-
-/** @brief          Check if the module is connected with the GPRS service.
- *  @param p_Device SIM7080 device object
- *  @return         #true when the module is connected to the GPRS service
- */
-bool SIM7080_isAttached(SIM7080_t& p_Device);
 
 /** @brief          Ping the module by sending an empty 'AT'.
  *  @param p_Device SIM7080 device object

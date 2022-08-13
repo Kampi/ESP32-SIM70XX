@@ -118,12 +118,17 @@ SIM70XX_Error_t SIM7080_EMail_SendText(SIM7080_t& p_Device, SIM7080_EMail_Config
         return SIM70XX_ERR_FAIL;
     }
 
-    SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response);
+    SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, NULL, &Response);
 
-    // TODO: Wait for "Download" string
+    if(Response.find("DOWNLOAD") == std::string::npos)
+    {
+        return SIM70XX_ERR_FAIL;
+    }
 
     vTaskSuspend(p_Device.Internal.TaskHandle);
     SIM70XX_UART_Send(p_Device.UART, Body);
+    SIM70XX_UART_ReadStringUntil(p_Device.UART);
+    SIM70XX_UART_ReadStringUntil(p_Device.UART);
     vTaskResume(p_Device.Internal.TaskHandle);
 
     SIM70XX_CREATE_CMD(Command);
@@ -134,12 +139,13 @@ SIM70XX_Error_t SIM7080_EMail_SendText(SIM7080_t& p_Device, SIM7080_EMail_Config
         return SIM70XX_ERR_FAIL;
     }
 
-    while(1)
+    // Wait for the transmission status.
+    while(SIM70XX_Queue_isEvent(p_Device.Internal.EventQueue, "+SMTPSEND:", &Response) == false)
     {
-        vTaskDelay(100000);
+        vTaskDelay(100);
     }
 
-
+    ESP_LOGI(TAG, "Response: %s", Response.c_str());
 
     if(p_Error != NULL)
     {

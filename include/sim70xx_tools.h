@@ -29,6 +29,15 @@
 #include "sim70xx_defs.h"
 #include "sim70xx_errors.h"
 
+/** @brief          Remove a line ending (\n and \r) from the input string.
+ *  @param String   Input string
+ */
+#define SIMXX_TOOLS_REMOVE_LINEEND(String)                  do                                                                                  \
+                                                            {                                                                                   \
+                                                                String.erase(std::remove(String.begin(), String.end(), '\n'), String.end());    \
+                                                                String.erase(std::remove(String.begin(), String.end(), '\r'), String.end());    \
+                                                            } while(0);
+
 /** @brief  Get the version number of the SIM70XX library.
  *  @return Library version
  */

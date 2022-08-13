@@ -30,6 +30,8 @@
 
 static const char* TAG = "SIM7020_PDP";
 
+// TODO: Check for GPRS and IP (see SIM7080)
+
 SIM70XX_Error_t SIM7020_PDP_GetContext(SIM7020_t& p_Device, SIM7020_PDP_Context_t* const p_Context)
 {
     SIM70XX_TxCmd_t* Command;
@@ -130,7 +132,7 @@ SIM70XX_Error_t SIM7020_PDP_GetStatus(SIM7020_t& p_Device, std::vector<SIM7020_P
 
 SIM70XX_Error_t SIM7020_PDP_ReadDynamicParameters(SIM7020_t& p_Device)
 {
-    uint8_t Parts;
+    uint8_t Parts = 0;
     std::string Dummy;
     std::string Octett;
     std::string Response;
@@ -152,6 +154,7 @@ SIM70XX_Error_t SIM7020_PDP_ReadDynamicParameters(SIM7020_t& p_Device)
 
     // TODO: Wait for the Response event.
 
+/* TODO
     if(p_Device.PDP_Type == SIM7020_PDP_IPV6)
     {
         Parts = 16;
@@ -160,12 +163,11 @@ SIM70XX_Error_t SIM7020_PDP_ReadDynamicParameters(SIM7020_t& p_Device)
     {
         Parts = 4;
     }
-
+*/
     // Get the IP address and the subnet mask.
     Dummy = Response.substr(Response.find_last_of(",") + 1);
     Response.erase(Response.find("," + Dummy), std::string("," + Dummy).length());
-    Dummy.replace(Dummy.find("\""), std::string("\"").size(), "");
-    Dummy.replace(Dummy.find("\""), std::string("\"").size(), "");
+    Dummy.erase(std::remove(Dummy.begin(), Dummy.end(), '\"'), Dummy.end()); 
 
     // Filter out the IP address.
     for(uint8_t i = 0; i < (Parts - 1); i++)

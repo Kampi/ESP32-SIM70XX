@@ -1,5 +1,5 @@
  /*
- * sim7080_pdp_defs.h
+ * sim7080_ntp_defs.h
  *
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -17,29 +17,11 @@
  * Errors and commissions should be reported to DanielKampert@kampis-elektroecke.de.
  */
 
-#ifndef SIM7080_PDP_DEFS_H_
-#define SIM7080_PDP_DEFS_H_
+#ifndef SIM7080_NTP_DEFS_H_
+#define SIM7080_NTP_DEFS_H_
 
+#include <string>
 #include <stdint.h>
 #include <stdbool.h>
 
-/** @brief Supported PDP actions
- */
-typedef enum
-{
-    SIM7080_PDP_DISABLE     = 0,                    /**< Deactive. */
-    SIM7080_PDP_ENABLE,                             /**< Active. */
-    SIM7080_PDP_AUTO,                               /**< Deactive. */
-} SIM7080_PDP_Action_t;
-
-/** @brief Supported PDP types.
- */
-typedef enum
-{
-    SIM7080_PDP_IP          = 0,                    /**< Internet Protocol (IETF STD 5). */
-    SIM7080_PDP_IPV6,                               /**< Internet Protocol, version 6 (IETF RFC 2460). */
-    SIM7080_PDP_IPV4V6,                             /**< Virtual <PDP_type) introduced to handle dual IP stack UE capability(see 3GPP TS 24.301). */
-    SIM7080_PDP_NO_IP,                              /**< Transfer of Non-IP data to external packet data Network (see 3GPP TS 24.301). */
-} SIM7080_PDP_Type_t;
-
-#endif /* SIM7080_PDP_DEFS_H_ */
+#endif /* SIM7080_NTP_DEFS_H_ */

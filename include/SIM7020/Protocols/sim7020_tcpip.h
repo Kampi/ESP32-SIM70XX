@@ -41,26 +41,20 @@ SIM70XX_Error_t SIM7020_TCP_Ping(SIM7020_t& p_Device, SIM7020_Ping_t& p_Config, 
  *  @param Timeout  (Optional) Message timeout for each the request in seconds
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_TCP_ParseDNS(SIM7020_t& p_Device, std::string Host, std::string* p_IP, SIM7020_DNS_Err_t* p_Error = NULL, uint32_t Timeout = 60);
+SIM70XX_Error_t SIM7020_TCP_ParseDNS(SIM7020_t& p_Device, std::string Host, std::string* p_IP, SIM7020_DNS_Error_t* p_Error = NULL, uint32_t Timeout = 60);
 
 /** @brief          Create a TCP socket.
  *  @param p_Device SIM7020 device object
  *  @param IP       IP address
  *  @param Port     TCP port
  *  @param p_Socket Pointer to TCP socket object
+ *  @param Timeout  (Optional) Timeout in seconds
  *  @param CID      (Optional) PDP context ID
  *  @param Domain   (Optional) Socket IP domain
  *  @param Protocol (Optional) Socket protocol
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_TCP_CreateTCP(SIM7020_t& p_Device, std::string IP, uint16_t Port, SIM7020_TCP_Socket_t* p_Socket, uint8_t CID = 1, SIM7020_TCP_Domain_t Domain = SIM7020_TCP_DOMAIN_IPV4, SIM7020_TCP_Protocol_t Protocol = SIM7020_TCP_PROT_IP);
-
-/** @brief          Create a common TCP/IP socket.
- *  @param p_Device SIM7020 device object
- *  @param p_Socket Pointer to TCP socket object
- *  @return         SIM70XX_ERR_OK when successful
- */
-SIM70XX_Error_t SIM7020_TCP_Create(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket);
+SIM70XX_Error_t SIM7020_TCP_Create(SIM7020_t& p_Device, std::string IP, uint16_t Port, SIM7020_TCP_Socket_t* p_Socket, uint16_t Timeout = 60, uint8_t CID = 1, SIM7020_TCP_Domain_t Domain = SIM7020_TCP_DOMAIN_IPV4, SIM7020_TCP_Protocol_t Protocol = SIM7020_TCP_PROT_IP);
 
 /** @brief          Open a TCP connection to a remote server.
  *  @param p_Device SIM7020 device object

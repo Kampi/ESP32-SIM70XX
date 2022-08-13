@@ -119,12 +119,13 @@ bool SIM70XX_Queue_Wait(QueueHandle_t Queue, bool* p_Active, uint32_t Timeout)
         ItemsInQueue = uxQueueMessagesWaiting(Queue);
         ESP_LOGD(TAG, "Items in queue: %u", ItemsInQueue);
 
-        if((SIM70XX_Tools_GetmsTimer() - Now) > Timeout_Temp)
+        if(((Timeout != 0) && ((SIM70XX_Tools_GetmsTimer() - Now) > Timeout_Temp)) || (*p_Active == false))
         {
-            return false;
-        }
-        else if(*p_Active == false)
-        {
+            ESP_LOGE(TAG, "Qeueue timeout");
+
+            // Something has gone wrong. Clear the queue.
+            xQueueReset(Queue);
+
             return false;
         }
 
@@ -163,8 +164,6 @@ bool SIM70XX_Queue_isEvent(QueueHandle_t Queue, std::string Filter, std::string*
         // Get a new item from the queue to check if the searched event has occured.
         if(xQueuePeek(Queue, &Message, portMAX_DELAY) == pdTRUE)
         {
-            ESP_LOGI(TAG, "Got event from queue: %s", Message->c_str());
-
             // Check if the filter match the item.
             if(Message->find(Filter) != std::string::npos)
             {

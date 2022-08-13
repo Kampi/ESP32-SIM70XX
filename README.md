@@ -9,7 +9,8 @@
 
 ## ToDo
 
-[ ] 
+- Check E-Mail (got a timeout every time)
+- Power Management is missing
 
 ## Maintainer
 

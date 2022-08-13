@@ -1,5 +1,5 @@
  /*
- * sim7080_pdp.cpp
+ * sim7080_pdp_gprs.cpp
  *
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -24,13 +24,13 @@
 #include <esp_log.h>
 
 #include "sim7080.h"
-#include "Misc/sim7080_pdp_defs.h"
+#include "PDP/sim7080_pdp_defs.h"
 #include "../../Private/Queue/sim70xx_queue.h"
 #include "../../Private/Commands/sim70xx_commands.h"
 
 static const char* TAG = "SIM7080_PDP";
 
-SIM70XX_Error_t SIM7080_PDP_Define(SIM7080_t& p_Device, SIM7080_PDP_Type_t PDP, SIM70XX_APN_t APN, uint8_t CID)
+SIM70XX_Error_t SIM7080_PDP_GPRS_Define(SIM7080_t& p_Device, SIM7080_PDP_GPRS_Type_t Type, SIM70XX_APN_t APN, uint8_t PDP)
 {
     std::string CommandStr;
     SIM70XX_TxCmd_t* Command;
@@ -40,26 +40,26 @@ SIM70XX_Error_t SIM7080_PDP_Define(SIM7080_t& p_Device, SIM7080_PDP_Type_t PDP, 
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
-    else if((CID == 0) || (CID > 15))
+    else if((PDP == 0) || (PDP > 15))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
 
-    if(PDP == SIM7080_PDP_IP)
+    if(Type == SIM7080_PDP_GPRS_IP)
     {
-        CommandStr = "AT+CGDCONT=" + std::to_string(CID) + ",\"IP\",\"" + APN.Name + "\"";
+        CommandStr = "AT+CGDCONT=" + std::to_string(PDP) + ",\"IP\",\"" + APN.Name + "\"";
     }
-    else if(PDP == SIM7080_PDP_IPV6)
+    else if(Type == SIM7080_PDP_GPRS_IPV6)
     {
-        CommandStr = "AT+CGDCONT=" + std::to_string(CID) + ",\"IPV6\",\"" + APN.Name + "\"";
+        CommandStr = "AT+CGDCONT=" + std::to_string(PDP) + ",\"IPV6\",\"" + APN.Name + "\"";
     }
-    else if(PDP == SIM7080_PDP_IPV4V6)
+    else if(Type == SIM7080_PDP_GPRS_IPV4V6)
     {
-        CommandStr = "AT+CGDCONT=" + std::to_string(CID) + ",\"IPV4V6\",\"" + APN.Name + "\"";
+        CommandStr = "AT+CGDCONT=" + std::to_string(PDP) + ",\"IPV4V6\",\"" + APN.Name + "\"";
     }
-    else if(PDP == SIM7080_PDP_NO_IP)
+    else if(Type == SIM7080_PDP_GPRS_NO_IP)
     {
-        CommandStr = "AT+CGDCONT=" + std::to_string(CID) + ",\"Non-IP\",\"" + APN.Name + "\"";
+        CommandStr = "AT+CGDCONT=" + std::to_string(PDP) + ",\"Non-IP\",\"" + APN.Name + "\"";
     }
 
     if((APN.Username.length() > 0) && (APN.Password.length() > 0))
@@ -82,36 +82,28 @@ SIM70XX_Error_t SIM7080_PDP_Define(SIM7080_t& p_Device, SIM7080_PDP_Type_t PDP, 
         return Error;
     }
 
-    p_Device.PDP_Type = PDP;
-
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7080_PDP_Action(SIM7080_t& p_Device, uint8_t CID, SIM7080_PDP_Action_t Action)
+bool SIM7080_PGP_GRPS_isAttached(SIM7080_t& p_Device)
 {
-    SIM70XX_Error_t Error;
+    std::string Response;
     SIM70XX_TxCmd_t* Command;
 
     if(p_Device.Internal.isInitialized == false)
     {
-        return SIM70XX_ERR_NOT_INITIALIZED;
-    }
-    else if(CID > 3)
-    {
-        return SIM70XX_ERR_INVALID_ARG;
+        return false;
     }
 
     SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7080_AT_CNACT_W(CID, Action);
+    *Command = SIM70XX_AT_CGATT_R;
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if((SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false) || (SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response) != SIM70XX_ERR_OK))
     {
-        return SIM70XX_ERR_FAIL;
+        return false;
     }
 
-    Error = SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
-
-    return Error;
+    return (bool)std::stoi(Response);
 }
 
 #endif

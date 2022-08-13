@@ -33,4 +33,86 @@
  */
 SIM70XX_Error_t SIM7080_TCP_Ping(SIM7080_t& p_Device, SIM7080_Ping_t& p_Config, std::vector<SIM7080_PingRes_t>* p_Result, bool IPv6 = false);
 
+/** @brief          Parse a given host name to get the IP address.
+ *  @param p_Device SIM7080 device object
+ *  @param Host     Host name
+ *  @param p_IP     Pointer to resolved IP address
+ *  @param p_Error  (Optional) DNS error code
+ *                  NOTE: Only used when the function returns an error code =/= SIM70XX_ERR_OK
+ *  @param Timeout  (Optional) Message timeout for each the request in seconds
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_TCP_ParseDNS(SIM7080_t& p_Device, std::string Host, std::string* p_IP, SIM7080_DNS_Error_t* p_Error = NULL, uint32_t Timeout = 60);
+
+/** @brief          Check if data are received for a specific socket.
+ *  @param p_Socket Pointer to TCP socket object
+ *  @return         #true when data are received
+ */
+bool inline __attribute__((always_inline)) SIM7080_TCP_Client_isDataAvailable(SIM7080_TCP_Socket_t* p_Socket)
+{
+    if(p_Socket == NULL)
+    {
+        return false;
+    }
+
+    return p_Socket->isDataReceived;
+}
+
+/** @brief              Create a socket for a TCP client.
+ *  @param p_Device     SIM7080 device object
+ *  @param IP           IP address
+ *  @param Port         TCP port
+ *  @param p_Socket     Pointer to TCP socket object
+ *  @param CID          (Optional) Socket CID
+ *  @param ReadManually (Optional) Set to #true to automatically read receiving data
+ *                      NOTE: Not supported yet
+ *  @return             SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_TCP_Client_Create(SIM7080_t& p_Device, std::string IP, uint16_t Port, SIM7080_TCP_Socket_t* p_Socket, uint8_t CID = 0, bool ReadManually = false);
+
+/** @brief          Open a TCP connection to a remote server.
+ *  @param p_Device SIM7080 device object
+ *  @param p_Socket Pointer to TCP socket object
+ *  @param PDP      (Optional) PDP context that should be used
+ *  @param p_Result (Optional) Pointer to TCP error code
+ *                  NOTE: Can be used for error tracking
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_TCP_Client_Connect(SIM7080_t& p_Device, SIM7080_TCP_Socket_t* p_Socket, uint8_t PDP = 0, SIM7080_TCP_Error_t* p_Result = NULL);
+
+/** @brief          Transmit a message string, including CR and LF, over TCP.
+ *  @param p_Device SIM7080 device object
+ *  @param p_Socket Pointer to TCP socket object
+ *  @param Message  Message string
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_TCP_Client_println(SIM7080_t& p_Device, SIM7080_TCP_Socket_t* p_Socket, std::string Message);
+
+/** @brief          Transmit a TCP message.
+ *  @param p_Device SIM7080 device object
+ *  @param p_Socket Pointer to TCP socket object
+ *  @param p_Buffer Pointer to data buffer
+ *  @param Length   Data length (maximum 1460 bytes)
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_TCP_Client_Transmit(SIM7080_t& p_Device, SIM7080_TCP_Socket_t* p_Socket, const void* p_Buffer, uint32_t Length);
+
+/** @brief          Receive a TCP message.
+ *  @param p_Device SIM7080 device object
+ *  @param p_Socket Pointer to TCP socket object
+ *  @param Length   Number of bytes to read from the buffer
+ *  @param p_Buffer Pointer to data buffer
+ *  @param p_Length Pointer to successfully read bytes
+ *                  NOTE: 0 when no data are available
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_TCP_Client_Receive(SIM7080_t& p_Device, SIM7080_TCP_Socket_t* p_Socket, uint32_t Length, void* p_Buffer, uint32_t* p_BytesRead);
+
+/** @brief          Close a TCP connection and release the socket.
+ *  @param p_Device SIM7080 device object
+ *  @param p_Socket Pointer to TCP socket object
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_TCP_Client_Destroy(SIM7080_t& p_Device, SIM7080_TCP_Socket_t* p_Socket);
+
 #endif /* SIM7080_TCPIP_H_ */

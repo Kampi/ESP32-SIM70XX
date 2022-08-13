@@ -51,14 +51,6 @@ static uart_config_t _UART_Config = {
 #endif
 };
 
-static gpio_config_t _GPIO_Config = {
-    .pin_bit_mask           = 0,
-    .mode                   = GPIO_MODE_OUTPUT,
-    .pull_up_en             = GPIO_PULLUP_DISABLE,
-    .pull_down_en           = GPIO_PULLDOWN_DISABLE,
-    .intr_type              = GPIO_INTR_DISABLE,
-};
-
 static const char* TAG = "SIM70XX_UART";
 
 /** @brief          Get a character from the UART FIFO.
@@ -84,23 +76,9 @@ static uint8_t SIM7020_UART_Get(SIM70XX_UART_Conf_t& p_Config)
     return c;
 }
 
-/** @brief          Read a character from the serial interface.
- *  @param p_Config Pointer to SIM70XX UART configuration object
- *  @return         Received character or -1 when no bytes available
- */
-static int SIM70XX_UART_Read(SIM70XX_UART_Conf_t& p_Config)
-{
-    if(SIM70XX_UART_Available(p_Config))
-    {
-        return SIM7020_UART_Get(p_Config);
-    }
-
-    return -1;
-}
-
 /** @brief          Wait for a character and read it.
  *  @param p_Config Pointer to SIM70XX UART configuration object
- *  @param Timeout  (Optional) Read timeout
+ *  @param Timeout  (Optional) Read timeout in milliseconds
  *  @return         Received character or -1 when no character received
  */
 static int SIM7020_UART_TimedRead(SIM70XX_UART_Conf_t& p_Config, uint32_t Timeout = 1000)
@@ -163,14 +141,11 @@ SIM70XX_Error_t SIM70XX_UART_Deinit(SIM70XX_UART_Conf_t& p_Config)
     {
         uart_flush(p_Config.Interface);
         uart_driver_delete(p_Config.Interface);
+        gpio_reset_pin(p_Config.Rx);
+        gpio_reset_pin(p_Config.Tx);
     }
 
     vSemaphoreDelete(p_Config.Lock);
-
-    _GPIO_Config.pin_bit_mask = ((1ULL << p_Config.Rx) | (1ULL << p_Config.Tx));
-    gpio_config(&_GPIO_Config);
-    gpio_set_level(p_Config.Rx, true);
-    gpio_set_level(p_Config.Tx, true);
 
     ESP_LOGI(TAG, "UART deinitialized...");
 
@@ -179,14 +154,18 @@ SIM70XX_Error_t SIM70XX_UART_Deinit(SIM70XX_UART_Conf_t& p_Config)
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM70XX_UART_Send(SIM70XX_UART_Conf_t& p_Config, std::string Data)
+SIM70XX_Error_t SIM70XX_UART_Send(SIM70XX_UART_Conf_t& p_Config, const void* p_Data, size_t Size)
 {
-    if(p_Config.isInitialized == false)
+    if(p_Data == NULL)
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+    else if(p_Config.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
-    uart_write_bytes(p_Config.Interface, (const char*)Data.c_str(), Data.length());
+    uart_write_bytes(p_Config.Interface, p_Data, Size);
 
     return SIM70XX_ERR_OK;
 }
@@ -204,7 +183,17 @@ SIM70XX_Error_t SIM70XX_UART_SendCommand(SIM70XX_UART_Conf_t& p_Config, std::str
     return SIM70XX_ERR_OK;
 }
 
-std::string SIM70XX_UART_ReadStringUntil(SIM70XX_UART_Conf_t& p_Config, char Terminator)
+int SIM70XX_UART_Read(SIM70XX_UART_Conf_t& p_Config)
+{
+    if(SIM70XX_UART_Available(p_Config) != 0)
+    {
+        return SIM7020_UART_Get(p_Config);
+    }
+
+    return -1;
+}
+
+std::string SIM70XX_UART_ReadStringUntil(SIM70XX_UART_Conf_t& p_Config, char Terminator, uint32_t Timeout)
 {
     int c;
     std::string Return;
@@ -214,11 +203,11 @@ std::string SIM70XX_UART_ReadStringUntil(SIM70XX_UART_Conf_t& p_Config, char Ter
         return std::string();
     }
 
-    c = SIM7020_UART_TimedRead(p_Config);
+    c = SIM7020_UART_TimedRead(p_Config, Timeout);
     while((c >= 0) && (c != Terminator))
     {
         Return += (char)c;
-        c = SIM7020_UART_TimedRead(p_Config);
+        c = SIM7020_UART_TimedRead(p_Config, Timeout);
     }
 
     return Return;
@@ -254,7 +243,7 @@ void SIM70XX_UART_Flush(SIM70XX_UART_Conf_t& p_Config)
     uart_flush(p_Config.Interface);
 }
 
-int SIM70XX_UART_Available(SIM70XX_UART_Conf_t& p_Config)
+size_t SIM70XX_UART_Available(SIM70XX_UART_Conf_t& p_Config)
 {
     size_t Avail;
 

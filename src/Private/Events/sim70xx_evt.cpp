@@ -125,6 +125,7 @@ static void SIM70XX_Evt_Task(void* p_Arg)
             vTaskDelay(10 / portTICK_PERIOD_MS);
         }
 
+        // Asynchronous responses from the module.
         // No messages pending. Get the asynchronous messages.
         if(Messages == 0)
         {
@@ -133,70 +134,19 @@ static void SIM70XX_Evt_Task(void* p_Arg)
             {
                 std::string* Message = new std::string();
 
-                // Get the response string.
+                // Get the event message.
                 do
                 {
                     Message->append(SIM70XX_UART_ReadString(Device->UART));
                 } while(SIM70XX_UART_Available(Device->UART));
 
-                ESP_LOGD(TAG, "Event: %s", Message->c_str());
+                ESP_LOGI(TAG, "Event: %s", Message->c_str());
 
-                // Shutdown message was received.
-                if(Message->find("NORMAL POWER DOWN") != std::string::npos)
-                {
-                    Device->Internal.isActive = false;
-
-                    // TODO: Event?
-
-                    delete Message;
-
-                    ESP_LOGI(TAG, "Power down event!");
-                }
-                else if(Message->find("EXIT PSM") != std::string::npos)
-                {
-                    SIM70XX_PSM_EVENT(Device, Message, false);
-                }
-                else if(Message->find("ENTER PSM") != std::string::npos)
-                {
-                    SIM70XX_PSM_EVENT(Device, Message, true);
-                }
-                #if(CONFIG_SIMXX_DEV == 7080)
-                    else if(Message->find("SMS Ready") != std::string::npos)
-                    {
-                        Device->Internal.isSMSReady = true;
-                    }
-                #endif
-                #ifdef CONFIG_SIM70XX_DRIVER_WITH_TCPIP
-                    else if(Message->find("+CSOERR") != std::string::npos)
-                    {
-                        SIM70XX_TCP_DISCONNECT_EVENT(Device, Message);
-                    }
-                #endif
-                #ifdef CONFIG_SIM70XX_DRIVER_WITH_MQTT
-                    else if(Message->find("+CMQPUB") != std::string::npos)
-                    {
-                        SIM70XX_MQTT_PUB_EVENT(Device, Message);
-                    }
-                    // Handle MQTT(S) socket disconnect events.
-                    else if(Message->find("+CMQDISCON") != std::string::npos)
-                    {
-                        SIM70XX_MQTT_DISCONNECT_EVENT(Device, Message);
-                    }
-                #endif
-                #ifdef CONFIG_SIM70XX_DRIVER_WITH_HTTP
-                    else if(Message->find("+CHTTPERR") != std::string::npos)
-                    {
-                        SIM70XX_HTTP_EVENT(Device, Message);
-                    }
-                #endif
-                // Handle all other messages by putting them into the event queue.
-                else
-                {
-                    xQueueSend(Device->Internal.EventQueue, &Message, 0);
-                }
+                SIM70XX_Evt_MessageFilter(Device, Message);
             }
         }
 
+        // Synchronous responses from the module.
         // All messages have been send. Now we need to handle the responses. We expect a response for each command.
         std::list<SIM70XX_CmdResp_t*>::iterator it = ActiveCommands.begin();
         while(it != ActiveCommands.end())
@@ -205,7 +155,7 @@ static void SIM70XX_Evt_Task(void* p_Arg)
 
             ESP_LOGD(TAG, "Active commands: %u", ActiveCommands.size());
 
-            SIM70XX_UART_ReadStringUntil(Device->UART, '\n');
+            SIM70XX_UART_ReadStringUntil(Device->UART);
 
             // Get the data from the command. The transmission has the following layout
             //  <CR><LF>+<Command>: <Data><CR><LF>
@@ -215,19 +165,14 @@ static void SIM70XX_Evt_Task(void* p_Arg)
                 Now = SIM70XX_Tools_GetmsTimer();
                 do
                 {
-                    size_t Index;
                     std::string Line;
 
                     // Read a new line from the serial interface.
                     // NOTE: The trailing \n is removed from the response!
-                    Line = std::string(SIM70XX_UART_ReadStringUntil(Device->UART, '\n'));
+                    Line = std::string(SIM70XX_UART_ReadStringUntil(Device->UART));
 
                     // Remove the line ending.
-                    Index = Line.find("\r");
-                    if(Index != std::string::npos)
-                    {
-                        Line.replace(Index, std::string("\r").size(), "");
-                    }
+                    SIMXX_TOOLS_REMOVE_LINEEND(Line);
 
                     if(Line.length() > 0)
                     {
@@ -278,7 +223,8 @@ static void SIM70XX_Evt_Task(void* p_Arg)
                         break;
                     }
                     // Abort when a timeout occurs.
-                    else if((SIM70XX_Tools_GetmsTimer() - Now) > (*it)->Timeout)
+                    // NOTE: Value 0 will disable the timeout function. This can be used by commands which will report a result anyway.
+                    else if(((*it)->Timeout != 0) && (SIM70XX_Tools_GetmsTimer() - Now) > (*it)->Timeout)
                     {
                         ESP_LOGE(TAG, "     Device response timout!");
 
@@ -301,10 +247,10 @@ static void SIM70XX_Evt_Task(void* p_Arg)
                 {
                     // Read a new line from the serial interface.
                     // NOTE: The trailing \n is removed from the response!
-                    (*it)->Status.append(SIM70XX_UART_ReadStringUntil(Device->UART, '\n'));
+                    (*it)->Status.append(SIM70XX_UART_ReadStringUntil(Device->UART));
 
                     // Abort when a timeout occurs.
-                    if((SIM70XX_Tools_GetmsTimer() - Now) > (*it)->Timeout)
+                    if(((*it)->Timeout != 0) && (SIM70XX_Tools_GetmsTimer() - Now) > (*it)->Timeout)
                     {
                         ESP_LOGE(TAG, "     Device status timout!");
 
@@ -317,8 +263,7 @@ static void SIM70XX_Evt_Task(void* p_Arg)
                 } while((*it)->Status.length() < 2);
 
                 // Remove the line endings.
-                (*it)->Status.erase(std::remove((*it)->Status.begin(), (*it)->Status.end(), '\r'), (*it)->Status.end());
-                (*it)->Status.erase(std::remove((*it)->Status.begin(), (*it)->Status.end(), '\n'), (*it)->Status.end());
+                SIMXX_TOOLS_REMOVE_LINEEND((*it)->Status);
 
                 // Transmission is without error when 'OK' as status code is transmitted and when no event data are received.
                 if((*it)->Status.find("OK") == std::string::npos)

@@ -20,42 +20,42 @@
 #ifndef SIM7020_H_
 #define SIM7020_H_
 
-#include "Misc/sim7020_pdp.h"
-#include "Misc/sim7020_info.h"
-#include "Definitions/sim7020_defs.h"
-#include "PowerManagement/sim7020_pwrmgnt.h"
+#include "sim7020_pdp.h"
+#include "sim7020_info.h"
+#include "sim7020_defs.h"
+#include "sim7020_pwrmgnt.h"
 #include "sim70xx_tools.h"
 #include "sim70xx_errors.h"
 
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "Definitions/Configs/sim7020_config_1nce.h"
-#include "Definitions/Configs/sim7020_config_fusion.h"
+#include "sim7020_config_1nce.h"
+#include "sim7020_config_fusion.h"
 
 #ifdef CONFIG_SIM70XX_DRIVER_WITH_NVRAM
-    #include "Misc/sim7020_nvram.h"
+    #include "sim7020_nvram.h"
 #endif
 
 #ifdef CONFIG_SIM70XX_DRIVER_WITH_TCPIP
-    #include "Protocols/sim7020_tcpip.h"
-    #include "Definitions/Configs/sim7020_config_ping.h"
+    #include "sim7020_tcpip.h"
+    #include "sim7020_config_ping.h"
 #endif
 
-#ifdef CONFIG_SIM70XX_DRIVER_WITH_SNTP
-    #include "Protocols/sim7020_sntp.h"
+#ifdef CONFIG_SIM70XX_DRIVER_WITH_NTP
+    #include "sim7020_ntp.h"
 #endif
 
 #ifdef CONFIG_SIM70XX_DRIVER_WITH_HTTP
-    #include "Protocols/sim7020_http.h"
+    #include "sim7020_http.h"
 #endif
 
 #ifdef CONFIG_SIM70XX_DRIVER_WITH_MQTT
-    #include "Protocols/sim7020_mqtt.h"
+    #include "sim7020_mqtt.h"
 #endif
 
 #ifdef CONFIG_SIM70XX_DRIVER_WITH_COAP
-    #include "Protocols/sim7020_coap.h"
+    #include "sim7020_coap.h"
 #endif
 
 /** @brief  Size of the command buffer of the SIM7020 module in bytes.
@@ -127,20 +127,20 @@ void SIM7020_Deinit(SIM7020_t& p_Device);
  */
 SIM70XX_Error_t SIM7020_SoftReset(SIM7020_t& p_Device, uint32_t Timeout = 10);
 
-/** @brief          Automatically set an enable a APN.
+/** @brief          Automatically set an enable an IP APN.
  *  @param p_Device SIM7020 device object
  *  @param APN      APN configuration object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_AutoAPN(SIM7020_t& p_Device, SIM70XX_APN_t APN);
+SIM70XX_Error_t SIM7020_IP_AutoAPN(SIM7020_t& p_Device, SIM70XX_APN_t APN);
 
-/** @brief          Manually set an enable a APN.
+/** @brief          Manually set an enable an IP APN.
  *  @param p_Device SIM7020 device object
  *  @param APN      APN configuration object
  *  @param CID      (Optional) PDP context ID
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_ManualAPN(SIM7020_t& p_Device, SIM70XX_APN_t APN, uint8_t CID = 0);
+SIM70XX_Error_t SIM7020_IP_ManualAPN(SIM7020_t& p_Device, SIM70XX_APN_t APN, uint8_t CID = 0);
 
 /** @brief          Set the default PSD connection settings.
  *  @param p_Device SIM7020 device object
@@ -209,12 +209,6 @@ SIM70XX_Error_t SIM7020_GetSIMStatus(SIM7020_t& p_Device, SIM7020_SIM_t* const p
  *  @return         #true when the SIM card is ready
  */
 bool SIM7020_isSIMReady(SIM7020_t& p_Device);
-
-/** @brief          Check if the module is connected with the GPRS service
- *  @param p_Device SIM7020 device object
- *  @return         #true when the module is connected to the GPRS service
- */
-bool SIM7020_isAttached(SIM7020_t& p_Device);
 
 /** @brief          Ping the module by sending an empty 'AT'.
  *  @param p_Device SIM7020 device object

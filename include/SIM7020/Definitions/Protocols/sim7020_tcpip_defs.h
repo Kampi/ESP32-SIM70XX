@@ -24,7 +24,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-/** @brief TCP connection error definitions.
+/** @brief SIM7020 TCP connection error definitions.
  */
 typedef enum
 {
@@ -43,7 +43,7 @@ typedef enum
     SIM7020_TCP_ERROR_PARAMETER,                    /**< Parameter error. */
 } SIM7020_TCP_Error_t;
 
-/** @brief TCP socket domains.
+/** @brief SIM7020 TCP socket domains.
  */
 typedef enum
 {
@@ -51,7 +51,7 @@ typedef enum
     SIM7020_TCP_DOMAIN_IPV6,                        /**< IPv4 socket. */
 } SIM7020_TCP_Domain_t;
 
-/** @brief TCP socket types.
+/** @brief SIM7020 TCP socket types.
  */
 typedef enum
 {
@@ -60,7 +60,7 @@ typedef enum
     SIM7020_TCP_TYPE_RAW,                           /**< RAW socket. */
 } SIM7020_TCP_Type_t;
 
-/** @brief TCP protocol types.
+/** @brief SIM7020 TCP protocol types.
  */
 typedef enum
 {
@@ -68,19 +68,19 @@ typedef enum
     SIM7020_TCP_PROT_ICMP,                          /**< ICMP protocol. */
 } SIM7020_TCP_Protocol_t;
 
-/** @brief DNS error codes.
+/** @brief SIM7020 DNS error codes.
  */
 typedef enum
 {
     SIM7020_DNS_ERR_NETWORK = 3,                    /**< Network error. */
     SIM7020_DNS_ERR_COMMON  = 8,                    /**< Common DNS error. */
-} SIM7020_DNS_Err_t;
+} SIM7020_DNS_Error_t;
 
 /** @brief SIM7020 ping configuration object.
  */
 typedef struct
 {
-    std::string IP;                                 /**< IP address of the remote host. */
+    std::string Host;                               /**< Name or IP address of the remote host. */
     int8_t Retries;                                 /**< The number of Ping Echo Request to send.
                                                          NOTE: -1 will use the default value (4). Minimum 1, Maximum 100. */
     int16_t DataLength;                             /**< The length of Ping Echo Request data.

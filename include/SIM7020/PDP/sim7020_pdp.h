@@ -22,7 +22,13 @@
 
 #include "sim7020_defs.h"
 #include "sim70xx_errors.h"
-#include "Definitions/Misc/sim7020_pdp_defs.h"
+#include "sim7020_pdp_defs.h"
+
+/** @brief          Check if the module is connected with the GPRS service
+ *  @param p_Device SIM7020 device object
+ *  @return         #true when the module is connected to the GPRS service
+ */
+bool SIM7020_PGP_GPRS_isAttached(SIM7020_t& p_Device);
 
 /** @brief              Get the PDP contexte.
  *  @param p_Device     SIM7020 device object

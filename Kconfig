@@ -83,9 +83,9 @@ menu "SIM70XX"
             help
                 Enable this option if you want TCP/IP support added to the driver.
 
-        config SIM70XX_DRIVER_WITH_SNTP
-            bool "Enable SNTP support"
-            depends on SIM70XX_DEV_SIM7020
+        config SIM70XX_DRIVER_WITH_NTP
+            bool "Enable NTP support"
+            depends on (SIM70XX_DEV_SIM7080 || SIM70XX_DEV_SIM7020)
             default n
             help
                 Enable this option if you want SNTP support added to the driver.
@@ -130,6 +130,7 @@ menu "SIM70XX"
     endmenu
 
     menu "Reset"
+        depends on SIM70XX_DEV_SIM7020
         config SIM70XX_RESET_USE_HW
             bool "Enable hardware reset"
             default n

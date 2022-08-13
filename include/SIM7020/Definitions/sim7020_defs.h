@@ -32,19 +32,19 @@
 #include <algorithm>
 
 #ifdef CONFIG_SIM70XX_DRIVER_WITH_COAP
-    #include "Protocols/sim7020_coap_defs.h"
+    #include "sim7020_coap_defs.h"
 #endif
 
 #ifdef CONFIG_SIM70XX_DRIVER_WITH_HTTP
-    #include "Protocols/sim7020_http_defs.h"
+    #include "sim7020_http_defs.h"
 #endif
 
 #ifdef CONFIG_SIM70XX_DRIVER_WITH_MQTT
-    #include "Protocols/sim7020_mqtt_defs.h"
+    #include "sim7020_mqtt_defs.h"
 #endif
 
 #ifdef CONFIG_SIM70XX_DRIVER_WITH_TCPIP
-    #include "Protocols/sim7020_tcpip_defs.h"
+    #include "sim7020_tcpip_defs.h"
 #endif
 
 #include "sim70xx_defs.h"
@@ -146,7 +146,6 @@ typedef struct
     std::vector<SIM70XX_Operator_t> Operators;              /**< */
     std::string Modes;                                      /**< */
     std::string Formats;                                    /**< */
-    SIM7020_PDP_Type_t PDP_Type;                            /**< The PDP type used by the device. */
     struct
     {
         std::string IP;                                     /**< Device IP address. */

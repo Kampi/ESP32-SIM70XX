@@ -56,7 +56,7 @@ SIM70XX_Error_t SIM7020_TCP_Ping(SIM7020_t& p_Device, SIM7020_Ping_t& p_Config, 
     }
     else
     {
-        p_Config.Retries = std::min(p_Config.Retries, 100);
+        p_Config.Retries = std::min(p_Config.Retries, (int8_t)100);
     }
 
     if(p_Config.DataLength <= -1)
@@ -79,7 +79,7 @@ SIM70XX_Error_t SIM7020_TCP_Ping(SIM7020_t& p_Device, SIM7020_Ping_t& p_Config, 
 
     // TODO: Copy implementation from SIM7080?
 
-    CommandStr = "AT+CIPPING=\"" + p_Config.IP + "\"," + std::to_string(p_Config.Retries) + "," + std::to_string(p_Config.DataLength) + "," + std::to_string(p_Config.Timeout);
+    CommandStr = "AT+CIPPING=\"" + p_Config.Host + "\"," + std::to_string(p_Config.Retries) + "," + std::to_string(p_Config.DataLength) + "," + std::to_string(p_Config.Timeout);
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CIPPING(CommandStr);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
@@ -101,10 +101,8 @@ SIM70XX_Error_t SIM7020_TCP_Ping(SIM7020_t& p_Device, SIM7020_Ping_t& p_Config, 
                 SIM7020_PingRes_t Result;
 
                 Temp = SIM70XX_Tools_SubstringSplitErase(&Response);
+                SIMXX_TOOLS_REMOVE_LINEEND(Temp);
 
-                // TODO: Kann hier crashen (wahrscheinlich Index)
-                Temp.replace(Temp.find("\r"), std::string("\r").size(), "");
-                Temp.replace(Temp.find("\n"), std::string("\n").size(), "");
                 Temp.replace(Temp.find("+CIPPING: "), std::string("+CIPPING: ").size(), "");
 
                 // Filter out the reply ID.

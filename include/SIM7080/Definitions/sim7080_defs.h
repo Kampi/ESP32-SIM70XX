@@ -32,9 +32,13 @@
 #include <algorithm>
 
 #include "sim70xx_defs.h"
-#include "Misc/sim7080_pdp_defs.h"
+#include "PDP/sim7080_pdp_defs.h"
 
 #include <sdkconfig.h>
+
+#ifdef CONFIG_SIM70XX_DRIVER_WITH_TCPIP
+    #include "sim7080_tcpip_defs.h"
+#endif
 
 /** @brief SIM7080 SIM card status codes definition.
  */
@@ -130,7 +134,6 @@ typedef enum
 typedef struct
 {
     SIM70XX_UART_Conf_t UART;                               /**< UART configuration object. */
-    SIM7080_PDP_Type_t PDP_Type;                            /**< The PDP type used by the device. */
     struct
     {
         SIM7080_NetRegistration_t Status;                   /**< Network status. */
@@ -143,6 +146,13 @@ typedef struct
                                                                  NOTE: Managed by the device driver. */                 
         } FS;
     #endif
+    #ifdef CONFIG_SIM70XX_DRIVER_WITH_TCPIP
+        struct
+        {
+            std::vector<SIM7080_TCP_Socket_t*> Sockets;     /**< List with pointer to active TCP sockets.
+                                                                 NOTE: Managed by the device driver. */
+        } TCP;
+    #endif
     struct
     {
         QueueHandle_t RxQueue;                              /**< Message receive (Module -> ESP32) queue.
@@ -154,8 +164,6 @@ typedef struct
         bool isInitialized;                                 /**< #true when the module is initialized and ready to use.
                                                                  NOTE: Managed by the device driver. */
         bool isActive;                                      /**< #true when the device is active and ready to use.
-                                                                 NOTE: Managed by the device driver. */
-        bool isSMSReady;                                    /**< #true when the device reports SMS ready.
                                                                  NOTE: Managed by the device driver. */
         TaskHandle_t TaskHandle;                            /**< Handle of the receive task.
                                                                  NOTE: Managed by the device driver. */

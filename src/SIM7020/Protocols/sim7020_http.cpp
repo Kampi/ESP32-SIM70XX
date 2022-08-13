@@ -274,6 +274,7 @@ SIM70XX_Error_t SIM7020_HTTP_POST(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_
 
 SIM70XX_Error_t SIM7020_HTTP_GET(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_Socket, std::string Path, uint8_t** p_Buffer, uint32_t* p_Length, uint16_t* p_ResponseCode)
 {
+    size_t Index;
     uint32_t Now;
     uint16_t ResponseCode;
     std::string Response;

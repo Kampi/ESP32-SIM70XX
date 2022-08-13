@@ -37,7 +37,6 @@ SIM70XX_Error_t SIM7080_TCP_Ping(SIM7080_t& p_Device, SIM7080_Ping_t& p_Config, 
     size_t Index;
     std::string Response;
     std::string CommandStr;
-    SIM70XX_Error_t Error = SIM70XX_ERR_OK;
     SIM70XX_TxCmd_t* Command;
 
     if(p_Device.Internal.isInitialized == false)
@@ -87,7 +86,7 @@ SIM70XX_Error_t SIM7080_TCP_Ping(SIM7080_t& p_Device, SIM7080_Ping_t& p_Config, 
         CommandStr = "AT+SNPING4=";
     }
 
-    CommandStr += "\"" + p_Config.IP + "\"," + std::to_string(p_Config.Retries) + "," + std::to_string(p_Config.Size) + "," + std::to_string(p_Config.Timeout);
+    CommandStr += "\"" + p_Config.Host + "\"," + std::to_string(p_Config.Retries) + "," + std::to_string(p_Config.Size) + "," + std::to_string(p_Config.Timeout);
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_SNPING(CommandStr, (uint16_t)p_Config.Retries);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
@@ -110,13 +109,10 @@ SIM70XX_Error_t SIM7080_TCP_Ping(SIM7080_t& p_Device, SIM7080_Ping_t& p_Config, 
         Result.IP = SIM70XX_Tools_SubstringSplitErase(&Dummy);
         Result.ReplyTime = std::stoi(SIM70XX_Tools_SubstringSplitErase(&Dummy));
 
-        ESP_LOGD(TAG, "IP: %s", Result.IP.c_str());
-        ESP_LOGD(TAG, "Reply time: %u", Result.ReplyTime);
-
         p_Result->push_back(Result);
     } while(Index != std::string::npos);
 
-    return Error;
+    return SIM70XX_ERR_OK;
 }
 
 #endif

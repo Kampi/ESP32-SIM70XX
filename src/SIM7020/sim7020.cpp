@@ -115,7 +115,7 @@ SIM70XX_Error_t SIM7020_Init(SIM7020_t& p_Device, SIM7020_Config_t& p_Config, ui
 	#endif
 
     vTaskSuspend(p_Device.Internal.TaskHandle);
-    SIM70XX_DisableEcho(p_Device.UART);
+    SIM70XX_Tools_DisableEcho(p_Device.UART);
     vTaskResume(p_Device.Internal.TaskHandle);
 
     SIM70XX_ERROR_CHECK(SIM7020_Ping(p_Device));
@@ -128,13 +128,12 @@ SIM70XX_Error_t SIM7020_Init(SIM7020_t& p_Device, SIM7020_Config_t& p_Config, ui
     }
 
     SIM70XX_ERROR_CHECK(SIM7020_SetFunctionality(p_Device, SIM7020_FUNC_MIN));    // TODO: Check this
-    SIM70XX_ERROR_CHECK(SIM7020_PDP_Define(p_Device, SIM7020_PDP_IP, p_Config.APN)); // TODO: CHange
+    //SIM70XX_ERROR_CHECK(SIM7020_PDP_GPRS_Define(p_Device, SIM7020_PDP_IP, p_Config.APN)); // TODO: CHange
     SIM70XX_ERROR_CHECK(SIM7020_SetOperator(p_Device, SIM_MODE_MANUAL, p_Config.OperatorFormat, p_Config.Operator));
     SIM70XX_ERROR_CHECK(SIM7020_SetFunctionality(p_Device, SIM7020_FUNC_FULL));    // TODO: Check this
     SIM70XX_ERROR_CHECK(SIM7020_SetBand(p_Device, p_Config.Band));
 
     SIM70XX_ERROR_CHECK(SIM7020_Info_GetNetworkRegistrationStatus(p_Device));
-    SIM70XX_ERROR_CHECK(SIM7020_Info_GetQuality(p_Device));
     //SIM70XX_ERROR_CHECK(SIM7020_PDP_ReadDynamicParameters(p_Device));
     //SIM70XX_ERROR_CHECK(SIM7020_PSM_GetEventStatus(p_Device, &p_Device.Internal.isPSMEvent));
 
@@ -202,8 +201,8 @@ SIM70XX_Error_t SIM7020_SoftReset(SIM7020_t& p_Device, uint32_t Timeout)
         // Reset the module.
         // NOTE: Echo mode is enabled after a reset!
         SIM70XX_UART_SendCommand(p_Device.UART, "ATZ");
-        Response = SIM70XX_UART_ReadStringUntil(p_Device.UART, '\n');
-        Response = SIM70XX_UART_ReadStringUntil(p_Device.UART, '\n');
+        Response = SIM70XX_UART_ReadStringUntil(p_Device.UART);
+        Response = SIM70XX_UART_ReadStringUntil(p_Device.UART);
         ESP_LOGI(TAG, "Response: %s", Response.c_str());
 
         // Check if the reset was successful.
@@ -232,13 +231,13 @@ SIM70XX_Error_t SIM7020_SoftReset(SIM7020_t& p_Device, uint32_t Timeout)
     return SIM70XX_ERR_FAIL;
 }
 
-SIM70XX_Error_t SIM7020_AutoAPN(SIM7020_t& p_Device, SIM70XX_APN_t APN)
+SIM70XX_Error_t SIM7020_IP_AutoAPN(SIM7020_t& p_Device, SIM70XX_APN_t APN)
 {
     // TODO:
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7080_ManualAPN(SIM7080_t& p_Device, SIM70XX_APN_t APN, uint8_t CID)
+SIM70XX_Error_t SIM7080_IP_ManualAPN(SIM7020_t& p_Device, SIM70XX_APN_t APN, uint8_t CID)
 {
     // TODO:
     return SIM70XX_ERR_OK;
@@ -295,8 +294,6 @@ SIM70XX_Error_t SIM7020_SetPSD(SIM7020_t& p_Device, SIM7020_PDP_Type_t PDP, SIM7
     }
 
     SIM70XX_ERROR_CHECK(SIM7020_SetFunctionality(p_Device, SIM7020_FUNC_FULL));
-
-    p_Device.PDP_Type = PDP;
 
     return SIM70XX_ERR_OK;
 }
@@ -625,28 +622,6 @@ bool SIM7020_isSIMReady(SIM7020_t& p_Device)
     }
 
     return false;      
-}
-
-bool SIM7020_isAttached(SIM7020_t& p_Device)
-{
-    std::string Response;
-    SIM70XX_TxCmd_t* Command;
-
-    if(p_Device.Internal.isInitialized == false)
-    {
-        return false;
-    }
-
-    SIM70XX_CREATE_CMD(Command);
-    *Command = SIM70XX_AT_CGATT_R;
-    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
-    {
-        return false;
-    }
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
-
-    return (bool)std::stoi(Response);
 }
 
 SIM70XX_Error_t SIM7020_Ping(SIM7020_t& p_Device)
