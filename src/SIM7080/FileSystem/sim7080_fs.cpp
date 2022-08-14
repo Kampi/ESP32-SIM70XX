@@ -54,7 +54,11 @@ static SIM70XX_Error_t SIM7080_FS_Init(SIM7080_t& p_Device)
     return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
 }
 
-SIM70XX_Error_t SIM7080_FS_Deinit(SIM7080_t& p_Device)
+/** @brief          Deinitialize the file system.
+ *  @param p_Device SIM7080 device object
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+static SIM70XX_Error_t SIM7080_FS_Deinit(SIM7080_t& p_Device)
 {
     SIM70XX_TxCmd_t* Command;
 
@@ -110,7 +114,7 @@ SIM70XX_Error_t SIM7080_FS_Write(SIM7080_t& p_Device, SIM7080_FS_Path_t Path, st
     SIM70XX_TxCmd_t* Command;
     SIM70XX_Error_t Error = SIM70XX_ERR_OK;
 
-    if((Name.length() > 230) || ((p_Buffer == NULL) && (Length > 0)) || (Length > SIM7080_FS_MAX_FILE_SIZE))
+    if((Name.size() > 230) || ((p_Buffer == NULL) && (Length > 0)) || (Length > SIM7080_FS_MAX_FILE_SIZE))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
@@ -167,7 +171,7 @@ SIM70XX_Error_t SIM7080_FS_Read(SIM7080_t& p_Device, SIM7080_FS_Path_t Path, std
     std::string Response;
     SIM70XX_TxCmd_t* Command;
 
-    if((Name.length() > 230) || ((p_Buffer == NULL) && (Length > 0)) || (Length > SIM7080_FS_MAX_FILE_SIZE) || ((UsePosition == true) && (Position > SIM7080_FS_MAX_FILE_SIZE)))
+    if((Name.size() > 230) || ((p_Buffer == NULL) && (Length > 0)) || (Length > SIM7080_FS_MAX_FILE_SIZE) || ((UsePosition == true) && (Position > SIM7080_FS_MAX_FILE_SIZE)))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }

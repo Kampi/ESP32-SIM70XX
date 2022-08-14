@@ -273,7 +273,7 @@ SIM70XX_Error_t SIM7020_SetPSD(SIM7020_t& p_Device, SIM7020_PDP_Type_t PDP, SIM7
         CommandStr = "AT*MCGDEFCONT=\"Non-IP\",\"" + APN.Name + "\"";
     }
 
-    if((APN.Username.length() > 0) && (APN.Password.length() > 0))
+    if((APN.Username.size() > 0) && (APN.Password.size() > 0))
     {
         CommandStr += ",\"" + APN.Username + "\",\"" + APN.Password + "\"";
     }
@@ -362,10 +362,10 @@ SIM70XX_Error_t SIM7020_GetOperator(SIM7020_t& p_Device, std::vector<SIM70XX_Ope
     *p_Modes = _RxCommand.Response.substring(Start, End);
 
     // Get the formats list.
-    *p_Formats = _RxCommand.Response.substring(End + 3, _RxCommand.Response.length() - 1);
+    *p_Formats = _RxCommand.Response.substring(End + 3, _RxCommand.Response.size() - 1);
 
     // Get the operators list.
-    _RxCommand.Response.remove(Start, _RxCommand.Response.length() - Start);
+    _RxCommand.Response.remove(Start, _RxCommand.Response.size() - Start);
     OperatorList = _RxCommand.Response.substring(_RxCommand.Response.indexOf("("), _RxCommand.Response.lastIndexOf(")") + 1);
 
     ESP_LOGD(TAG, "Operator list: %s", OperatorList.c_str());
@@ -383,7 +383,7 @@ SIM70XX_Error_t SIM7020_GetOperator(SIM7020_t& p_Device, std::vector<SIM70XX_Ope
         Dummy.replace("(", "");
         Dummy.replace(")", "");
 
-        if(Dummy.length() > 0)
+        if(Dummy.size() > 0)
         {
             int End;
             int Index = 0;
@@ -411,7 +411,7 @@ SIM70XX_Error_t SIM7020_GetOperator(SIM7020_t& p_Device, std::vector<SIM70XX_Ope
 
             p_Operator->push_back(Operator);
         }
-    } while(Dummy.length() > 0);
+    } while(Dummy.size() > 0);
 
     ESP_LOGD(TAG, "Found %u operators...", p_Operator->size());
 

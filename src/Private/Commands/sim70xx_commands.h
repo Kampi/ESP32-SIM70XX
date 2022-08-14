@@ -20,9 +20,9 @@
 #ifndef SIM70XX_COMMANDS_H_
 #define SIM70XX_COMMANDS_H_
 
-#include <sdkconfig.h>
-
 #include "../Queue/sim70xx_queue.h"
+
+#include <sdkconfig.h>
 
 /** @brief      Create a new command object.
  *              An error is generated when no memory is available for allocation.

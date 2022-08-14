@@ -52,7 +52,7 @@ SIM70XX_Error_t SIM7020_MQTT_Create(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* 
     std::string CommandStr;
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Socket == NULL) || (p_Socket->Timeout > 60000) || (p_Socket->BufferSize < 20) || (p_Socket->BufferSize > 1132) || (p_Socket->Broker.length() > 50) || (p_Socket->CID > 10))
+    if((p_Socket == NULL) || (p_Socket->Timeout > 60000) || (p_Socket->BufferSize < 20) || (p_Socket->BufferSize > 1132) || (p_Socket->Broker.size() > 50) || (p_Socket->CID > 10))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
@@ -106,8 +106,8 @@ SIM70XX_Error_t SIM7020_MQTT_Connect(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t*
     std::string CommandStr;
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Socket == NULL) || (p_Socket->Version < SIM7020_MQTT_31) || (p_Socket->Version > SIM7020_MQTT_311) || (p_Socket->ClientID.length() == 0) || (p_Socket->ClientID.length() > 120) || (p_Socket->KeepAlive > 64800) || 
-        (p_Socket->WillFlag && ((p_Socket->LastWill.Topic.length() == 0) || (p_Socket->LastWill.Message.length() == 0))) || ((p_Socket->Username.length() > 100) && (p_Socket->Passwort.length() > 100)))
+    if((p_Socket == NULL) || (p_Socket->Version < SIM7020_MQTT_31) || (p_Socket->Version > SIM7020_MQTT_311) || (p_Socket->ClientID.size() == 0) || (p_Socket->ClientID.size() > 120) || (p_Socket->KeepAlive > 64800) || 
+        (p_Socket->WillFlag && ((p_Socket->LastWill.Topic.size() == 0) || (p_Socket->LastWill.Message.size() == 0))) || ((p_Socket->Username.size() > 100) && (p_Socket->Passwort.size() > 100)))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
@@ -132,7 +132,7 @@ SIM70XX_Error_t SIM7020_MQTT_Connect(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t*
         CommandStr += "";
     }
 
-    if((p_Socket->Username.length() > 0) && (p_Socket->Passwort.length() > 0))
+    if((p_Socket->Username.size() > 0) && (p_Socket->Passwort.size() > 0))
     {
         CommandStr += ",\"" + p_Socket->Username + "\",\"" + p_Socket->Passwort + "\"";
     }
@@ -153,7 +153,7 @@ SIM70XX_Error_t SIM7020_MQTT_Connect(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t*
 
 SIM70XX_Error_t SIM7020_MQTT_Publish(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* p_Socket, std::string Topic, SIM7020_MQTT_QoS_t QoS, std::string Message, bool Retained, bool Dup)
 {
-    return SIM7020_MQTT_Publish(p_Device, p_Socket, Topic, QoS, Message.c_str(), Message.length(), Retained, Dup);
+    return SIM7020_MQTT_Publish(p_Device, p_Socket, Topic, QoS, Message.c_str(), Message.size(), Retained, Dup);
 }
 
 SIM70XX_Error_t SIM7020_MQTT_Publish(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* p_Socket, std::string Topic, SIM7020_MQTT_QoS_t QoS, const void* p_Buffer, uint32_t Length, bool Retained, bool Dup)
@@ -163,7 +163,7 @@ SIM70XX_Error_t SIM7020_MQTT_Publish(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t*
     std::string CommandStr;
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Socket == NULL) || (p_Buffer == NULL) || (Topic.length() > 128) || (QoS < SIM7020_MQTT_QOS_0) || (QoS > SIM7020_MQTT_QOS_2) || (Length < 2) || (Length > 1000))
+    if((p_Socket == NULL) || (p_Buffer == NULL) || (Topic.size() > 128) || (QoS < SIM7020_MQTT_QOS_0) || (QoS > SIM7020_MQTT_QOS_2) || (Length < 2) || (Length > 1000))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
@@ -194,7 +194,7 @@ SIM70XX_Error_t SIM7020_MQTT_Subscribe(SIM7020_t& p_Device, SIM7020_MQTT_Socket_
     std::string Response;
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Socket == NULL) || (Topic.length() > 128) || (QoS < SIM7020_MQTT_QOS_0) || (QoS > SIM7020_MQTT_QOS_2))
+    if((p_Socket == NULL) || (Topic.size() > 128) || (QoS < SIM7020_MQTT_QOS_0) || (QoS > SIM7020_MQTT_QOS_2))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
@@ -259,7 +259,7 @@ SIM70XX_Error_t SIM7020_MQTT_Unsubscribe(SIM7020_t& p_Device, SIM7020_MQTT_Socke
 {
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Socket == NULL) || (Topic.length() > 128))
+    if((p_Socket == NULL) || (Topic.size() > 128))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }

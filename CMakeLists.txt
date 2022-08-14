@@ -4,6 +4,7 @@ set(COMPONENT_SRCS
 
     # SIM7080
     "src/SIM7080/sim7080.cpp"
+    "src/SIM7080/SSL/sim7080_ssl.cpp"
     "src/SIM7080/Protocols/sim7080_ntp.cpp"
     "src/SIM7080/Protocols/sim7080_dns.cpp"
     "src/SIM7080/Protocols/sim7080_dns.cpp"
@@ -49,11 +50,13 @@ set(COMPONENT_ADD_INCLUDEDIRS
     # SIM7080
     "include/SIM7080"
 	"include/SIM7080/PDP"
+	"include/SIM7080/SSL"
 	"include/SIM7080/Misc"
 	"include/SIM7080/Protocols"
 	"include/SIM7080/FileSystem"
 	"include/SIM7080/Definitions"
 	"include/SIM7080/Definitions/PDP"
+	"include/SIM7080/Definitions/SSL"
 	"include/SIM7080/Definitions/Misc"
 	"include/SIM7080/Definitions/Configs"
 	"include/SIM7080/Definitions/Protocols"

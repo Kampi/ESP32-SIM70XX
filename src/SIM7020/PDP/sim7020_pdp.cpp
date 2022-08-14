@@ -125,7 +125,7 @@ SIM70XX_Error_t SIM7020_PDP_GetStatus(SIM7020_t& p_Device, std::vector<SIM7020_P
         }
 
         p_Status->push_back(Status);
-    } while(Response.length() > 0);
+    } while(Response.size() > 0);
 
     return SIM70XX_ERR_OK;
 }
@@ -166,7 +166,7 @@ SIM70XX_Error_t SIM7020_PDP_ReadDynamicParameters(SIM7020_t& p_Device)
 */
     // Get the IP address and the subnet mask.
     Dummy = Response.substr(Response.find_last_of(",") + 1);
-    Response.erase(Response.find("," + Dummy), std::string("," + Dummy).length());
+    Response.erase(Response.find("," + Dummy), std::string("," + Dummy).size());
     Dummy.erase(std::remove(Dummy.begin(), Dummy.end(), '\"'), Dummy.end()); 
 
     // Filter out the IP address.

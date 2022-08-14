@@ -20,17 +20,19 @@
 #ifndef SIM7080_H_
 #define SIM7080_H_
 
+#include <stdint.h>
+#include <stdbool.h>
+
 #include "sim7080_pdp.h"
 #include "sim7080_info.h"
 #include "sim7080_defs.h"
 #include "sim70xx_tools.h"
 #include "sim70xx_errors.h"
 
-#include <stdint.h>
-#include <stdbool.h>
-
 #include "sim7080_config_1nce.h"
 #include "sim7080_config_fusion.h"
+
+#include <sdkconfig.h>
 
 #ifdef CONFIG_SIM70XX_DRIVER_WITH_FS
     #include "sim7080_fs.h"
@@ -51,6 +53,10 @@
 
 #ifdef CONFIG_SIM70XX_DRIVER_WITH_EMAIL
     #include "sim7080_email.h"
+#endif
+
+#ifdef CONFIG_SIM70XX_DRIVER_WITH_SSL
+    #include "sim7080_ssl.h"
 #endif
 
 /** @brief          Check if the module is initialized.

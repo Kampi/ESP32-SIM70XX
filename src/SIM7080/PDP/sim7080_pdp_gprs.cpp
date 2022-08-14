@@ -62,7 +62,7 @@ SIM70XX_Error_t SIM7080_PDP_GPRS_Define(SIM7080_t& p_Device, SIM7080_PDP_GPRS_Ty
         CommandStr = "AT+CGDCONT=" + std::to_string(PDP) + ",\"Non-IP\",\"" + APN.Name + "\"";
     }
 
-    if((APN.Username.length() > 0) && (APN.Password.length() > 0))
+    if((APN.Username.size() > 0) && (APN.Password.size() > 0))
     {
         CommandStr += ",\"" + APN.Username + "\",\"" + APN.Password + "\"";
     }

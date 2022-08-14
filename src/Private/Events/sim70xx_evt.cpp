@@ -106,7 +106,7 @@ static void SIM70XX_Evt_Task(void* p_Arg)
                 Command->recData = CmdObj->recData;
                 Command->Timeout = CmdObj->Timeout * 1000;
                 Command->Lines = CmdObj->Lines;
-                Command->Length = CmdObj->Command.length();
+                Command->Length = CmdObj->Command.size();
                 ActiveCommands.push_back(Command);
 
                 ESP_LOGI(TAG, "Transmit command: %s", CmdObj->Command.c_str());
@@ -174,7 +174,7 @@ static void SIM70XX_Evt_Task(void* p_Arg)
                     // Remove the line ending.
                     SIMXX_TOOLS_REMOVE_LINEEND(Line);
 
-                    if(Line.length() > 0)
+                    if(Line.size() > 0)
                     {
                         ESP_LOGI(TAG, "     Device response: %s", Line.c_str());
                     }
@@ -189,7 +189,7 @@ static void SIM70XX_Evt_Task(void* p_Arg)
                         break;
                     }
                     // Filter out empty lines.
-                    else if(Line.length() > 0)
+                    else if(Line.size() > 0)
                     {
                         size_t Index;
 
@@ -218,7 +218,7 @@ static void SIM70XX_Evt_Task(void* p_Arg)
                         }
                     }
                     // Abort when an empty line was received.
-                    else if((Line.length() == 0) && ((*it)->Lines == 0))
+                    else if((Line.size() == 0) && ((*it)->Lines == 0))
                     {
                         break;
                     }
@@ -260,7 +260,7 @@ static void SIM70XX_Evt_Task(void* p_Arg)
                     }
 
                     vTaskDelay(20 / portTICK_PERIOD_MS);
-                } while((*it)->Status.length() < 2);
+                } while((*it)->Status.size() < 2);
 
                 // Remove the line endings.
                 SIMXX_TOOLS_REMOVE_LINEEND((*it)->Status);

@@ -21,12 +21,8 @@
 
 #if(CONFIG_SIMXX_DEV == 7080)
 
-#include <esp_log.h>
-
 #include "sim7080.h"
 #include "sim7080_evt.h"
-
-static const char* TAG = "SIM7080_Evt";
 
 void SIM70XX_Evt_MessageFilter(void* p_Device, std::string* p_Message)
 {

@@ -24,12 +24,6 @@
 #include "sim70xx_errors.h"
 #include "sim7080_fs_defs.h"
 
-/** @brief          Deinitialize the file system.
- *  @param p_Device SIM7080 device object
- *  @return         SIM70XX_ERR_OK when successful
- */
-SIM70XX_Error_t SIM7080_FS_Deinit(SIM7080_t& p_Device);
-
 /** @brief          Write a file into the file system.
  *  @param p_Device SIM7080 device object
  *  @param Path     Directory path

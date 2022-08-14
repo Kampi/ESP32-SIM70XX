@@ -117,6 +117,12 @@ SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t& p_Conf
         SIM70XX_ERROR_CHECK(SIM7080_SetBandConfig(p_Device, p_Config.Mode, p_Config.Bandlist));
     }
 
+    // Disable all PDP contextes.
+    for(uint8_t i = 0; i < 4; i++)
+    {
+        SIM7080_PDP_IP_Action(p_Device, i, SIM7080_PDP_DISABLE);
+    }
+
     return SIM70XX_ERR_OK;
 }
 
@@ -147,8 +153,7 @@ SIM70XX_Error_t SIM7080_SoftReset(SIM7080_t& p_Device, uint32_t Timeout)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
-
-    if(p_Device.Internal.TaskHandle != NULL)
+    else if(p_Device.Internal.TaskHandle != NULL)
     {
         vTaskSuspend(p_Device.Internal.TaskHandle);
     }
@@ -593,8 +598,8 @@ SIM70XX_Error_t SIM7080_SetFunctionality(SIM7080_t& p_Device, SIM7080_Func_t Fun
         }
     }
     // Device is in full functionality -> Transition into another functionality
-    //  Response = +CPIN: NOT READY
-    //  Status = OK
+    //  Response = +APP PDP: 0,DEACTIVE
+    //  Status = +CPIN: NOT READY
     else if(p_Device.Connection.Functionality == SIM7080_FUNC_FULL)
     {
         ESP_LOGI(TAG, "Last: Full functionality...");

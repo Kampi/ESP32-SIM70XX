@@ -36,7 +36,7 @@ SIM70XX_Error_t SIM7020_NVRAM_Write(SIM7020_t& p_Device, std::string Key, const 
     SIM70XX_TxCmd_t* Command;
     SIM7020_NVRAM_Error_t Error;
 
-    if((Key.length() < 1) || (Key.length() > 20) || (Data.length() < 1) || (Data.length() > 1024))
+    if((Key.size() < 1) || (Key.size() > 20) || (Data.size() < 1) || (Data.size() > 1024))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
@@ -48,7 +48,7 @@ SIM70XX_Error_t SIM7020_NVRAM_Write(SIM7020_t& p_Device, std::string Key, const 
     ESP_LOGD(TAG, "Writing to NVRAM...");
 
     SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7020_AT_CNVMW(Key, Data, Data.length());
+    *Command = SIM7020_AT_CNVMW(Key, Data, Data.size());
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
     if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
@@ -86,7 +86,7 @@ SIM70XX_Error_t SIM7020_NVRAM_Read(SIM7020_t& p_Device, std::string Key, std::st
     SIM70XX_TxCmd_t* Command;
     SIM7020_NVRAM_Error_t Error;
 
-    if((p_Payload == NULL) || (Key.length() < 1) || (Key.length() > 20))
+    if((p_Payload == NULL) || (Key.size() < 1) || (Key.size() > 20))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
@@ -145,7 +145,7 @@ SIM70XX_Error_t SIM7020_NVRAM_Erase(SIM7020_t& p_Device, std::string Key, SIM702
     SIM70XX_TxCmd_t* Command;
     SIM7020_NVRAM_Error_t Error;
 
-    if((Key.length() < 1) || (Key.length() > 20))
+    if((Key.size() < 1) || (Key.size() > 20))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
@@ -214,7 +214,7 @@ SIM70XX_Error_t SIM7020_NVRAM_GetKeys(SIM7020_t& p_Device, std::vector<std::stri
 
         Key = Response.substr(0, Index);
 
-        if(Key.length() < 1)
+        if(Key.size() < 1)
         {
             break;
         }

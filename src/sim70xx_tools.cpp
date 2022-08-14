@@ -53,13 +53,13 @@ void SIM70XX_Tools_Hex2ASCII(std::string Hex, uint8_t* const p_Buffer)
     uint8_t Low = 0;
     uint8_t High = 0;
 
-    if((p_Buffer == NULL) || ((Hex.length() % 2) != 0))
+    if((p_Buffer == NULL) || ((Hex.size() % 2) != 0))
     {
         return;
     }
 
     Offset = 0;
-    for(uint32_t i = 0; i < Hex.length(); i++)
+    for(uint32_t i = 0; i < Hex.size(); i++)
     {
         uint8_t Temp = 0;
 
@@ -148,7 +148,7 @@ bool SIM70XX_Tools_isActive(SIM70XX_UART_Conf_t& p_Config)
         {
             Result = true;
         }
-    } while(Response.length() > 0);
+    } while(Response.size() > 0);
 
     if(SIM70XX_UART_Deinit(p_Config) != SIM70XX_ERR_OK)
     {

@@ -1,5 +1,5 @@
  /*
- * sim7080_ntp.h
+ * sim7080_ssl.h
  *
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -17,24 +17,36 @@
  * Errors and commissions should be reported to DanielKampert@kampis-elektroecke.de.
  */
 
-#ifndef SIM7080_NTP_H_
-#define SIM7080_NTP_H_
-
-#include <time.h>
+#ifndef SIM7080_SSL_H_
+#define SIM7080_SSL_H_
 
 #include "sim7080_defs.h"
 #include "sim70xx_errors.h"
-#include "sim7080_ntp_defs.h"
+#include "sim7080_ssl_defs.h"
 
-/** @brief              Sync the local time with the time from an NTP server.
+/** @brief          
+ *  @param p_Device SIM7080 device object
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_SSL_Configure(SIM7080_t& p_Device);
+
+/** @brief          Import the root certificate authority on the device.
+ *  @param p_Device SIM7080 device object
+ *  @param Path     Directory path
+ *  @param RootCA   Client certificate file
+ *  @param CID      (Optional) SSL CID
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_SSL_ImportRoot(SIM7080_t& p_Device, SIM7080_FS_Path_t Path, SIM7080_SSL_Type_t Type, SIM7080_SSL_File_t RootCA, uint8_t CID = 0);
+
+/** @brief              Import the client key and the client certificate on the device.
  *  @param p_Device     SIM7080 device object
- *  @param Server       NTP server
- *  @param Timezone     Timezone
- *  @param p_Time       Pointer to local time
- *  @param p_Error      (Optional) NTP synchronization error code
- *  @param CID          (Optional) NTP CID
+ *  @param Path         Directory path
+ *  @param Client_Cer   Client certificate file
+ *  @param Client_Key   Client key file
+ *  @param CID          (Optional) SSL CID
  *  @return             SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_NTP_Sync(SIM7080_t& p_Device, std::string Server, int8_t TimeZone, struct tm* p_Time, SIM7080_NTP_Error_t* p_Error = NULL, uint8_t CID = 0);
+SIM70XX_Error_t SIM7080_SSL_ImportCert(SIM7080_t& p_Device, SIM7080_FS_Path_t Path, SIM7080_SSL_File_t Client_Cer, SIM7080_SSL_File_t Client_Key, uint8_t CID = 0);
 
-#endif /* SIM7080_NTP_H_ */
+#endif /* SIM7080_SSL_H_ */

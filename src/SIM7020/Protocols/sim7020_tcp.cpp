@@ -150,7 +150,7 @@ SIM70XX_Error_t SIM7020_TCP_TransmitString(SIM7020_t& p_Device, SIM7020_TCP_Sock
 {
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Socket == NULL) || (Data.length() > 512) || (p_Socket->Type != SIM7020_TCP_TYPE_TCP))
+    if((p_Socket == NULL) || (Data.size() > 512) || (p_Socket->Type != SIM7020_TCP_TYPE_TCP))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }

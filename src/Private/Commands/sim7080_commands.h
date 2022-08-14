@@ -86,6 +86,13 @@
 
 /**
  * 
+ * Used in SIM7080 SSL driver.
+ * 
+ */
+#define SIM7020_AT_CSSLCFG(Command)                             SIM70XX_CMD(Command, false, 10, 1)
+
+/**
+ * 
  * Used in SIM7080 file system driver.
  * 
  */

@@ -26,7 +26,7 @@ static void HTTP_Transmit(void)
 
     SIM7020_HTTP_Create(&_Device, "https://webhook.site", &Socket);
     SIM7020_HTTP_Connect(&_Device, &Socket);
-    SIM7020_HTTP_POST(&_Device, &Socket, "/044baec6-adc5-4e4c-aedb-6414c20497ff", "application/json", Header, Payload.c_str(), Payload.length());
+    SIM7020_HTTP_POST(&_Device, &Socket, "/044baec6-adc5-4e4c-aedb-6414c20497ff", "application/json", Header, Payload.c_str(), Payload.size());
     SIM7020_HTTP_Disconnect(&_Device, &Socket);
     SIM7020_HTTP_Destroy(&_Device, &Socket);
 }

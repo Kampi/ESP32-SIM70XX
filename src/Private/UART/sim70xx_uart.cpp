@@ -177,7 +177,7 @@ SIM70XX_Error_t SIM70XX_UART_SendLine(SIM70XX_UART_Conf_t& p_Config, std::string
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
-    uart_write_bytes(p_Config.Interface, Data.c_str(), Data.length());
+    uart_write_bytes(p_Config.Interface, Data.c_str(), Data.size());
     uart_write_bytes(p_Config.Interface, "\r\n", 2);
 
     return SIM70XX_ERR_OK;

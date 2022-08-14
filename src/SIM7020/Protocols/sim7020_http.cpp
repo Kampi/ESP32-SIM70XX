@@ -127,7 +127,7 @@ SIM70XX_Error_t SIM7020_HTTP_Connect(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t*
 
 SIM70XX_Error_t SIM7020_HTTP_POST(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_Socket, std::string Path, std::string ContentType, std::string Header, std::string Payload, uint16_t* p_ResponseCode)
 {
-    return SIM7020_HTTP_POST(p_Device, p_Socket, Path, ContentType, Header, Payload.c_str(), Payload.length(), p_ResponseCode);
+    return SIM7020_HTTP_POST(p_Device, p_Socket, Path, ContentType, Header, Payload.c_str(), Payload.size(), p_ResponseCode);
 }
 
 SIM70XX_Error_t SIM7020_HTTP_POST(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_Socket, std::string Path, std::string ContentType, std::string Header, const void* p_Buffer, uint32_t Length, uint16_t* p_ResponseCode)
@@ -158,30 +158,30 @@ SIM70XX_Error_t SIM7020_HTTP_POST(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_
     }
 
     // Prepare the header packet.
-    SIM70XX_Tools_ASCII2Hex(Header.c_str(), Header.length(), &Buffer_Hex);
+    SIM70XX_Tools_ASCII2Hex(Header.c_str(), Header.size(), &Buffer_Hex);
     Packet = std::to_string(p_Socket->ID) + "," +
              std::to_string(SIM7020_HTTP_REQ_POST) + "," +
-             std::to_string(Path.length()) + "," +
+             std::to_string(Path.size()) + "," +
              "\"" + Path + "\"" + "," +
-             std::to_string(Buffer_Hex.length()) + "," +
+             std::to_string(Buffer_Hex.size()) + "," +
              Buffer_Hex + "," +
-             std::to_string(ContentType.length()) + "," +
+             std::to_string(ContentType.size()) + "," +
              "\"" + ContentType + "\",";
 
     // The length of the payload length and the trailing comma.
-    PayloadLength_Length = std::to_string(Length_Temp * 2).length() + 1;
+    PayloadLength_Length = std::to_string(Length_Temp * 2).size() + 1;
 
     // The total length is calculated with 
     //  - The length of the first packet, beginning with the socket ID  +
     //  - The length of the payload (multiplied by 2, because ASCII)    +
     //  - The length of the payload length                              +
     //  - 1 (for the comma)
-    TotalLength = Packet.length() + (Length_Temp * 2) + PayloadLength_Length;
+    TotalLength = Packet.size() + (Length_Temp * 2) + PayloadLength_Length;
 
     // Transmit the header.
     CommandStr = "AT+CHTTPSENDEXT=" + std::to_string(1) + "," +
                                       std::to_string(TotalLength) + "," +
-                                      std::to_string(Packet.length()) + "," +
+                                      std::to_string(Packet.size()) + "," +
                                       Packet;
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CHTTPSENDEXT(CommandStr);
@@ -217,7 +217,7 @@ SIM70XX_Error_t SIM7020_HTTP_POST(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_
             //  <1/0>, <TotalLength>,<Payload Length + Number of Chars for the Payload length + 1>,<Payload Length>
             CommandStr = "AT+CHTTPSENDEXT=" + std::to_string(isAdditionalPackets) + "," +
                                               std::to_string(TotalLength) + "," +
-                                              std::to_string(Buffer_Hex.length() + PayloadLength_Length) + "," +
+                                              std::to_string(Buffer_Hex.size() + PayloadLength_Length) + "," +
                                               Packet;
 
             isFirstPacket = false;
@@ -226,7 +226,7 @@ SIM70XX_Error_t SIM7020_HTTP_POST(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_
         {
             CommandStr = "AT+CHTTPSENDEXT=" + std::to_string(isAdditionalPackets) + "," +
                                               std::to_string(TotalLength) + "," +
-                                              std::to_string(Buffer_Hex.length()) + "," + Buffer_Hex;
+                                              std::to_string(Buffer_Hex.size()) + "," + Buffer_Hex;
         }
 
         SIM70XX_CREATE_CMD(Command);
@@ -328,7 +328,7 @@ SIM70XX_Error_t SIM7020_HTTP_GET(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_S
 
     // Remove the header and the command from the response.
     Index = Response.find("+CHTTPNMIC: " + std::to_string(p_Socket->ID) + ",");
-    Response = Response.substr(Index + std::string("+CHTTPNMIC: " + std::to_string(p_Socket->ID) + ",").length());
+    Response = Response.substr(Index + std::string("+CHTTPNMIC: " + std::to_string(p_Socket->ID) + ",").size());
 
     // Get the additional data flag.
     // TODO: Must be implemented

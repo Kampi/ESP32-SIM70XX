@@ -123,8 +123,15 @@ menu "SIM70XX"
             depends on SIM70XX_DEV_SIM7020
             default n
             help
-                Enable this option if you want NWR support added to the driver.
+                Enable this option if you want NWRAM support added to the driver.
 
+        config SIM70XX_DRIVER_WITH_SSL
+            bool "Enable SSL support"
+            select SIM70XX_DRIVER_WITH_FS
+            depends on SIM70XX_DEV_SIM7080 && (SIM70XX_DRIVER_WITH_HTTP || SIM70XX_DRIVER_WITH_FTP || SIM70XX_DRIVER_WITH_TCPIP || SIM70XX_DRIVER_WITH_MQTT || SIM70XX_DRIVER_WITH_EMAIL)
+            default n
+            help
+                Enable this option if you want SSL support added to the driver.
     endmenu
 
     menu "UART"

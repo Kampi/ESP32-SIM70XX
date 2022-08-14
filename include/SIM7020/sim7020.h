@@ -20,6 +20,9 @@
 #ifndef SIM7020_H_
 #define SIM7020_H_
 
+#include <stdint.h>
+#include <stdbool.h>
+
 #include "sim7020_pdp.h"
 #include "sim7020_info.h"
 #include "sim7020_defs.h"
@@ -27,11 +30,10 @@
 #include "sim70xx_tools.h"
 #include "sim70xx_errors.h"
 
-#include <stdint.h>
-#include <stdbool.h>
-
 #include "sim7020_config_1nce.h"
 #include "sim7020_config_fusion.h"
+
+#include <sdkconfig.h>
 
 #ifdef CONFIG_SIM70XX_DRIVER_WITH_NVRAM
     #include "sim7020_nvram.h"
