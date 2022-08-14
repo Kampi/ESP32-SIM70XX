@@ -25,7 +25,6 @@
 
 #include "sim7020.h"
 #include "sim7020_nvram.h"
-#include "sim70xx_tools.h"
 #include "../../Private/Queue/sim70xx_queue.h"
 #include "../../Private/Commands/sim70xx_commands.h"
 

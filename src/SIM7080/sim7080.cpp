@@ -159,7 +159,7 @@ SIM70XX_Error_t SIM7080_SoftReset(SIM7080_t& p_Device, uint32_t Timeout)
     {
         // Reset the module.
         // NOTE: Echo mode is enabled after a reset!
-        SIM70XX_UART_SendCommand(p_Device.UART, "ATZ");
+        SIM70XX_UART_SendLine(p_Device.UART, "ATZ");
         Response = SIM70XX_UART_ReadStringUntil(p_Device.UART);
         Response = SIM70XX_UART_ReadStringUntil(p_Device.UART);
         ESP_LOGI(TAG, "Response: %s", Response.c_str());

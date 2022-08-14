@@ -1,5 +1,5 @@
  /*
- * sim7080_ntp.h
+ * sim7080_fs_defs.h
  *
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -17,24 +17,20 @@
  * Errors and commissions should be reported to DanielKampert@kampis-elektroecke.de.
  */
 
-#ifndef SIM7080_NTP_H_
-#define SIM7080_NTP_H_
+#ifndef SIM7080_FS_DEFS_H_
+#define SIM7080_FS_DEFS_H_
 
-#include <time.h>
+#include <stdint.h>
+#include <stdbool.h>
 
-#include "sim7080_defs.h"
-#include "sim70xx_errors.h"
-#include "sim7080_ntp_defs.h"
-
-/** @brief              Sync the local time with the time from an NTP server.
- *  @param p_Device     SIM7080 device object
- *  @param Server       
- *  @param Timezone     
- *  @param p_Time       Pointer to local time
- *  @param p_Error      (Optional) NTP synchronization error code
- *  @param CID          (Optional) NTP CID
- *  @return             SIM70XX_ERR_OK when successful
+/** @brief SIM7080 file system path definitions.
  */
-SIM70XX_Error_t SIM7080_NTP_Sync(SIM7080_t& p_Device, std::string Server, int8_t TimeZone, struct tm* p_Time, SIM7080_NTP_Error_t* p_Error = NULL, uint8_t CID = 0);
+typedef enum
+{
+    SIM7080_FS_PATH_APP         = 0,                /**< Use the path /custapp. */
+    SIM7080_FS_PATH_FOTA,                           /**< Use the path /fota. */
+    SIM7080_FS_PATH_DATA,                           /**< Use the path /datatx. */
+    SIM7080_FS_PATH_CUSTOMER,                       /**< Use the path /customer. */
+} SIM7080_FS_Path_t;
 
-#endif /* SIM7080_NTP_H_ */
+#endif /* SIM7020_FS_DEFS_H_ */

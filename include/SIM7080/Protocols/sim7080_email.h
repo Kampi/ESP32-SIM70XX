@@ -35,7 +35,7 @@
  *  @param CID      (Optional) E-Mail CID
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_EMail_SendText(SIM7080_t& p_Device, SIM7080_EMail_Config_t& p_Config, SIM7080_EMail_User_t& p_Sender, SIM7080_EMail_User_t& p_To, std::string Subject, std::string Body, SIM7080_EMail_Error_t* p_Error = NULL, uint8_t CID = 0);
+SIM70XX_Error_t SIM7080_EMail_SendText(SIM7080_t& p_Device, SIM7080_EMail_Config_t* p_Config, SIM7080_EMail_User_t* p_Sender, SIM7080_EMail_User_t* p_To, std::string Subject, std::string Body, SIM7080_EMail_Error_t* p_Error = NULL, uint8_t CID = 0);
 
 /** @brief          Send a text E-Mail.
  *  @param p_Device SIM7080 device object
@@ -44,12 +44,12 @@ SIM70XX_Error_t SIM7080_EMail_SendText(SIM7080_t& p_Device, SIM7080_EMail_Config
  *  @param p_To     To recipient
  *  @param Subject  E-Mail subject
  *  @param Body     E-Mail body
- *  @param p_CC     (Optional) CC recipent
- *  @param p_BCC    (Optional) BCC recipient
+ *  @param p_CC     CC recipent
+ *  @param p_BCC    BCC recipient
  *  @param p_Error  (Optional) Pointer to E-Mail transmission error code
  *  @param CID      (Optional) E-Mail CID
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_EMail_SendText(SIM7080_t& p_Device, SIM7080_EMail_Config_t& p_Config, SIM7080_EMail_User_t& p_Sender, SIM7080_EMail_User_t& p_To, std::string Subject, std::string Body, SIM7080_EMail_User_t* p_CC, SIM7080_EMail_User_t* p_BCC, SIM7080_EMail_Error_t* p_Error = NULL, uint8_t CID = 0);
+SIM70XX_Error_t SIM7080_EMail_SendText(SIM7080_t& p_Device, SIM7080_EMail_Config_t* p_Config, SIM7080_EMail_User_t* p_Sender, SIM7080_EMail_User_t* p_To, std::string Subject, std::string Body, SIM7080_EMail_User_t* p_CC, SIM7080_EMail_User_t* p_BCC, SIM7080_EMail_Error_t* p_Error = NULL, uint8_t CID = 0);
 
 #endif /* SIM7080_EMAIL_H_ */

@@ -32,7 +32,7 @@
 
 static const char* TAG = "SIM7080_TCPIP";
 
-SIM70XX_Error_t SIM7080_TCP_Ping(SIM7080_t& p_Device, SIM7080_Ping_t& p_Config, std::vector<SIM7080_PingRes_t>* p_Result, bool IPv6)
+SIM70XX_Error_t SIM7080_TCP_Ping(SIM7080_t& p_Device, SIM7080_Ping_t* p_Config, std::vector<SIM7080_PingRes_t>* p_Result, bool IPv6)
 {
     size_t Index;
     std::string Response;
@@ -43,52 +43,51 @@ SIM70XX_Error_t SIM7080_TCP_Ping(SIM7080_t& p_Device, SIM7080_Ping_t& p_Config, 
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
-    else if((p_Result == NULL) || (p_Config.Retries == 0) || (p_Config.Size == 0) || (p_Config.Timeout == 0))
+    else if((p_Result == NULL) || (p_Config == NULL) || (p_Config->Retries == 0) || (p_Config->Size == 0) || (p_Config->Timeout == 0))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
 
     p_Result->clear();
 
-    if(p_Config.Retries <= -1)
+    if(p_Config->Retries <= -1)
     {
-        p_Config.Retries = 4;
+        p_Config->Retries = 4;
     }
     else
     {
-        p_Config.Retries = std::min(p_Config.Retries, (int16_t)500);
+        p_Config->Retries = std::min(p_Config->Retries, (int16_t)500);
     }
 
-    if(p_Config.Size <= -1)
+    if(p_Config->Size <= -1)
     {
-        p_Config.Size = 32;
+        p_Config->Size = 32;
     }
     else
     {
-        p_Config.Size = std::min(p_Config.Size, (int16_t)1400);
+        p_Config->Size = std::min(p_Config->Size, (int16_t)1400);
     }
 
-    if(p_Config.Timeout <= -1)
+    if(p_Config->Timeout <= -1)
     {
-        p_Config.Timeout = 100;
+        p_Config->Timeout = 100;
     }
     else
     {
-        p_Config.Timeout = std::min(p_Config.Timeout, (int32_t)60000);
+        p_Config->Timeout = std::min(p_Config->Timeout, (int32_t)60000);
     }
+
+    SIM70XX_CREATE_CMD(Command);
 
     if(IPv6)
     {
-        CommandStr = "AT+SNPING6=";
+        *Command = SIM7080_AT_SNPING6(p_Config->Host, p_Config->Retries, p_Config->Size, p_Config->Timeout, (uint16_t)p_Config->Retries);
     }
     else
     {
-        CommandStr = "AT+SNPING4=";
+        *Command = SIM7080_AT_SNPING4(p_Config->Host, p_Config->Retries, p_Config->Size, p_Config->Timeout, (uint16_t)p_Config->Retries);
     }
 
-    CommandStr += "\"" + p_Config.Host + "\"," + std::to_string(p_Config.Retries) + "," + std::to_string(p_Config.Size) + "," + std::to_string(p_Config.Timeout);
-    SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7080_AT_SNPING(CommandStr, (uint16_t)p_Config.Retries);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
     if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {

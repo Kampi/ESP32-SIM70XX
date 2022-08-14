@@ -19,21 +19,21 @@
 
 #include <sdkconfig.h>
 
-#if((CONFIG_SIMXX_DEV == 7080) && (defined CONFIG_SIM70XX_DRIVER_WITH_TCPIP))
+#if((CONFIG_SIMXX_DEV == 7080) && (defined CONFIG_SIM70XX_DRIVER_WITH_DNS))
 
 #include <esp_log.h>
 
 #include "sim7080.h"
-#include "sim7080_tcpip.h"
+#include "sim7080_dns.h"
 #include "../../Private/Queue/sim70xx_queue.h"
 #include "../../Private/Commands/sim70xx_commands.h"
 
-static const char* TAG = "SIM7080_TCPIP";
+static const char* TAG = "SIM7080_DNS";
 
 // TODO: Add configuration for DNS Server (CDNSCFG)
 // TODO: Add selection of PDP index for DNS (CDNSPDPID)
 
-SIM70XX_Error_t SIM7080_TCP_ParseDNS(SIM7080_t& p_Device, std::string Host, std::string* p_IP, SIM7080_DNS_Error_t* p_Error, uint32_t Timeout)
+SIM70XX_Error_t SIM7080_DNS_FetchAddress(SIM7080_t& p_Device, std::string Host, std::string* p_IP, SIM7080_DNS_Error_t* p_Error, uint32_t Timeout)
 {
     size_t Index;
     uint32_t Now;
@@ -53,7 +53,7 @@ SIM70XX_Error_t SIM7080_TCP_ParseDNS(SIM7080_t& p_Device, std::string Host, std:
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CDNSGIP(Host);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -95,12 +95,12 @@ SIM70XX_Error_t SIM7080_TCP_ParseDNS(SIM7080_t& p_Device, std::string Host, std:
     {
         DNS_Error = std::stoi(Response.substr(Index + 1));
 
-        ESP_LOGD(TAG, "DNS_Error: %u", DNS_Error);
+        ESP_LOGE(TAG, "DNS_Error: %u", DNS_Error);
+    }
 
-        if (p_Error != NULL)
-        {
-            *p_Error = (SIM7080_DNS_Error_t)DNS_Error;
-        }
+    if (p_Error != NULL)
+    {
+        *p_Error = (SIM7080_DNS_Error_t)DNS_Error;
     }
 
     return SIM70XX_ERR_FAIL;

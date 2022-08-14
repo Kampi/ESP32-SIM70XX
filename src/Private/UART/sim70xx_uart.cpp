@@ -170,14 +170,14 @@ SIM70XX_Error_t SIM70XX_UART_Send(SIM70XX_UART_Conf_t& p_Config, const void* p_D
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM70XX_UART_SendCommand(SIM70XX_UART_Conf_t& p_Config, std::string Command)
+SIM70XX_Error_t SIM70XX_UART_SendLine(SIM70XX_UART_Conf_t& p_Config, std::string Data)
 {
     if(p_Config.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
-    uart_write_bytes(p_Config.Interface, (const char*)Command.c_str(), Command.length());
+    uart_write_bytes(p_Config.Interface, Data.c_str(), Data.length());
     uart_write_bytes(p_Config.Interface, "\r\n", 2);
 
     return SIM70XX_ERR_OK;

@@ -1,5 +1,5 @@
  /*
- * sim7080_fs.h
+ * sim7080_dns.h
  *
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -17,33 +17,21 @@
  * Errors and commissions should be reported to DanielKampert@kampis-elektroecke.de.
  */
 
-#ifndef SIM7080_FS_H_
-#define SIM7080_FS_H_
+#ifndef SIM7080_DNS_H_
+#define SIM7080_DNS_H_
 
-#include "sim7020_defs.h"
+#include "sim7080_defs.h"
 #include "sim70xx_errors.h"
-#include "Misc/sim7080_fs_defs.h"
+#include "sim7080_dns_defs.h"
 
-/** @brief          Delete a file.
+/** @brief          Parse a given host name to get the IP address.
  *  @param p_Device SIM7080 device object
- *  @param Name     File name
+ *  @param Host     Host name
+ *  @param p_IP     Pointer to resolved IP address
+ *  @param p_Error  (Optional) DNS error code
+ *  @param Timeout  (Optional) Message timeout for each the request in seconds
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_FS_Delete(SIM7080_t& p_Device, std::string File);
+SIM70XX_Error_t SIM7080_DNS_FetchAddress(SIM7080_t& p_Device, std::string Host, std::string* p_IP, SIM7080_DNS_Error_t* p_Error = NULL, uint32_t Timeout = 60);
 
-/** @brief          Rename a file.
- *  @param p_Device SIM7080 device object
- *  @param Old      Old file name
- *  @param New      New file name
- *  @return         SIM70XX_ERR_OK when successful
- */
-SIM70XX_Error_t SIM7080_FS_Rename(SIM7080_t& p_Device, std::string Old, std::string New);
-
-/** @brief          Get the free size of the file system.
- *  @param p_Device SIM7080 device object
- *  @param p_Free   Pointer to free file system size (bytes)
- *  @return         SIM70XX_ERR_OK when successful
- */
-SIM70XX_Error_t SIM7080_FS_GetFree(SIM7080_t& p_Device, uint32_t* const p_Free);
-
-#endif /* SIM7080_FS_H_ */
+#endif /* SIM7080_DNS_H_ */

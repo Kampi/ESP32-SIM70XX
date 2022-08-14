@@ -113,7 +113,7 @@ static void SIM70XX_Evt_Task(void* p_Arg)
 
                 // Transmit the command. The command has the layout
                 //  Command<CR><LF>
-                SIM70XX_UART_SendCommand(Device->UART, CmdObj->Command);
+                SIM70XX_UART_SendLine(Device->UART, CmdObj->Command);
 
                 // Flush the string, because the data aren´t needed anymore.
                 CmdObj->Command.clear();

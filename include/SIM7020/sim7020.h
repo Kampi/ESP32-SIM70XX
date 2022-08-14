@@ -42,6 +42,10 @@
     #include "sim7020_config_ping.h"
 #endif
 
+#ifdef CONFIG_SIM70XX_DRIVER_WITH_DNS
+    #include "sim7020_dns.h"
+#endif
+
 #ifdef CONFIG_SIM70XX_DRIVER_WITH_NTP
     #include "sim7020_ntp.h"
 #endif

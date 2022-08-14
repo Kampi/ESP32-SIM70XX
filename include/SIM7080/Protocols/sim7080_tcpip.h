@@ -31,18 +31,7 @@
  *  @param IPv6     (Optional) Set to #true to perform an IPv6 ping
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_TCP_Ping(SIM7080_t& p_Device, SIM7080_Ping_t& p_Config, std::vector<SIM7080_PingRes_t>* p_Result, bool IPv6 = false);
-
-/** @brief          Parse a given host name to get the IP address.
- *  @param p_Device SIM7080 device object
- *  @param Host     Host name
- *  @param p_IP     Pointer to resolved IP address
- *  @param p_Error  (Optional) DNS error code
- *                  NOTE: Only used when the function returns an error code =/= SIM70XX_ERR_OK
- *  @param Timeout  (Optional) Message timeout for each the request in seconds
- *  @return         SIM70XX_ERR_OK when successful
- */
-SIM70XX_Error_t SIM7080_TCP_ParseDNS(SIM7080_t& p_Device, std::string Host, std::string* p_IP, SIM7080_DNS_Error_t* p_Error = NULL, uint32_t Timeout = 60);
+SIM70XX_Error_t SIM7080_TCP_Ping(SIM7080_t& p_Device, SIM7080_Ping_t* p_Config, std::vector<SIM7080_PingRes_t>* p_Result, bool IPv6 = false);
 
 /** @brief          Check if data are received for a specific socket.
  *  @param p_Socket Pointer to TCP socket object

@@ -51,7 +51,7 @@ SIM70XX_Error_t SIM70XX_UART_Send(SIM70XX_UART_Conf_t& p_Config, const void* p_D
  *  @param Command  Command string
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM70XX_UART_SendCommand(SIM70XX_UART_Conf_t& p_Config, std::string Command);
+SIM70XX_Error_t SIM70XX_UART_SendLine(SIM70XX_UART_Conf_t& p_Config, std::string Command);
 
 /** @brief          Read a number of bytes from the UART interface.
  *  @param p_Config Pointer to SIM70XX UART configuration object

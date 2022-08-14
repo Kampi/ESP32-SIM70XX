@@ -135,7 +135,7 @@ bool SIM70XX_Tools_isActive(SIM70XX_UART_Conf_t& p_Config)
     bool Result;
     std::string Response;
 
-    if((SIM70XX_UART_Init(p_Config) != SIM70XX_ERR_OK) || (SIM70XX_UART_SendCommand(p_Config, "AT") != SIM70XX_ERR_OK))
+    if((SIM70XX_UART_Init(p_Config) != SIM70XX_ERR_OK) || (SIM70XX_UART_SendLine(p_Config, "AT") != SIM70XX_ERR_OK))
     {
         return false;
     }
@@ -170,7 +170,7 @@ SIM70XX_Error_t SIM70XX_Tools_DisableEcho(SIM70XX_UART_Conf_t& p_Config)
     // Check if echo mode is enabled. With echo mode enable the answer will have the following format:
     //  AT<CR><LF>
     //  OK<CR><LF><CR><LF>
-    SIM70XX_UART_SendCommand(p_Config, "AT");
+    SIM70XX_UART_SendLine(p_Config, "AT");
     Response = SIM70XX_UART_ReadStringUntil(p_Config);
     SIM70XX_UART_ReadStringUntil(p_Config);
     if(Response.find("AT") != std::string::npos)
@@ -178,7 +178,7 @@ SIM70XX_Error_t SIM70XX_Tools_DisableEcho(SIM70XX_UART_Conf_t& p_Config)
         ESP_LOGI(TAG, "Echo mode enabled. Disable echo mode...");
 
         // Disable echo mode.
-        SIM70XX_UART_SendCommand(p_Config, "ATE0");
+        SIM70XX_UART_SendLine(p_Config, "ATE0");
         SIM70XX_UART_ReadStringUntil(p_Config);
         SIM70XX_UART_ReadStringUntil(p_Config);
     }
@@ -193,12 +193,16 @@ SIM70XX_Error_t SIM70XX_Tools_DisableEcho(SIM70XX_UART_Conf_t& p_Config)
 std::string SIM70XX_Tools_SubstringSplitErase(std::string* p_Input, std::string Delimiter)
 {
     size_t Index;
-    std::string Result;
+    std::string Result = *p_Input;
 
     assert(p_Input);
 
     Index = p_Input->find(",");
-    Result = p_Input->substr(0, Index);
+    if(Index != std::string::npos)
+    {
+        Result = p_Input->substr(0, Index);
+    }
+
     p_Input->erase(0, Index + 1);
 
     return Result;

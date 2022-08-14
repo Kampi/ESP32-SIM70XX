@@ -36,6 +36,10 @@
     #include "sim7080_fs.h"
 #endif
 
+#ifdef CONFIG_SIM70XX_DRIVER_WITH_DNS
+    #include "sim7080_dns.h"
+#endif
+
 #ifdef CONFIG_SIM70XX_DRIVER_WITH_TCPIP
     #include "sim7080_tcpip.h"
     #include "sim7080_config_ping.h"

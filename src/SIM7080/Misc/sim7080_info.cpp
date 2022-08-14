@@ -231,6 +231,11 @@ SIM70XX_Error_t SIM7080_Info_GetQuality(SIM7080_t& p_Device, SIM70XX_Qual_t* p_R
     // TODO: Implement RSSI calculation
 
     Index = Response.find(",");
+    if(Index == std::string::npos)
+    {
+        return SIM70XX_ERR_FAIL;
+    }
+
     p_Report->RSSI = std::stoi(Response.substr(0, Index));
     p_Report->RXQual = std::stoi(Response.substr(Response.find_last_of(",") + 1));
 

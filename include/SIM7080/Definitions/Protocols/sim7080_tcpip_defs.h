@@ -24,21 +24,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-/** @brief SIM7080 DNS error definitions.
- */
-typedef enum
-{
-    SIM7080_DNS_ERROR_OK        = -1,               /**< Common error. */
-    SIM7080_DNS_ERROR_NOT_AUTH,                     /**< Not authenticated error. */
-    SIM7080_DNS_ERROR_INVALID_PARA,                 /**< Invalid parameter error. */
-    SIM7080_DNS_ERROR_NETWORK,                      /**< No network error. */
-    SIM7080_DNS_ERROR_NO_SERVER,                    /**< No server found error. */
-    SIM7080_DNS_ERROR_TIMEOUT,                      /**< Timeout error. */
-    SIM7080_DNS_ERROR_NO_CONFIG,                    /**< No configuration error. */
-    SIM7080_DNS_ERROR_NO_MEMORY,                    /**< No memory error. */
-    SIM7080_DNS_ERROR_UNKNOWN,                      /**< Unknown error. */
-} SIM7080_DNS_Error_t;
-
 /** @brief SIM7080 TCP socket types definitions.
  */
 typedef enum
@@ -48,7 +33,7 @@ typedef enum
     SIM7080_TCP_TYPE_NONIP,                         /**< NONIP socket. */
 } SIM7080_TCP_Type_t;
 
-/** @brief SIM7080 TCP result definitions.
+/** @brief SIM7080 TCP error definitions.
  */
 typedef enum
 {

@@ -131,7 +131,7 @@ SIM70XX_Error_t SIM7080_TCP_Client_Transmit(SIM7080_t& p_Device, SIM7080_TCP_Soc
     SIM70XX_Error_t Error = SIM70XX_ERR_OK;
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Socket == NULL) || (p_Socket->Type != SIM7080_TCP_TYPE_TCP) || (p_Buffer == NULL))
+    if((p_Socket == NULL) || (p_Socket->Type != SIM7080_TCP_TYPE_TCP) || ((p_Buffer == NULL) && (Length > 0)))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
@@ -173,7 +173,7 @@ SIM70XX_Error_t SIM7080_TCP_Client_Transmit(SIM7080_t& p_Device, SIM7080_TCP_Soc
         vTaskSuspend(p_Device.Internal.TaskHandle);
         SIM70XX_CREATE_CMD(Command);
         *Command = SIM7080_AT_CASEND(p_Socket->ID, BytesToSend);
-        SIM70XX_UART_SendCommand(p_Device.UART, Command->Command);
+        SIM70XX_UART_SendLine(p_Device.UART, Command->Command);
 
         // Wait for the empty space after the ">".
         Response = SIM70XX_UART_ReadStringUntil(p_Device.UART, ' ', Command->Timeout * 1000UL);
@@ -201,7 +201,7 @@ SIM70XX_Error_t SIM7080_TCP_Client_Transmit(SIM7080_t& p_Device, SIM7080_TCP_Soc
 
         Buffer += BytesToSend;
         Remaining -= BytesToSend;
-    } while(Remaining > 0);
+    } while((Remaining > 0) && (p_Socket->isConnected));
 
 SIM7080_TCP_Client_Transmit_Exit:
     delete Command;
@@ -239,7 +239,7 @@ SIM70XX_Error_t SIM7080_TCP_Client_Receive(SIM7080_t& p_Device, SIM7080_TCP_Sock
     vTaskSuspend(p_Device.Internal.TaskHandle);
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CARECV(p_Socket->ID, Length);
-    SIM70XX_UART_SendCommand(p_Device.UART, Command->Command);
+    SIM70XX_UART_SendLine(p_Device.UART, Command->Command);
     delete Command;
 
     do

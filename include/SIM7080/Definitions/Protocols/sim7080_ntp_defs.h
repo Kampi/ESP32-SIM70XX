@@ -24,4 +24,25 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+/** @brief SIM7080 NTP error definitions.
+ */
+typedef enum
+{
+    SIM7080_NTP_ERROR_OK                = 1,        /**< No error. */
+    SIM7080_NTP_ERROR_NETWORK           = 61,       /**< Network error. */
+    SIM7080_NTP_ERROR_DNS,                          /**< DNS resolution error. */
+    SIM7080_NTP_ERROR_CONNECTION,                   /**< Connection error. */
+    SIM7080_NTP_ERROR_SERVICE_RESP,                 /**< Service response error. */
+    SIM7080_NTP_ERROR_SERVICE_TIME,                 /**< Service response timeout. */
+} SIM7080_NTP_Error_t;
+
+/** @brief SIM7080 NTP mode definitions.
+ */
+typedef enum
+{
+    SIM7080_NTP_MODE_SYNC               = 0,        /**< Just set UTC to localtime. */
+    SIM7080_NTP_MODE_FETCH,                         /**< Just output UTC time to AT port. */
+    SIM7080_NTP_MODE_BOTH,                          /**< Set UTC to localtime and output UTC time to AT port. */
+} SIM7080_NTP_Mode_t;
+
 #endif /* SIM7080_NTP_DEFS_H_ */

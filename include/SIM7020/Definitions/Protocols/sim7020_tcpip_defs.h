@@ -43,7 +43,7 @@ typedef enum
     SIM7020_TCP_ERROR_PARAMETER,                    /**< Parameter error. */
 } SIM7020_TCP_Error_t;
 
-/** @brief SIM7020 TCP socket domains.
+/** @brief SIM7020 TCP socket domain type definitions.
  */
 typedef enum
 {
@@ -51,7 +51,7 @@ typedef enum
     SIM7020_TCP_DOMAIN_IPV6,                        /**< IPv4 socket. */
 } SIM7020_TCP_Domain_t;
 
-/** @brief SIM7020 TCP socket types.
+/** @brief SIM7020 TCP socket type definitions.
  */
 typedef enum
 {
@@ -68,15 +68,7 @@ typedef enum
     SIM7020_TCP_PROT_ICMP,                          /**< ICMP protocol. */
 } SIM7020_TCP_Protocol_t;
 
-/** @brief SIM7020 DNS error codes.
- */
-typedef enum
-{
-    SIM7020_DNS_ERR_NETWORK = 3,                    /**< Network error. */
-    SIM7020_DNS_ERR_COMMON  = 8,                    /**< Common DNS error. */
-} SIM7020_DNS_Error_t;
-
-/** @brief SIM7020 ping configuration object.
+/** @brief SIM7020 ping configuration object definition.
  */
 typedef struct
 {
@@ -89,7 +81,7 @@ typedef struct
                                                          NOTE: -1 will use the default value (100). Minimum 0, Maximum 600. */
 } SIM7020_Ping_t;
 
-/** @brief SIM7020 ping response object.
+/** @brief SIM7020 ping response object definition.
  */
 typedef struct
 {
@@ -98,7 +90,7 @@ typedef struct
     uint8_t TTL;                                    /**< Time to live. */
 } SIM7020_PingRes_t;
 
-/** @brief SIM7020 TCP/IP Socket object.
+/** @brief SIM7020 TCP/IP Socket object definition.
  */
 typedef struct
 {

@@ -19,16 +19,16 @@
 
 #include <sdkconfig.h>
 
-#if((CONFIG_SIMXX_DEV == 7020) && (defined CONFIG_SIM70XX_DRIVER_WITH_TCPIP))
+#if((CONFIG_SIMXX_DEV == 7020) && (defined CONFIG_SIM70XX_DRIVER_WITH_DNS))
 
 #include <esp_log.h>
 
 #include "sim7020.h"
-#include "sim7020_tcpip.h"
+#include "sim7020_dns.h"
 #include "../../Private/Queue/sim70xx_queue.h"
 #include "../../Private/Commands/sim70xx_commands.h"
 
-static const char* TAG = "SIM7020_TCPIP";
+static const char* TAG = "SIM7020_DNS"
 
 // TODO: Add configuration for DNS Server (CDNSCFG)
 // TODO: Add selection of PDP index for DNS (CDNSPDPID)
@@ -92,16 +92,16 @@ SIM70XX_Error_t SIM7020_TCP_ParseDNS(SIM7020_t& p_Device, std::string Host, std:
         return SIM70XX_ERR_OK;
     }
     // Handle the error codes.
-    else if(DNS_Error != 1)
+    else if(DNS_Error != SIM7020_DNS_ERROR_OK)
     {
         DNS_Error = std::stoi(Response.substr(Index + 1));
 
-        ESP_LOGD(TAG, "DNS_Error: %u", DNS_Error);
+        ESP_LOGE(TAG, "DNS_Error: %u", DNS_Error);
+    }
 
-        if (p_Error != NULL)
-        {
-            *p_Error = (SIM7020_DNS_Error_t)DNS_Error;
-        }
+    if (p_Error != NULL)
+    {
+        *p_Error = (SIM7020_DNS_Error_t)DNS_Error;
     }
 
     return SIM70XX_ERR_FAIL;

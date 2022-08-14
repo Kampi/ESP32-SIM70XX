@@ -32,17 +32,6 @@
  */
 SIM70XX_Error_t SIM7020_TCP_Ping(SIM7020_t& p_Device, SIM7020_Ping_t& p_Config, std::vector<SIM7020_PingRes_t>* p_Result);
 
-/** @brief          Parse a given host name to get the IP address.
- *  @param p_Device SIM7020 device object
- *  @param Host     Host name
- *  @param p_IP     Pointer to resolved IP address
- *  @param p_Error  (Optional) DNS error code
- *                  NOTE: Only used when the function returns an error code =/= SIM70XX_ERR_OK
- *  @param Timeout  (Optional) Message timeout for each the request in seconds
- *  @return         SIM70XX_ERR_OK when successful
- */
-SIM70XX_Error_t SIM7020_TCP_ParseDNS(SIM7020_t& p_Device, std::string Host, std::string* p_IP, SIM7020_DNS_Error_t* p_Error = NULL, uint32_t Timeout = 60);
-
 /** @brief          Create a TCP socket.
  *  @param p_Device SIM7020 device object
  *  @param IP       IP address

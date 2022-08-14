@@ -1,5 +1,5 @@
  /*
- * sim7080_fs_defs.h
+ * sim7020_dns.h
  *
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -17,10 +17,22 @@
  * Errors and commissions should be reported to DanielKampert@kampis-elektroecke.de.
  */
 
-#ifndef SIM7080_FS_DEFS_H_
-#define SIM7080_FS_DEFS_H_
+#ifndef SIM7020_DNS_H_
+#define SIM7020_DNS_H_
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sim7020_defs.h"
+#include "sim70xx_errors.h"
+#include "sim7020_dns_defs.h"
 
-#endif /* SIM7020_FS_DEFS_H_ */
+/** @brief          Parse a given host name to get the IP address.
+ *  @param p_Device SIM7020 device object
+ *  @param Host     Host name
+ *  @param p_IP     Pointer to resolved IP address
+ *  @param p_Error  (Optional) DNS error code
+ *                  NOTE: Only used when the function returns an error code =/= SIM70XX_ERR_OK
+ *  @param Timeout  (Optional) Message timeout for each the request in seconds
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7020_DNS_FetchAddress(SIM7020_t& p_Device, std::string Host, std::string* p_IP, SIM7020_DNS_Error_t* p_Error = NULL, uint32_t Timeout = 60);
+
+#endif /* SIM7020_DNS_H_ */
