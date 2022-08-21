@@ -1,5 +1,5 @@
  /*
- * sim7080_ntp.h
+ * sim7080_mqtt.h
  *
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -17,31 +17,34 @@
  * Errors and commissions should be reported to DanielKampert@kampis-elektroecke.de.
  */
 
-#ifndef SIM7080_NTP_H_
-#define SIM7080_NTP_H_
+#ifndef SIM7080_MQTT_H_
+#define SIM7080_MQTT_H_
 
 #include "sim7080_defs.h"
 #include "sim70xx_errors.h"
-#include "sim7080_ntp_defs.h"
+#include "sim7080_mqtt_defs.h"
 
-/** @brief              Sync the local time with the time from an NTP server.
- *  @param p_Device     SIM7080 device object
- *  @param Server       NTP server
- *  @param Timezone     Timezone
- *  @param p_Time       Pointer to local time
- *  @param p_Error      (Optional) NTP synchronization error code
- *  @param CID          (Optional) NTP CID
- *  @return             SIM70XX_ERR_OK when successful
+/** @brief          Create a MQTT socket.
+ *  @param p_Device SIM7080 device object
+ *  @param p_Socket Pointer to MQTT socket object
+ *  @param Broker   MQTT broker address
+ *  @param Port     (Optional) MQTT broker port
+ *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_NTP_Sync(SIM7080_t& p_Device, std::string Server, int8_t TimeZone, struct tm* p_Time, SIM7080_NTP_Error_t* p_Error = NULL, uint8_t CID = 0);
+SIM70XX_Error_t SIM7080_MQTT_Create(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* p_Socket, std::string Broker, uint16_t Port = 1883);
 
-/** @brief              Get the current time from the module.
- *                      NOTE: Use \ref SIM7080_NTP_Sync to sync the time first!
- *  @param p_Device     SIM7080 device object
- *  @param p_Time       Pointer to local time
- *  @param p_Timezone   (Optional) Pointer to timezone
- *  @return             SIM70XX_ERR_OK when successful
+/** @brief          Create a MQTT socket.
+ *  @param p_Device SIM7080 device object
+ *  @param p_Socket Pointer to MQTT socket object
+ *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_NTP_GetTime(SIM7080_t& p_Device, struct tm* p_Time, int8_t* p_Timezone = NULL);
+SIM70XX_Error_t SIM7080_MQTT_Create(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* p_Socket);
 
-#endif /* SIM7080_NTP_H_ */
+/** @brief          Open a connection to a MQTT socket.
+ *  @param p_Device SIM7080 device object
+ *  @param p_Socket Pointer to MQTT socket object
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_MQTT_Connect(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* p_Socket);
+
+#endif /* SIM7080_MQTT_H_ */

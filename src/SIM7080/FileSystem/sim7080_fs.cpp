@@ -78,7 +78,7 @@ static SIM70XX_Error_t SIM7080_FS_Deinit(SIM7080_t& p_Device)
     return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
 }
 
-SIM70XX_Error_t SIM7080_FS_GetFileSize(SIM7080_t& p_Device, SIM7080_FS_Path_t Path, std::string Name, uint32_t* p_Size)
+SIM70XX_Error_t SIM7080_FS_GetFileSize(SIM7080_t& p_Device, SIM7080_FS_Path_t Path, std::string Name, size_t* p_Size)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;
@@ -103,18 +103,18 @@ SIM70XX_Error_t SIM7080_FS_GetFileSize(SIM7080_t& p_Device, SIM7080_FS_Path_t Pa
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    *p_Size = std::stoi(Response);
+    *p_Size = (size_t)std::stoi(Response);
 
     return SIM7080_FS_Deinit(p_Device);
 }
 
-SIM70XX_Error_t SIM7080_FS_Write(SIM7080_t& p_Device, SIM7080_FS_Path_t Path, std::string Name, const void* const p_Buffer, uint16_t Length, bool Append)
+SIM70XX_Error_t SIM7080_FS_Write(SIM7080_t& p_Device, SIM7080_FS_Path_t Path, std::string Name, const void* const p_Buffer, uint16_t Length, bool Append, uint16_t Timeout)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;
     SIM70XX_Error_t Error = SIM70XX_ERR_OK;
 
-    if((Name.size() > 230) || ((p_Buffer == NULL) && (Length > 0)) || (Length > SIM7080_FS_MAX_FILE_SIZE))
+    if((Name.size() > 230) || ((p_Buffer == NULL) && (Length > 0)) || (Length > SIM7080_FS_MAX_FILE_SIZE) || (Timeout < 100) || (Timeout > 10000))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
@@ -130,7 +130,7 @@ SIM70XX_Error_t SIM7080_FS_Write(SIM7080_t& p_Device, SIM7080_FS_Path_t Path, st
     SIM70XX_ERROR_CHECK(SIM7080_FS_Init(p_Device));
 
     SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7080_AT_CFSWFILE(Path, Name, Append, Length);
+    *Command = SIM7080_AT_CFSWFILE(Path, Name, Append, Length, Timeout);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
     if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
@@ -154,7 +154,7 @@ SIM70XX_Error_t SIM7080_FS_Write(SIM7080_t& p_Device, SIM7080_FS_Path_t Path, st
         goto SIM7080_FS_Write_Exit;
     }
 
-    ESP_LOGI(TAG, "Response: %s", Response.c_str());
+    ESP_LOGD(TAG, "Response: %s", Response.c_str());
 
     p_Device.FS.Free -= Length;
 

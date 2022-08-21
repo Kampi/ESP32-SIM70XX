@@ -23,6 +23,9 @@
 #include "sim7080_defs.h"
 #include "sim70xx_errors.h"
 #include "sim7080_tcpip_defs.h"
+/** @brief Maximum number of bytes for a single TCP / UDP transmission.
+ */
+#define SIM7080_TCP_MAX_PAYLOAD_SIZE                        1460
 
 /** @brief          Perform a ping.
  *  @param p_Device SIM7080 device object
@@ -65,37 +68,30 @@ SIM70XX_Error_t SIM7080_TCP_Client_Create(SIM7080_t& p_Device, std::string IP, u
  *  @param PDP      (Optional) PDP context that should be used
  *  @param p_Result (Optional) Pointer to TCP error code
  *                  NOTE: Can be used for error tracking
+ *  @param Timeout  (Optional) Transmission timeout in milliseconds
  *  @return         SIM70XX_ERR_OK when successful
  */
 SIM70XX_Error_t SIM7080_TCP_Client_Connect(SIM7080_t& p_Device, SIM7080_TCP_Socket_t* p_Socket, uint8_t PDP = 0, SIM7080_TCP_Error_t* p_Result = NULL);
 
-/** @brief          Transmit a message string, including CR and LF, over TCP.
- *  @param p_Device SIM7080 device object
- *  @param p_Socket Pointer to TCP socket object
- *  @param Message  Message string
- *  @return         SIM70XX_ERR_OK when successful
+/** @brief              Transmit a TCP message.
+ *  @param p_Device     SIM7080 device object
+ *  @param p_Socket     Pointer to TCP socket object
+ *  @param p_Buffer     Pointer to data buffer
+ *  @param Length       Data length
+ *  @param Timeout      (Optional) Transmission timeout in milliseconds
+ *  @param PacketSize   (Optional) Message transmission packet size in bytes
+ *  @return             SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_TCP_Client_println(SIM7080_t& p_Device, SIM7080_TCP_Socket_t* p_Socket, std::string Message);
-
-/** @brief          Transmit a TCP message.
- *  @param p_Device SIM7080 device object
- *  @param p_Socket Pointer to TCP socket object
- *  @param p_Buffer Pointer to data buffer
- *  @param Length   Data length (maximum 1460 bytes)
- *  @return         SIM70XX_ERR_OK when successful
- */
-SIM70XX_Error_t SIM7080_TCP_Client_Transmit(SIM7080_t& p_Device, SIM7080_TCP_Socket_t* p_Socket, const void* p_Buffer, uint32_t Length);
+SIM70XX_Error_t SIM7080_TCP_Client_Transmit(SIM7080_t& p_Device, SIM7080_TCP_Socket_t* p_Socket, const void* p_Buffer, uint32_t Length, uint16_t Timeout = 1000, uint16_t PacketSize = SIM7080_TCP_MAX_PAYLOAD_SIZE);
 
 /** @brief          Receive a TCP message.
  *  @param p_Device SIM7080 device object
  *  @param p_Socket Pointer to TCP socket object
  *  @param Length   Number of bytes to read from the buffer
  *  @param p_Buffer Pointer to data buffer
- *  @param p_Length Pointer to successfully read bytes
- *                  NOTE: 0 when no data are available
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_TCP_Client_Receive(SIM7080_t& p_Device, SIM7080_TCP_Socket_t* p_Socket, uint32_t Length, void* p_Buffer, uint32_t* p_BytesRead);
+SIM70XX_Error_t SIM7080_TCP_Client_Receive(SIM7080_t& p_Device, SIM7080_TCP_Socket_t* p_Socket, uint32_t Length, std::string* p_Buffer);
 
 /** @brief          Close a TCP connection and release the socket.
  *  @param p_Device SIM7080 device object

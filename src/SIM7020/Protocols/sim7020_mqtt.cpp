@@ -30,7 +30,7 @@
 
 static const char* TAG = "SIM7020_MQTT";
 
-SIM70XX_Error_t SIM7020_MQTT_Create(SIM7020_t& p_Device, std::string Broker, uint16_t Port, SIM7020_MQTT_Socket_t* p_Socket, uint8_t CID)
+SIM70XX_Error_t SIM7020_MQTT_Create(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* p_Socket, std::string Broker, uint16_t Port, uint8_t CID)
 {
     if(p_Socket == NULL)
     {
@@ -76,7 +76,6 @@ SIM70XX_Error_t SIM7020_MQTT_Create(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* 
     // Everything okay. The socket is active now.
     ESP_LOGI(TAG, "Socket %u opened...", p_Socket->ID);
 
-    p_Device.MQTT.Sockets.push_back(p_Socket);
     p_Socket->isConnected = false;
     p_Socket->isCreated = true;
     p_Device.MQTT.SubTopics = 0;
@@ -147,6 +146,7 @@ SIM70XX_Error_t SIM7020_MQTT_Connect(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t*
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
 
     p_Socket->isConnected = true;
+    p_Device.MQTT.Sockets.push_back(p_Socket);
 
     return SIM70XX_ERR_OK;
 }
@@ -297,6 +297,8 @@ SIM70XX_Error_t SIM7020_MQTT_Unsubscribe(SIM7020_t& p_Device, SIM7020_MQTT_Socke
 
     return SIM70XX_ERR_OK;
 }
+
+// TODO: Disconnect function
 
 SIM70XX_Error_t SIM7020_MQTT_Destroy(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* p_Socket)
 {

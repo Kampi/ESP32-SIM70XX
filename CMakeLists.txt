@@ -8,6 +8,8 @@ set(COMPONENT_SRCS
     "src/SIM7080/Protocols/sim7080_ntp.cpp"
     "src/SIM7080/Protocols/sim7080_dns.cpp"
     "src/SIM7080/Protocols/sim7080_dns.cpp"
+    "src/SIM7080/Protocols/sim7080_coap.cpp"
+    "src/SIM7080/Protocols/sim7080_mqtt.cpp"
     "src/SIM7080/Protocols/sim7080_tcp_client.cpp"
     "src/SIM7080/Protocols/sim7080_ping.cpp"
     "src/SIM7080/Protocols/sim7080_email.cpp"

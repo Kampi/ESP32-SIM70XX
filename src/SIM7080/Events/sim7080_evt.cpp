@@ -40,11 +40,13 @@ void SIM70XX_Evt_MessageFilter(void* p_Device, std::string* p_Message)
 		if(p_Message->find("+CASTATE") != std::string::npos)
 		{
 			SIM7080_Evt_on_TCP_Disconnect(Device, p_Message);
+			Found = true;
 		}
 
 		if(p_Message->find("+CADATAIND") != std::string::npos)
 		{
-			SIM7080_Evt_on_TCP_DataReceived(Device, p_Message);
+			SIM7080_Evt_on_TCP_DataReady(Device, p_Message);
+			Found = true;
 		}
 	#endif
 

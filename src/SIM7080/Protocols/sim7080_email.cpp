@@ -141,7 +141,7 @@ SIM70XX_Error_t SIM7080_EMail_SendText(SIM7080_t& p_Device, SIM7080_EMail_Config
     }
 
     // Wait for the transmission status.
-    while(SIM70XX_Queue_isEvent(p_Device.Internal.EventQueue, "+SMTPSEND:", &Response) == false)
+    while(SIM70XX_Queue_isEvent(p_Device.Internal.EventQueue, "+SMTPSEND", &Response) == false)
     {
         vTaskDelay(100);
     }

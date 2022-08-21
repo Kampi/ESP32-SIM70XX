@@ -31,7 +31,7 @@
  *  @param p_Size   Pointer to file size
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_FS_GetFileSize(SIM7080_t& p_Device, SIM7080_FS_Path_t Path, std::string Name, uint32_t* p_Size);
+SIM70XX_Error_t SIM7080_FS_GetFileSize(SIM7080_t& p_Device, SIM7080_FS_Path_t Path, std::string Name, size_t* p_Size);
 
 /** @brief          Write a file into the file system.
  *  @param p_Device SIM7080 device object
@@ -41,10 +41,12 @@ SIM70XX_Error_t SIM7080_FS_GetFileSize(SIM7080_t& p_Device, SIM7080_FS_Path_t Pa
  *  @param p_Buffer Pointer to data buffer
  *  @param Length   Buffer length
  *                  NOTE: 10240 bytes are allowed for a single file!
- *  @param Append   (Optional) If set to #true and the file already existed, add the data at the end of the file.
+ *  @param Append   (Optional) If set to #true and the file already existed, add the data at the end of the file
+ *  @param Timeout  (Optional) Input timeout in milliseconds
+ *                  NOTE: Only values between 100 and 10000 are allowed!
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_FS_Write(SIM7080_t& p_Device, SIM7080_FS_Path_t Path, std::string Name, const void* const p_Buffer, uint16_t Length, bool Append = false);
+SIM70XX_Error_t SIM7080_FS_Write(SIM7080_t& p_Device, SIM7080_FS_Path_t Path, std::string Name, const void* const p_Buffer, uint16_t Length, bool Append = false, uint16_t Timeout = 100);
 
 /** @brief              Read a from into the file system.
  *  @param p_Device     SIM7080 device object

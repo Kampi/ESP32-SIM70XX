@@ -20,6 +20,7 @@
 #ifndef SIM7080_NTP_DEFS_H_
 #define SIM7080_NTP_DEFS_H_
 
+#include <time.h>
 #include <string>
 #include <stdint.h>
 #include <stdbool.h>

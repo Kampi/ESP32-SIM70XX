@@ -130,7 +130,7 @@ static void SIM70XX_Evt_Task(void* p_Arg)
         if(Messages == 0)
         {
             // New data available?
-            if(SIM70XX_UART_Available(Device->UART) > 2)
+            if(SIM70XX_UART_Available(Device->UART) > std::string("\r\n").size())
             {
                 std::string* Message = new std::string();
 

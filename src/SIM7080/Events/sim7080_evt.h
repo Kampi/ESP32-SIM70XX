@@ -41,12 +41,12 @@
      */
     void SIM7080_Evt_on_TCP_Disconnect(SIM7080_t* const p_Device, std::string* p_Message);
 
-    /** @brief              TCP/IP data received event handler.
+    /** @brief              TCP/IP data ready event handler.
      *                      This function will filter out the receive message from the event message.
      *  @param p_Device     Pointer to device
      *  @param p_Message    Pointer to message string
      */
-    void SIM7080_Evt_on_TCP_DataReceived(SIM7080_t* const p_Device, std::string* p_Message);
+    void SIM7080_Evt_on_TCP_DataReady(SIM7080_t* const p_Device, std::string* p_Message);
 #endif
 
 #endif /* SIM7080_EVT_H_ */

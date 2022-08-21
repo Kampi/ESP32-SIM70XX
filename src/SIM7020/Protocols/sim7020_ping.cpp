@@ -93,7 +93,7 @@ SIM70XX_Error_t SIM7020_TCP_Ping(SIM7020_t& p_Device, SIM7020_Ping_t& p_Config, 
     do
     {
         // Wait for a ping response.
-        if(SIM70XX_Queue_isEvent(p_Device.Internal.EventQueue, "+CIPPING: ", &Response))
+        if(SIM70XX_Queue_isEvent(p_Device.Internal.EventQueue, "+CIPPING", &Response))
         {
             do
             {

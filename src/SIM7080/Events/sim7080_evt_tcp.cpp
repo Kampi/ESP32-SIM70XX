@@ -25,6 +25,7 @@
 
 #include "sim7080.h"
 #include "sim7080_evt.h"
+#include "../../Private/UART/sim70xx_uart.h"
 #include "../../Private/Queue/sim70xx_queue.h"
 #include "../../Private/Commands/sim70xx_commands.h"
 
@@ -41,7 +42,12 @@ void SIM7080_Evt_on_TCP_Disconnect(SIM7080_t* const p_Device, std::string* p_Mes
 
     SIMXX_TOOLS_REMOVE_LINEEND((*p_Message));
 
-    Index = p_Message->find("+CASTATE:");
+    Index = p_Message->find("+CASTATE");
+    if(Index == std::string::npos)
+    {
+        return;
+    }
+
     Message = p_Message->substr(Index + std::string("+CASTATE:").size() + 1, p_Message->find("\r\n", Index) - Index);
     p_Message->erase(Index, p_Message->find("\r\n", Index) - Index);
 
@@ -61,17 +67,22 @@ void SIM7080_Evt_on_TCP_Disconnect(SIM7080_t* const p_Device, std::string* p_Mes
     }
 }
 
-void SIM7080_Evt_on_TCP_DataReceived(SIM7080_t* const p_Device, std::string* p_Message)
+void SIM7080_Evt_on_TCP_DataReady(SIM7080_t* const p_Device, std::string* p_Message)
 {
     uint8_t ID;
     size_t Index;
     std::string Message;
 
-    ESP_LOGI(TAG, "TCP message received event!");
+    ESP_LOGI(TAG, "TCP message data ready event!");
 
     SIMXX_TOOLS_REMOVE_LINEEND((*p_Message));
 
-    Index = p_Message->find("+CADATAIND:");
+    Index = p_Message->find("+CADATAIND");
+    if(Index == std::string::npos)
+    {
+        return;
+    }
+
     Message = p_Message->substr(Index + std::string("+CADATAIND:").size() + 1, p_Message->find("\r\n", Index) - Index);
     p_Message->erase(Index, p_Message->find("\r\n", Index) - Index);
 

@@ -164,21 +164,21 @@ typedef struct
     #ifdef CONFIG_SIM70XX_DRIVER_WITH_TCPIP
         struct
         {
-            std::vector<SIM7020_TCP_Socket_t*> Sockets;     /**< List with pointer to active TCP sockets.
+            std::vector<SIM7020_TCP_Socket_t*> Sockets;     /**< List with pointer to connected TCP sockets.
                                                                  NOTE: Managed by the device driver. */
         } TCP;
     #endif
     #ifdef CONFIG_SIM70XX_DRIVER_WITH_HTTP
         struct
         {
-            std::vector<SIM7020_HTTP_Socket_t*> Sockets;    /**< List with pointer to active HTTP sockets.
+            std::vector<SIM7020_HTTP_Socket_t*> Sockets;    /**< List with pointer to connected HTTP sockets.
                                                                  NOTE: Managed by the device driver. */
         } HTTP;
     #endif
     #ifdef CONFIG_SIM70XX_DRIVER_WITH_MQTT
         struct
         {
-            std::vector<SIM7020_MQTT_Socket_t*> Sockets;    /**< List with pointer to active MQTT sockets.
+            std::vector<SIM7020_MQTT_Socket_t*> Sockets;    /**< List with pointer to connected MQTT sockets.
                                                                  NOTE: Managed by the device driver. */
             QueueHandle_t SubQueue;                         /**< Subscribe event queue.
                                                                  NOTE: Managed by the device driver. */
@@ -189,7 +189,7 @@ typedef struct
     #ifdef CONFIG_SIM70XX_DRIVER_WITH_COAP
         struct
         {
-            std::vector<SIM7020_CoAP_Socket_t*> Sockets;    /**< List with pointer to active CoAP sockets.
+            std::vector<SIM7020_CoAP_Socket_t*> Sockets;    /**< List with pointer to connected CoAP sockets.
                                                                  NOTE: Managed by the device driver. */
         } CoAP;
     #endif

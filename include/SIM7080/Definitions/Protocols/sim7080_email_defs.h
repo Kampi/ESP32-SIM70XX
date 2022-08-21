@@ -24,6 +24,19 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include <sdkconfig.h>
+
+#ifdef CONFIG_SIM70XX_DRIVER_WITH_SSL
+    /** @brief SIM7080 E-Mail SSL enable options definitions.
+     */
+    typedef enum
+    {
+        SIM7080_EMAIL_SSL_NO    = 1,                /**< Don´t use SSL. */
+        SIM7080_EMAIL_SSL_ENABLE,                   /**< Enable SSL. */
+        SIM7080_EMAIL_SSL_START,                    /**< Only for SMTP. */
+    } SIM7080_EMail_SSL_t;
+#endif
+
 /** @brief SIM7080 E-Mail error codes.
  */
 typedef enum

@@ -112,6 +112,11 @@ SIM70XX_Error_t SIM7080_PDP_IP_CheckNetworks(SIM7080_t& p_Device, std::vector<SI
 
     ESP_LOGI(TAG, "Response: %s", Response.c_str());
 
+    if(Response.find("NOT READY") != std::string::npos)
+    {
+        return SIM70XX_ERR_FAIL;
+    }
+
     do
     {
         std::string Dummy;

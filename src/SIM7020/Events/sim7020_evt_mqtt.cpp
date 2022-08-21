@@ -37,6 +37,12 @@ void SIM7020_Evt_on_MQTT_Pub(SIM7020_t* const p_Device, std::string* p_Message)
 
     ESP_LOGI(TAG, "MQTT subscribe event!");
 
+    Index = p_Message->find("+CMQPUB");
+    if(Index == std::string::npos)
+    {
+        return;
+    }
+
     Packet = new SIM7020_Pub_t();
 
     SIMXX_TOOLS_REMOVE_LINEEND((*p_Message));
@@ -84,6 +90,10 @@ void SIM7020_Evt_on_MQTT_Disconnect(SIM7020_t* const p_Device, std::string* p_Me
     SIMXX_TOOLS_REMOVE_LINEEND((*p_Message));
 
     Index = p_Message->find(":");
+    if(Index == std::string::npos)
+    {
+        return;
+    }
 
     // TODO: Event
 }

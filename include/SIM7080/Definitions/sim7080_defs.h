@@ -32,7 +32,7 @@
 #include <algorithm>
 
 #include "sim70xx_defs.h"
-#include "PDP/sim7080_pdp_defs.h"
+#include "sim7080_pdp_defs.h"
 
 #include <sdkconfig.h>
 
@@ -40,7 +40,11 @@
     #include "sim7080_tcpip_defs.h"
 #endif
 
-/** @brief SIM7080 SIM card status codes definition.
+#ifdef CONFIG_SIM70XX_DRIVER_WITH_MQTT
+    #include "sim7080_mqtt_defs.h"
+#endif
+
+/** @brief SIM7080 SIM card status codes definitions.
  */
 typedef enum
 {
@@ -54,7 +58,7 @@ typedef enum
     SIM7080_SIM_WAIT_PUK2,                                  /**< Possible only if preceding Command was acknowledged with error +CME ERROR: 18. */
 } SIM7080_SIM_t;
 
-/** @brief SIM7080 preferred network modes.
+/** @brief SIM7080 preferred network modes definitions
  */
 typedef enum
 {
@@ -146,10 +150,17 @@ typedef struct
                                                                  NOTE: Managed by the device driver. */                 
         } FS;
     #endif
+    #ifdef CONFIG_SIM70XX_DRIVER_WITH_MQTT
+        struct
+        {
+            std::vector<SIM7080_MQTT_Socket_t*> Sockets;    /**< List with pointer to connected MQTT sockets.
+                                                                 NOTE: Managed by the device driver. */
+        } MQTT;
+    #endif
     #ifdef CONFIG_SIM70XX_DRIVER_WITH_TCPIP
         struct
         {
-            std::vector<SIM7080_TCP_Socket_t*> Sockets;     /**< List with pointer to active TCP sockets.
+            std::vector<SIM7080_TCP_Socket_t*> Sockets;     /**< List with pointer to connected TCP sockets.
                                                                  NOTE: Managed by the device driver. */
         } TCP;
     #endif

@@ -1,5 +1,5 @@
  /*
- * sim7080_ntp.h
+ * sim7080_coap.cpp
  *
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -17,31 +17,17 @@
  * Errors and commissions should be reported to DanielKampert@kampis-elektroecke.de.
  */
 
-#ifndef SIM7080_NTP_H_
-#define SIM7080_NTP_H_
+#include <sdkconfig.h>
 
-#include "sim7080_defs.h"
-#include "sim70xx_errors.h"
-#include "sim7080_ntp_defs.h"
+#if((CONFIG_SIMXX_DEV == 7080) && (defined CONFIG_SIM70XX_DRIVER_WITH_COAP))
 
-/** @brief              Sync the local time with the time from an NTP server.
- *  @param p_Device     SIM7080 device object
- *  @param Server       NTP server
- *  @param Timezone     Timezone
- *  @param p_Time       Pointer to local time
- *  @param p_Error      (Optional) NTP synchronization error code
- *  @param CID          (Optional) NTP CID
- *  @return             SIM70XX_ERR_OK when successful
- */
-SIM70XX_Error_t SIM7080_NTP_Sync(SIM7080_t& p_Device, std::string Server, int8_t TimeZone, struct tm* p_Time, SIM7080_NTP_Error_t* p_Error = NULL, uint8_t CID = 0);
+#include <esp_log.h>
 
-/** @brief              Get the current time from the module.
- *                      NOTE: Use \ref SIM7080_NTP_Sync to sync the time first!
- *  @param p_Device     SIM7080 device object
- *  @param p_Time       Pointer to local time
- *  @param p_Timezone   (Optional) Pointer to timezone
- *  @return             SIM70XX_ERR_OK when successful
- */
-SIM70XX_Error_t SIM7080_NTP_GetTime(SIM7080_t& p_Device, struct tm* p_Time, int8_t* p_Timezone = NULL);
+#include "sim7080.h"
+#include "sim7080_coap.h"
+#include "../../Private/Queue/sim70xx_queue.h"
+#include "../../Private/Commands/sim70xx_commands.h"
 
-#endif /* SIM7080_NTP_H_ */
+static const char* TAG = "SIM7080_CoAP";
+
+#endif

@@ -59,6 +59,14 @@
     #include "sim7080_ssl.h"
 #endif
 
+#ifdef CONFIG_SIM70XX_DRIVER_WITH_MQTT
+    #include "sim7080_mqtt.h"
+#endif
+
+#ifdef CONFIG_SIM70XX_DRIVER_WITH_COAP
+    #include "sim7080_coap.h"
+#endif
+
 /** @brief          Check if the module is initialized.
  *  @param p_Device SIM7080 device object
  *  @return         #true when the module is initialized

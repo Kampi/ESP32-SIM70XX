@@ -32,7 +32,6 @@ static const char* TAG = "SIM7080_NTP";
 
 SIM70XX_Error_t SIM7080_NTP_Sync(SIM7080_t& p_Device, std::string Server, int8_t TimeZone, struct tm* p_Time, SIM7080_NTP_Error_t* p_Error, uint8_t CID)
 {
-    struct tm;
     size_t Index;
     std::string Status;
     std::string Response;
@@ -50,7 +49,7 @@ SIM70XX_Error_t SIM7080_NTP_Sync(SIM7080_t& p_Device, std::string Server, int8_t
     }
 
     SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7020_AT_CNTP_W(Server, TimeZone, CID, 2);
+    *Command = SIM7020_AT_CNTP_W(Server, TimeZone, CID, SIM7080_NTP_MODE_BOTH);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
     if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
@@ -65,8 +64,9 @@ SIM70XX_Error_t SIM7080_NTP_Sync(SIM7080_t& p_Device, std::string Server, int8_t
     {
         return SIM70XX_ERR_FAIL;
     }
-    SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Status, &Response);
 
+    // NOTE: Status and Response are swapped here!
+    SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Status, &Response);
     if(Status.find("OK") == std::string::npos)
     {
         return SIM70XX_ERR_FAIL;
@@ -107,6 +107,51 @@ SIM70XX_Error_t SIM7080_NTP_Sync(SIM7080_t& p_Device, std::string Server, int8_t
     }
 
     return Error;
+}
+
+SIM70XX_Error_t SIM7080_NTP_GetTime(SIM7080_t& p_Device, struct tm* p_Time, int8_t* p_Timezone)
+{
+    size_t Index;
+    std::string Status;
+    std::string Response;
+    SIM70XX_TxCmd_t* Command;
+
+    if(p_Time == NULL)
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+    else if(p_Device.Internal.isInitialized == false)
+    {
+        return SIM70XX_ERR_NOT_INITIALIZED;
+    }
+
+    SIM70XX_CREATE_CMD(Command);
+    *Command = SIM7020_AT_CCLK_R;
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    {
+        return SIM70XX_ERR_FAIL;
+    }
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
+
+    Response.replace(Response.find("\""), std::string("\"").size(), "");
+    Response.replace(Response.find("\""), std::string("\"").size(), "");
+
+    // Get the timezone from the response.
+    Index = Response.find("+");
+    if(p_Timezone != NULL)
+    {
+        *p_Timezone = std::stoi(Response.substr(Index + 1));
+    }
+    Response.erase(Index);
+
+    // We have to add the year to the response to use the convert function from time.h properly.
+    Response = "20" + Response;
+    ESP_LOGI(TAG, "Response: %s", Response.c_str());
+
+    strptime((char*)Response.c_str(), "%Y/%m/%d,%H:%M:%S", p_Time);
+
+    return SIM70XX_ERR_OK;
 }
 
 #endif

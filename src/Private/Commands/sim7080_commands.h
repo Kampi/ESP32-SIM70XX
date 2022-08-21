@@ -72,7 +72,7 @@
 #define SIM7080_AT_SNPING6(Host, Retries, Size, Timeout, Items) SIM70XX_CMD("AT+SNPING6=\"" + Host + "\"," + std::to_string(Retries) + "," + std::to_string(Size) + "," + std::to_string(Timeout), true, 60, Items)
 #define SIM7080_AT_CDNSGIP(Host)                                SIM70XX_CMD("AT+CDNSGIP=\"" + Host + "\"", false, 1, 1)
 #define SIM7080_AT_CAOPEN(ID, PDP, Type, Address, Port)         SIM70XX_CMD("AT+CAOPEN=" + std::to_string(ID) + "," + std::to_string(PDP) + "," + "\"" + Type + "\",\"" + Address + "\"," + std::to_string(Port), true, 0, 1)
-#define SIM7080_AT_CASEND(ID, Size)                             SIM70XX_CMD("AT+CASEND=" + std::to_string(ID) + "," + std::to_string(Size), false, 10, 1)
+#define SIM7080_AT_CASEND(ID, Size, Timeout)                    SIM70XX_CMD("AT+CASEND=" + std::to_string(ID) + "," + std::to_string(Size) + "," + std::to_string(Timeout), false, 1, 1)
 #define SIM7080_AT_CARECV(ID, Size)                             SIM70XX_CMD("AT+CARECV=" + std::to_string(ID) + "," + std::to_string(Size), true, 10, 1)
 #define SIM7020_AT_CACLOSE(ID)                                  SIM70XX_CMD("AT+CACLOSE=" + std::to_string(ID), false, 1, 1)
 
@@ -83,6 +83,7 @@
  */
 #define SIM7020_AT_CNTP_W(Server, TimeZone, ID, Mode)           SIM70XX_CMD("AT+CNTP=\"" + Server + "\"," + std::to_string(TimeZone) + "," + std::to_string(ID) + "," + std::to_string(Mode), false, 60, 1)
 #define SIM7020_AT_CNTP                                         SIM70XX_CMD("AT+CNTP", true, 60, 1)
+#define SIM7020_AT_CCLK_R                                       SIM70XX_CMD("AT+CCLK?", true, 1, 1)
 
 /**
  * 
@@ -93,11 +94,19 @@
 
 /**
  * 
+ * Used in SIM7080 MQTT driver.
+ * 
+ */
+#define SIM7020_AT_SMCONF(Command)                              SIM70XX_CMD(Command, false, 10, 1)
+#define SIM7020_AT_SMCONN                                       SIM70XX_CMD("AT+SMCONN", false, 10, 1)
+
+/**
+ * 
  * Used in SIM7080 file system driver.
  * 
  */
 #define SIM7080_AT_CFSINIT                                      SIM70XX_CMD("AT+CFSINIT", false, 10, 1)
-#define SIM7080_AT_CFSWFILE(Path, Name, Mode, Size)             SIM70XX_CMD("AT+CFSWFILE=" + std::to_string(Path) + ",\"" + Name + "\"," + std::to_string(Mode) + "," + std::to_string(Size) + ",100", false, 1, 1)
+#define SIM7080_AT_CFSWFILE(Path, Name, Mode, Size, Timeout)    SIM70XX_CMD("AT+CFSWFILE=" + std::to_string(Path) + ",\"" + Name + "\"," + std::to_string(Mode) + "," + std::to_string(Size) + "," + std::to_string(Timeout), false, 1, 1)
 #define SIM7080_AT_CFSRFILE(Path, Name, Mode, Size, Position)   SIM70XX_CMD("AT+CFSRFILE=" + std::to_string(Path) + ",\"" + Name + "\"," + std::to_string(Mode) + "," + std::to_string(Size) + "," + std::to_string(Position), false, 1, 1)
 #define SIM7080_AT_CFSGFRS                                      SIM70XX_CMD("AT+CFSGFRS?", true, 1, 1)
 #define SIM7080_AT_CFSGFIS(Path, Name)                          SIM70XX_CMD("AT+CFSGFIS=" + std::to_string(Path) + ",\"" + Name + "\"", true, 1, 1)

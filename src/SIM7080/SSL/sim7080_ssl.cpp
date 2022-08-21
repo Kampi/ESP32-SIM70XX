@@ -89,7 +89,7 @@ SIM70XX_Error_t SIM7080_SSL_ImportRoot(SIM7080_t& p_Device, SIM7080_FS_Path_t Pa
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
-    SIM70XX_ERROR_CHECK(SIM7080_FS_Write(p_Device, Path, RootCA.Name, RootCA.p_Data, RootCA.Size));
+    SIM70XX_ERROR_CHECK(SIM7080_FS_Write(p_Device, Path, RootCA.Name, RootCA.p_Data, RootCA.Size, false, 10000));
 
     CommandStr = "AT+CSSLCFG=\"CONVERT\"," + std::to_string(Type) + "," + RootCA.Name;
 

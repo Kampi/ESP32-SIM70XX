@@ -42,21 +42,23 @@ void SIM7020_Evt_on_HTTP_Event(SIM7020_t* const p_Device, std::string* p_Message
     SIMXX_TOOLS_REMOVE_LINEEND((*p_Message));
 
     Index = p_Message->find(",");
-    if(Index != std::string::npos)
+    if(Index == std::string::npos)
     {
-        ID = std::stoi(p_Message->substr(Index - 1, 1));
-        HTTP_Error = (SIM7020_HTTP_Error_t)std::stoi(p_Message->substr(Index + 1));
+        return;
+    }
 
-        // Iterate through the list of active sockets and close the socket with the given ID.
-        for(std::vector<SIM7020_HTTP_Socket_t*>::iterator it = p_Device->HTTP.Sockets.begin(); it != p_Device->HTTP.Sockets.end(); ++it)
+    ID = std::stoi(p_Message->substr(Index - 1, 1));
+    HTTP_Error = (SIM7020_HTTP_Error_t)std::stoi(p_Message->substr(Index + 1));
+
+    // Iterate through the list of active sockets and close the socket with the given ID.
+    for(std::vector<SIM7020_HTTP_Socket_t*>::iterator it = p_Device->HTTP.Sockets.begin(); it != p_Device->HTTP.Sockets.end(); ++it)
+    {
+        if((*it)->ID == ID)
         {
-            if((*it)->ID == ID)
-            {
-                (*it)->isConnected = false;
+            (*it)->isConnected = false;
 
-                ESP_LOGI(TAG, "Disconnect socket %u", ID);
-                ESP_LOGI(TAG, "Error: %i", HTTP_Error);
-            }
+            ESP_LOGI(TAG, "Disconnect socket %u", ID);
+            ESP_LOGI(TAG, "Error: %i", HTTP_Error);
         }
     }
 }

@@ -21,6 +21,7 @@ Multi driver for SIMCom cellular modules with UART interface.
 | GPS           |               | Not started   |
 | E-Mail        |               | Open          |
 | File system   |               | Basic         |
+| SSL   		    |               | Open          |
 | NVRAM         | Basic         |               |
 | TCP (Client)  | Open          | Basic         |
 | UDP (Client)  | Open          | Open          |

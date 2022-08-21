@@ -241,7 +241,7 @@ SIM70XX_Error_t SIM7020_HTTP_POST(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_
 
     // Get the response from the server.
     Now = SIM70XX_Tools_GetmsTimer();
-    while(SIM70XX_Queue_isEvent(p_Device.Internal.EventQueue, "+CHTTPNMIH: " + std::to_string(p_Socket->ID), &Packet) == false)
+    while(SIM70XX_Queue_isEvent(p_Device.Internal.EventQueue, "+CHTTPNMIH" + std::to_string(p_Socket->ID), &Packet) == false)
     {
         if((SIM70XX_Tools_GetmsTimer() - Now) > (p_Socket->Timeout * 1000UL))
         {
@@ -309,7 +309,7 @@ SIM70XX_Error_t SIM7020_HTTP_GET(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_S
 
     // Get the response from the server.
     Now = SIM70XX_Tools_GetmsTimer();
-    while(SIM70XX_Queue_isEvent(p_Device.Internal.EventQueue, "+CHTTPNMIH: " + std::to_string(p_Socket->ID), &Response) == false)
+    while(SIM70XX_Queue_isEvent(p_Device.Internal.EventQueue, "+CHTTPNMIH" + std::to_string(p_Socket->ID), &Response) == false)
     {
         if((SIM70XX_Tools_GetmsTimer() - Now) > (p_Socket->Timeout * 1000UL))
         {
