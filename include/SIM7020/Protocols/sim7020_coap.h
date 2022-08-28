@@ -29,7 +29,7 @@
  *  @param Server   CoAP server address
  *  @param Port     CoAP broker port
  *  @param p_Socket Pointer to CoAP socket object
- *  @param CID      (Optional) PDP context ID
+ *  @param CID      (Optional) Context Identifier
  *  @return         SIM70XX_ERR_OK when successful
  */
 SIM70XX_Error_t SIM7020_CoAP_Create(SIM7020_t& p_Device, std::string Server, uint16_t Port, SIM7020_CoAP_Socket_t* p_Socket, uint8_t CID = 1);

@@ -77,11 +77,26 @@ bool SIM70XX_Tools_ToBase64(const void* const p_Buffer, uint32_t Length, std::st
  */
 unsigned long IRAM_ATTR SIM70XX_Tools_GetmsTimer(void);
 
+/** @brief          Enable the module.
+ *  @param p_Config Pointer to SIM70XX UART configuration object
+ *  @param Cycles   (Optional) Number of activation cycles
+ *  @return         #true when the module is enabled
+ */
+bool SIM70XX_Tools_EnableModule(SIM70XX_UART_Conf_t& p_Config, uint8_t Cycles = 20);
+
+/** @brief Disable the module.
+ */
+void SIM70XX_Tools_DisableModule(void);
+
 /** @brief          Check if the SIM70XX module is active.
  *  @param p_Config Pointer to SIM70XX UART configuration object
  *  @return         #true when the module is active
  */
 bool SIM70XX_Tools_isActive(SIM70XX_UART_Conf_t& p_Config);
+
+/** @brief Perform a reset of the module.
+ */
+void SIM70XX_Tools_ResetModule(void);
 
 /** @brief          Disable the echo mode of the SIM70XX module.
  *  @param p_Config Pointer to SIM70XX UART configuration object

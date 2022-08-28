@@ -24,29 +24,37 @@
 #include "sim70xx_errors.h"
 #include "sim7080_ssl_defs.h"
 
-/** @brief          
+/** @brief          Configure the SSL driver.
  *  @param p_Device SIM7080 device object
+ *  @param p_Config Pointer to SSL configuration object
+ *  @param CID      (Optional) Context Identifier
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_SSL_Configure(SIM7080_t& p_Device);
+SIM70XX_Error_t SIM7080_SSL_Configure(SIM7080_t& p_Device, SIM7080_SSL_Config_t* p_Config, uint8_t CID = 0);
 
 /** @brief          Import the root certificate authority on the device.
  *  @param p_Device SIM7080 device object
  *  @param Path     Directory path
  *  @param RootCA   Client certificate file
- *  @param CID      (Optional) SSL CID
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_SSL_ImportRoot(SIM7080_t& p_Device, SIM7080_FS_Path_t Path, SIM7080_SSL_Type_t Type, SIM7080_SSL_File_t RootCA, uint8_t CID = 0);
+SIM70XX_Error_t SIM7080_SSL_ImportRoot(SIM7080_t& p_Device, SIM7080_FS_Path_t Path, SIM7080_SSL_Type_t Type, SIM7080_SSL_File_t RootCA);
 
 /** @brief              Import the client key and the client certificate on the device.
  *  @param p_Device     SIM7080 device object
  *  @param Path         Directory path
  *  @param Client_Cer   Client certificate file
  *  @param Client_Key   Client key file
- *  @param CID          (Optional) SSL CID
  *  @return             SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_SSL_ImportCert(SIM7080_t& p_Device, SIM7080_FS_Path_t Path, SIM7080_SSL_File_t Client_Cer, SIM7080_SSL_File_t Client_Key, uint8_t CID = 0);
+SIM70XX_Error_t SIM7080_SSL_ImportCert(SIM7080_t& p_Device, SIM7080_FS_Path_t Path, SIM7080_SSL_File_t Client_Cer, SIM7080_SSL_File_t Client_Key);
+
+/** @brief                  Enable the SSL configuration for a given CID and store it under a given configuration.
+ *  @param p_Device         SIM7080 device object
+ *  @param CID              (Optional) Context Identifier
+ *  @param Configuration    (Optional) SSL configuration index
+ *  @return                 SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_SSL_Enable(SIM7080_t& p_Device, uint8_t CID = 0, uint8_t Configuration = 0);
 
 #endif /* SIM7080_SSL_H_ */

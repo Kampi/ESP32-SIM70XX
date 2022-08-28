@@ -26,6 +26,7 @@
 
 #include "sim70xx_tools.h"
 #include "Private/UART/sim70xx_uart.h"
+#include "Private/GPIO/sim70xx_gpio.h"
 
 static const char* TAG = "SIM70XX_Tools";
 
@@ -130,6 +131,47 @@ unsigned long IRAM_ATTR SIM70XX_Tools_GetmsTimer(void)
     return (unsigned long)(esp_timer_get_time() / 1000ULL);
 }
 
+bool SIM70XX_Tools_EnableModule(SIM70XX_UART_Conf_t& p_Config, uint8_t Cycles)
+{
+    bool Result;
+    uint8_t Attempts;
+
+    SIM70XX_GPIO_Init();
+    SIM70XX_GPIO_SetPwrKey(true);
+
+    Result = false;
+    Attempts = 0;
+    do
+    {
+        if(SIM70XX_Tools_isActive(p_Config))
+        {
+            ESP_LOGI(TAG, "Module active!");
+
+            SIM70XX_GPIO_SetPwrKey(false);
+
+            Result = true;
+
+            break;
+        }
+        else
+        {
+            ESP_LOGI(TAG, "Module inactive. Try to enable module: %u / %u...", Attempts + 1, 10);
+            ESP_LOGI(TAG, "Power on module...");
+
+            Attempts++;
+        }
+
+        vTaskDelay(500 / portTICK_PERIOD_MS);
+    } while((Attempts < Cycles));
+
+    return Result;
+}
+
+void SIM70XX_Tools_DisableModule(void)
+{
+    // TODO
+}
+
 bool SIM70XX_Tools_isActive(SIM70XX_UART_Conf_t& p_Config)
 {
     bool Result;
@@ -141,14 +183,13 @@ bool SIM70XX_Tools_isActive(SIM70XX_UART_Conf_t& p_Config)
     }
 
     Result = false;
-    do
+    Response = SIM70XX_UART_ReadStringUntil(p_Config);
+    ESP_LOGD(TAG, "Response: %s", Response.c_str());
+    ESP_LOGD(TAG, "Length: %u", Response.size());
+    if((Response.find("AT") != std::string::npos) || (Response.find("OK") != std::string::npos))
     {
-        Response = SIM70XX_UART_ReadStringUntil(p_Config);
-        if(Response.find("OK") != std::string::npos)
-        {
-            Result = true;
-        }
-    } while(Response.size() > 0);
+        Result = true;
+    }
 
     if(SIM70XX_UART_Deinit(p_Config) != SIM70XX_ERR_OK)
     {
@@ -156,6 +197,11 @@ bool SIM70XX_Tools_isActive(SIM70XX_UART_Conf_t& p_Config)
     }
 
     return Result;
+}
+
+void SIM70XX_Tools_ResetModule(void)
+{
+    // TODO
 }
 
 SIM70XX_Error_t SIM70XX_Tools_DisableEcho(SIM70XX_UART_Conf_t& p_Config)

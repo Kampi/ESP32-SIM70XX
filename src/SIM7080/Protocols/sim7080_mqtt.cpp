@@ -30,13 +30,14 @@
 
 static const char* TAG = "SIM7080_MQTT";
 
-SIM70XX_Error_t SIM7080_MQTT_Create(SIM7080_t& p_Device, std::string Broker, uint16_t Port, SIM7080_MQTT_Socket_t* p_Socket)
+SIM70XX_Error_t SIM7080_MQTT_Create(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* p_Socket, std::string Broker, uint16_t Port)
 {
     if(p_Socket == NULL)
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
 
+    p_Socket->KeepAlive = 60;
     p_Socket->Broker = Broker;
     p_Socket->Port = Port;
     p_Socket->ClientID = "SIM7080-MQTT";
@@ -58,7 +59,7 @@ SIM70XX_Error_t SIM7080_MQTT_Create(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* 
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
-    CommandStr = "AT+SMCONF=\"CLIENTID,\",\"" + p_Socket->ClientID + "\"";
+    CommandStr = "AT+SMCONF=\"CLIENTID\",\"" + p_Socket->ClientID + "\"";
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_SMCONF(CommandStr);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
@@ -78,7 +79,7 @@ SIM70XX_Error_t SIM7080_MQTT_Create(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* 
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
 
-    CommandStr = "AT+SMCONF=\"URL\"," + p_Socket->Broker + "\"," + std::to_string(p_Socket->Port);
+    CommandStr = "AT+SMCONF=\"URL\",\"" + p_Socket->Broker + "\"," + std::to_string(p_Socket->Port);
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_SMCONF(CommandStr);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);

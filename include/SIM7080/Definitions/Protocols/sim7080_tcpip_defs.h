@@ -82,7 +82,7 @@ typedef struct
 {
     std::string IP;                                 /**< IP address. */
     uint16_t Port;                                  /**< Target port. */
-    uint8_t ID;                                     /**< Socket ID from the module.
+    uint8_t CID;                                    /**< Context Identifier.
                                                          NOTE: Handled by the device driver. */
     bool isConnected;                               /**< Socket connected.
                                                          NOTE: Handled by the device driver. */

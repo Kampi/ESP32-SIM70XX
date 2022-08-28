@@ -38,7 +38,7 @@ SIM70XX_Error_t SIM7020_TCP_Ping(SIM7020_t& p_Device, SIM7020_Ping_t& p_Config, 
  *  @param Port     TCP port
  *  @param p_Socket Pointer to TCP socket object
  *  @param Timeout  (Optional) Timeout in seconds
- *  @param CID      (Optional) PDP context ID
+ *  @param CID      (Optional) Context Identifier
  *  @param Domain   (Optional) Socket IP domain
  *  @param Protocol (Optional) Socket protocol
  *  @return         SIM70XX_ERR_OK when successful

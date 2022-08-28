@@ -143,6 +143,34 @@ menu "SIM70XX"
                 UART communication buffer size.
     endmenu
 
+    menu "GPIO"
+        menu "PwrKey"
+            config SIM70XX_GPIO_PWRKEY_PIN
+                int "PwrKey pin"
+                default 25
+
+            config SIM70XX_GPIO_PWRKEY_INVERT
+                bool "Invert the PwrKey logic"
+                default y
+                help
+                    Enable this option when the PwrKey is switched by a transistor (see Reference circuit).
+
+            config SIM70XX_GPIO_PWRKEY_ENABLE_PULL
+                bool "Enable a Pull-Up / Pull-Down resistor"
+                default n
+                help
+                    This option will enable a pull-up / pull-down resistor for the PwrKey pin (depending on the invert option).
+
+            config SIM70XX_GPIO_USE_STATUS
+                bool "Enable support for the Status signal of the module"
+                default n
+
+            config SIM70XX_GPIO_USE_NETLIGHT
+                bool "Enable support for the Netlight signal of the module"
+                default n
+        endmenu
+    endmenu
+
     menu "Reset"
         depends on SIM70XX_DEV_SIM7020
         config SIM70XX_RESET_USE_HW

@@ -37,7 +37,7 @@
     #define CONFIG_SIM70XX_UART_BUFFER_SIZE                 256
 #endif
 
-static uart_config_t _UART_Config = {
+static uart_config_t _SIM70XX_UART_Config = {
     .baud_rate              = 0,
     .data_bits              = UART_DATA_8_BITS,
     .parity                 = UART_PARITY_DISABLE,
@@ -103,7 +103,7 @@ SIM70XX_Error_t SIM70XX_UART_Init(SIM70XX_UART_Conf_t& p_Config)
 
     p_Config.isInitialized = false;
 
-    _UART_Config.baud_rate = p_Config.Baudrate;
+    _SIM70XX_UART_Config.baud_rate = p_Config.Baudrate;
 
     p_Config.Lock = xSemaphoreCreateMutex();
     if(p_Config.Lock == NULL)
@@ -113,7 +113,7 @@ SIM70XX_Error_t SIM70XX_UART_Init(SIM70XX_UART_Conf_t& p_Config)
 
     xSemaphoreTake(p_Config.Lock, portMAX_DELAY);
     if((uart_driver_install(p_Config.Interface, CONFIG_SIM70XX_UART_BUFFER_SIZE * 2, 0, 0, NULL, 0) ||
-        uart_param_config(p_Config.Interface, &_UART_Config) ||
+        uart_param_config(p_Config.Interface, &_SIM70XX_UART_Config) ||
         uart_set_pin(p_Config.Interface, p_Config.Tx, p_Config.Rx, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE) ||
         uart_flush(p_Config.Interface)) != ESP_OK)
     {

@@ -33,7 +33,7 @@ static const char* TAG = "SIM7080_Evt_TCP";
 
 void SIM7080_Evt_on_TCP_Disconnect(SIM7080_t* const p_Device, std::string* p_Message)
 {
-    uint8_t ID;
+    uint8_t CID;
     size_t Index;
     std::string Message;
     SIM7080_TCP_Error_t Error;
@@ -52,16 +52,16 @@ void SIM7080_Evt_on_TCP_Disconnect(SIM7080_t* const p_Device, std::string* p_Mes
     p_Message->erase(Index, p_Message->find("\r\n", Index) - Index);
 
     Index = Message.find(",");
-    ID = std::stoi(Message.substr((Index - 1), Index));
+    CID = std::stoi(Message.substr((Index - 1), Index));
     Error = (SIM7080_TCP_Error_t)std::stoi(Message.substr(Index + 1));
 
     for(std::vector<SIM7080_TCP_Socket_t*>::iterator it = p_Device->TCP.Sockets.begin(); it != p_Device->TCP.Sockets.end(); ++it)
     {
-        if((*it)->ID == ID)
+        if((*it)->CID == CID)
         {
             (*it)->isConnected = false;
 
-            ESP_LOGI(TAG, "Disconnect socket: %u", ID);
+            ESP_LOGI(TAG, "Disconnect socket: %u", CID);
             ESP_LOGI(TAG, "Error: %i", Error);
         }
     }
@@ -69,7 +69,7 @@ void SIM7080_Evt_on_TCP_Disconnect(SIM7080_t* const p_Device, std::string* p_Mes
 
 void SIM7080_Evt_on_TCP_DataReady(SIM7080_t* const p_Device, std::string* p_Message)
 {
-    uint8_t ID;
+    uint8_t CID;
     size_t Index;
     std::string Message;
 
@@ -87,15 +87,15 @@ void SIM7080_Evt_on_TCP_DataReady(SIM7080_t* const p_Device, std::string* p_Mess
     p_Message->erase(Index, p_Message->find("\r\n", Index) - Index);
 
     Index = Message.find(":");
-    ID = std::stoi(Message.substr(Index + 1, Message.find("\r\n", Index) - Index + 1));
+    CID = std::stoi(Message.substr(Index + 1, Message.find("\r\n", Index) - Index + 1));
 
     for(std::vector<SIM7080_TCP_Socket_t*>::iterator it = p_Device->TCP.Sockets.begin(); it != p_Device->TCP.Sockets.end(); ++it)
     {
-        if((*it)->ID == ID)
+        if((*it)->CID == CID)
         {
             (*it)->isDataReceived = true;
 
-            ESP_LOGI(TAG, "Data received for socket: %u", ID);
+            ESP_LOGI(TAG, "Data received for socket: %u", CID);
         }
     }
 }

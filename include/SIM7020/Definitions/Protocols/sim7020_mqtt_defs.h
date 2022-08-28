@@ -69,7 +69,7 @@ typedef struct
 {
     std::string Broker;                             /**< MQTT broker URL. */
     uint16_t Port;                                  /**< MQTT port. */
-    uint8_t CID;                                    /**< PDP context ID. */
+    uint8_t CID;                                    /**< Context Identifier. */
     uint16_t Timeout;                               /**< MQTT command timeout in milliseconds.
                                                          NOTE: Possible values are from 0 to 60000. */
     uint32_t BufferSize;                            /**< Buffer size.

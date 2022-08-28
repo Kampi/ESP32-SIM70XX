@@ -44,6 +44,7 @@ set(COMPONENT_SRCS
     "src/Private/Events/sim70xx_evt.cpp"
     "src/Private/Queue/sim70xx_queue.cpp"
     "src/Private/UART/sim70xx_uart.cpp"
+    "src/Private/GPIO/sim70xx_gpio.cpp"
     )
 
 set(COMPONENT_ADD_INCLUDEDIRS

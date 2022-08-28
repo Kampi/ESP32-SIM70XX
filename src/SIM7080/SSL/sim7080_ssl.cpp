@@ -68,19 +68,44 @@ static SIM70XX_Error_t SIM7080_SSL_Convert(SIM7080_t& p_Device, std::string Comm
     return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
 }
 
-SIM70XX_Error_t SIM7080_SSL_Configure(SIM7080_t& p_Device)
+SIM70XX_Error_t SIM7080_SSL_Configure(SIM7080_t& p_Device, SIM7080_SSL_Config_t* p_Config, uint8_t CID)
 {
-    if(p_Device.Internal.isInitialized == false)
+    std::string CommandStr;
+    SIM70XX_TxCmd_t* Command;
+
+    if((p_Config == NULL) || (CID > 12))
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+    else if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
-    // TODO
+    CommandStr = "AT+CSSLCFG=\"SSLVERSION\"," + std::to_string(CID) + "," + std::to_string(p_Config->Version);
+    SIM70XX_CREATE_CMD(Command);
+    *Command = SIM7020_AT_CSSLCFG(CommandStr);
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    {
+        return SIM70XX_ERR_FAIL;
+    }
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
+
+    CommandStr = "AT+CSSLCFG=\"IGNORERTCTIME\"," + std::to_string(CID) + "," + std::to_string(p_Config->IgnoreTime);
+    SIM70XX_CREATE_CMD(Command);
+    *Command = SIM7020_AT_CSSLCFG(CommandStr);
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    {
+        return SIM70XX_ERR_FAIL;
+    }
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
 
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7080_SSL_ImportRoot(SIM7080_t& p_Device, SIM7080_FS_Path_t Path, SIM7080_SSL_Type_t Type, SIM7080_SSL_File_t RootCA, uint8_t CID)
+SIM70XX_Error_t SIM7080_SSL_ImportRoot(SIM7080_t& p_Device, SIM7080_FS_Path_t Path, SIM7080_SSL_Type_t Type, SIM7080_SSL_File_t RootCA)
 {
     std::string CommandStr;
 
@@ -98,7 +123,7 @@ SIM70XX_Error_t SIM7080_SSL_ImportRoot(SIM7080_t& p_Device, SIM7080_FS_Path_t Pa
     return SIM7080_FS_Delete(p_Device, Path, RootCA.Name);
 }
 
-SIM70XX_Error_t SIM7080_SSL_ImportCert(SIM7080_t& p_Device, SIM7080_FS_Path_t Path, SIM7080_SSL_Type_t Type, SIM7080_SSL_File_t Client_Cer, SIM7080_SSL_File_t Client_Key, std::string Password, uint8_t CID)
+SIM70XX_Error_t SIM7080_SSL_ImportCert(SIM7080_t& p_Device, SIM7080_FS_Path_t Path, SIM7080_SSL_Type_t Type, SIM7080_SSL_File_t Client_Cer, SIM7080_SSL_File_t Client_Key, std::string Password)
 {
     std::string CommandStr;
 
@@ -123,6 +148,29 @@ SIM70XX_Error_t SIM7080_SSL_ImportCert(SIM7080_t& p_Device, SIM7080_FS_Path_t Pa
     SIM70XX_ERROR_CHECK(SIM7080_FS_Delete(p_Device, Path, Client_Cer.Name));
 
     return SIM7080_FS_Delete(p_Device, Path, Client_Key.Name);
+}
+
+SIM70XX_Error_t SIM7080_SSL_Enable(SIM7080_t& p_Device, uint8_t CID, uint8_t Configuration)
+{
+    SIM70XX_TxCmd_t* Command;
+
+    if((CID > 12) || (Configuration > 5))
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+    else if(p_Device.Internal.isInitialized == false)
+    {
+        return SIM70XX_ERR_NOT_INITIALIZED;
+    }
+
+    SIM70XX_CREATE_CMD(Command);
+    *Command = SIM7020_AT_CSSLCFG("AT+CASSLCFG=" + std::to_string(CID) + ",\"CRINDEX\"," + std::to_string(Configuration));
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    {
+        return SIM70XX_ERR_FAIL;
+    }
+    return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
 }
 
 #endif

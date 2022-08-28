@@ -29,7 +29,7 @@
  *  @param Broker   MQTT broker address
  *  @param p_Socket Pointer to MQTT socket object
  *  @param Port     (Optional) MQTT broker port
- *  @param CID      (Optional) PDP context ID
+ *  @param CID      (Optional) Context Identifier
  *  @return         SIM70XX_ERR_OK when successful
  */
 SIM70XX_Error_t SIM7020_MQTT_Create(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* p_Socket, std::string Broker, uint16_t Port = 1883, uint8_t CID = 0);

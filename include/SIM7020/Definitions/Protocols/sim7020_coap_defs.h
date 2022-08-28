@@ -40,7 +40,7 @@ typedef struct
 {
     std::string Server;                             /**< CoAP server IP address. */
     uint16_t Port;                                  /**< CoAP port. */
-    uint8_t CID;                                    /**< PDP context ID. */
+    uint8_t CID;                                    /**< Context Identifier. */
     uint8_t ID;                                     /**< Socket ID from the module.
                                                          NOTE: Handled by the device driver. */
     bool isConnected;                               /**< #true when the socket is connected.

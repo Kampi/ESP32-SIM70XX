@@ -57,7 +57,7 @@ typedef enum
  */
 typedef struct
 {
-    uint8_t CID;                                    /**< PDP Context ID. */
+    uint8_t CID;                                    /**< Context Identifier. */
     SIM7020_PDP_Type_t Type;                        /**< PDP Context type. */
     std::string APN;                                /**< Access Point Name. */
     std::string PDP_Address;                        /**< */
@@ -75,7 +75,7 @@ typedef struct
  */
 typedef struct
 {
-    uint8_t CID;                                    /**< PDP Context ID. */
+    uint8_t CID;                                    /**< Context Identifier. */
     bool Status;                                    /**< PDP Context enable status. */
 } SIM7020_PDP_Status_t;
 

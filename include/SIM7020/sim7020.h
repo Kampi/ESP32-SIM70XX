@@ -143,7 +143,7 @@ SIM70XX_Error_t SIM7020_IP_AutoAPN(SIM7020_t& p_Device, SIM70XX_APN_t APN);
 /** @brief          Manually set an enable an IP APN.
  *  @param p_Device SIM7020 device object
  *  @param APN      APN configuration object
- *  @param CID      (Optional) PDP context ID
+ *  @param CID      (Optional) Context Identifier
  *  @return         SIM70XX_ERR_OK when successful
  */
 SIM70XX_Error_t SIM7020_IP_ManualAPN(SIM7020_t& p_Device, SIM70XX_APN_t APN, uint8_t CID = 0);

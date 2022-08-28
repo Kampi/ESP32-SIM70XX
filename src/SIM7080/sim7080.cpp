@@ -577,6 +577,8 @@ SIM70XX_Error_t SIM7080_SetFunctionality(SIM7080_t& p_Device, SIM7080_Func_t Fun
     // NOTE: Do not use the error macro, because the response and status depends on the current state of the device.
     Error = SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response, &Status);
 
+    ESP_LOGI(TAG, "Response: %s", Response.c_str());
+
     // Device is in minimum functionality -> Transition into another functionality. Responses:
     //  OK
     //  +CPIN: READY

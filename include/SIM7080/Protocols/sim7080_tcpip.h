@@ -55,7 +55,7 @@ bool inline __attribute__((always_inline)) SIM7080_TCP_Client_isDataAvailable(SI
  *  @param IP           IP address
  *  @param Port         TCP port
  *  @param p_Socket     Pointer to TCP socket object
- *  @param CID          (Optional) Socket CID
+ *  @param CID          (Optional) Context Identifier
  *  @param ReadManually (Optional) Set to #true to automatically read receiving data
  *                      NOTE: Not supported yet
  *  @return             SIM70XX_ERR_OK when successful

@@ -28,6 +28,7 @@
 #include <freertos/event_groups.h>
 #include <freertos/queue.h>
 
+#include <string>
 #include <stdint.h>
 #include <stdbool.h>
 
