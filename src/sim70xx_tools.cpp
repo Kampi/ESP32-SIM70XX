@@ -183,10 +183,11 @@ bool SIM70XX_Tools_isActive(SIM70XX_UART_Conf_t& p_Config)
     }
 
     Result = false;
+    SIM70XX_UART_ReadStringUntil(p_Config);
     Response = SIM70XX_UART_ReadStringUntil(p_Config);
     ESP_LOGD(TAG, "Response: %s", Response.c_str());
     ESP_LOGD(TAG, "Length: %u", Response.size());
-    if((Response.find("AT") != std::string::npos) || (Response.find("OK") != std::string::npos))
+    if(Response.find("OK") != std::string::npos)
     {
         Result = true;
     }
