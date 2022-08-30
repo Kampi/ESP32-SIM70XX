@@ -61,17 +61,17 @@ void SIM70XX_GPIO_Init(void)
     gpio_config(&_SIM70XX_PwrKey_Config);
 
     #ifdef CONFIG_SIM70XX_GPIO_USE_STATUS
-        ESP_LOGI(TAG, "     Use status signal: [x]");
+        ESP_LOGI(TAG, "     Status signal: [x]");
         gpio_config(&_SIM70XX_Status_Config);
     #else
-        ESP_LOGI(TAG, "     Use status signal: [ ]");
+        ESP_LOGI(TAG, "     Status signal: [ ]");
     #endif
 
     #ifdef CONFIG_SIM70XX_GPIO_USE_NETLIGHT
-        ESP_LOGI(TAG, "     Use netlight signal: [x]");
+        ESP_LOGI(TAG, "     Netlight signal: [x]");
         gpio_config(&_SIM70XX_Netlight_Config);
     #else
-        ESP_LOGI(TAG, "     Use netlight signal: [ ]");
+        ESP_LOGI(TAG, "     Netlight signal: [ ]");
     #endif
 
     #ifdef CONFIG_SIM70XX_GPIO_PWRKEY_INVERT
