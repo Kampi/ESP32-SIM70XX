@@ -68,6 +68,7 @@ size_t SIM70XX_UART_Read(SIM70XX_UART_Conf_t& p_Config, uint8_t* p_Buffer, size_
 int SIM70XX_UART_Read(SIM70XX_UART_Conf_t& p_Config);
 
 /** @brief              Receive a string from the UART interface until a termination character is received.
+ *                      NOTE: The termination character will not be returned in the output string!
  *  @param p_Config     Pointer to SIM70XX UART configuration object
  *  @param Terminator   (Optional) Termination character
  *  @param Timeout      (Optional) Timeout in milliseconds

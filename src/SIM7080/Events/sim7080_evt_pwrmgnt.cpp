@@ -1,5 +1,5 @@
  /*
- * sim7020_evt_psm.cpp
+ * sim7080_evt_pwrmgnt.cpp
  *
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -19,18 +19,23 @@
 
 #include <sdkconfig.h>
 
-#if(CONFIG_SIMXX_DEV == 7020)
+#if(CONFIG_SIMXX_DEV == 7080)
 
 #include <esp_log.h>
 
-#include "sim7020.h"
-#include "sim7020_evt.h"
+#include "sim7080.h"
+#include "sim7080_evt.h"
 #include "../../Private/Queue/sim70xx_queue.h"
 
-static const char* TAG = "SIM7020_Evt_TCP";
+static const char* TAG = "SIM7080_Evt_TCP";
 
-void SIM7020_Evt_on_PSM_Event(SIM7020_t* const p_Device, std::string* p_Message, bool isPSM)
+void SIM7080_Evt_on_PSM(SIM7080_t* const p_Device, std::string* p_Message)
 {
+    if(p_Message->find("ENTER PSM") != std::string::npos)
+    {
+        ESP_LOGI(TAG, "Power down event!");
+        p_Device->PwrMgnt.PSM.isActive = true;
+    }
 }
 
 #endif

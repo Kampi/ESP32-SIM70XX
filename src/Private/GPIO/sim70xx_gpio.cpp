@@ -44,11 +44,17 @@ static gpio_config_t _SIM70XX_PwrKey_Config = {
 
 #ifdef CONFIG_SIM70XX_GPIO_USE_STATUS
     static gpio_config_t _SIM70XX_Status_Config = {
+        .pin_bit_mask = BIT(CONFIG_SIM70XX_GPIO_STATUS_PIN),
+        .mode = GPIO_MODE_OUTPUT,
+        .intr_type = GPIO_INTR_DISABLE,
     };
 #endif
 
 #ifdef CONFIG_SIM70XX_GPIO_USE_NETLIGHT
     static gpio_config_t _SIM70XX_Netlight_Config = {
+        .pin_bit_mask = BIT(CONFIG_SIM70XX_GPIO_NETLIGHT_PIN),
+        .mode = GPIO_MODE_OUTPUT,
+        .intr_type = GPIO_INTR_DISABLE,
     };
 #endif
 

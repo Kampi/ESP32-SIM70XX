@@ -57,4 +57,11 @@ SIM70XX_Error_t SIM7080_SSL_ImportCert(SIM7080_t& p_Device, SIM7080_FS_Path_t Pa
  */
 SIM70XX_Error_t SIM7080_SSL_Enable(SIM7080_t& p_Device, uint8_t CID = 0, uint8_t Configuration = 0);
 
+/** @brief          Disable the SSL configuration for a given CID.
+ *  @param p_Device SIM7080 device object
+ *  @param CID      (Optional) Context Identifier
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_SSL_Disable(SIM7080_t& p_Device, uint8_t CID);
+
 #endif /* SIM7080_SSL_H_ */

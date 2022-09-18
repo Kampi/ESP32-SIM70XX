@@ -24,12 +24,108 @@
 #include <esp_log.h>
 
 #include "sim7080.h"
+#include "sim7080_ntp.h"
 #include "sim7080_email.h"
 #include "../../Private/UART/sim70xx_uart.h"
 #include "../../Private/Queue/sim70xx_queue.h"
 #include "../../Private/Commands/sim70xx_commands.h"
 
 static const char* TAG = "SIM7080_EMail";
+
+/** @brief          Prepare an E-Mail and set the sender and the recipients.
+ *  @param p_Device SIM7080 device object
+ *  @param p_Config SIM7080 E-Mail configuration object
+ *  @param p_Sender E-Mail sender
+ *  @param p_To     To recipient
+ *  @param Subject  E-Mail subject
+ *  @param p_CC     CC recipent
+ *  @param p_BCC    BCC recipient
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+static SIM70XX_Error_t SIM7080_EMail_PrepareEMail(SIM7080_t& p_Device, SIM7080_EMail_Config_t* p_Config, SIM7080_EMail_User_t* p_Sender, SIM7080_EMail_User_t* p_To, std::string Subject, SIM7080_EMail_User_t* p_CC, SIM7080_EMail_User_t* p_BCC)
+{
+    SIM70XX_TxCmd_t* Command;
+
+    if((p_Config == NULL) || (p_Sender == NULL) || (p_To == NULL) ||
+            ((p_Sender->Address.size() > 48) || (p_Sender->Name.size() > 48) || (p_To->Address.size() > 48) || (p_To->Name.size() > 48)) ||
+            ((p_CC != NULL) && ((p_CC->Address.size() > 48) || (p_CC->Name.size() > 48))) ||
+            ((p_BCC != NULL) && ((p_BCC->Address.size() > 48) || (p_BCC->Name.size() > 48))))
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+
+    SIM70XX_CREATE_CMD(Command);
+    *Command = SIM7080_AT_EMAILTO(p_Config->Timeout);
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if((SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false) || (SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue) != SIM70XX_ERR_OK))
+    {
+        return SIM70XX_ERR_FAIL;
+    }
+
+    SIM70XX_CREATE_CMD(Command);
+    *Command = SIM7080_AT_SMTPSRV(p_Config->SMTP_Address, p_Config->SMTP_Port);
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if((SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false) || (SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue) != SIM70XX_ERR_OK))
+    {
+        return SIM70XX_ERR_FAIL;
+    }
+
+    SIM70XX_CREATE_CMD(Command);
+    *Command = SIM7080_AT_SMTPAUTH(p_Config->SMTP_Auth_User, p_Config->SMTP_Auth_Pass);
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if((SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false) || (SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue) != SIM70XX_ERR_OK))
+    {
+        return SIM70XX_ERR_FAIL;
+    }
+
+    SIM70XX_CREATE_CMD(Command);
+    *Command = SIM7080_AT_SMTPFROM(p_Sender->Address, p_Sender->Name);
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if((SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false) || (SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue) != SIM70XX_ERR_OK))
+    {
+        return SIM70XX_ERR_FAIL;
+    }
+
+    SIM70XX_CREATE_CMD(Command);
+    *Command = SIM7080_AT_SMTPRCPT(0, p_To->Address, p_To->Name);
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if((SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false) || (SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue) != SIM70XX_ERR_OK))
+    {
+        return SIM70XX_ERR_FAIL;
+    }
+
+    SIM70XX_CREATE_CMD(Command);
+    *Command = SIM7080_AT_SMTPSUB(Subject);
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    {
+        return SIM70XX_ERR_FAIL;
+    }
+
+    if(p_CC != NULL)
+    {
+        SIM70XX_CREATE_CMD(Command);
+        *Command = SIM7080_AT_SMTPRCPT(1, p_CC->Address, p_CC->Name);
+        SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+        if((SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false) || (SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue) != SIM70XX_ERR_OK))
+        {
+            return SIM70XX_ERR_FAIL;
+        }
+    }
+
+    if(p_BCC != NULL)
+    {
+        SIM70XX_CREATE_CMD(Command);
+        *Command = SIM7080_AT_SMTPRCPT(2, p_BCC->Address, p_BCC->Name);
+        SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+        if((SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false) || (SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue) != SIM70XX_ERR_OK))
+        {
+            return SIM70XX_ERR_FAIL;
+        }
+    }
+
+    return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
+}
 
 SIM70XX_Error_t SIM7080_EMail_SendText(SIM7080_t& p_Device, SIM7080_EMail_Config_t* p_Config, SIM7080_EMail_User_t* p_Sender, SIM7080_EMail_User_t* p_To, std::string Subject, std::string Body, SIM7080_EMail_Error_t* p_Error, uint8_t CID)
 {
@@ -46,10 +142,7 @@ SIM70XX_Error_t SIM7080_EMail_SendText(SIM7080_t& p_Device, SIM7080_EMail_Config
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
-    else if((p_Config == NULL) || (p_Sender == NULL) || (p_To == NULL) ||
-            ((CID > 4) || (p_Sender->Address.size() > 48) || (p_Sender->Name.size() > 48) || (p_To->Address.size() > 48) || (p_To->Name.size() > 48)) ||
-            ((p_CC != NULL) && ((p_CC->Address.size() > 48) || (p_CC->Name.size() > 48))) ||
-            ((p_BCC != NULL) && ((p_BCC->Address.size() > 48) || (p_BCC->Name.size() > 48))))
+    else if(CID > 4)
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
@@ -64,54 +157,8 @@ SIM70XX_Error_t SIM7080_EMail_SendText(SIM7080_t& p_Device, SIM7080_EMail_Config
         return SIM70XX_ERR_FAIL;
     }
 
-    SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7080_AT_EMAILTO(30);
-    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if((SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false) || (SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response) != SIM70XX_ERR_OK))
-    {
-        return SIM70XX_ERR_FAIL;
-    }
-
-    SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7080_AT_SMTPSRV(p_Config->SMTP_Address, p_Config->SMTP_Port);
-    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if((SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false) || (SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response) != SIM70XX_ERR_OK))
-    {
-        return SIM70XX_ERR_FAIL;
-    }
-
-    SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7080_AT_SMTPAUTH(p_Config->SMTP_Auth_User, p_Config->SMTP_Auth_Pass);
-    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if((SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false) || (SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response) != SIM70XX_ERR_OK))
-    {
-        return SIM70XX_ERR_FAIL;
-    }
-
-    SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7080_AT_SMTPFROM(p_Sender->Address, p_Sender->Name);
-    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if((SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false) || (SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response) != SIM70XX_ERR_OK))
-    {
-        return SIM70XX_ERR_FAIL;
-    }
-
-    SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7080_AT_SMTPRCPT(0, p_To->Address, p_To->Name);
-    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if((SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false) || (SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response) != SIM70XX_ERR_OK))
-    {
-        return SIM70XX_ERR_FAIL;
-    }
-
-    SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7080_AT_SMTPSUB(Subject);
-    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if((SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false) || (SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response) != SIM70XX_ERR_OK))
-    {
-        return SIM70XX_ERR_FAIL;
-    }
-
+    SIM70XX_ERROR_CHECK(SIM7080_EMail_PrepareEMail(p_Device, p_Config, p_Sender, p_To, Subject, p_CC, p_BCC));
+    
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_SMTPBODY(Body.size());
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
@@ -146,7 +193,7 @@ SIM70XX_Error_t SIM7080_EMail_SendText(SIM7080_t& p_Device, SIM7080_EMail_Config
         vTaskDelay(100);
     }
 
-    ESP_LOGI(TAG, "Response: %s", Response.c_str());
+    ESP_LOGD(TAG, "Response: %s", Response.c_str());
 
     Response.erase(Response.find("+SMTPSEND: "), std::string("+SMTPSEND: ").size());
 
@@ -156,12 +203,39 @@ SIM70XX_Error_t SIM7080_EMail_SendText(SIM7080_t& p_Device, SIM7080_EMail_Config
         *p_Error = Error;
     }
 
-    if(Error != SIM7080_EMAIL_ERR_OK)
+    if(Error != SIM7080_EMAIL_OK)
     {
         return SIM70XX_ERR_FAIL;
     }
 
     return SIM70XX_ERR_OK;
 }
+
+#ifdef CONFIG_SIM70XX_DRIVER_WITH_SSL
+    SIM70XX_Error_t SIM7080_EMail_EnableSSL(SIM7080_t& p_Device, bool Enable, uint8_t SSL_Config, SIM7080_EMail_SSL_t SSL_Opts)
+    {
+        SIM70XX_TxCmd_t* Command;
+
+        if(SSL_Config > 5)
+        {
+            return SIM70XX_ERR_INVALID_ARG;
+        }
+        else if(p_Device.Internal.isInitialized == false)
+        {
+            return SIM70XX_ERR_NOT_INITIALIZED;
+        }
+
+        SIM70XX_CREATE_CMD(Command);
+        *Command = SIM7080_AT_EMAILSSL(SSL_Opts, SSL_Config);
+        SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+        if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+        {
+            return SIM70XX_ERR_FAIL;
+        }
+        SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
+
+        return SIM70XX_ERR_OK;
+    }
+#endif
 
 #endif

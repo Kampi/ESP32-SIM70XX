@@ -49,7 +49,7 @@ SIM70XX_Error_t SIM7080_NTP_Sync(SIM7080_t& p_Device, std::string Server, int8_t
     }
 
     SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7020_AT_CNTP_W(Server, TimeZone, CID, SIM7080_NTP_MODE_BOTH);
+    *Command = SIM7080_AT_CNTP_W(Server, TimeZone, CID, SIM7080_NTP_MODE_BOTH);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
     if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
@@ -58,7 +58,7 @@ SIM70XX_Error_t SIM7080_NTP_Sync(SIM7080_t& p_Device, std::string Server, int8_t
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
     SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7020_AT_CNTP;
+    *Command = SIM7080_AT_CNTP;
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
     if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
@@ -126,7 +126,7 @@ SIM70XX_Error_t SIM7080_NTP_GetTime(SIM7080_t& p_Device, struct tm* p_Time, int8
     }
 
     SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7020_AT_CCLK_R;
+    *Command = SIM7080_AT_CCLK_R;
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
     if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {

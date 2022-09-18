@@ -147,8 +147,6 @@ bool SIM70XX_Tools_EnableModule(SIM70XX_UART_Conf_t& p_Config, uint8_t Cycles)
         {
             ESP_LOGI(TAG, "Module active!");
 
-            SIM70XX_GPIO_SetPwrKey(false);
-
             Result = true;
 
             break;
@@ -161,15 +159,35 @@ bool SIM70XX_Tools_EnableModule(SIM70XX_UART_Conf_t& p_Config, uint8_t Cycles)
             Attempts++;
         }
 
-        vTaskDelay(500 / portTICK_PERIOD_MS);
+        vTaskDelay(100 / portTICK_PERIOD_MS);
     } while((Attempts < Cycles));
+
+    SIM70XX_GPIO_SetPwrKey(false);
 
     return Result;
 }
 
-void SIM70XX_Tools_DisableModule(void)
+bool SIM70XX_Tools_DisableModule(SIM70XX_UART_Conf_t& p_Config)
 {
-    // TODO
+    std::string Response;
+
+    if(SIM70XX_UART_Init(p_Config) != SIM70XX_ERR_OK)
+    {
+        return false;
+    }
+
+    SIM70XX_GPIO_Init();
+
+    // TODO: Test this
+    SIM70XX_GPIO_SetPwrKey(true);
+
+    do
+    {
+        Response = SIM70XX_UART_ReadStringUntil(p_Config);
+        vTaskDelay(100 / portTICK_PERIOD_MS);
+    } while(Response.find("NORMAL POWER DOWN") != std::string::npos);
+
+    return true;
 }
 
 bool SIM70XX_Tools_isActive(SIM70XX_UART_Conf_t& p_Config)
@@ -234,6 +252,56 @@ SIM70XX_Error_t SIM70XX_Tools_DisableEcho(SIM70XX_UART_Conf_t& p_Config)
         ESP_LOGI(TAG, "Echo mode disabled...");
     }
 
+    return SIM70XX_ERR_OK;
+}
+
+SIM70XX_Error_t SIM70XX_Tools_SetBaudrate(SIM70XX_UART_Conf_t& p_Config, SIM70XX_Baud_t Old, SIM70XX_Baud_t New)
+{
+    std::string Status;
+
+    // TODO:
+
+/*
+    // Initialize the serial interface with the old baudrate.
+    vTaskSuspend(p_Device.Internal.TaskHandle);
+    p_Device.UART.Baudrate = Old;
+    SIM70XX_ERROR_CHECK(SIM70XX_UART_Deinit(p_Device.UART));
+    SIM70XX_ERROR_CHECK(SIM70XX_UART_Init(p_Device.UART));
+    vTaskResume(p_Device.Internal.TaskHandle);
+
+    // Set the new baudrate.
+    SIM70XX_CREATE_CMD(Command);
+    *Command = SIM70XX_AT_IPR_W(New);
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    {
+        return SIM70XX_ERR_NOT_READY;
+    }
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Status));
+
+    if(Status.find("OK") == std::string::npos)
+    {
+        ESP_LOGE(TAG, "Can not enable new baudrate!");
+
+        // Switch back to the old baudrate.
+        vTaskSuspend(p_Device.Internal.TaskHandle);
+        p_Device.UART.Baudrate = Old;
+        SIM70XX_ERROR_CHECK(SIM70XX_UART_Deinit(p_Device.UART));
+        SIM70XX_ERROR_CHECK(SIM70XX_UART_Init(p_Device.UART));
+        vTaskResume(p_Device.Internal.TaskHandle);
+
+        return SIM70XX_ERR_FAIL;
+    }
+
+    ESP_LOGI(TAG, "New baudrate enabled. Reinitialize the interface!");
+
+    // Reinitialize the interface with the new baudrate.
+    vTaskSuspend(p_Device.Internal.TaskHandle);
+    p_Device.UART.Baudrate = New;
+    SIM70XX_ERROR_CHECK(SIM70XX_UART_Deinit(p_Device.UART));
+    SIM70XX_ERROR_CHECK(SIM70XX_UART_Init(p_Device.UART));
+    vTaskResume(p_Device.Internal.TaskHandle);
+*/
     return SIM70XX_ERR_OK;
 }
 

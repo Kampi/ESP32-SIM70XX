@@ -1,5 +1,5 @@
  /*
- * sim7080_pdp.cpp
+ * sim7080_psm.cpp
  *
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -23,72 +23,20 @@
 
 #include <esp_log.h>
 
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
+#include <freertos/event_groups.h>
+
+#include <bitset>
+
 #include "sim7080.h"
-#include "sim7080_pdp_defs.h"
+#include "sim7080_pwrmgnt.h"
+#include "../../Private/GPIO/sim70xx_gpio.h"
 #include "../../Private/Queue/sim70xx_queue.h"
 #include "../../Private/Commands/sim70xx_commands.h"
 
-static const char* TAG = "SIM7080_PDP";
-
-SIM70XX_Error_t SIM7080_PDP_IP_Configure(SIM7080_t& p_Device, SIM7080_PDP_IP_Type_t Type, SIM70XX_APN_t APN, uint8_t PDP, SIM7080_PDP_IP_Auth_t Auth)
+SIM70XX_Error_t SIM7080_PSM_Init(SIM7080_t& p_Device)
 {
-    std::string CommandStr;
-    SIM70XX_TxCmd_t* Command;
-
-    if((PDP > 3) || ((Auth != SIM7080_PDP_IP_AUTH_NONE) && (APN.Username.size() == 0)))
-    {
-        return SIM70XX_ERR_INVALID_ARG;
-    }
-    else if(p_Device.Internal.isInitialized == false)
-    {
-        return SIM70XX_ERR_NOT_INITIALIZED;
-    }
-
-    CommandStr = std::to_string(PDP) + "," + std::to_string(Type) + ",\"" + APN.Name + "\"";
-
-    if(Auth != SIM7080_PDP_IP_AUTH_NONE)
-    {
-        CommandStr += ",\"" + APN.Username + "\",\"" + APN.Password + "\"," + std::to_string(Auth);
-    }
-
-    SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7080_AT_CNCFG_W(CommandStr);
-    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
-    {
-        return SIM70XX_ERR_FAIL;
-    }
-
-    return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);;
-}
-
-SIM70XX_Error_t SIM7080_PDP_IP_Action(SIM7080_t& p_Device, uint8_t PDP, SIM7080_PDP_Action_t Action)
-{
-    SIM70XX_TxCmd_t* Command;
-
-    if(PDP > 3)
-    {
-        return SIM70XX_ERR_INVALID_ARG;
-    }
-    else if(p_Device.Internal.isInitialized == false)
-    {
-        return SIM70XX_ERR_NOT_INITIALIZED;
-    }
-
-    SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7080_AT_CNACT_W(PDP, Action);
-    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
-    {
-        return SIM70XX_ERR_FAIL;
-    }
-
-    return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
-}
-
-SIM70XX_Error_t SIM7080_PDP_IP_CheckNetworks(SIM7080_t& p_Device, std::vector<SIM7080_PDP_Network_t>* p_Networks)
-{
-    size_t Index;
     std::string Response;
     SIM70XX_TxCmd_t* Command;
 
@@ -96,13 +44,18 @@ SIM70XX_Error_t SIM7080_PDP_IP_CheckNetworks(SIM7080_t& p_Device, std::vector<SI
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
-    else if(p_Networks == NULL)
-    {
-        return SIM70XX_ERR_INVALID_ARG;
-    }
 
     SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7080_AT_CNACT_R;
+    *Command = SIM7080_AT_CEREG_W(SIM7080_NETREG_PSM);
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    {
+        return SIM70XX_ERR_FAIL;
+    }
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
+
+    SIM70XX_CREATE_CMD(Command);
+    *Command = SIM7080_AT_CEREG_R;
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
     if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
@@ -110,28 +63,96 @@ SIM70XX_Error_t SIM7080_PDP_IP_CheckNetworks(SIM7080_t& p_Device, std::vector<SI
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    if(Response.find("NOT READY") != std::string::npos)
+    return SIM70XX_ERR_OK;
+}
+
+SIM70XX_Error_t SIM7080_PSM_Enable(SIM7080_t& p_Device, SIM7080_PSM_TAU_t TAU_Base, uint8_t TAU_Value, SIM7080_PSM_Time_t Time_Base, uint8_t Time_Value)
+{
+    std::string Response;
+    SIM70XX_TxCmd_t* Command;
+
+    if((TAU_Base > SIM7080_TAU_BASE_320_H) || (TAU_Value > 31) || (Time_Base > SIM7080_TIME_BASE_6_MINUTES) || (Time_Value > 31))
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+    else if(p_Device.Internal.isInitialized == false)
+    {
+        return SIM70XX_ERR_NOT_INITIALIZED;
+    }
+
+    SIM70XX_CREATE_CMD(Command);
+    *Command = SIM7080_AT_CPSMS(true, std::bitset<8>((TAU_Base << 5) | (TAU_Value & 0x1F)).to_string(), std::bitset<8>((Time_Base << 5) | (Time_Value & 0x1F)).to_string());
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    do
-    {
-        std::string Dummy;
-        SIM7080_PDP_Network_t Result;
-
-        Index = Response.find("\n");
-        Dummy = Response.substr(0, Index).c_str();
-        Response.erase(0, Index + 1);
-
-        Result.ID = std::stoi(SIM70XX_Tools_SubstringSplitErase(&Dummy));
-        Result.Status = (SIM7080_PDP_Status_t)std::stoi(SIM70XX_Tools_SubstringSplitErase(&Dummy));
-        Result.IP = SIM70XX_Tools_SubstringSplitErase(&Dummy);
-
-        p_Networks->push_back(Result);
-    } while(Index != std::string::npos);
+    p_Device.PwrMgnt.PSM.isEnabled = true;
 
     return SIM70XX_ERR_OK;
+}
+
+SIM70XX_Error_t SIM7080_PSM_Disable(SIM7080_t& p_Device)
+{
+    std::string Response;
+    SIM70XX_TxCmd_t* Command;
+
+    SIM70XX_CREATE_CMD(Command);
+    *Command = SIM7080_AT_CPSMS(false, "00000000", "00000000");
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    {
+        return SIM70XX_ERR_FAIL;
+    }
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
+
+    p_Device.PwrMgnt.PSM.isEnabled = false;
+
+    return SIM70XX_ERR_OK;
+}
+
+SIM70XX_Error_t SIM7080_PSM_SetOptimizations(SIM7080_t& p_Device, SIM7080_PSM_ModemOpts_t* p_Opts)
+{
+    if(p_Opts == NULL)
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+    else if(p_Device.Internal.isInitialized == false)
+    {
+        return SIM70XX_ERR_NOT_INITIALIZED;
+    }
+
+    // TODO
+
+    return SIM70XX_ERR_OK;
+}
+
+SIM70XX_Error_t SIM7080_PSM_GetOptimizations(SIM7080_t& p_Device, SIM7080_PSM_ModemOpts_t* p_Opts)
+{
+    if(p_Opts == NULL)
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+    else if(p_Device.Internal.isInitialized == false)
+    {
+        return SIM70XX_ERR_NOT_INITIALIZED;
+    }
+
+    // TODO
+
+    return SIM70XX_ERR_OK;
+}
+
+bool SIM7080_PSM_isActive(SIM7080_t& p_Device)
+{
+    if(p_Device.PwrMgnt.PSM.isEnabled == false)
+    {
+        return false;
+    }
+
+    return p_Device.PwrMgnt.PSM.isActive;
 }
 
 #endif

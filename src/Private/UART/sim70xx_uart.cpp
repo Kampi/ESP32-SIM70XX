@@ -266,7 +266,5 @@ size_t SIM70XX_UART_Available(SIM70XX_UART_Conf_t& p_Config)
     uart_get_buffered_data_len(p_Config.Interface, &Avail);
     xSemaphoreGive(p_Config.Lock);
 
-    // TODO: Can return 0?
-
     return Avail;
 }

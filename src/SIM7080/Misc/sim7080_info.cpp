@@ -55,7 +55,6 @@ SIM70XX_Error_t SIM7080_Info_GetDeviceInformation(SIM7080_t& p_Device, SIM7080_I
     SIM70XX_ERROR_CHECK(SIM7080_Info_GetFW(p_Device, &p_Info->Firmware));
     SIM70XX_ERROR_CHECK(SIM7080_Info_GetIMEI(p_Device, &p_Info->IMEI));
     SIM70XX_ERROR_CHECK(SIM7080_Info_GetICCID(p_Device, &p_Info->ICCID));
-    SIM70XX_ERROR_CHECK(SIM7080_Info_GetFW(p_Device, &p_Info->Firmware));
 
     return SIM70XX_ERR_OK;
 }
@@ -228,8 +227,6 @@ SIM70XX_Error_t SIM7080_Info_GetQuality(SIM7080_t& p_Device, SIM70XX_Qual_t* p_R
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    // TODO: Implement RSSI calculation
-
     Index = Response.find(",");
     if(Index == std::string::npos)
     {
@@ -237,7 +234,32 @@ SIM70XX_Error_t SIM7080_Info_GetQuality(SIM7080_t& p_Device, SIM70XX_Qual_t* p_R
     }
 
     p_Report->RSSI = std::stoi(Response.substr(0, Index));
+    if(p_Report->RSSI == 99)
+    {
+        p_Report->RSSI = 0;
+    }
+    else if(p_Report->RSSI == 0)
+    {
+        p_Report->RSSI = -115;
+    }
+    else if(p_Report->RSSI == 1)
+    {
+        p_Report->RSSI = -111;
+    }
+    else if(p_Report->RSSI == 31)
+    {
+        p_Report->RSSI = -52;
+    }
+    else
+    {
+        p_Report->RSSI = -110 + ((p_Report->RSSI - 2) * 2);
+    }
+
     p_Report->RXQual = std::stoi(Response.substr(Response.find_last_of(",") + 1));
+    if(p_Report->RXQual == 99)
+    {
+        p_Report->RXQual = 0;
+    }
 
     ESP_LOGD(TAG, "RSSI: %u", p_Report->RSSI);
     ESP_LOGD(TAG, "RXQual: %u", p_Report->RXQual);

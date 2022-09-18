@@ -31,7 +31,7 @@
      */
     typedef enum
     {
-        SIM7080_EMAIL_SSL_NO    = 1,                /**< Don´t use SSL. */
+        SIM7080_EMAIL_SSL_NO    = 0,                /**< Don´t use SSL. */
         SIM7080_EMAIL_SSL_ENABLE,                   /**< Enable SSL. */
         SIM7080_EMAIL_SSL_START,                    /**< Only for SMTP. */
     } SIM7080_EMail_SSL_t;
@@ -41,7 +41,7 @@
  */
 typedef enum
 {
-    SIM7080_EMAIL_ERR_OK        = 1,                /**< The Email has been sent successfully. */
+    SIM7080_EMAIL_OK            = 1,                /**< The E-Mail has been sent successfully. */
     SIM7080_EMAIL_NET_ERR       = 61,               /**< Network error. */
     SIM7080_EMAIL_DNS_ERR       = 62,               /**< DNS resolve error. */
     SIM7080_EMAIL_SMTP_ERR      = 63,               /**< SMTP TCP connection error. */

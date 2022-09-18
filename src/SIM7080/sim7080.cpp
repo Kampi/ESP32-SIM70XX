@@ -74,21 +74,19 @@ SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t& p_Conf
     p_Device.Internal.isActive = true;
     p_Device.Internal.isInitialized = true;
 
+/*
     if(Old != SIM_BAUD_AUTO)
     {
-        /*
         SIM70XX_Error_t Error;
         ESP_LOGI(TAG, "Changing baudrate...");
 
-        p_Device.Internal.isInitialized = true;
-        Error = SIM7080_SetBaudrate(p_Device, Old, p_Config.UART.Baudrate);
-        p_Device.Internal.isInitialized = false;
+        Error = SIM70XX_Tools_SetBaudrate(p_Device.UART, Old, p_Config.UART.Baudrate);
         if(Error != SIM70XX_ERR_OK)
         {
             return Error;
-        }*/
+        }
     }
-
+*/
 	SIM70XX_ERROR_CHECK(SIM7080_SoftReset(p_Device, Timeout));
 
     vTaskSuspend(p_Device.Internal.TaskHandle);
@@ -97,7 +95,12 @@ SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t& p_Conf
 
     SIM70XX_ERROR_CHECK(SIM7080_Ping(p_Device));
     SIM70XX_ERROR_CHECK(SIM7080_GetFunctionality(p_Device));
-
+/*
+    if(p_Device.Connection.Functionality == SIM7080_FUNC_FULL)
+    {
+        SIM70XX_ERROR_CHECK(SIM7080_SetFunctionality(p_Device, SIM7080_FUNC_MIN));
+    }
+*/
     SIM70XX_ERROR_CHECK(SIM7080_SetFunctionality(p_Device, SIM7080_FUNC_FULL));
 
     #ifdef CONFIG_SIM70XX_DRIVER_WITH_FS
@@ -107,7 +110,7 @@ SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t& p_Conf
     SIM70XX_ERROR_CHECK(SIM7080_SetNetMode(p_Device, p_Config.NetMode));
     SIM70XX_ERROR_CHECK(SIM7080_SetSelectedMode(p_Device, p_Config.Mode));
 
-    if(p_Config.Mode == (SIM7080_MODE_CAT | SIM7080_MODE_NB))
+    if(p_Config.Mode == SIM7080_MODE_BOTH)
     {
         SIM70XX_ERROR_CHECK(SIM7080_SetBandConfig(p_Device, SIM7080_MODE_CAT, p_Config.Bandlist));
         SIM70XX_ERROR_CHECK(SIM7080_SetBandConfig(p_Device, SIM7080_MODE_NB, p_Config.Bandlist));
@@ -126,8 +129,38 @@ SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t& p_Conf
     return SIM70XX_ERR_OK;
 }
 
-void SIM7080_Deinit(SIM7080_t& p_Device)
+SIM70XX_Error_t SIM7080_Deinit(SIM7080_t& p_Device, bool Skip)
 {
+    std::string Response;
+    SIM70XX_TxCmd_t* Command;
+
+    if(p_Device.Internal.isInitialized == false)
+    {
+        return SIM70XX_ERR_OK;
+    }
+
+    // Shutdown the modem.
+    if(Skip == false)
+    {
+        SIM70XX_CREATE_CMD(Command);
+        *Command = SIM7080_AT_CPOWD(true);
+        SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+        if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+        {
+            return SIM70XX_ERR_FAIL;
+        }
+
+        SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response);
+        if(Response.find("NORMAL POWER DOWN") == std::string::npos)
+        {
+            return SIM70XX_ERR_FAIL;
+        }
+    }
+
+    p_Device.Internal.isInitialized = false;
+
+    ESP_LOGI(TAG, "Modem inactive...");
+
     // Stop the receive task.
     vTaskSuspend(p_Device.Internal.TaskHandle);
     vTaskDelete(p_Device.Internal.TaskHandle);
@@ -138,10 +171,8 @@ void SIM7080_Deinit(SIM7080_t& p_Device)
     vQueueDelete(p_Device.Internal.TxQueue);
     vQueueDelete(p_Device.Internal.EventQueue);
 
-    // TODO: Shutdown modem
-
-    // Deinitialize the modem.
-    SIM70XX_UART_Deinit(p_Device.UART);
+    // Deinitialize the UART interface.
+    return SIM70XX_UART_Deinit(p_Device.UART);
 }
 
 SIM70XX_Error_t SIM7080_SoftReset(SIM7080_t& p_Device, uint32_t Timeout)
@@ -552,10 +583,10 @@ SIM70XX_Error_t SIM7080_GetSelectedMode(SIM7080_t& p_Device, SIM7080_Mode_t* p_M
 
 SIM70XX_Error_t SIM7080_SetFunctionality(SIM7080_t& p_Device, SIM7080_Func_t Func, SIM7080_Reset_t Reset)
 {
-    std::string Status;
+    uint32_t Now;
+    std::string Line;
     std::string Response;
-    SIM70XX_TxCmd_t* Command;
-    SIM70XX_Error_t Error = SIM70XX_ERR_FAIL;
+    SIM70XX_TxCmd_t Command;
 
     if(p_Device.Internal.isInitialized == false)
     {
@@ -566,57 +597,34 @@ SIM70XX_Error_t SIM7080_SetFunctionality(SIM7080_t& p_Device, SIM7080_Func_t Fun
         return SIM70XX_ERR_OK;
     }
 
-    SIM70XX_CREATE_CMD(Command);
-    *Command = SIM70XX_AT_CFUN_W(Func, Reset);
-    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    Command = SIM70XX_AT_CFUN_W(Func, Reset);
+    vTaskSuspend(p_Device.Internal.TaskHandle);
+    ESP_LOGI(TAG, "Tranmit command: %s", Command.Command.c_str());
+    SIM70XX_UART_SendLine(p_Device.UART, Command.Command);
+    Now = SIM70XX_Tools_GetmsTimer();
+    do
     {
-        return SIM70XX_ERR_FAIL;
-    }
+        Line = SIM70XX_UART_ReadStringUntil(p_Device.UART);
+        Response += Line + "\n";
 
-    // NOTE: Do not use the error macro, because the response and status depends on the current state of the device.
-    Error = SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response, &Status);
+        if((SIM70XX_Tools_GetmsTimer() - Now) > (Command.Timeout * 1000UL))
+        {
+            break;
+        }
+    } while(Line.size() > 0);
+    vTaskResume(p_Device.Internal.TaskHandle);
 
     ESP_LOGI(TAG, "Response: %s", Response.c_str());
 
-    // Device is in minimum functionality -> Transition into another functionality. Responses:
-    //  OK
-    //  +CPIN: READY
-    //  SMS Ready
-    if(p_Device.Connection.Functionality == SIM7080_FUNC_MIN)
+    if(Response.find("OK") == std::string::npos)
     {
-        ESP_LOGI(TAG, "Last: Minimum functionality...");
-
-        if(Response.find("OK") != std::string::npos)
-        {
-            p_Device.Connection.Functionality = Func;
-
-            Error = SIM70XX_ERR_OK;
-        }
-
-        while(SIM70XX_Queue_isEvent(p_Device.Internal.EventQueue, "SMS Ready", &Response) == false)
-        {
-            vTaskDelay(100 / portTICK_PERIOD_MS);
-        }
-    }
-    // Device is in full functionality -> Transition into another functionality
-    //  Response = +APP PDP: 0,DEACTIVE
-    //  Status = +CPIN: NOT READY
-    else if(p_Device.Connection.Functionality == SIM7080_FUNC_FULL)
-    {
-        ESP_LOGI(TAG, "Last: Full functionality...");
-
-        if(Status.find("OK") != std::string::npos)
-        {
-            p_Device.Connection.Functionality = Func;
-
-            Error = SIM70XX_ERR_OK;
-        }
+        return SIM70XX_ERR_FAIL;
+        
     }
 
-    ESP_LOGI(TAG, "Functionality: %u", p_Device.Connection.Functionality);
+    p_Device.Connection.Functionality = Func;
 
-    return Error;
+    return SIM70XX_ERR_OK;
 }
 
 SIM70XX_Error_t SIM7080_GetFunctionality(SIM7080_t& p_Device)

@@ -30,8 +30,6 @@
 #include "../../Private/Queue/sim70xx_queue.h"
 #include "../../Private/Commands/sim70xx_commands.h"
 
-static const char* TAG = "SIM7080_TCPIP";
-
 SIM70XX_Error_t SIM7080_TCP_Ping(SIM7080_t& p_Device, SIM7080_Ping_t* p_Config, std::vector<SIM7080_PingRes_t>* p_Result, bool IPv6)
 {
     size_t Index;

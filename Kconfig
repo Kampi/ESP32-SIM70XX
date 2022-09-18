@@ -143,10 +143,10 @@ menu "SIM70XX"
                 UART communication buffer size.
     endmenu
 
-    menu "GPIO"
+    menu "GPIO" 
         menu "PwrKey"
             config SIM70XX_GPIO_PWRKEY_PIN
-                int "PwrKey pin"
+                int "PwrKey signal output"
                 default 25
 
             config SIM70XX_GPIO_PWRKEY_INVERT
@@ -165,9 +165,19 @@ menu "SIM70XX"
                 bool "Enable support for the Status signal of the module"
                 default n
 
+            config SIM70XX_GPIO_STATUS_PIN
+                int "Status signal input"
+                depends on SIM70XX_GPIO_USE_STATUS
+                default 34
+
             config SIM70XX_GPIO_USE_NETLIGHT
                 bool "Enable support for the Netlight signal of the module"
                 default n
+
+            config SIM70XX_GPIO_NETLIGHT_PIN
+                int "Netlight signal input"
+                depends on SIM70XX_GPIO_USE_NETLIGHT
+                default 35
         endmenu
     endmenu
 

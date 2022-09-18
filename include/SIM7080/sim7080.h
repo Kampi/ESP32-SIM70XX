@@ -28,6 +28,7 @@
 #include "sim7080_defs.h"
 #include "sim70xx_tools.h"
 #include "sim70xx_errors.h"
+#include "sim7080_pwrmgnt.h"
 
 #include "sim7080_config_1nce.h"
 #include "sim7080_config_fusion.h"
@@ -103,10 +104,13 @@ SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t& p_Conf
  */
 SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t& p_Config, uint32_t Timeout = 10, SIM70XX_Baud_t Old = SIM_BAUD_AUTO);
 
-/** @brief          Deinitialize the SIM7080 module.
+/** @brief          Deinitialize the SIM7080 module by using the serial interface.
  *  @param p_Device SIM7080 device object
+ *  @param Skip     (Optional) Skip the shutdown command for the modem
+ *                  NOTE: This is usefull when you have used \ref SIM70XX_Tools_DisableModule to shutdown the modem
+ *  @return         SIM70XX_ERR_OK when successful
  */
-void SIM7080_Deinit(SIM7080_t& p_Device);
+SIM70XX_Error_t SIM7080_Deinit(SIM7080_t& p_Device, bool Skip = false);
 
 /** @brief          Perform a software reset of the device.
  *  @param p_Device SIM7080 device object

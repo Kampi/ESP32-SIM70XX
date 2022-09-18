@@ -42,9 +42,9 @@
                                                                             .Password = "",                                                     \
                                                                         },                                                                      \
                                                                         .OperatorFormat = SIM_FORM_NUMERIC,                                     \
-                                                                        .Operator = "26201",                                                    \
+                                                                        .Operator = "23201",                                                    \
                                                                         .NetMode = SIM7080_NETMODE_LTE,                                         \
-                                                                        .Mode = SIM7080_MODE_CAT,                                               \
+                                                                        .Mode = SIM7080_MODE_BOTH,                                              \
                                                                         .Bandlist = std::vector<uint8_t>(),                                     \
                                                                     };
 #endif /* SIM7080_CONFIG_FUSION_H_ */

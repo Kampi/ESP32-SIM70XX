@@ -11,6 +11,8 @@ set(COMPONENT_SRCS
     "src/SIM7080/Protocols/sim7080_coap.cpp"
     "src/SIM7080/Protocols/sim7080_mqtt.cpp"
     "src/SIM7080/Protocols/sim7080_tcp_client.cpp"
+    "src/SIM7080/PowerManagement/sim7080_psm.cpp"
+    "src/SIM7080/PowerManagement/sim7080_pwrmgnt.cpp"
     "src/SIM7080/Protocols/sim7080_ping.cpp"
     "src/SIM7080/Protocols/sim7080_email.cpp"
     "src/SIM7080/PDP/sim7080_pdp_gprs.cpp"
@@ -18,7 +20,9 @@ set(COMPONENT_SRCS
     "src/SIM7080/Misc/sim7080_info.cpp"
     "src/SIM7080/FileSystem/sim7080_fs.cpp"
     "src/SIM7080/Events/sim7080_evt.cpp"
+    "src/SIM7080/Events/sim7080_evt_mqtt.cpp"
     "src/SIM7080/Events/sim7080_evt_tcp.cpp"
+    "src/SIM7080/Events/sim7080_evt_pwrmgnt.cpp"
 
     # SIM7020
     "src/SIM7020/sim7020.cpp"
@@ -58,13 +62,14 @@ set(COMPONENT_ADD_INCLUDEDIRS
 	"include/SIM7080/Protocols"
 	"include/SIM7080/FileSystem"
 	"include/SIM7080/Definitions"
+	"include/SIM7080/PowerManagement"
 	"include/SIM7080/Definitions/PDP"
 	"include/SIM7080/Definitions/SSL"
 	"include/SIM7080/Definitions/Misc"
 	"include/SIM7080/Definitions/Configs"
 	"include/SIM7080/Definitions/Protocols"
 	"include/SIM7080/Definitions/FileSystem"
-	"include/SIM7080/Protocols"
+	"include/SIM7080/Definitions/PowerManagement"
 
     # SIM7020
     "include/SIM7020"

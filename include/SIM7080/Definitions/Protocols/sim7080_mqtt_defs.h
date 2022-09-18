@@ -43,6 +43,14 @@ typedef struct
     bool Retained;                                  /**< Retained flag. */
 } SIM7080_MQTT_Will_t;
 
+/** @brief SIM7080 MQTT subscription event object definition.
+ */
+typedef struct
+{
+    std::string Topic;                              /**< Message topic. */
+    std::string Payload;                            /**< Message payload. */
+} SIM7080_Sub_Evt;
+
 /** @brief SIM7080 MQTT Socket object.
  */
 typedef struct
@@ -53,14 +61,21 @@ typedef struct
     uint16_t KeepAlive;                             /**< Keep alive interval in seconds. */
     bool CleanSession;                              /**< Clean session flag. */
     bool WillFlag;                                  /**< Last will flag. */
-    bool isConnected;                               /**< Socket connected.
-                                                         NOTE: Handled by the device driver. */
-    bool isCreated;                                 /**< #true when the socket is created.
-                                                         NOTE: Handled by the device driver. */
     std::string Username;                           /**< Optional username. */
     std::string Password;                           /**< Optional password. */
     SIM7080_MQTT_QoS_t QoS;                         /**< Quality of service settings. */
     SIM7080_MQTT_Will_t* p_LastWill;                /**< Pointer to last will configuration object. */
+    struct
+    {
+        bool isConnected;                           /**< Socket connected.
+                                                         NOTE: Handled by the device driver. */
+        bool isCreated;                             /**< #true when the socket is created.
+                                                         NOTE: Handled by the device driver. */
+        QueueHandle_t SubQueue;                     /**< Subscribe event queue.
+                                                         NOTE: Managed by the device driver. */
+        uint32_t SubTopics;                         /**< Topic subscription counter.
+                                                         NOTE: Managed by the device driver. */
+    } Internal;
 } SIM7080_MQTT_Socket_t;
 
 #endif /* SIM7080_MQTT_DEFS_H_ */

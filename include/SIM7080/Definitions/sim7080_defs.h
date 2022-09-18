@@ -58,7 +58,18 @@ typedef enum
     SIM7080_SIM_WAIT_PUK2,                                  /**< Possible only if preceding Command was acknowledged with error +CME ERROR: 18. */
 } SIM7080_SIM_t;
 
-/** @brief SIM7080 preferred network modes definitions
+/** @brief SIM7080 preferred network registration definitions.
+ */
+typedef enum
+{
+    SIM7080_NETREG_DISABLE  = 0,                            /**< Disable network registration unsolicited result code. */
+    SIM7080_NETREG_ENABLE   = 1,                            /**< Enable network registration unsolicited result code. */
+    SIM7080_NETREG_LOCATION = 2,                            /**< Enable network registration and location information unsolicited result code. */
+    SIM7080_NETREG_PSM      = 4,                            /**< For a UE that wants to apply PSM, enable network registration and
+                                                                 location information unsolicited result code. */
+} SIM7080_NetReg_t;
+
+/** @brief SIM7080 preferred network modes definitions.
  */
 typedef enum
 {
@@ -68,12 +79,13 @@ typedef enum
     SIM7080_NETMODE_GSM_LTE = 51,                           /**< GSM and LTE mode only. */
 } SIM7080_NetMode_t;
 
-/** @brief SIM7080 preferred selections between CAT-M and NB-IoT
+/** @brief SIM7080 preferred selections between CAT-M and NB-IoT.
  */
 typedef enum
 {
     SIM7080_MODE_CAT        = 1,                            /**< Select CAT-M. */
     SIM7080_MODE_NB         = 2,                            /**< Select NB-IoT. */
+    SIM7080_MODE_BOTH       = 3,                            /**< Select NB-IoT and CAT-M. */
 } SIM7080_Mode_t;
 
 /** @brief SIM7080 supported frequency bands.
@@ -118,6 +130,8 @@ typedef enum
                                                                  PLMN is currently not available. The UE will start a GPRS attach as
                                                                  soon as an allowable PLMN is available.
                                                                  3 Registration denied, The GPRS service */
+    SIM7080_NET_DENIED,                                     /**< Registration denied, The GPRS service is disabled, the UE is not
+                                                                 allowed to attach for GPRS if it is requested by the user. */
     SIM7080_NET_UNKNOWN,                                    /**< Unknown. */
     SIM7080_NET_ROAMING,                                    /**< Registered, roaming. */
 } SIM7080_NetRegistration_t;
@@ -153,7 +167,7 @@ typedef struct
     #ifdef CONFIG_SIM70XX_DRIVER_WITH_MQTT
         struct
         {
-            std::vector<SIM7080_MQTT_Socket_t*> Sockets;    /**< List with pointer to connected MQTT sockets.
+            SIM7080_MQTT_Socket_t* Socket;                  /**< Active MQTT socket.
                                                                  NOTE: Managed by the device driver. */
         } MQTT;
     #endif
@@ -179,6 +193,16 @@ typedef struct
         TaskHandle_t TaskHandle;                            /**< Handle of the receive task.
                                                                  NOTE: Managed by the device driver. */
     } Internal;
+    struct
+    {
+        struct
+        {
+            bool isEnabled;                                 /**< #true when PSM is enabled.
+                                                                 NOTE: Managed by the device driver. */
+            bool isActive;                                 /**< #true when PSM is is active.
+                                                                 NOTE: Managed by the device driver. */
+        } PSM;
+    } PwrMgnt;
 } SIM7080_t;
 
 /** @brief SIM7080 device configuration object.

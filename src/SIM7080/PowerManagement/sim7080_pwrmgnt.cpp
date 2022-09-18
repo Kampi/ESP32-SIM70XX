@@ -1,5 +1,5 @@
  /*
- * sim7020_evt_psm.cpp
+ * sim7080_pwrmgnt.cpp
  *
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -19,18 +19,55 @@
 
 #include <sdkconfig.h>
 
-#if(CONFIG_SIMXX_DEV == 7020)
+#if(CONFIG_SIMXX_DEV == 7080)
 
 #include <esp_log.h>
 
-#include "sim7020.h"
-#include "sim7020_evt.h"
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
+#include <freertos/event_groups.h>
+
+#include "sim7080.h"
+#include "sim7080_pwrmgnt.h"
+#include "../../Private/GPIO/sim70xx_gpio.h"
 #include "../../Private/Queue/sim70xx_queue.h"
+#include "../../Private/Commands/sim70xx_commands.h"
 
-static const char* TAG = "SIM7020_Evt_TCP";
-
-void SIM7020_Evt_on_PSM_Event(SIM7020_t* const p_Device, std::string* p_Message, bool isPSM)
+SIM70XX_Error_t SIM7080_PwrMgnt_WakeUp(SIM7080_t& p_Device, uint8_t Timeout)
 {
+    uint32_t Now;
+    SIM70XX_Error_t Error;
+
+    if((p_Device.PwrMgnt.PSM.isEnabled == false) || (p_Device.PwrMgnt.PSM.isActive == false))
+    {
+        return SIM70XX_ERR_OK;
+    }
+
+    SIM70XX_GPIO_SetPwrKey(true);
+
+    Now = SIM70XX_Tools_GetmsTimer();
+    Error = SIM70XX_ERR_FAIL;
+    do
+    {
+        Error = SIM7080_Ping(p_Device);
+
+        if((SIM70XX_Tools_GetmsTimer() - Now) > (Timeout * 1000UL))
+        {
+            Error = SIM70XX_ERR_TIMEOUT;
+            goto SIM7080_PwrMgnt_WakeUpPSM_Error;
+
+            break;
+        }
+
+        vTaskDelay(100 / portTICK_PERIOD_MS);
+    } while(Error != SIM70XX_ERR_OK);
+
+    p_Device.PwrMgnt.PSM.isActive = false;
+
+SIM7080_PwrMgnt_WakeUpPSM_Error:
+    SIM70XX_GPIO_SetPwrKey(false);
+
+    return Error;
 }
 
 #endif

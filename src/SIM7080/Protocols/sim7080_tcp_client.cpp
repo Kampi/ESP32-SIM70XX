@@ -114,12 +114,13 @@ SIM70XX_Error_t SIM7080_TCP_Client_Connect(SIM7080_t& p_Device, SIM7080_TCP_Sock
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7080_TCP_Client_Transmit(SIM7080_t& p_Device, SIM7080_TCP_Socket_t* p_Socket, const void* p_Buffer, uint32_t Length, uint16_t Timeout, uint16_t PacketSize)
+SIM70XX_Error_t SIM7080_TCP_Client_Transmit(SIM7080_t& p_Device, SIM7080_TCP_Socket_t* p_Socket, const void* p_Buffer, uint32_t Length, uint8_t Retries, uint16_t Timeout, uint16_t PacketSize)
 {
+    uint8_t RetryCounter;
     uint8_t* Buffer = (uint8_t*)p_Buffer;
     uint32_t Remaining = Length;
     SIM70XX_Error_t Error = SIM70XX_ERR_OK;
-    SIM70XX_TxCmd_t* Command;
+    SIM70XX_TxCmd_t Command;
 
     if((p_Socket == NULL) || (p_Socket->Type != SIM7080_TCP_TYPE_TCP) || ((p_Buffer == NULL) && (Length > 0)) || (PacketSize > SIM7080_TCP_MAX_PAYLOAD_SIZE))
     {
@@ -145,6 +146,7 @@ SIM70XX_Error_t SIM7080_TCP_Client_Transmit(SIM7080_t& p_Device, SIM7080_TCP_Soc
     // NOTE: We can not use the standard process here, because the response (">") does not contain a new line. The command will end with an empty space (0x20).
     vTaskSuspend(p_Device.Internal.TaskHandle);
     ESP_LOGI(TAG, "Total %u bytes to transmit...", Remaining);
+    RetryCounter = 0;
     do
     {
         uint32_t BytesToSend;
@@ -163,56 +165,67 @@ SIM70XX_Error_t SIM7080_TCP_Client_Transmit(SIM7080_t& p_Device, SIM7080_TCP_Soc
 
         ESP_LOGI(TAG, "     Transmit %u bytes...", BytesToSend);
 
-        SIM70XX_CREATE_CMD(Command);
-        *Command = SIM7080_AT_CASEND(p_Socket->CID, BytesToSend, Timeout);
-        SIM70XX_UART_SendLine(p_Device.UART, Command->Command);
+        // Transmit the command.
+        Command = SIM7080_AT_CASEND(p_Socket->CID, BytesToSend, Timeout);
+        SIM70XX_UART_SendLine(p_Device.UART, Command.Command);
 
         // Wait for the empty space after the ">".
-        Response = SIM70XX_UART_ReadStringUntil(p_Device.UART, ' ', Command->Timeout * 1000UL);
+        Response = SIM70XX_UART_ReadStringUntil(p_Device.UART, ' ', Command.Timeout * 1000UL);
         if(Response.find(">") == std::string::npos)
         {
             ESP_LOGE(TAG, "Invalid response. Expect '>', got: %s", Response.c_str());
 
             Error = SIM70XX_ERR_FAIL;
-            goto SIM7080_TCP_Client_Transmit_Exit;
+            break;
         }
 
         // Send the data.
         SIM70XX_UART_Send(p_Device.UART, Buffer, BytesToSend);
 
-        // Read and parse the result.
+        // Read and parse the status code.
         SIM70XX_UART_ReadStringUntil(p_Device.UART);
-        Response = SIM70XX_UART_ReadStringUntil(p_Device.UART, '\n', Command->Timeout * 1000UL);
+        Response = SIM70XX_UART_ReadStringUntil(p_Device.UART, '\n', Command.Timeout * 1000UL);
+
         ESP_LOGE(TAG, "Response: %s", Response.c_str());
     
         // Transmission error. Repeat the last packet.
         if(Response.find("ERROR") != std::string::npos)
         {
-            continue;
-        }
-        // Packet transmission successful.
-        else
-        {
-            // Response "OK" - transmit the next packet.
-            if(Response.find("OK") != std::string::npos)
+            if(RetryCounter < Retries)
             {
-                Buffer += BytesToSend;
-                Remaining -= BytesToSend;
+                RetryCounter++;
+                continue;
+            }
+            else
+            {
+                Error = SIM70XX_ERR_TIMEOUT;
+                break;
             }
         }
-    } while((Remaining > 0) && (p_Socket->isConnected));
-
-SIM7080_TCP_Client_Transmit_Exit:
-    delete Command;
+        // Data received. Abort the transmission.
+        else if(Response.find("+CADATAIND") != std::string::npos)
+        {
+            p_Socket->isDataReceived = true;
+            Error = SIM70XX_ERR_FAIL;
+            break;
+        }
+        // Response "OK" - transmit the next packet.
+        else if(Response.find("OK") != std::string::npos)
+        {
+            RetryCounter = 0;
+            Buffer += BytesToSend;
+            Remaining -= BytesToSend;
+        }
+    } while(Remaining > 0);
 
     vTaskResume(p_Device.Internal.TaskHandle);
 
     return Error;
 }
 
-SIM70XX_Error_t SIM7080_TCP_Client_Receive(SIM7080_t& p_Device, SIM7080_TCP_Socket_t* p_Socket, uint32_t Length, std::string* p_Buffer)
+SIM70XX_Error_t SIM7080_TCP_Client_Receive(SIM7080_t& p_Device, SIM7080_TCP_Socket_t* p_Socket, std::string* p_Buffer, uint32_t Length)
 {
-    SIM70XX_TxCmd_t* Command;
+    SIM70XX_TxCmd_t Command;
 
     if((p_Socket == NULL) || (p_Socket->Type != SIM7080_TCP_TYPE_TCP) || (p_Buffer == NULL))
     {
@@ -228,15 +241,14 @@ SIM70XX_Error_t SIM7080_TCP_Client_Receive(SIM7080_t& p_Device, SIM7080_TCP_Sock
     }
     else if((p_Socket->isDataReceived == false) || (Length == 0))
     {
-        return SIM70XX_ERR_OK;
+        return SIM70XX_ERR_FAIL;
     }
 
     // We have to use the event queue here, because payload can contain CR and LF which will lead to wrong results when we use the normal way here.
+    ESP_LOGI(TAG, "Transmit command: %s", Command.Command.c_str());
     vTaskSuspend(p_Device.Internal.TaskHandle);
-    SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7080_AT_CARECV(p_Socket->CID, Length);
-    SIM70XX_UART_SendLine(p_Device.UART, Command->Command);
-    delete Command;
+    Command = SIM7080_AT_CARECV(p_Socket->CID, Length);
+    SIM70XX_UART_SendLine(p_Device.UART, Command.Command);
     vTaskResume(p_Device.Internal.TaskHandle);
 
     while(SIM70XX_Queue_isEvent(p_Device.Internal.EventQueue, "+CARECV" , p_Buffer) == false)
@@ -244,6 +256,7 @@ SIM70XX_Error_t SIM7080_TCP_Client_Receive(SIM7080_t& p_Device, SIM7080_TCP_Sock
         vTaskDelay(100 / portTICK_PERIOD_MS);
     }
 
+    // Remove the command and the length from the response.
     SIM70XX_Tools_SubstringSplitErase(p_Buffer);
 
     return SIM70XX_ERR_OK;
@@ -271,7 +284,7 @@ SIM70XX_Error_t SIM7080_TCP_Client_Destroy(SIM7080_t& p_Device, SIM7080_TCP_Sock
     }
 
     SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7020_AT_CACLOSE(p_Socket->CID);
+    *Command = SIM7080_AT_CACLOSE(p_Socket->CID);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
     if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
@@ -284,5 +297,35 @@ SIM70XX_Error_t SIM7080_TCP_Client_Destroy(SIM7080_t& p_Device, SIM7080_TCP_Sock
 
     return SIM70XX_ERR_OK;
 }
+
+#ifdef CONFIG_SIM70XX_DRIVER_WITH_SSL
+    SIM70XX_Error_t SIM7080_TCP_Client_EnableSSL(SIM7080_t& p_Device, bool Enable, uint8_t CID)
+    {
+        SIM70XX_TxCmd_t* Command;
+        std::string CommandStr;
+
+        if(CID > 12)
+        {
+            return SIM70XX_ERR_INVALID_ARG;
+        }
+        else if(p_Device.Internal.isInitialized == false)
+        {
+            return SIM70XX_ERR_NOT_INITIALIZED;
+        }
+
+        CommandStr = "AT+CASSLCFG=" + std::to_string(CID) + ",\"SSL\"," + std::to_string(Enable);
+
+        SIM70XX_CREATE_CMD(Command);
+        *Command = SIM7080_AT_CASSLCFG(CommandStr);
+        SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+        if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+        {
+            return SIM70XX_ERR_FAIL;
+        }
+        SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
+
+        return SIM70XX_ERR_OK;
+    }
+#endif
 
 #endif

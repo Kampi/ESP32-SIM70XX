@@ -81,14 +81,19 @@ typedef struct
     bool WillFlag;                                  /**< Last will flag. */
     SIM7020_MQTT_Will_t* p_LastWill;                /**< Pointer to last will configuration object.
                                                          NOTE: Only needed when \ref SIM7020_MQTT_Socket_t.WillFlag is set to #true. */
-    uint8_t ID;                                     /**< Socket ID from the module.
-                                                         NOTE: Handled by the device driver. */
-    bool isConnected;                               /**< Socket connected.
-                                                         NOTE: Handled by the device driver. */
-    bool isCreated;                                 /**< #true when the socket is created.
-                                                         NOTE: Handled by the device driver. */
     std::string Username;                           /**< Optional username. */
     std::string Password;                           /**< Optional password. */
+    struct
+    {
+        QueueHandle_t SubQueue;                     /**< Subscribe event queue.
+                                                         NOTE: Managed by the device driver. */
+        uint8_t ID;                                 /**< Socket ID from the module.
+                                                         NOTE: Handled by the device driver. */
+        bool isConnected;                           /**< Socket connected.
+                                                         NOTE: Handled by the device driver. */
+        bool isCreated;                             /**< #true when the socket is created.
+                                                         NOTE: Handled by the device driver. */
+    } Internal;
 } SIM7020_MQTT_Socket_t;
 
 #endif /* SIM7020_MQTT_DEFS_H_ */

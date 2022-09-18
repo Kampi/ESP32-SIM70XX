@@ -132,6 +132,7 @@ static void SIM70XX_Evt_Task(void* p_Arg)
             // New data available?
             if(SIM70XX_UART_Available(Device->UART) > std::string("\r\n").size())
             {
+                // NOTE: We have to use dynamic memory here, because the string object can not be used inside queues without issues.
                 std::string* Message = new std::string();
 
                 // Get the event message.

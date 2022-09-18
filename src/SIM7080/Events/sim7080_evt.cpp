@@ -21,46 +21,81 @@
 
 #if(CONFIG_SIMXX_DEV == 7080)
 
+#include <esp_log.h>
+
 #include "sim7080.h"
 #include "sim7080_evt.h"
 
+static const char* TAG = "SIM7080_Event";
+
 void SIM70XX_Evt_MessageFilter(void* p_Device, std::string* p_Message)
 {
-	bool Found;
+	// This flag is set to #true when the data were processed completely in the event handler. Do not set this flag to #true when
+	// the data should be processed by using the event message queue.
+	bool Processed;
 	SIM7080_t* Device = (SIM7080_t*)p_Device;
 
-	Found = false;
+	Processed = false;
 
 	// Shutdown message was received.
 	if(p_Message->find("NORMAL POWER DOWN") != std::string::npos)
 	{
+		ESP_LOGI(TAG, "Power down event!");
+
+		Device->Internal.isActive = false;
+		Processed = true;
+	}
+
+	// PSM related events.
+	if(p_Message->find("+CPSMSTATUS") != std::string::npos)
+	{
+		ESP_LOGI(TAG, "PSM event!");
+
+		SIM7080_Evt_on_PSM(Device, p_Message);
+		Processed = true;
 	}
 
 	#ifdef CONFIG_SIM70XX_DRIVER_WITH_TCPIP
+		// NOTE: The modem can output the event messages combined. So we have to search and process each message one by one.
 		if(p_Message->find("+CASTATE") != std::string::npos)
 		{
 			SIM7080_Evt_on_TCP_Disconnect(Device, p_Message);
-			Found = true;
+			Processed = true;
 		}
 
 		if(p_Message->find("+CADATAIND") != std::string::npos)
 		{
 			SIM7080_Evt_on_TCP_DataReady(Device, p_Message);
-			Found = true;
+			Processed = true;
+		}
+
+		if(p_Message->find("+CARECV") != std::string::npos)
+		{
+			SIM7080_Evt_on_TCP_Data(Device, p_Message);
+			Processed = true;
+		}
+	#endif
+
+	#ifdef CONFIG_SIM70XX_DRIVER_WITH_MQTT
+		if(p_Message->find("+SMSUB") != std::string::npos)
+		{
+			SIM7080_Evt_on_MQTT_Subscribe(Device, p_Message);
+			Processed = true;
 		}
 	#endif
 
 	#ifdef CONFIG_SIM70XX_DRIVER_WITH_EMAIL
 	#endif
 
-	// Handle all other messages by putting them into the event queue.
-	if(Found == false)
-	{
-		xQueueSend(Device->Internal.EventQueue, &p_Message, 0);
-	}
-	else
+	// Delete the event string object.
+	if(Processed)
 	{
 		delete p_Message;
+	}
+	// Handle all other messages by putting them into the event queue.
+	else
+	{
+		xQueueSend(Device->Internal.EventQueue, &p_Message, 0);
 	}
 }
 

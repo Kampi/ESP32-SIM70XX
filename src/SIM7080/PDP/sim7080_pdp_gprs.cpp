@@ -28,8 +28,6 @@
 #include "../../Private/Queue/sim70xx_queue.h"
 #include "../../Private/Commands/sim70xx_commands.h"
 
-static const char* TAG = "SIM7080_PDP";
-
 SIM70XX_Error_t SIM7080_PDP_GPRS_Define(SIM7080_t& p_Device, SIM7080_PDP_GPRS_Type_t Type, SIM70XX_APN_t APN, uint8_t PDP)
 {
     std::string CommandStr;

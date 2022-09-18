@@ -312,7 +312,7 @@ SIM70XX_Error_t SIM7020_MQTT_Destroy(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t*
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
-    else if(p_Socket->isConnected == false)
+    else if(p_Socket->isCreated == false)
     {
         return SIM70XX_ERR_OK;
     }

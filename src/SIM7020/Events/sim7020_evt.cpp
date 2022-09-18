@@ -30,10 +30,10 @@ static const char* TAG = "SIM7020_Evt";
 
 void SIM70XX_Evt_MessageFilter(void* p_Device, std::string* p_Message)
 {
-	bool Found;
+	bool Processed;
 	SIM7020_t* Device = (SIM7020_t*)p_Device;
 
-	Found = false;
+	Processed = false;
 
 	// Shutdown message was received.
 	if(p_Message->find("NORMAL POWER DOWN") != std::string::npos)
@@ -87,13 +87,13 @@ void SIM70XX_Evt_MessageFilter(void* p_Device, std::string* p_Message)
 	#endif
 
 	// Handle all other messages by putting them into the event queue.
-	if(Found == false)
+	if(Processed)
 	{
-		xQueueSend(Device->Internal.EventQueue, &p_Message, 0);
+		delete p_Message;
 	}
 	else
 	{
-		delete p_Message;
+		xQueueSend(Device->Internal.EventQueue, &p_Message, 0);
 	}
 }
 

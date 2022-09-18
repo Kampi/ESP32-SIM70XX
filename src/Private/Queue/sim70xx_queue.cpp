@@ -161,21 +161,22 @@ bool SIM70XX_Queue_isEvent(QueueHandle_t Queue, std::string Filter, std::string*
     {
         std::string* Message;
 
-        // Get a new item from the queue to check if the searched event has occured.
-        if(xQueuePeek(Queue, &Message, portMAX_DELAY) == pdTRUE)
+        if(xQueueReceive(Queue, &Message, portMAX_DELAY) == pdTRUE)
         {
             // Check if the filter match the item.
             if(Message->find(Filter) != std::string::npos)
             {
                 *p_Event = *Message;
 
-                // Remove the item from the queue.
-                xQueueReceive(Queue, &Message, 0);
-
                 // Delete the item.
                 delete Message;
 
                 return true;
+            }
+            // Otherwise put it back to the queue.
+            else
+            {
+                xQueueSend(Queue, &Message, portMAX_DELAY);
             }
         }
     }

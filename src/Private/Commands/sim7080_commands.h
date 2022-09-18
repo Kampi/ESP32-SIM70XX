@@ -23,13 +23,13 @@
 #include "sim70xx_commands.h"
 
 /**
- * 
- * Used in SIM7080 device driver.
- * 
+ *
+ * Common SIM7080 commands.
+ *
  */
 #define SIM7080_AT_CNMP_W(Mode)                                 SIM70XX_CMD("AT+CNMP=" + std::to_string(Mode), false, 10, 1)
 #define SIM7080_AT_CNMP_R                                       SIM70XX_CMD("AT+CNMP?", true, 10, 1)
-#define SIM7080_AT_CMNB_W(Sel)                                  SIM70XX_CMD("AT+CMNB=" + std::to_string(Sel), false, 10, 1)
+#define SIM7080_AT_CMNB_W(Sel)                                  SIM70XX_CMD("AT+CMNB=" + std::to_string(Sel), false, 60, 1)
 #define SIM7080_AT_CMNB_R                                       SIM70XX_CMD("AT+CMNB?", true, 10, 1)
 #define SIM7080_AT_CGREG                                        SIM70XX_CMD("AT+CGREG?", true, 10, 1)
 #define SIM7080_AT_COPS_W(Command)                              SIM70XX_CMD(Command, false, 300, 1)
@@ -41,11 +41,14 @@
 #define SIM7080_AT_CNCFG_W(Command)                             SIM70XX_CMD("AT+CNCFG=" + Command, false, 1, 1)
 #define SIM7080_AT_CNACT_W(PDP, Action)                         SIM70XX_CMD("AT+CNACT=" + std::to_string(PDP) + "," + std::to_string(Action), true, 300, 1)
 #define SIM7080_AT_CNACT_R                                      SIM70XX_CMD("AT+CNACT?", true, 10, 4)
+#define SIM7080_AT_CEREG_W(ID)                                  SIM70XX_CMD("AT+CEREG=" + std::to_string(ID), false, 1, 1)
+#define SIM7080_AT_CEREG_R                                      SIM70XX_CMD("AT+CEREG?", true, 300, 1)
+#define SIM7080_AT_CPOWD(Urgently)                              SIM70XX_CMD("AT+CPOWD=" + std::to_string(Urgently), true, 1, 1)
 
 /**
- * 
+ *
  * Used in SIM7080 device information driver.
- * 
+ *
  */
 #define SIM7080_AT_CGMI                                         SIM70XX_CMD("AT+CGMI", true, 1, 1)
 #define SIM7080_AT_CGMM                                         SIM70XX_CMD("AT+CGMM", true, 1, 1)
@@ -64,48 +67,64 @@
 #define SIM7080_AT_CENG_W(Mode)                                 SIM70XX_CMD("AT+CENG=" + std::to_String(Mode), false, 1, 1)
 
 /**
- * 
+ *
  * Used in SIM7080 TCP driver.
- * 
+ *
  */
 #define SIM7080_AT_SNPING4(Host, Retries, Size, Timeout, Items) SIM70XX_CMD("AT+SNPING4=\"" + Host + "\"," + std::to_string(Retries) + "," + std::to_string(Size) + "," + std::to_string(Timeout), true, 60, Items)
 #define SIM7080_AT_SNPING6(Host, Retries, Size, Timeout, Items) SIM70XX_CMD("AT+SNPING6=\"" + Host + "\"," + std::to_string(Retries) + "," + std::to_string(Size) + "," + std::to_string(Timeout), true, 60, Items)
 #define SIM7080_AT_CDNSGIP(Host)                                SIM70XX_CMD("AT+CDNSGIP=\"" + Host + "\"", false, 1, 1)
+#define SIM7080_AT_CDNSPDPID_W(Index)                           SIM70XX_CMD("AT+CDNSPDPID=" + std::to_string(Index), false, 1, 1)
+#define SIM7080_AT_CDNSPDPID_R                                  SIM70XX_CMD("AT+CDNSPDPID?", true, 1, 1)
+#define SIM7080_AT_CDNSCFG_W(Prim, Sec)                         SIM70XX_CMD("AT+CDNSPDPID=\"" + Prim + "\",\"" + Sec + "\"", false, 1, 1)
+#define SIM7080_AT_CDNSCFG_R                                    SIM70XX_CMD("AT+CDNSCFG?", true, 10, 4)
 #define SIM7080_AT_CAOPEN(ID, PDP, Type, Address, Port)         SIM70XX_CMD("AT+CAOPEN=" + std::to_string(ID) + "," + std::to_string(PDP) + "," + "\"" + Type + "\",\"" + Address + "\"," + std::to_string(Port), true, 0, 1)
 #define SIM7080_AT_CASEND(ID, Size, Timeout)                    SIM70XX_CMD("AT+CASEND=" + std::to_string(ID) + "," + std::to_string(Size) + "," + std::to_string(Timeout), false, 1, 1)
 #define SIM7080_AT_CARECV(ID, Size)                             SIM70XX_CMD("AT+CARECV=" + std::to_string(ID) + "," + std::to_string(Size), true, 10, 1)
-#define SIM7020_AT_CACLOSE(ID)                                  SIM70XX_CMD("AT+CACLOSE=" + std::to_string(ID), false, 1, 1)
+#define SIM7080_AT_CACLOSE(ID)                                  SIM70XX_CMD("AT+CACLOSE=" + std::to_string(ID), false, 1, 1)
+#define SIM7080_AT_CASSLCFG(Command)                            SIM70XX_CMD(Command, false, 1, 1)
 
 /**
- * 
+ *
  * Used in SIM7080 NTP driver.
- * 
+ *
  */
-#define SIM7020_AT_CNTP_W(Server, TimeZone, ID, Mode)           SIM70XX_CMD("AT+CNTP=\"" + Server + "\"," + std::to_string(TimeZone) + "," + std::to_string(ID) + "," + std::to_string(Mode), false, 60, 1)
-#define SIM7020_AT_CNTP                                         SIM70XX_CMD("AT+CNTP", true, 60, 1)
-#define SIM7020_AT_CCLK_R                                       SIM70XX_CMD("AT+CCLK?", true, 1, 1)
+#define SIM7080_AT_CNTP_W(Server, TimeZone, ID, Mode)           SIM70XX_CMD("AT+CNTP=\"" + Server + "\"," + std::to_string(TimeZone) + "," + std::to_string(ID) + "," + std::to_string(Mode), false, 60, 1)
+#define SIM7080_AT_CNTP                                         SIM70XX_CMD("AT+CNTP", true, 60, 1)
+#define SIM7080_AT_CCLK_R                                       SIM70XX_CMD("AT+CCLK?", true, 1, 1)
 
 /**
- * 
+ *
+ * Used in SIM7080 Power Management driver.
+ *
+ */
+#define SIM7080_AT_CPSMSTATUS(Enable)                           SIM70XX_CMD("AT+CPSMSTATUS=" + std::to_string(Enable), false, 1, 1)
+#define SIM7080_AT_CPSMS(Enable, TAU, Active)                   SIM70XX_CMD("AT+CPSMS=" + std::to_string(Enable) + ",,,\"" + TAU + "\",\"" + Active + "\"", false, 1, 1)
+/**
+ *
  * Used in SIM7080 SSL driver.
- * 
+ *
  */
-#define SIM7020_AT_CSSLCFG(Command)                             SIM70XX_CMD(Command, false, 10, 1)
+#define SIM7080_AT_CSSLCFG(Command)                             SIM70XX_CMD(Command, false, 10, 1)
 
 /**
- * 
+ *
  * Used in SIM7080 MQTT driver.
- * 
+ *
  */
-#define SIM7020_AT_SMCONF(Command)                              SIM70XX_CMD(Command, false, 10, 1)
-#define SIM7020_AT_SMCONN                                       SIM70XX_CMD("AT+SMCONN", false, 10, 1)
+#define SIM7080_AT_SMCONF(Command)                              SIM70XX_CMD(Command, false, 10, 1)
+#define SIM7080_AT_SMCONN                                       SIM70XX_CMD("AT+SMCONN", false, 10, 1)
+#define SIM7080_AT_SMPUB(Topic, Length, QoS, Retained)          SIM70XX_CMD("AT+SMPUB=\"" + Topic + "\"," + std::to_string(Length) + "," + std::to_string(QoS) + "," + std::to_string(Retained), false, 10, 1)
+#define SIM7080_AT_SMSUB(Topic, QoS)                            SIM70XX_CMD("AT+SMSUB=\"" + Topic + "\"," + std::to_string(QoS), false, 10, 1)
+#define SIM7080_AT_SMUNSUB(Topic)                               SIM70XX_CMD("AT+SMUNSUB=\"" + Topic + "\"", false, 10, 1)
+#define SIM7080_AT_SMDISC                                       SIM70XX_CMD("AT+SMDISC", false, 10, 1)
 
 /**
- * 
+ *
  * Used in SIM7080 file system driver.
- * 
+ *
  */
-#define SIM7080_AT_CFSINIT                                      SIM70XX_CMD("AT+CFSINIT", false, 10, 1)
+#define SIM7080_AT_CFSINIT                                      SIM70XX_CMD("AT+CFSINIT", false, 1, 1)
 #define SIM7080_AT_CFSWFILE(Path, Name, Mode, Size, Timeout)    SIM70XX_CMD("AT+CFSWFILE=" + std::to_string(Path) + ",\"" + Name + "\"," + std::to_string(Mode) + "," + std::to_string(Size) + "," + std::to_string(Timeout), false, 1, 1)
 #define SIM7080_AT_CFSRFILE(Path, Name, Mode, Size, Position)   SIM70XX_CMD("AT+CFSRFILE=" + std::to_string(Path) + ",\"" + Name + "\"," + std::to_string(Mode) + "," + std::to_string(Size) + "," + std::to_string(Position), false, 1, 1)
 #define SIM7080_AT_CFSGFRS                                      SIM70XX_CMD("AT+CFSGFRS?", true, 1, 1)
@@ -115,9 +134,9 @@
 #define SIM7080_AT_CFSTERM                                      SIM70XX_CMD("AT+CFSTERM", false, 1, 1)
 
 /**
- * 
+ *
  * Used in SIM7080 E-Mail driver.
- * 
+ *
  */
 #define SIM7080_AT_EMAILCID(ID)                                 SIM70XX_CMD("AT+EMAILCID=" + std::to_string(ID), false, 1, 1)
 #define SIM7080_AT_EMAILTO(Timeout)                             SIM70XX_CMD("AT+EMAILTO=" + std::to_string(Timeout), false, 1, 1)
@@ -128,5 +147,6 @@
 #define SIM7080_AT_SMTPSUB(Subject)                             SIM70XX_CMD("AT+SMTPSUB=" + Subject, false, 1, 1)
 #define SIM7080_AT_SMTPBODY(Size)                               SIM70XX_CMD("AT+SMTPBODY=" + std::to_string(Size), false, 1, 1)
 #define SIM7080_AT_SMTPSEND                                     SIM70XX_CMD("AT+SMTPSEND", false, 300, 1)
+#define SIM7080_AT_EMAILSSL(Type, Config)                       SIM70XX_CMD("AT+EMAILSSL=" + std::to_string(Type) + "," + std::to_string(Config), false, 1, 1)
 
 #endif /* SIM7080_COMMANDS_H_ */

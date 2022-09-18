@@ -52,4 +52,15 @@ SIM70XX_Error_t SIM7080_EMail_SendText(SIM7080_t& p_Device, SIM7080_EMail_Config
  */
 SIM70XX_Error_t SIM7080_EMail_SendText(SIM7080_t& p_Device, SIM7080_EMail_Config_t* p_Config, SIM7080_EMail_User_t* p_Sender, SIM7080_EMail_User_t* p_To, std::string Subject, std::string Body, SIM7080_EMail_User_t* p_CC, SIM7080_EMail_User_t* p_BCC, SIM7080_EMail_Error_t* p_Error = NULL, uint8_t CID = 0);
 
+#ifdef CONFIG_SIM70XX_DRIVER_WITH_SSL
+    /** @brief                  Enable / Disable SSL support for the E-Mail client.
+     *  @param p_Device         SIM7080 device object
+     *  @param Enable           Enable / Disable SSL
+     *  @param SSL_Config       (Optional) SSL configuration identifier
+     *  @param SSL_Opts         (Optional) SSL options
+     *  @return                 SIM70XX_ERR_OK when successful
+     */
+    SIM70XX_Error_t SIM7080_EMail_EnableSSL(SIM7080_t& p_Device, bool Enable, uint8_t SSL_Config = 0, SIM7080_EMail_SSL_t SSL_Opts = SIM7080_EMAIL_SSL_ENABLE);
+#endif
+
 #endif /* SIM7080_EMAIL_H_ */

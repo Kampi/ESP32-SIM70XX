@@ -16,7 +16,7 @@ Multi driver for SIMCom cellular modules with UART interface.
 | Driver        | SIM7020       | SIM7080       | 
 |---------------|---------------|---------------|
 | NTP           | Basic         | Basic         |
-| DNS           | Basic         | Basic         |
+| DNS           | Advanced      | Advanced      |
 | Ping          | Basic         | Basic         |
 | GPS           |               | Not started   |
 | E-Mail        |               | Open          |
@@ -29,7 +29,7 @@ Multi driver for SIMCom cellular modules with UART interface.
 | UDP (Server)  | Open          | Open          |
 | HTTP          | Open          | Not started   |
 | CoAP          | Open          | Not started   |
-| MQTT          | Open          | Not started   |
+| MQTT          | Open          | Open          |
 | PSM           | Open          | Not started   |
 
 ### Description

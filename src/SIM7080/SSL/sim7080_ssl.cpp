@@ -29,8 +29,6 @@
 #include "../../Private/Queue/sim70xx_queue.h"
 #include "../../Private/Commands/sim70xx_commands.h"
 
-static const char* TAG = "SIM7080_SSL";
-
 /** @brief              Execute a SSL convert command.
  *  @param p_Device     SIM7080 device object
  *  @param CommandStr   Command string to be executed
@@ -50,7 +48,7 @@ static SIM70XX_Error_t SIM7080_SSL_Convert(SIM7080_t& p_Device, std::string Comm
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
 
     SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7020_AT_CSSLCFG(CommandStr);
+    *Command = SIM7080_AT_CSSLCFG(CommandStr);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
     if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
@@ -72,8 +70,9 @@ SIM70XX_Error_t SIM7080_SSL_Configure(SIM7080_t& p_Device, SIM7080_SSL_Config_t*
 {
     std::string CommandStr;
     SIM70XX_TxCmd_t* Command;
+    char StringBuffer[7];
 
-    if((p_Config == NULL) || (CID > 12))
+    if((p_Config == NULL) || (CID > 12) || (p_Config->CipherIndex > 7))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
@@ -84,7 +83,18 @@ SIM70XX_Error_t SIM7080_SSL_Configure(SIM7080_t& p_Device, SIM7080_SSL_Config_t*
 
     CommandStr = "AT+CSSLCFG=\"SSLVERSION\"," + std::to_string(CID) + "," + std::to_string(p_Config->Version);
     SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7020_AT_CSSLCFG(CommandStr);
+    *Command = SIM7080_AT_CSSLCFG(CommandStr);
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    {
+        return SIM70XX_ERR_FAIL;
+    }
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
+
+    sprintf(StringBuffer, "0x%04x", p_Config->CiperSuite);
+    CommandStr = "AT+CSSLCFG=\"CIPHERSUITE\"," + std::to_string(CID) + "," + std::to_string(p_Config->CipherIndex) + "," + std::string(StringBuffer);
+    SIM70XX_CREATE_CMD(Command);
+    *Command = SIM7080_AT_CSSLCFG(CommandStr);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
     if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
@@ -94,7 +104,7 @@ SIM70XX_Error_t SIM7080_SSL_Configure(SIM7080_t& p_Device, SIM7080_SSL_Config_t*
 
     CommandStr = "AT+CSSLCFG=\"IGNORERTCTIME\"," + std::to_string(CID) + "," + std::to_string(p_Config->IgnoreTime);
     SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7020_AT_CSSLCFG(CommandStr);
+    *Command = SIM7080_AT_CSSLCFG(CommandStr);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
     if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
@@ -164,7 +174,39 @@ SIM70XX_Error_t SIM7080_SSL_Enable(SIM7080_t& p_Device, uint8_t CID, uint8_t Con
     }
 
     SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7020_AT_CSSLCFG("AT+CASSLCFG=" + std::to_string(CID) + ",\"CRINDEX\"," + std::to_string(Configuration));
+    *Command = SIM7080_AT_CASSLCFG("AT+CASSLCFG=" + std::to_string(CID) + ",\"SSL\",1");
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    {
+        return SIM70XX_ERR_FAIL;
+    }
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
+
+    SIM70XX_CREATE_CMD(Command);
+    *Command = SIM7080_AT_CSSLCFG("AT+CASSLCFG=" + std::to_string(CID) + ",\"CRINDEX\"," + std::to_string(Configuration));
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    {
+        return SIM70XX_ERR_FAIL;
+    }
+    return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
+}
+
+SIM70XX_Error_t SIM7080_SSL_Disable(SIM7080_t& p_Device, uint8_t CID)
+{
+    SIM70XX_TxCmd_t* Command;
+
+    if(CID > 12)
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+    else if(p_Device.Internal.isInitialized == false)
+    {
+        return SIM70XX_ERR_NOT_INITIALIZED;
+    }
+
+    SIM70XX_CREATE_CMD(Command);
+    *Command = SIM7080_AT_CASSLCFG("AT+CASSLCFG=" + std::to_string(CID) + ",\"SSL\",1");
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
     if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {

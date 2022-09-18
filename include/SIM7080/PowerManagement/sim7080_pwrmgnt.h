@@ -1,5 +1,5 @@
  /*
- * sim7080_dns.h
+ * sim7080_pwrmgnt.h
  *
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -17,50 +17,60 @@
  * Errors and commissions should be reported to DanielKampert@kampis-elektroecke.de.
  */
 
-#ifndef SIM7080_DNS_H_
-#define SIM7080_DNS_H_
+#ifndef SIM7080_PWRMGNT_H_
+#define SIM7080_PWRMGNT_H_
 
 #include "sim7080_defs.h"
 #include "sim70xx_errors.h"
-#include "sim7080_dns_defs.h"
+#include "sim7080_pwrmgnt_defs.h"
 
-/** @brief          Parse a given host name to get the IP address.
+/** @brief          Initialize the PSM. Must be called before enabling PSM.
  *  @param p_Device SIM7080 device object
- *  @param Host     Host name
- *  @param p_IP     Pointer to resolved IP address
- *  @param p_Error  (Optional) DNS error code
- *  @param Timeout  (Optional) Message timeout for each the request in seconds
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_DNS_FetchAddress(SIM7080_t& p_Device, std::string Host, std::string* p_IP, SIM7080_DNS_Error_t* p_Error = NULL, uint32_t Timeout = 60);
+SIM70XX_Error_t SIM7080_PSM_Init(SIM7080_t& p_Device);
 
-/** @brief          Set the PDP index for DNS.
+/** @brief              Enable PSM.
+ *  @param p_Device     SIM7080 device object
+ *  @param TAU_Base     Periodic-TAU base value
+ *  @param TAU_Value    Periodic-TAU value
+ *  @param Active_Base  Active-Time base value
+ *  @param Active_Value Active-Time value
+ *  @return             SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_PSM_Enable(SIM7080_t& p_Device, SIM7080_PSM_TAU_t TAU_Base, uint8_t TAU_Value, SIM7080_PSM_Time_t Time_Base, uint8_t Time_Value);
+
+/** @brief          Disable PSM.
  *  @param p_Device SIM7080 device object
- *  @param Index    PDP index
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_DNS_SetIndex(SIM7080_t& p_Device, uint8_t Index);
+SIM70XX_Error_t SIM7080_PSM_Disable(SIM7080_t& p_Device);
 
-/** @brief          Get the PDP index for DNS.
+/** @brief          Set the PSM modem optimizations.
  *  @param p_Device SIM7080 device object
- *  @param p_Index  Pointer to PDP index
+ *  @param p_Opts   Pointer to modem optimization object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_DNS_GetIndex(SIM7080_t& p_Device, uint8_t* p_Index);
+SIM70XX_Error_t SIM7080_PSM_SetOptimizations(SIM7080_t& p_Device, SIM7080_PSM_ModemOpts_t* p_Opts);
 
-/** @brief          Set the DNS server configuration.
+/** @brief          Get the PSM modem optimizations.
  *  @param p_Device SIM7080 device object
- *  @param Server   Server configuration object
+ *  @param p_Opts   Pointer to modem optimization object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_DNS_SetServer(SIM7080_t& p_Device, SIM7080_DNS_Server_t Server);
+SIM70XX_Error_t SIM7080_PSM_GetOptimizations(SIM7080_t& p_Device, SIM7080_PSM_ModemOpts_t* p_Opts);
 
-/** @brief          Get the DNS server configuration.
+/** @brief          Get the status of the PSM mode.
  *  @param p_Device SIM7080 device object
- *  @param p_IPv4   Pointer to IPv4 DNS server configuration object
- *  @param p_IPv6   (Optional) Pointer to IPv6 DNS server configuration object
+ *  @return         #true when PSM mode is active.
+ */
+bool SIM7080_PSM_isActive(SIM7080_t& p_Device);
+
+/** @brief          Wake up the module.
+ *  @param p_Device SIM7080 device object
+ *  @param Timeout  (Optional) Timeout in seconds
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_DNS_GetServer(SIM7080_t& p_Device, SIM7080_DNS_Server_t* p_IPv4, SIM7080_DNS_Server_t* p_IPv6 = NULL);
+SIM70XX_Error_t SIM7080_PwrMgnt_WakeUp(SIM7080_t& p_Device, uint8_t Timeout = 10);
 
-#endif /* SIM7080_DNS_H_ */
+#endif /* SIM7020_PWRMGNT_H_ */

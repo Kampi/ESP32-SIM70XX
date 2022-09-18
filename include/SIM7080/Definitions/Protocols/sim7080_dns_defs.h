@@ -39,4 +39,12 @@ typedef enum
     SIM7080_DNS_ERROR_UNKNOWN,                      /**< Unknown error. */
 } SIM7080_DNS_Error_t;
 
+/** @brief SIM7080 DNS server address object definitions.
+ */
+typedef struct
+{
+    std::string Prim;                               /**< Primary DNS server. */
+    std::string Sec;                                /**< Secondary DNS server. */
+} SIM7080_DNS_Server_t;
+
 #endif /* SIM7080_DNS_DEFS_H_ */

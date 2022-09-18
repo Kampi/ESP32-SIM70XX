@@ -180,8 +180,6 @@ typedef struct
         {
             std::vector<SIM7020_MQTT_Socket_t*> Sockets;    /**< List with pointer to connected MQTT sockets.
                                                                  NOTE: Managed by the device driver. */
-            QueueHandle_t SubQueue;                         /**< Subscribe event queue.
-                                                                 NOTE: Managed by the device driver. */
             uint32_t SubTopics;                             /**< Subscribe counter.
                                                                  NOTE: Managed by the device driver. */
         } MQTT;

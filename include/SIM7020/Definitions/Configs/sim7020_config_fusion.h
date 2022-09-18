@@ -37,7 +37,7 @@
                                                                         },                                                  \
                                                                         .Band = SIM7020_BAND_8,                             \
                                                                         .APN = {                                            \
-                                                                            .Name = "iot.1nce.net",                         \
+                                                                            .Name = "m2m.fusion-iot.de",                    \
                                                                             .Username = "",                                 \
                                                                             .Password = "",                                 \
                                                                         },                                                  \

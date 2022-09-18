@@ -84,9 +84,11 @@ unsigned long IRAM_ATTR SIM70XX_Tools_GetmsTimer(void);
  */
 bool SIM70XX_Tools_EnableModule(SIM70XX_UART_Conf_t& p_Config, uint8_t Cycles = 20);
 
-/** @brief Disable the module.
+/** @brief          Disable the module by using the PwrKey signal.
+ *  @param p_Config Pointer to SIM70XX UART configuration object
+ *  @return         #true when the module is disabled
  */
-void SIM70XX_Tools_DisableModule(void);
+bool SIM70XX_Tools_DisableModule(SIM70XX_UART_Conf_t& p_Config);
 
 /** @brief          Check if the SIM70XX module is active.
  *  @param p_Config Pointer to SIM70XX UART configuration object
@@ -103,6 +105,14 @@ void SIM70XX_Tools_ResetModule(void);
  *  @return         SIM70XX_ERR_OK when successful
  */
 SIM70XX_Error_t SIM70XX_Tools_DisableEcho(SIM70XX_UART_Conf_t& p_Config);
+
+/** @brief          Change the baudrate settings of the module.
+ *  @param p_Config Pointer to SIM70XX UART configuration object
+ *  @param Old      Old baudrate
+ *  @param New      New baudrate
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM70XX_Tools_SetBaudrate(SIM70XX_UART_Conf_t& p_Config, SIM70XX_Baud_t Old, SIM70XX_Baud_t New);
 
 /** @brief              Get a substring from the input string. The substring is delimited by the given delimiter.
  *  @param p_Input      Pointer to input string
