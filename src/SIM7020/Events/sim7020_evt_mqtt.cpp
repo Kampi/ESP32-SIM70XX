@@ -31,16 +31,9 @@ static const char* TAG = "SIM7020_Evt_MQTT";
 
 void SIM7020_Evt_on_MQTT_Pub(SIM7020_t* const p_Device, std::string* p_Message)
 {
-    size_t Index;
     SIM7020_Pub_t* Packet;
 
     ESP_LOGI(TAG, "MQTT subscribe event!");
-
-    Index = p_Message->find("+CMQPUB");
-    if(Index == std::string::npos)
-    {
-        return;
-    }
 
     Packet = new SIM7020_Pub_t();
 

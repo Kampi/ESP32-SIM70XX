@@ -312,7 +312,7 @@ std::string SIM70XX_Tools_SubstringSplitErase(std::string* p_Input, std::string 
 
     assert(p_Input);
 
-    Index = p_Input->find(",");
+    Index = p_Input->find(Delimiter);
     if(Index != std::string::npos)
     {
         Result = p_Input->substr(0, Index);

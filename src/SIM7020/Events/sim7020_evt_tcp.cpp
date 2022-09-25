@@ -31,17 +31,11 @@ static const char* TAG = "SIM7020_Evt_TCP";
 
 void SIM7020_Evt_on_TCP_Disconnect(SIM7020_t* const p_Device, std::string* p_Message)
 {
-    size_t Index;
     uint8_t ID;
+    size_t Index;
     SIM7020_TCP_Error_t TCP_Error;
 
     ESP_LOGI(TAG, "TCP disconnect event!");
-
-    Index = p_Message->find("+CSOERR");
-    if(Index == std::string::npos)
-    {
-        return;
-    }
 
     SIMXX_TOOLS_REMOVE_LINEEND((*p_Message));
 

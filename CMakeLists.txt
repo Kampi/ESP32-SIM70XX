@@ -41,12 +41,10 @@ set(COMPONENT_SRCS
     "src/SIM7020/PDP/sim7020_pdp.cpp"
     "src/SIM7020/PDP/sim7020_pdp_gprs.cpp"
     "src/SIM7020/Events/sim7020_evt.cpp"
-    "src/SIM7020/Events/sim7020_evt_fota.cpp"
     "src/SIM7020/Events/sim7020_evt_http.cpp"
     "src/SIM7020/Events/sim7020_evt_mqtt.cpp"
     "src/SIM7020/Events/sim7020_evt_tcp.cpp"
     "src/SIM7020/Events/sim7020_evt_psm.cpp"
-    "src/SIM7020/Events/sim7020_evt_ntp.cpp"
 
     # Driver internal
     "src/Private/Events/sim70xx_evt.cpp"

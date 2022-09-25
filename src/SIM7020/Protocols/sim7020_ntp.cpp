@@ -88,6 +88,8 @@ SIM70XX_Error_t SIM7020_NTP_Sync(SIM7020_t& p_Device, std::string Server, int8_t
         vTaskDelay(100 / portTICK_PERIOD_MS);
     }
 
+    SIMXX_TOOLS_REMOVE_LINEEND(Response);
+
     // Remove the command from the response.
     Response.replace(Response.find("+CSNTP:"), std::string("+CSNTP:").size(), "");
 

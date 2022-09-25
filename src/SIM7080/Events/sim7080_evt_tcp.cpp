@@ -64,16 +64,9 @@ void SIM7080_Evt_on_TCP_Disconnect(SIM7080_t* const p_Device, std::string* p_Mes
 void SIM7080_Evt_on_TCP_DataReady(SIM7080_t* const p_Device, std::string* p_Message)
 {
     uint8_t CID;
-    size_t Index;
     std::string Message;
 
     ESP_LOGD(TAG, "TCP message data ready event!");
-
-    Index = p_Message->find("+CADATAIND");
-    if(Index == std::string::npos)
-    {
-        return;
-    }
 
     Message = p_Message->substr(Index, p_Message->find("\r\n\r\n", Index) - Index);
     Index = Message.find(":");
@@ -92,17 +85,10 @@ void SIM7080_Evt_on_TCP_DataReady(SIM7080_t* const p_Device, std::string* p_Mess
 
 void SIM7080_Evt_on_TCP_Data(SIM7080_t* const p_Device, std::string* p_Message)
 {
-    size_t Index;
     std::string Message;
     std::string* Response;
 
     ESP_LOGD(TAG, "TCP message data event!");
-
-    Index = p_Message->find("+CARECV");
-    if(Index == std::string::npos)
-    {
-        return;
-    }
 
     // Create a new response object, because we want to place the response in the event loop.
     Response = new std::string();

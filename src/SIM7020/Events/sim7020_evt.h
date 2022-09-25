@@ -62,27 +62,12 @@
  */
 void SIM7020_Evt_on_PSM_Event(SIM7020_t* const p_Device, std::string* p_Message, bool isPSM);
 
-/** @brief              FOTA event handler.
- *  @param p_Device     Pointer to device
- *  @param p_Message    Pointer to message string
- *  @param isPSM        PSM mode entered or leaved flag
- */
-void SIM7020_Evt_on_FOTA_Event(SIM7020_t* const p_Device, std::string* p_Message);
-
 #ifdef CONFIG_SIM70XX_DRIVER_WITH_TCPIP
     /** @brief              TCP/IP disconnect event handler.
      *  @param p_Device     Pointer to device
      *  @param p_Message    Pointer to message string
      */
     void SIM7020_Evt_on_TCP_Disconnect(SIM7020_t* const p_Device, std::string* p_Message);
-#endif
-
-#ifdef CONFIG_SIM70XX_DRIVER_WITH_NTP
-    /** @brief              NPT event handler.
-     *  @param p_Device     Pointer to device
-     *  @param p_Message    Pointer to message string
-     */
-    void SIM7020_Evt_on_NTP_Event(SIM7020_t* const p_Device, std::string* p_Message);
 #endif
 
 #endif /* SIM7020_EVT_H_ */

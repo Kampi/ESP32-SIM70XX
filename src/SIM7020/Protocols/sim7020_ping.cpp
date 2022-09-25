@@ -32,7 +32,7 @@
 
 static const char* TAG = "SIM7020_TCPIP";
 
-SIM70XX_Error_t SIM7020_TCP_Ping(SIM7020_t& p_Device, SIM7020_Ping_t& p_Config, std::vector<SIM7020_PingRes_t>* p_Result)
+SIM70XX_Error_t SIM7020_TCP_Ping(SIM7020_t& p_Device, SIM7020_Ping_t* p_Config, std::vector<SIM7020_PingRes_t>* p_Result)
 {
     uint8_t Pings;
     std::string Status;
@@ -45,41 +45,41 @@ SIM70XX_Error_t SIM7020_TCP_Ping(SIM7020_t& p_Device, SIM7020_Ping_t& p_Config, 
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
-
-    // TODO: Add Parameter check
+    else if((p_Result == NULL) || (p_Config == NULL) || (p_Config->Retries == 0) || (p_Config->Timeout == 0))
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
 
     p_Result->clear();
 
-    if(p_Config.Retries <= -1)
+    if(p_Config->Retries <= -1)
     {
-        p_Config.Retries = 4;
+        p_Config->Retries = 4;
     }
     else
     {
-        p_Config.Retries = std::min(p_Config.Retries, (int8_t)100);
+        p_Config->Retries = std::min(p_Config->Retries, (int8_t)100);
     }
 
-    if(p_Config.DataLength <= -1)
+    if(p_Config->DataLength <= -1)
     {
-        p_Config.DataLength = 32;
+        p_Config->DataLength = 32;
     }
     else
     {
-        p_Config.DataLength = std::min(p_Config.DataLength, (int16_t)5120);
+        p_Config->DataLength = std::min(p_Config->DataLength, (int16_t)5120);
     }
 
-    if(p_Config.Timeout <= -1)
+    if(p_Config->Timeout <= -1)
     {
-        p_Config.Timeout = 100;
+        p_Config->Timeout = 100;
     }
     else
     {
-        p_Config.Timeout = std::min(p_Config.Timeout, (int16_t)600);
+        p_Config->Timeout = std::min(p_Config->Timeout, (int16_t)600);
     }
 
-    // TODO: Copy implementation from SIM7080?
-
-    CommandStr = "AT+CIPPING=\"" + p_Config.Host + "\"," + std::to_string(p_Config.Retries) + "," + std::to_string(p_Config.DataLength) + "," + std::to_string(p_Config.Timeout);
+    CommandStr = "AT+CIPPING=\"" + p_Config->Host + "\"," + std::to_string(p_Config->Retries) + "," + std::to_string(p_Config->DataLength) + "," + std::to_string(p_Config->Timeout);
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CIPPING(CommandStr);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
@@ -95,39 +95,35 @@ SIM70XX_Error_t SIM7020_TCP_Ping(SIM7020_t& p_Device, SIM7020_Ping_t& p_Config, 
         // Wait for a ping response.
         if(SIM70XX_Queue_isEvent(p_Device.Internal.EventQueue, "+CIPPING", &Response))
         {
+            // Split the received lines.
             do
             {
-                std::string Temp;
                 SIM7020_PingRes_t Result;
 
-                Temp = SIM70XX_Tools_SubstringSplitErase(&Response);
-                SIMXX_TOOLS_REMOVE_LINEEND(Temp);
-
-                Temp.replace(Temp.find("+CIPPING: "), std::string("+CIPPING: ").size(), "");
+                Response.replace(Response.find("+CIPPING: "), std::string("+CIPPING: ").size(), "");
 
                 // Filter out the reply ID.
-                SIM70XX_Tools_SubstringSplitErase(&Temp);
+                SIM70XX_Tools_SubstringSplitErase(&Response);
 
                 // Filter out the IP address.
-                Result.IP =  SIM70XX_Tools_SubstringSplitErase(&Temp);
+                Result.IP =  SIM70XX_Tools_SubstringSplitErase(&Response);
 
                 // Filter out the reply time.
-                Result.ReplyTime = std::stoi(SIM70XX_Tools_SubstringSplitErase(&Temp));
+                Result.ReplyTime = std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
 
                 // Filter out the time to live.
-                Result.TTL = std::stoi(SIM70XX_Tools_SubstringSplitErase(&Temp));
+                Result.TTL = std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response, "\n"));
 
                 p_Result->push_back(Result);
 
                 Pings++;
 
-                ESP_LOGD(TAG, "Ping %u / %u", Pings, p_Config.Retries);
-                ESP_LOGD(TAG, "     Response: %s", Response.c_str());
+                ESP_LOGD(TAG, "Ping %u / %u", Pings, p_Config->Retries);
             } while(Response.find("+CIPPING") != std::string::npos);
         }
 
         vTaskDelay(100 / portTICK_PERIOD_MS);
-    } while(Pings != p_Config.Retries);
+    } while(Pings != p_Config->Retries);
 
     return Error;
 }

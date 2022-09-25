@@ -61,6 +61,8 @@ SIM70XX_Error_t SIM7020_FOTA_Start(SIM7020_t& p_Device, uint32_t Timeout)
         vTaskDelay(100 / portTICK_PERIOD_MS);
     }
 
+    SIMXX_TOOLS_REMOVE_LINEEND(Response);
+
     ESP_LOGI(TAG, "Response: %s", Response.c_str());
 
     if(Response.find("No update package") != std::string::npos)

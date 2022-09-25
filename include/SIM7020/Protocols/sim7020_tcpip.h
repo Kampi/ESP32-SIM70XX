@@ -30,7 +30,7 @@
  *  @param p_Result Pointer to list with Ping results
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_TCP_Ping(SIM7020_t& p_Device, SIM7020_Ping_t& p_Config, std::vector<SIM7020_PingRes_t>* p_Result);
+SIM70XX_Error_t SIM7020_TCP_Ping(SIM7020_t& p_Device, SIM7020_Ping_t* p_Config, std::vector<SIM7020_PingRes_t>* p_Result);
 
 /** @brief          Create a TCP socket.
  *  @param p_Device SIM7020 device object
