@@ -100,15 +100,20 @@ typedef struct
     uint8_t CID;                                    /**< Context Identifier. */
     uint16_t Timeout;                               /**< TCP command timeout in seconds. */
     SIM7020_TCP_Domain_t Domain;                    /**< Socket IP address domain. */
-    SIM7020_TCP_Protocol_t Protocol;                /**< Socket protocol .*/
-    uint8_t ID;                                     /**< Socket ID from the module.
+    SIM7020_TCP_Protocol_t Protocol;                /**< Socket protocol. */
+    struct
+    {
+        uint8_t ID;                                 /**< Socket ID from the module.
                                                          NOTE: Handled by the device driver. */
-    bool isConnected;                               /**< Socket connected.
+        bool isConnected;                           /**< Socket connected.
                                                          NOTE: Handled by the device driver. */
-    bool isCreated;                                 /**< #true when the socket is created.
+        bool isCreated;                             /**< #true when the socket is created.
                                                          NOTE: Handled by the device driver. */
-    SIM7020_TCP_Type_t Type;                        /**< Socket type.
+        bool isDataReceived;                        /**< Set to #true when data are received.
+                                                         NOTE: Managed by the device driver. */
+        SIM7020_TCP_Type_t Type;                    /**< Socket type.
                                                          NOTE: Handled by the device driver. */
+    } Internal;
 } SIM7020_TCP_Socket_t;
 
 #endif /* SIM7020_TCPIP_DEFS_H_ */

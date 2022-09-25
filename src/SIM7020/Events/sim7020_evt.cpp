@@ -66,6 +66,12 @@ void SIM70XX_Evt_MessageFilter(void* p_Device, std::string* p_Message)
 			SIM7020_Evt_on_TCP_Disconnect(Device, p_Message);
 			Processed = true;
 		}
+
+		if(p_Message->find("+CSONMI") != std::string::npos)
+		{
+			SIM7020_Evt_on_TCP_Data(Device, p_Message);
+			Processed = true;
+		}
 	#endif
 
 	#ifdef CONFIG_SIM70XX_DRIVER_WITH_MQTT

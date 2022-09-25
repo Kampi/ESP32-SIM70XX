@@ -46,13 +46,30 @@ void SIM7020_Evt_on_TCP_Disconnect(SIM7020_t* const p_Device, std::string* p_Mes
     // Iterate through the list of active sockets and close the socket with the given ID.
     for(std::vector<SIM7020_TCP_Socket_t*>::iterator it = p_Device->TCP.Sockets.begin(); it != p_Device->TCP.Sockets.end(); ++it)
     {
-        if((*it)->ID == ID)
+        if((*it)->Internal.ID == ID)
         {
-            (*it)->isConnected = false;
+            (*it)->Internal.isConnected = false;
 
             ESP_LOGI(TAG, "Disconnect socket %u", ID);
             ESP_LOGI(TAG, "Error: %i", TCP_Error);
         }
+    }
+}
+
+void SIM7020_Evt_on_TCP_Data(SIM7020_t* const p_Device, std::string* p_Message)
+{
+    std::string Message;
+    std::string* Response;
+
+    ESP_LOGD(TAG, "TCP message data event!");
+
+    // Create a new response object, because we want to place the response in the event loop.
+    Response = new std::string();
+    *Response = p_Message->substr(Index, p_Message->find("\r\n\r\n", Index) - Index);
+
+	if(xQueueSend(p_Device->Internal.EventQueue, &Response, 0) != pdPASS)
+    {
+        delete Response;
     }
 }
 

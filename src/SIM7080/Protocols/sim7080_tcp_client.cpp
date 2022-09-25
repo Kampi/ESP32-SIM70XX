@@ -49,12 +49,12 @@ SIM70XX_Error_t SIM7080_TCP_Client_Create(SIM7080_t& p_Device, std::string IP, u
 
     p_Socket->IP = IP;
     p_Socket->Port = Port;
-    p_Socket->CID = CID;
-    p_Socket->Type = SIM7080_TCP_TYPE_TCP;
-    p_Socket->isCreated = true;
-    p_Socket->isConnected = false;
-    p_Socket->isReadManually = ReadManually;
-    p_Socket->isDataReceived = false;
+    p_Socket->Internal.CID = CID;
+    p_Socket->Internal.Type = SIM7080_TCP_TYPE_TCP;
+    p_Socket->Internal.isCreated = true;
+    p_Socket->Internal.isConnected = false;
+    p_Socket->Internal.isReadManually = ReadManually;
+    p_Socket->Internal.isDataReceived = false;
 
     // TODO: Check if a socket with the ID is open
 
@@ -75,17 +75,17 @@ SIM70XX_Error_t SIM7080_TCP_Client_Connect(SIM7080_t& p_Device, SIM7080_TCP_Sock
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
-    else if(p_Socket->isCreated == false)
+    else if(p_Socket->Internal.isCreated == false)
     {
         return SIM70XX_ERR_NOT_CREATED;
     }
-    else if(p_Socket->isConnected == true)
+    else if(p_Socket->Internal.isConnected == true)
     {
         return SIM70XX_ERR_OK;
     }
 
     SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7080_AT_CAOPEN(p_Socket->CID, PDP, "TCP", p_Socket->IP, p_Socket->Port);
+    *Command = SIM7080_AT_CAOPEN(p_Socket->Internal.CID, PDP, "TCP", p_Socket->IP, p_Socket->Port);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
     if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
@@ -108,7 +108,7 @@ SIM70XX_Error_t SIM7080_TCP_Client_Connect(SIM7080_t& p_Device, SIM7080_TCP_Sock
         return SIM70XX_ERR_FAIL;
     }
 
-    p_Socket->isConnected = true;
+    p_Socket->Internal.isConnected = true;
     p_Device.TCP.Sockets.push_back(p_Socket);
 
     return SIM70XX_ERR_OK;
@@ -122,7 +122,7 @@ SIM70XX_Error_t SIM7080_TCP_Client_Transmit(SIM7080_t& p_Device, SIM7080_TCP_Soc
     SIM70XX_Error_t Error = SIM70XX_ERR_OK;
     SIM70XX_TxCmd_t Command;
 
-    if((p_Socket == NULL) || (p_Socket->Type != SIM7080_TCP_TYPE_TCP) || ((p_Buffer == NULL) && (Length > 0)) || (PacketSize > SIM7080_TCP_MAX_PAYLOAD_SIZE))
+    if((p_Socket == NULL) || (p_Socket->Internal.Type != SIM7080_TCP_TYPE_TCP) || ((p_Buffer == NULL) && (Length > 0)) || (PacketSize > SIM7080_TCP_MAX_PAYLOAD_SIZE))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
@@ -130,11 +130,11 @@ SIM70XX_Error_t SIM7080_TCP_Client_Transmit(SIM7080_t& p_Device, SIM7080_TCP_Soc
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
-    else if(p_Socket->isCreated == false)
+    else if(p_Socket->Internal.isCreated == false)
     {
         return SIM70XX_ERR_NOT_CREATED;
     }
-    else if(p_Socket->isConnected == false)
+    else if(p_Socket->Internal.isConnected == false)
     {
         return SIM70XX_ERR_NOT_CONNECTED;
     }
@@ -166,7 +166,7 @@ SIM70XX_Error_t SIM7080_TCP_Client_Transmit(SIM7080_t& p_Device, SIM7080_TCP_Soc
         ESP_LOGI(TAG, "     Transmit %u bytes...", BytesToSend);
 
         // Transmit the command.
-        Command = SIM7080_AT_CASEND(p_Socket->CID, BytesToSend, Timeout);
+        Command = SIM7080_AT_CASEND(p_Socket->Internal.CID, BytesToSend, Timeout);
         SIM70XX_UART_SendLine(p_Device.UART, Command.Command);
 
         // Wait for the empty space after the ">".
@@ -205,7 +205,7 @@ SIM70XX_Error_t SIM7080_TCP_Client_Transmit(SIM7080_t& p_Device, SIM7080_TCP_Soc
         // Data received. Abort the transmission.
         else if(Response.find("+CADATAIND") != std::string::npos)
         {
-            p_Socket->isDataReceived = true;
+            p_Socket->Internal.isDataReceived = true;
             Error = SIM70XX_ERR_FAIL;
             break;
         }
@@ -227,7 +227,7 @@ SIM70XX_Error_t SIM7080_TCP_Client_Receive(SIM7080_t& p_Device, SIM7080_TCP_Sock
 {
     SIM70XX_TxCmd_t Command;
 
-    if((p_Socket == NULL) || (p_Socket->Type != SIM7080_TCP_TYPE_TCP) || (p_Buffer == NULL))
+    if((p_Socket == NULL) || (p_Socket->Internal.Type != SIM7080_TCP_TYPE_TCP) || (p_Buffer == NULL))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
@@ -235,11 +235,11 @@ SIM70XX_Error_t SIM7080_TCP_Client_Receive(SIM7080_t& p_Device, SIM7080_TCP_Sock
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
-    else if(p_Socket->isCreated == false)
+    else if(p_Socket->Internal.isCreated == false)
     {
         return SIM70XX_ERR_NOT_CREATED;
     }
-    else if((p_Socket->isDataReceived == false) || (Length == 0))
+    else if((p_Socket->Internal.isDataReceived == false) || (Length == 0))
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -247,7 +247,7 @@ SIM70XX_Error_t SIM7080_TCP_Client_Receive(SIM7080_t& p_Device, SIM7080_TCP_Sock
     // We have to use the event queue here, because payload can contain CR and LF which will lead to wrong results when we use the normal way here.
     ESP_LOGI(TAG, "Transmit command: %s", Command.Command.c_str());
     vTaskSuspend(p_Device.Internal.TaskHandle);
-    Command = SIM7080_AT_CARECV(p_Socket->CID, Length);
+    Command = SIM7080_AT_CARECV(p_Socket->Internal.CID, Length);
     SIM70XX_UART_SendLine(p_Device.UART, Command.Command);
     vTaskResume(p_Device.Internal.TaskHandle);
 
@@ -274,17 +274,17 @@ SIM70XX_Error_t SIM7080_TCP_Client_Destroy(SIM7080_t& p_Device, SIM7080_TCP_Sock
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
-    else if(p_Socket->isCreated == false)
+    else if(p_Socket->Internal.isCreated == false)
     {
         return SIM70XX_ERR_NOT_CREATED;
     }
-    else if(p_Socket->isConnected == false)
+    else if(p_Socket->Internal.isConnected == false)
     {
         return SIM70XX_ERR_OK;
     }
 
     SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7080_AT_CACLOSE(p_Socket->CID);
+    *Command = SIM7080_AT_CACLOSE(p_Socket->Internal.CID);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
     if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
@@ -292,8 +292,8 @@ SIM70XX_Error_t SIM7080_TCP_Client_Destroy(SIM7080_t& p_Device, SIM7080_TCP_Sock
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
 
-    p_Socket->isConnected = false;
-    p_Socket->isCreated = false;
+    p_Socket->Internal.isConnected = false;
+    p_Socket->Internal.isCreated = false;
 
     return SIM70XX_ERR_OK;
 }

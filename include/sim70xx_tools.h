@@ -56,7 +56,7 @@ const inline __attribute__((always_inline)) std::string SIM70XX_LibVersion(void)
  *                  NOTE: Length must be a power of 2!
  *  @param p_Hex    Pointer to hexadecimal ASCII string
  */
-void SIM70XX_Tools_ASCII2Hex(const void* const p_Buffer, uint32_t Length, std::string* const p_Hex);
+void SIM70XX_Tools_Buf2Hex(const void* const p_Buffer, uint32_t Length, std::string* const p_Hex);
 
 /** @brief          Convert a hexadecimal ASCII string into a buffer.
  *  @param Hex      Hex string

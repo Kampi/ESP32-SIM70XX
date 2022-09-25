@@ -68,6 +68,13 @@ void SIM7020_Evt_on_PSM_Event(SIM7020_t* const p_Device, std::string* p_Message,
      *  @param p_Message    Pointer to message string
      */
     void SIM7020_Evt_on_TCP_Disconnect(SIM7020_t* const p_Device, std::string* p_Message);
+
+    /** @brief              TCP/IP data event handler.
+     *                      This function will filter out the receive message from the event message.
+     *  @param p_Device     Pointer to device
+     *  @param p_Message    Pointer to message string
+     */
+    void SIM7020_Evt_on_TCP_Data(SIM7020_t* const p_Device, std::string* p_Message);
 #endif
 
 #endif /* SIM7020_EVT_H_ */

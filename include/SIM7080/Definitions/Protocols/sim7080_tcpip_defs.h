@@ -82,18 +82,21 @@ typedef struct
 {
     std::string IP;                                 /**< IP address. */
     uint16_t Port;                                  /**< Target port. */
-    uint8_t CID;                                    /**< Context Identifier.
+    struct
+    {
+        uint8_t CID;                                /**< Context Identifier.
                                                          NOTE: Handled by the device driver. */
-    bool isConnected;                               /**< Socket connected.
+        bool isConnected;                           /**< Socket connected.
                                                          NOTE: Handled by the device driver. */
-    bool isCreated;                                 /**< #true when the socket is created.
+        bool isCreated;                             /**< #true when the socket is created.
                                                          NOTE: Handled by the device driver. */
-    bool isReadManually;                            /**< #true when the received data can only be read manually.
+        bool isReadManually;                        /**< #true when the received data can only be read manually.
                                                          NOTE: Handled by the device driver. */
-    bool isDataReceived;                            /**< Set to #true when data are received.
+        bool isDataReceived;                        /**< Set to #true when data are received.
                                                          NOTE: Managed by the device driver. */
-    SIM7080_TCP_Type_t Type;                        /**< Socket type.
+        SIM7080_TCP_Type_t Type;                    /**< Socket type.
                                                          NOTE: Handled by the device driver. */
+    } Internal;
 } SIM7080_TCP_Socket_t;
 
 #endif /* SIM7080_TCPIP_DEFS_H_ */

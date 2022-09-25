@@ -24,6 +24,10 @@
 #include "sim70xx_errors.h"
 #include "sim7020_tcpip_defs.h"
 
+/** @brief Maximum number of bytes for a single TCP / UDP transmission.
+ */
+#define SIM7020_TCP_MAX_PAYLOAD_SIZE                        512
+
 /** @brief          Perform a ping.
  *  @param p_Device SIM7020 device object
  *  @param p_Config Pointer to SIM7020 ping configuration object
@@ -31,6 +35,20 @@
  *  @return         SIM70XX_ERR_OK when successful
  */
 SIM70XX_Error_t SIM7020_TCP_Ping(SIM7020_t& p_Device, SIM7020_Ping_t* p_Config, std::vector<SIM7020_PingRes_t>* p_Result);
+
+/** @brief          Check if data are received for a specific socket.
+ *  @param p_Socket Pointer to TCP socket object
+ *  @return         #true when data are received
+ */
+bool inline __attribute__((always_inline)) SIM7020_TCP_Client_isDataAvailable(SIM7020_TCP_Socket_t* p_Socket)
+{
+    if(p_Socket == NULL)
+    {
+        return false;
+    }
+
+    return p_Socket->Internal.isDataReceived;
+}
 
 /** @brief          Create a TCP socket.
  *  @param p_Device SIM7020 device object
@@ -56,10 +74,10 @@ SIM70XX_Error_t SIM7020_TCP_Client_Connect(SIM7020_t& p_Device, SIM7020_TCP_Sock
  *  @param p_Device SIM7020 device object
  *  @param p_Socket Pointer to TCP socket object
  *  @param p_Buffer Pointer to data buffer
- *  @param Length   Data length (maximum 512 bytes)
+ *  @param Length   Data length
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_TCP_Client_Transmit(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket, const void* p_Buffer, uint16_t Length);
+SIM70XX_Error_t SIM7020_TCP_Client_Transmit(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket, const void* p_Buffer, uint32_t Length);
 
 /** @brief          Close a TCP connection and release the socket.
  *  @param p_Device SIM7020 device object

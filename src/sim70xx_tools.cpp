@@ -30,7 +30,7 @@
 
 static const char* TAG = "SIM70XX_Tools";
 
-void SIM70XX_Tools_ASCII2Hex(const void* const p_Buffer, uint32_t Length, std::string* const p_Hex)
+void SIM70XX_Tools_Buf2Hex(const void* const p_Buffer, uint32_t Length, std::string* const p_Hex)
 {
     char Buffer[3];
 

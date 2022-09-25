@@ -50,7 +50,7 @@ bool inline __attribute__((always_inline)) SIM7080_TCP_Client_isDataAvailable(SI
         return false;
     }
 
-    return p_Socket->isDataReceived;
+    return p_Socket->Internal.isDataReceived;
 }
 
 /** @brief              Create a socket for a TCP client.

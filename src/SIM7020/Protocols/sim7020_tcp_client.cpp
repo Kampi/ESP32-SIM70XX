@@ -50,10 +50,10 @@ SIM70XX_Error_t SIM7020_TCP_Client_Create(SIM7020_t& p_Device, std::string IP, u
     p_Socket->Timeout = Timeout;
     p_Socket->CID = CID;
     p_Socket->Domain = Domain;
-    p_Socket->Type = SIM7020_TCP_TYPE_TCP;
+    p_Socket->Internal.Type = SIM7020_TCP_TYPE_TCP;
     p_Socket->Protocol = Protocol;
 
-    CommandStr = "AT+CSOC=" + std::to_string(p_Socket->Domain) + "," + std::to_string(p_Socket->Type) + "," + std::to_string(p_Socket->CID);
+    CommandStr = "AT+CSOC=" + std::to_string(p_Socket->Domain) + "," + std::to_string(p_Socket->Internal.Type) + "," + std::to_string(p_Socket->CID);
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CSOC(CommandStr);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
@@ -63,12 +63,12 @@ SIM70XX_Error_t SIM7020_TCP_Client_Create(SIM7020_t& p_Device, std::string IP, u
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    p_Socket->ID = (uint8_t)std::stoi(Response);
+    p_Socket->Internal.ID = (uint8_t)std::stoi(Response);
     p_Device.TCP.Sockets.push_back(p_Socket);
-    p_Socket->isConnected = false;
-    p_Socket->isCreated = true;
+    p_Socket->Internal.isConnected = false;
+    p_Socket->Internal.isCreated = true;
 
-    ESP_LOGD(TAG, "Socket %u created...", p_Socket->ID);
+    ESP_LOGD(TAG, "Socket %u created...", p_Socket->Internal.ID);
 
     return SIM70XX_ERR_OK;    
 }
@@ -86,17 +86,17 @@ SIM70XX_Error_t SIM7020_TCP_Client_Connect(SIM7020_t& p_Device, SIM7020_TCP_Sock
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
-    else if(p_Socket->isCreated == false)
+    else if(p_Socket->Internal.isCreated == false)
     {
         return SIM70XX_ERR_NOT_CREATED;
     }
-    else if(p_Socket->isConnected == true)
+    else if(p_Socket->Internal.isConnected == true)
     {
         return SIM70XX_ERR_OK;
     }
 
     SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7020_AT_CSOCON(p_Socket->ID, p_Socket->Port, p_Socket->IP);
+    *Command = SIM7020_AT_CSOCON(p_Socket->Internal.ID, p_Socket->Port, p_Socket->IP);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
     if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, p_Socket->Timeout) == false)
     {
@@ -104,17 +104,18 @@ SIM70XX_Error_t SIM7020_TCP_Client_Connect(SIM7020_t& p_Device, SIM7020_TCP_Sock
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    p_Socket->isConnected = true;
+    p_Socket->Internal.isConnected = true;
 
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_TCP_Client_Transmit(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket, const void* p_Buffer, uint16_t Length)
+SIM70XX_Error_t SIM7020_TCP_Client_Transmit(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket, const void* p_Buffer, uint32_t Length)
 {
-    std::string Buffer_Hex;
+    uint8_t* Buffer_Temp;
+    uint32_t BytesToTransmit;
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Socket == NULL) || (Length > 512) || (p_Socket->Type != SIM7020_TCP_TYPE_TCP))
+    if((p_Socket == NULL) || (p_Socket->Internal.Type != SIM7020_TCP_TYPE_TCP))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
@@ -122,26 +123,52 @@ SIM70XX_Error_t SIM7020_TCP_Client_Transmit(SIM7020_t& p_Device, SIM7020_TCP_Soc
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
-    else if(p_Socket->isCreated == false)
+    else if(p_Socket->Internal.isCreated == false)
     {
         return SIM70XX_ERR_NOT_CREATED;
     }
-    else if(p_Socket->isConnected == false)
+    else if(p_Socket->Internal.isConnected == false)
     {
         return SIM70XX_ERR_NOT_CONNECTED;
     }
 
-    SIM70XX_Tools_ASCII2Hex(p_Buffer, Length, &Buffer_Hex);
-
-    SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7020_AT_CCSOSEND(p_Socket->ID, Length, Buffer_Hex);
-    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    Buffer_Temp = (uint8_t*)p_Buffer;
+    BytesToTransmit = Length;
+    do
     {
-        return SIM70XX_ERR_FAIL;
-    }
+        uint16_t TransmissionSize;
+        std::string Buffer_Hex;
 
-    return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
+        if(BytesToTransmit > SIM7020_TCP_MAX_PAYLOAD_SIZE)
+        {
+            TransmissionSize = SIM7020_TCP_MAX_PAYLOAD_SIZE;
+        }
+        else
+        {
+            TransmissionSize = BytesToTransmit;
+        }
+
+        SIM70XX_Tools_Buf2Hex(Buffer_Temp, TransmissionSize, &Buffer_Hex);
+
+        SIM70XX_CREATE_CMD(Command);
+        *Command = SIM7020_AT_CCSOSEND(p_Socket->Internal.ID, Buffer_Hex.size(), Buffer_Hex);
+        SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+        if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+        {
+            return SIM70XX_ERR_FAIL;
+        }
+        SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
+
+        if(p_Socket->Internal.isConnected == false)
+        {
+            return SIM70XX_ERR_NOT_CONNECTED;
+        }
+
+        Buffer_Temp += SIM7020_TCP_MAX_PAYLOAD_SIZE;
+        BytesToTransmit -= TransmissionSize;
+    } while(BytesToTransmit > 0);
+
+    return SIM70XX_ERR_OK;
 }
 
 SIM70XX_Error_t SIM7020_TCP_Client_Destroy(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket)
@@ -156,17 +183,17 @@ SIM70XX_Error_t SIM7020_TCP_Client_Destroy(SIM7020_t& p_Device, SIM7020_TCP_Sock
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
-    else if(p_Socket->isCreated == false)
+    else if(p_Socket->Internal.isCreated == false)
     {
         return SIM70XX_ERR_NOT_CREATED;
     }
-    else if(p_Socket->isConnected == false)
+    else if(p_Socket->Internal.isConnected == false)
     {
         return SIM70XX_ERR_OK;
     }
 
     SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7020_AT_CSOCL(p_Socket->ID);
+    *Command = SIM7020_AT_CSOCL(p_Socket->Internal.ID);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
     if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
@@ -176,8 +203,8 @@ SIM70XX_Error_t SIM7020_TCP_Client_Destroy(SIM7020_t& p_Device, SIM7020_TCP_Sock
 
     // TODO: Remove socket from list
 
-    p_Socket->isConnected = false;
-    p_Socket->isCreated = false;
+    p_Socket->Internal.isConnected = false;
+    p_Socket->Internal.isCreated = false;
 
     return SIM70XX_ERR_OK;
 }

@@ -39,11 +39,6 @@ void SIM7080_Evt_on_TCP_Disconnect(SIM7080_t* const p_Device, std::string* p_Mes
     ESP_LOGD(TAG, "TCP disconnect event!");
 
     Index = p_Message->find("+CASTATE");
-    if(Index == std::string::npos)
-    {
-        return;
-    }
-
     Message = p_Message->substr(Index, p_Message->find("\r\n\r\n", Index) - Index);
     Index = Message.find(",");
     CID = std::stoi(Message.substr((Index - 1), Index));
@@ -51,9 +46,9 @@ void SIM7080_Evt_on_TCP_Disconnect(SIM7080_t* const p_Device, std::string* p_Mes
 
     for(std::vector<SIM7080_TCP_Socket_t*>::iterator it = p_Device->TCP.Sockets.begin(); it != p_Device->TCP.Sockets.end(); ++it)
     {
-        if((*it)->CID == CID)
+        if((*it)->Internal.CID == CID)
         {
-            (*it)->isConnected = false;
+            (*it)->Internal.isConnected = false;
 
             ESP_LOGI(TAG, "Disconnect socket: %u", CID);
             ESP_LOGI(TAG, "Error: %i", Error);
@@ -63,32 +58,37 @@ void SIM7080_Evt_on_TCP_Disconnect(SIM7080_t* const p_Device, std::string* p_Mes
 
 void SIM7080_Evt_on_TCP_DataReady(SIM7080_t* const p_Device, std::string* p_Message)
 {
+    size_t Index;
     uint8_t CID;
     std::string Message;
 
     ESP_LOGD(TAG, "TCP message data ready event!");
 
+    Index = p_Message->find("+CADATAIND");
     Message = p_Message->substr(Index, p_Message->find("\r\n\r\n", Index) - Index);
     Index = Message.find(":");
     CID = std::stoi(Message.substr(Index + 1, Message.find("\r\n\r\n", Index) - Index + 1));
 
     for(std::vector<SIM7080_TCP_Socket_t*>::iterator it = p_Device->TCP.Sockets.begin(); it != p_Device->TCP.Sockets.end(); ++it)
     {
-        if((*it)->CID == CID)
+        if((*it)->Internal.CID == CID)
         {
             ESP_LOGI(TAG, "Data received for socket: %u", CID);
 
-            (*it)->isDataReceived = true;
+            (*it)->Internal.isDataReceived = true;
         }
     }
 }
 
 void SIM7080_Evt_on_TCP_Data(SIM7080_t* const p_Device, std::string* p_Message)
 {
+    size_t Index;
     std::string Message;
     std::string* Response;
 
     ESP_LOGD(TAG, "TCP message data event!");
+
+    Index = p_Message->find("+CARECV");
 
     // Create a new response object, because we want to place the response in the event loop.
     Response = new std::string();
