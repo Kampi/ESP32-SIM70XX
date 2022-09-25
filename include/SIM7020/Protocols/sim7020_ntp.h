@@ -24,13 +24,23 @@
 #include "sim70xx_errors.h"
 #include "sim7020_ntp_defs.h"
 
-/** @brief          Get the network time by using an SNTP server instance.
- *  @param p_Device SIM7020 device object
- *  @param Server   NTP server address
- *  @param Timezone Current timezone
- *  @param Timeout  (Optional) Message timeout for each Ping response in seconds
- *  @return         SIM70XX_ERR_OK when successful
+/** @brief              Sync the local time with the time from an NTP server.
+ *  @param p_Device     SIM7020 device object
+ *  @param Server       NTP server
+ *  @param Timezone     Timezone
+ *  @param p_Time       Pointer to local time
+ *  @param Timeout      (Optional) Timeout in seconds
+ *  @return             SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_NTP_GetNetworkTime(SIM7020_t& p_Device, std::string Server, int8_t Timezone, uint8_t Timeout = 60);
+SIM70XX_Error_t SIM7020_NTP_Sync(SIM7020_t& p_Device, std::string Server, int8_t TimeZone, struct tm* p_Time, uint32_t Timeout = 60);
+
+/** @brief              Get the current time from the module.
+ *                      NOTE: Use \ref SIM7020_NTP_Sync to sync the time first!
+ *  @param p_Device     SIM7020 device object
+ *  @param p_Time       Pointer to local time
+ *  @param p_Timezone   (Optional) Pointer to timezone
+ *  @return             SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7020_NTP_GetTime(SIM7020_t& p_Device, struct tm* p_Time, int8_t* p_Timezone = NULL);
 
 #endif /* SIM7020_NTP_H_ */

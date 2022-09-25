@@ -4,8 +4,6 @@
 #include <freertos/task.h>
 #include <freertos/event_groups.h>
 
-#include <ArduinoJson.h>
-
 #include "sim7020.h"
 
 static SIM7020_Config_t _Config = SIM7020_DEFAULT_CONF_1NCE(UART_NUM_1, SIM_BAUD_460800, GPIO_NUM_13, GPIO_NUM_14);

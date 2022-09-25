@@ -87,7 +87,7 @@ void SIM70XX_Evt_MessageFilter(void* p_Device, std::string* p_Message)
 	#ifdef CONFIG_SIM70XX_DRIVER_WITH_EMAIL
 	#endif
 
-	// Delete the event string object.
+	// Delete the old event string object.
 	if(Processed)
 	{
 		delete p_Message;

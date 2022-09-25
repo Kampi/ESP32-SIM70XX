@@ -26,6 +26,7 @@ set(COMPONENT_SRCS
 
     # SIM7020
     "src/SIM7020/sim7020.cpp"
+    "src/SIM7020/FOTA/sim7020_fota.cpp"
     "src/SIM7020/Protocols/sim7020_coap.cpp"
     "src/SIM7020/Protocols/sim7020_dns.cpp"
     "src/SIM7020/Protocols/sim7020_http.cpp"
@@ -39,10 +40,12 @@ set(COMPONENT_SRCS
     "src/SIM7020/NVRAM/sim7020_nvram.cpp"
     "src/SIM7020/PDP/sim7020_pdp.cpp"
     "src/SIM7020/PDP/sim7020_pdp_gprs.cpp"
+    "src/SIM7020/Events/sim7020_evt.cpp"
     "src/SIM7020/Events/sim7020_evt_http.cpp"
     "src/SIM7020/Events/sim7020_evt_mqtt.cpp"
     "src/SIM7020/Events/sim7020_evt_tcp.cpp"
     "src/SIM7020/Events/sim7020_evt_psm.cpp"
+    "src/SIM7020/Events/sim7020_evt_ntp.cpp"
 
     # Driver internal
     "src/Private/Events/sim70xx_evt.cpp"

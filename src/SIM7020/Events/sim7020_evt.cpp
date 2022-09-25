@@ -57,12 +57,20 @@ void SIM70XX_Evt_MessageFilter(void* p_Device, std::string* p_Message)
 	if(p_Message->find("ENTER PSM") != std::string::npos)
 	{
 		SIM7020_Evt_on_PSM_Event(Device, p_Message, true);
+		Processed = true;
 	}
 
 	#ifdef CONFIG_SIM70XX_DRIVER_WITH_TCPIP
 		if(p_Message->find("+CSOERR") != std::string::npos)
 		{
 			SIM7020_Evt_on_TCP_Disconnect(Device, p_Message);
+		}
+	#endif
+
+	#ifdef CONFIG_SIM70XX_DRIVER_WITH_NTP
+		if(p_Message->find("+CSNTP") != std::string::npos)
+		{
+			SIM7020_Evt_on_NTP_Event(Device, p_Message);
 		}
 	#endif
 
@@ -86,11 +94,12 @@ void SIM70XX_Evt_MessageFilter(void* p_Device, std::string* p_Message)
 		}
 	#endif
 
-	// Handle all other messages by putting them into the event queue.
+	// Delete the old event string object.
 	if(Processed)
 	{
 		delete p_Message;
 	}
+	// Handle all other messages by putting them into the event queue.
 	else
 	{
 		xQueueSend(Device->Internal.EventQueue, &p_Message, 0);

@@ -1,5 +1,5 @@
  /*
- * SIM7020_Evt_HTTP.cpp
+ * SIM7020_evt_http.cpp
  *
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de

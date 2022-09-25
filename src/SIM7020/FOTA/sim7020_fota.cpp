@@ -1,5 +1,5 @@
  /*
- * sim7020_dns_defs.h
+ * sim7080_fota.cpp
  *
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -17,20 +17,18 @@
  * Errors and commissions should be reported to DanielKampert@kampis-elektroecke.de.
  */
 
-#ifndef SIM7020_DNS_DEFS_H_
-#define SIM7020_DNS_DEFS_H_
+#include <sdkconfig.h>
 
-#include <string>
-#include <stdint.h>
-#include <stdbool.h>
+#if(CONFIG_SIMXX_DEV == 7020)
 
-/** @brief SIM7020 DNS error codes.
- */
-typedef enum
-{
-    SIM7020_DNS_ERROR_OK        = 0,                /**< No error. */
-    SIM7020_DNS_ERROR_NETWORK	= 3,           		/**< Network error. */
-    SIM7020_DNS_ERROR_COMMON  	= 8,                /**< Common DNS error. */
-} SIM7020_DNS_Error_t;
+#include <esp_log.h>
 
-#endif /* SIM7020_DNS_DEFS_H_ */
+#include "sim7080.h"
+#include "../../Private/Queue/sim70xx_queue.h"
+#include "../../Private/Commands/sim70xx_commands.h"
+
+static const char* TAG = "SIM7080_FOTA";
+
+
+
+#endif

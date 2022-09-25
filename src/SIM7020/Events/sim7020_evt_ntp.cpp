@@ -1,5 +1,5 @@
  /*
- * sim7020_dns_defs.h
+ * SIM7020_evt_ntp.cpp
  *
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -17,20 +17,31 @@
  * Errors and commissions should be reported to DanielKampert@kampis-elektroecke.de.
  */
 
-#ifndef SIM7020_DNS_DEFS_H_
-#define SIM7020_DNS_DEFS_H_
+#include <sdkconfig.h>
 
-#include <string>
-#include <stdint.h>
-#include <stdbool.h>
+#if((CONFIG_SIMXX_DEV == 7020) && (defined CONFIG_SIM70XX_DRIVER_WITH_NTP))
 
-/** @brief SIM7020 DNS error codes.
- */
-typedef enum
+#include <esp_log.h>
+
+#include "sim7020.h"
+#include "sim7020_evt.h"
+#include "../../Private/Queue/sim70xx_queue.h"
+
+static const char* TAG = "SIM7020_Evt_NTP";
+
+void SIM7020_Evt_on_NTP_Event(SIM7020_t* const p_Device, std::string* p_Message)
 {
-    SIM7020_DNS_ERROR_OK        = 0,                /**< No error. */
-    SIM7020_DNS_ERROR_NETWORK	= 3,           		/**< Network error. */
-    SIM7020_DNS_ERROR_COMMON  	= 8,                /**< Common DNS error. */
-} SIM7020_DNS_Error_t;
+    size_t Index;
 
-#endif /* SIM7020_DNS_DEFS_H_ */
+    ESP_LOGD(TAG, "NTP event!");
+
+    Index = p_Message->find("+CSNTP");
+    if(Index == std::string::npos)
+    {
+        return;
+    }
+
+    SIMXX_TOOLS_REMOVE_LINEEND((*p_Message));
+}
+
+#endif

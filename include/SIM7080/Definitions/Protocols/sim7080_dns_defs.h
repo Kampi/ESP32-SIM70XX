@@ -28,7 +28,7 @@
  */
 typedef enum
 {
-    SIM7080_DNS_ERROR_OK        = -1,               /**< Common error. */
+    SIM7080_DNS_ERROR_OK        = -1,               /**< No error. */
     SIM7080_DNS_ERROR_NOT_AUTH,                     /**< Not authenticated error. */
     SIM7080_DNS_ERROR_INVALID_PARA,                 /**< Invalid parameter error. */
     SIM7080_DNS_ERROR_NETWORK,                      /**< No network error. */

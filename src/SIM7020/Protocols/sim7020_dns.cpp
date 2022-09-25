@@ -28,12 +28,12 @@
 #include "../../Private/Queue/sim70xx_queue.h"
 #include "../../Private/Commands/sim70xx_commands.h"
 
-static const char* TAG = "SIM7020_DNS"
+static const char* TAG = "SIM7020_DNS";
 
 // TODO: Add configuration for DNS Server (CDNSCFG)
 // TODO: Add selection of PDP index for DNS (CDNSPDPID)
 
-SIM70XX_Error_t SIM7020_TCP_ParseDNS(SIM7020_t& p_Device, std::string Host, std::string* p_IP, SIM7020_DNS_Error_t* p_Error, uint32_t Timeout)
+SIM70XX_Error_t SIM7020_DNS_FetchAddress(SIM7020_t& p_Device, std::string Host, std::string* p_IP, SIM7020_DNS_Error_t* p_Error, uint32_t Timeout)
 {
     size_t Index;
     uint32_t Now;

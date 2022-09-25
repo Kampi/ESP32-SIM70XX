@@ -29,20 +29,6 @@
 #include "../Private/Queue/sim70xx_queue.h"
 #include "../Private/Commands/sim70xx_commands.h"
 
-#ifdef CONFIG_SIM70XX_TASK_CORE_AFFINITY
-    #ifndef CONFIG_SIM70XX_TASK_COM_CORE
-        #define CONFIG_SIM70XX_TASK_COM_CORE    1
-    #endif
-#endif
-
-#ifndef CONFIG_SIM70XX_TASK_COM_PRIO
-    #define CONFIG_SIM70XX_TASK_COM_PRIO        12
-#endif
-
-#ifndef CONFIG_SIM70XX_TASK_COM_STACK
-    #define CONFIG_SIM70XX_TASK_COM_STACK       4096
-#endif
-
 static const char* TAG = "SIM7020";
 
 SIM70XX_Error_t SIM7020_Init(SIM7020_t& p_Device, SIM7020_Config_t& p_Config, uint32_t Timeout)
@@ -57,8 +43,6 @@ SIM70XX_Error_t SIM7020_Init(SIM7020_t& p_Device, SIM7020_Config_t& p_Config, SI
 
 SIM70XX_Error_t SIM7020_Init(SIM7020_t& p_Device, SIM7020_Config_t& p_Config, uint32_t Timeout, SIM70XX_Baud_t Old)
 {
-    std::string Response;
-
     if(p_Device.Internal.isInitialized)
     {
         SIM7020_Deinit(p_Device);
@@ -120,19 +104,11 @@ SIM70XX_Error_t SIM7020_Init(SIM7020_t& p_Device, SIM7020_Config_t& p_Config, ui
 
     SIM70XX_ERROR_CHECK(SIM7020_Ping(p_Device));
     SIM70XX_ERROR_CHECK(SIM7020_GetFunctionality(p_Device))
-
-    SIM70XX_ERROR_CHECK(SIM7020_PSM_Disable(p_Device, SIM7020_PSM_DIS));
-    if(SIM7020_GetFunctionality(p_Device) == SIM70XX_ERR_INVALID_STATE)
-    {
-
-    }
-
-    SIM70XX_ERROR_CHECK(SIM7020_SetFunctionality(p_Device, SIM7020_FUNC_MIN));    // TODO: Check this
-    //SIM70XX_ERROR_CHECK(SIM7020_PDP_GPRS_Define(p_Device, SIM7020_PDP_IP, p_Config.APN)); // TODO: CHange
+    SIM70XX_ERROR_CHECK(SIM7020_SetFunctionality(p_Device, SIM7020_FUNC_MIN));
+    SIM70XX_ERROR_CHECK(SIM7020_SetPSD(p_Device, SIM7020_PDP_IP, p_Config.APN));
+    SIM70XX_ERROR_CHECK(SIM7020_SetFunctionality(p_Device, SIM7020_FUNC_FULL));
     SIM70XX_ERROR_CHECK(SIM7020_SetOperator(p_Device, SIM_MODE_MANUAL, p_Config.OperatorFormat, p_Config.Operator));
-    SIM70XX_ERROR_CHECK(SIM7020_SetFunctionality(p_Device, SIM7020_FUNC_FULL));    // TODO: Check this
     SIM70XX_ERROR_CHECK(SIM7020_SetBand(p_Device, p_Config.Band));
-
     SIM70XX_ERROR_CHECK(SIM7020_Info_GetNetworkRegistrationStatus(p_Device));
     //SIM70XX_ERROR_CHECK(SIM7020_PDP_ReadDynamicParameters(p_Device));
     //SIM70XX_ERROR_CHECK(SIM7020_PSM_GetEventStatus(p_Device, &p_Device.Internal.isPSMEvent));
@@ -200,7 +176,7 @@ SIM70XX_Error_t SIM7020_SoftReset(SIM7020_t& p_Device, uint32_t Timeout)
     {
         // Reset the module.
         // NOTE: Echo mode is enabled after a reset!
-        SIM70XX_UART_SendCommand(p_Device.UART, "ATZ");
+        SIM70XX_UART_SendLine(p_Device.UART, "ATZ");
         Response = SIM70XX_UART_ReadStringUntil(p_Device.UART);
         Response = SIM70XX_UART_ReadStringUntil(p_Device.UART);
         ESP_LOGI(TAG, "Response: %s", Response.c_str());
@@ -312,7 +288,7 @@ SIM70XX_Error_t SIM7020_SetOperator(SIM7020_t& p_Device, SIM70XX_OpMode_t Mode, 
 
     if((Mode == SIM_MODE_MANUAL) || (Mode == SIM_MODE_BOTH))
     {
-        CommandStr += "," + std::to_string(Format) + ",\"" + Operator + "\"" + "," + std::to_string(SIM7020_ACT_NB_IOT);
+        CommandStr += "," + std::to_string(Format) + ",\"" + Operator + "\"";
     }
 
     SIM70XX_CREATE_CMD(Command);
@@ -567,7 +543,7 @@ SIM70XX_Error_t SIM7020_GetFunctionality(SIM7020_t& p_Device)
 
     p_Device.Connection.Functionality = (SIM7020_Func_t)std::stoi(Response);
 
-    ESP_LOGD(TAG, "Functionality: %u", p_Device.Connection.Functionality);
+    ESP_LOGI(TAG, "Functionality: %u", p_Device.Connection.Functionality);
 
     return SIM70XX_ERR_OK;
 }
@@ -672,7 +648,7 @@ SIM70XX_Error_t SIM7020_SetBaudrate(SIM7020_t& p_Device, SIM70XX_Baud_t Old, SIM
 
     // Set the new baudrate.
     SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7020_AT_IPR_W(New);
+    *Command = SIM70XX_AT_IPR_W(New);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
     if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {

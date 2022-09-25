@@ -27,7 +27,7 @@
 #include "sim7020_evt.h"
 #include "../../Private/Queue/sim70xx_queue.h"
 
-static const char* TAG = "SIM7020_Evt_TCP";
+static const char* TAG = "SIM7020_Evt_PSM";
 
 void SIM7020_Evt_on_PSM_Event(SIM7020_t* const p_Device, std::string* p_Message, bool isPSM)
 {

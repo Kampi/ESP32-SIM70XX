@@ -43,8 +43,6 @@ SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t& p_Conf
 
 SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t& p_Config, uint32_t Timeout, SIM70XX_Baud_t Old)
 {
-    std::string Response;
-
     if(p_Device.Internal.isInitialized)
     {
         SIM7080_Deinit(p_Device);
