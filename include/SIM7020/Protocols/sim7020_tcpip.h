@@ -43,14 +43,14 @@ SIM70XX_Error_t SIM7020_TCP_Ping(SIM7020_t& p_Device, SIM7020_Ping_t* p_Config, 
  *  @param Protocol (Optional) Socket protocol
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_TCP_Create(SIM7020_t& p_Device, std::string IP, uint16_t Port, SIM7020_TCP_Socket_t* p_Socket, uint16_t Timeout = 60, uint8_t CID = 1, SIM7020_TCP_Domain_t Domain = SIM7020_TCP_DOMAIN_IPV4, SIM7020_TCP_Protocol_t Protocol = SIM7020_TCP_PROT_IP);
+SIM70XX_Error_t SIM7020_TCP_Client_Create(SIM7020_t& p_Device, std::string IP, uint16_t Port, SIM7020_TCP_Socket_t* p_Socket, uint16_t Timeout = 60, uint8_t CID = 1, SIM7020_TCP_Domain_t Domain = SIM7020_TCP_DOMAIN_IPV4, SIM7020_TCP_Protocol_t Protocol = SIM7020_TCP_PROT_IP);
 
 /** @brief          Open a TCP connection to a remote server.
  *  @param p_Device SIM7020 device object
  *  @param p_Socket Pointer to TCP socket object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_TCP_Connect(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket);
+SIM70XX_Error_t SIM7020_TCP_Client_Connect(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket);
 
 /** @brief          Transmit a TCP message with a length up to 512 bytes.
  *  @param p_Device SIM7020 device object
@@ -59,22 +59,13 @@ SIM70XX_Error_t SIM7020_TCP_Connect(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p
  *  @param Length   Data length (maximum 512 bytes)
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_TCP_TransmitBytes(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket, const void* p_Buffer, uint16_t Length);
-
-/** @brief          Transmit a TCP string message with a length up to 512 characters.
- *  @param p_Device SIM7020 device object
- *  @param p_Socket Pointer to TCP socket object
- *  @param p_Buffer Pointer to data buffer
- *  @param Length   Data length (maximum 512 bytes)
- *  @return         SIM70XX_ERR_OK when successful
- */
-SIM70XX_Error_t SIM7020_TCP_TransmitString(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket, std::string Data);
+SIM70XX_Error_t SIM7020_TCP_Client_Transmit(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket, const void* p_Buffer, uint16_t Length);
 
 /** @brief          Close a TCP connection and release the socket.
  *  @param p_Device SIM7020 device object
  *  @param p_Socket Pointer to TCP socket object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_TCP_Destroy(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket);
+SIM70XX_Error_t SIM7020_TCP_Client_Destroy(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket);
 
 #endif /* SIM7020_TCPIP_H_ */

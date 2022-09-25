@@ -30,7 +30,7 @@
 #include "../../Private/Queue/sim70xx_queue.h"
 #include "../../Private/Commands/sim70xx_commands.h"
 
-static const char* TAG = "SIM7080_TCPIP";
+static const char* TAG = "SIM7080_TCPIP_Client";
 
 SIM70XX_Error_t SIM7080_TCP_Client_Create(SIM7080_t& p_Device, std::string IP, uint16_t Port, SIM7080_TCP_Socket_t* p_Socket, uint8_t CID, bool ReadManually)
 {

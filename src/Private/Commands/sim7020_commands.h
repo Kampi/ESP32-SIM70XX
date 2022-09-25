@@ -91,8 +91,7 @@
 #define SIM7020_AT_CIPPING(Command)                             SIM70XX_CMD(Command, false, 60, 1)
 #define SIM7020_AT_CSOC(Command)                                SIM70XX_CMD(Command, true, 60, 1)
 #define SIM7020_AT_CSOCON(ID, Port, Address)                    SIM70XX_CMD("AT+CSOCON=" + std::to_string(ID) + "," + std::to_string(Port) + ",\"" + Address + "\"", false, 60, 1)
-#define SIM7020_AT_CCSOSEND_BYTES(ID, Length, Data)             SIM70XX_CMD("AT+CSOSEND=" + std::to_string(ID) + "," + std::to_string(Length) + "," + Data, false, 60, 1)
-#define SIM7020_AT_CCSOSEND_STRING(ID, Data)                    SIM70XX_CMD("AT+CSOSEND=" + std::to_string(ID) + ",0,\"" + Data + "\"", false, 60, 1)
+#define SIM7020_AT_CCSOSEND(ID, Length, Data)                   SIM70XX_CMD("AT+CSOSEND=" + std::to_string(ID) + "," + std::to_string(Length) + "," + Data, false, 60, 1)
 #define SIM7020_AT_CSOCL(ID)                                    SIM70XX_CMD("AT+CSOCL=" + std::to_string(ID), false, 60, 1)
 
 /**

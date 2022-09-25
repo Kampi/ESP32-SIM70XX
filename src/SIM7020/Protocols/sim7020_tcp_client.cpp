@@ -28,9 +28,9 @@
 #include "../../Private/Queue/sim70xx_queue.h"
 #include "../../Private/Commands/sim70xx_commands.h"
 
-static const char* TAG = "SIM7020_TCPIP";
+static const char* TAG = "SIM7020_TCPIP_Client";
 
-SIM70XX_Error_t SIM7020_TCP_Create(SIM7020_t& p_Device, std::string IP, uint16_t Port, SIM7020_TCP_Socket_t* p_Socket, uint16_t Timeout, uint8_t CID, SIM7020_TCP_Domain_t Domain, SIM7020_TCP_Protocol_t Protocol)
+SIM70XX_Error_t SIM7020_TCP_Client_Create(SIM7020_t& p_Device, std::string IP, uint16_t Port, SIM7020_TCP_Socket_t* p_Socket, uint16_t Timeout, uint8_t CID, SIM7020_TCP_Domain_t Domain, SIM7020_TCP_Protocol_t Protocol)
 {
     std::string Response;
     std::string CommandStr;
@@ -64,18 +64,16 @@ SIM70XX_Error_t SIM7020_TCP_Create(SIM7020_t& p_Device, std::string IP, uint16_t
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
     p_Socket->ID = (uint8_t)std::stoi(Response);
-
-    // Everything okay. The socket is active now.
-    ESP_LOGI(TAG, "Socket %u opened...", p_Socket->ID);
-
     p_Device.TCP.Sockets.push_back(p_Socket);
     p_Socket->isConnected = false;
     p_Socket->isCreated = true;
 
+    ESP_LOGD(TAG, "Socket %u created...", p_Socket->ID);
+
     return SIM70XX_ERR_OK;    
 }
 
-SIM70XX_Error_t SIM7020_TCP_Connect(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket)
+SIM70XX_Error_t SIM7020_TCP_Client_Connect(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;
@@ -111,7 +109,7 @@ SIM70XX_Error_t SIM7020_TCP_Connect(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_TCP_TransmitBytes(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket, const void* p_Buffer, uint16_t Length)
+SIM70XX_Error_t SIM7020_TCP_Client_Transmit(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket, const void* p_Buffer, uint16_t Length)
 {
     std::string Buffer_Hex;
     SIM70XX_TxCmd_t* Command;
@@ -136,7 +134,7 @@ SIM70XX_Error_t SIM7020_TCP_TransmitBytes(SIM7020_t& p_Device, SIM7020_TCP_Socke
     SIM70XX_Tools_ASCII2Hex(p_Buffer, Length, &Buffer_Hex);
 
     SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7020_AT_CCSOSEND_BYTES(p_Socket->ID, Length, Buffer_Hex);
+    *Command = SIM7020_AT_CCSOSEND(p_Socket->ID, Length, Buffer_Hex);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
     if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
@@ -146,39 +144,7 @@ SIM70XX_Error_t SIM7020_TCP_TransmitBytes(SIM7020_t& p_Device, SIM7020_TCP_Socke
     return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
 }
 
-SIM70XX_Error_t SIM7020_TCP_TransmitString(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket, std::string Data)
-{
-    SIM70XX_TxCmd_t* Command;
-
-    if((p_Socket == NULL) || (Data.size() > 512) || (p_Socket->Type != SIM7020_TCP_TYPE_TCP))
-    {
-        return SIM70XX_ERR_INVALID_ARG;
-    }
-    else if(p_Device.Internal.isInitialized == false)
-    {
-        return SIM70XX_ERR_NOT_INITIALIZED;
-    }
-    else if(p_Socket->isCreated == false)
-    {
-        return SIM70XX_ERR_NOT_CREATED;
-    }
-    else if(p_Socket->isConnected == false)
-    {
-        return SIM70XX_ERR_NOT_CONNECTED;
-    }
-
-    SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7020_AT_CCSOSEND_STRING(p_Socket->ID, Data);
-    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
-    {
-        return SIM70XX_ERR_FAIL;
-    }
-
-    return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);   
-}
-
-SIM70XX_Error_t SIM7020_TCP_Destroy(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket)
+SIM70XX_Error_t SIM7020_TCP_Client_Destroy(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket)
 {
     SIM70XX_TxCmd_t* Command;
 

@@ -34,7 +34,7 @@ set(COMPONENT_SRCS
     "src/SIM7020/Protocols/sim7020_ping.cpp"
     "src/SIM7020/Protocols/sim7020_ntp.cpp"
     "src/SIM7020/Protocols/sim7020_dns.cpp"
-    "src/SIM7020/Protocols/sim7020_tcp.cpp"
+    "src/SIM7020/Protocols/sim7020_tcp_client.cpp"
     "src/SIM7020/PowerManagement/sim7020_pwrmgnt.cpp"
     "src/SIM7020/Misc/sim7020_info.cpp"
     "src/SIM7020/NVRAM/sim7020_nvram.cpp"
