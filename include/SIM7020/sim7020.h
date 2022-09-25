@@ -26,6 +26,7 @@
 #include "sim7020_pdp.h"
 #include "sim7020_info.h"
 #include "sim7020_defs.h"
+#include "sim7020_fota.h"
 #include "sim7020_pwrmgnt.h"
 #include "sim70xx_tools.h"
 #include "sim70xx_errors.h"

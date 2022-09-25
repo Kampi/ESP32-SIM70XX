@@ -60,6 +60,11 @@ void SIM70XX_Evt_MessageFilter(void* p_Device, std::string* p_Message)
 		Processed = true;
 	}
 
+	if(p_Message->find("+CFOTA") != std::string::npos)
+	{
+		SIM7020_Evt_on_FOTA_Event(Device, p_Message);
+	}
+
 	#ifdef CONFIG_SIM70XX_DRIVER_WITH_TCPIP
 		if(p_Message->find("+CSOERR") != std::string::npos)
 		{

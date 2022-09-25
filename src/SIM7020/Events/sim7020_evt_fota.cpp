@@ -1,5 +1,5 @@
  /*
- * sim7080_fota.cpp
+ * SIM7020_evt_fota.cpp
  *
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -24,51 +24,24 @@
 #include <esp_log.h>
 
 #include "sim7020.h"
-#include "sim7020_fota.h"
+#include "sim7020_evt.h"
 #include "../../Private/Queue/sim70xx_queue.h"
-#include "../../Private/Commands/sim70xx_commands.h"
 
-static const char* TAG = "SIM7020_FOTA";
+static const char* TAG = "SIM7020_Evt_FOTA";
 
-SIM70XX_Error_t SIM7020_FOTA_Start(SIM7020_t& p_Device, uint32_t Timeout)
+void SIM7020_Evt_on_FOTA_Event(SIM7020_t* const p_Device, std::string* p_Message)
 {
-    uint32_t Now;
-    std::string Response;
-    SIM70XX_TxCmd_t* Command;
+    size_t Index;
 
-    if(p_Device.Internal.isInitialized == false)
+    ESP_LOGD(TAG, "FOTA event!");
+
+    Index = p_Message->find("+CFOTA");
+    if(Index == std::string::npos)
     {
-        return SIM70XX_ERR_NOT_INITIALIZED;
+        return;
     }
 
-    SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7020_AT_CFOTA(SIM7020_FOTA_DOWNLOAD_UPDATE);
-    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
-    {
-        return SIM70XX_ERR_FAIL;
-    }
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
-
-    Now = SIM70XX_Tools_GetmsTimer();
-    while(SIM70XX_Queue_isEvent(p_Device.Internal.EventQueue, "+CFOTA", &Response) == false)
-    {
-        if((SIM70XX_Tools_GetmsTimer() - Now) > (Timeout * 1000UL))
-        {
-            return SIM70XX_ERR_TIMEOUT;
-        }
-
-        vTaskDelay(100 / portTICK_PERIOD_MS);
-    }
-
-    ESP_LOGI(TAG, "Response: %s", Response.c_str());
-
-    if(Response.find("No update package") != std::string::npos)
-    {
-        return SIM70XX_ERR_NO_UPDATE;
-    }
-
-    return SIM70XX_ERR_OK;
+    SIMXX_TOOLS_REMOVE_LINEEND((*p_Message));
 }
 
 #endif
