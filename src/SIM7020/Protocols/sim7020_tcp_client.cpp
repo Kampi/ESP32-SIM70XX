@@ -48,12 +48,12 @@ SIM70XX_Error_t SIM7020_TCP_Client_Create(SIM7020_t& p_Device, std::string IP, u
     p_Socket->IP = IP;
     p_Socket->Port = Port;
     p_Socket->Timeout = Timeout;
-    p_Socket->CID = CID;
+    p_Socket->Internal.CID = CID;
     p_Socket->Domain = Domain;
     p_Socket->Internal.Type = SIM7020_TCP_TYPE_TCP;
     p_Socket->Protocol = Protocol;
 
-    CommandStr = "AT+CSOC=" + std::to_string(p_Socket->Domain) + "," + std::to_string(p_Socket->Internal.Type) + "," + std::to_string(p_Socket->CID);
+    CommandStr = "AT+CSOC=" + std::to_string(p_Socket->Domain) + "," + std::to_string(p_Socket->Internal.Type) + "," + std::to_string(p_Socket->Internal.CID);
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CSOC(CommandStr);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
@@ -167,6 +167,52 @@ SIM70XX_Error_t SIM7020_TCP_Client_Transmit(SIM7020_t& p_Device, SIM7020_TCP_Soc
         Buffer_Temp += SIM7020_TCP_MAX_PAYLOAD_SIZE;
         BytesToTransmit -= TransmissionSize;
     } while(BytesToTransmit > 0);
+
+    return SIM70XX_ERR_OK;
+}
+
+SIM70XX_Error_t SIM7020_TCP_Client_Receive(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket, std::string* p_Buffer)
+{
+    size_t Index;
+    std::string Response;
+    SIM70XX_TxCmd_t Command;
+
+    if((p_Socket == NULL) || (p_Socket->Internal.Type != SIM7020_TCP_TYPE_TCP) || (p_Buffer == NULL))
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+    else if(p_Device.Internal.isInitialized == false)
+    {
+        return SIM70XX_ERR_NOT_INITIALIZED;
+    }
+    else if(p_Socket->Internal.isCreated == false)
+    {
+        return SIM70XX_ERR_NOT_CREATED;
+    }
+    else if(p_Socket->Internal.isDataReceived == false)
+    {
+        return SIM70XX_ERR_FAIL;
+    }
+
+    while(SIM70XX_Queue_isEvent(p_Device.Internal.EventQueue, "+CSONMI: " + std::to_string(p_Socket->Internal.ID), &Response) == false);
+
+    ESP_LOGD(TAG, "Response: %s", Response.c_str());
+
+    // Get the index of the first delimiter.
+    Index = Response.find(",");
+
+    // Get the index of the second delimiter.
+    Index = Response.find(",", Index + 1);
+    Response = Response.substr(Index + 1);
+
+    SIM70XX_Tools_Hex2ASCII(Response, p_Buffer);
+
+    // Remove the last line end.
+    if(p_Buffer->empty() == false)
+    {
+        p_Buffer->pop_back();
+        p_Buffer->pop_back();
+    }
 
     return SIM70XX_ERR_OK;
 }

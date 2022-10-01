@@ -87,15 +87,9 @@ void SIM70XX_Evt_MessageFilter(void* p_Device, std::string* p_Message)
 	#ifdef CONFIG_SIM70XX_DRIVER_WITH_EMAIL
 	#endif
 
-	// Delete the old event string object.
-	if(Processed)
+	if((Processed == true) || (xQueueSend(Device->Internal.EventQueue, &p_Message, 0) != pdPASS))
 	{
 		delete p_Message;
-	}
-	// Handle all other messages by putting them into the event queue.
-	else
-	{
-		xQueueSend(Device->Internal.EventQueue, &p_Message, 0);
 	}
 }
 

@@ -97,12 +97,13 @@ typedef struct
 {
     std::string IP;                                 /**< IP address. */
     uint16_t Port;                                  /**< Target port. */
-    uint8_t CID;                                    /**< Context Identifier. */
     uint16_t Timeout;                               /**< TCP command timeout in seconds. */
     SIM7020_TCP_Domain_t Domain;                    /**< Socket IP address domain. */
     SIM7020_TCP_Protocol_t Protocol;                /**< Socket protocol. */
     struct
     {
+        uint8_t CID;                                /**< Context Identifier.
+                                                         NOTE: Handled by the device driver. */
         uint8_t ID;                                 /**< Socket ID from the module.
                                                          NOTE: Handled by the device driver. */
         bool isConnected;                           /**< Socket connected.

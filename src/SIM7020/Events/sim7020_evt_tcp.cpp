@@ -37,10 +37,9 @@ void SIM7020_Evt_on_TCP_Disconnect(SIM7020_t* const p_Device, std::string* p_Mes
 
     ESP_LOGI(TAG, "TCP disconnect event!");
 
-    SIMXX_TOOLS_REMOVE_LINEEND((*p_Message));
-
+    Index = p_Message->find("+CSOERR");
     Index = p_Message->find(",");
-    ID = std::stoi(p_Message->substr(Index - 1, Index));
+    ID = std::stoi(p_Message->substr(Index - 1, 1));
     TCP_Error = (SIM7020_TCP_Error_t)std::stoi(p_Message->substr(Index));
 
     // Iterate through the list of active sockets and close the socket with the given ID.
@@ -58,18 +57,24 @@ void SIM7020_Evt_on_TCP_Disconnect(SIM7020_t* const p_Device, std::string* p_Mes
 
 void SIM7020_Evt_on_TCP_Data(SIM7020_t* const p_Device, std::string* p_Message)
 {
+    uint8_t ID;
+    size_t Index;
     std::string Message;
-    std::string* Response;
 
     ESP_LOGD(TAG, "TCP message data event!");
 
-    // Create a new response object, because we want to place the response in the event loop.
-    Response = new std::string();
-    *Response = p_Message->substr(Index, p_Message->find("\r\n\r\n", Index) - Index);
+    Index = p_Message->find("+CSONMI");
+    Index = p_Message->find(",", Index);
+    ID = std::stoi(p_Message->substr(Index - 1, 1));
 
-	if(xQueueSend(p_Device->Internal.EventQueue, &Response, 0) != pdPASS)
+    for(std::vector<SIM7020_TCP_Socket_t*>::iterator it = p_Device->TCP.Sockets.begin(); it != p_Device->TCP.Sockets.end(); ++it)
     {
-        delete Response;
+        if((*it)->Internal.ID == ID)
+        {
+            ESP_LOGI(TAG, "Data received for socket: %u", ID);
+
+            (*it)->Internal.isDataReceived = true;
+        }
     }
 }
 

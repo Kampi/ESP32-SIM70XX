@@ -79,6 +79,14 @@ SIM70XX_Error_t SIM7020_TCP_Client_Connect(SIM7020_t& p_Device, SIM7020_TCP_Sock
  */
 SIM70XX_Error_t SIM7020_TCP_Client_Transmit(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket, const void* p_Buffer, uint32_t Length);
 
+/** @brief          Receive a TCP message.
+ *  @param p_Device SIM7080 device object
+ *  @param p_Socket Pointer to TCP socket object
+ *  @param p_Buffer Pointer to data buffer
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7020_TCP_Client_Receive(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket, std::string* p_Buffer);
+
 /** @brief          Close a TCP connection and release the socket.
  *  @param p_Device SIM7020 device object
  *  @param p_Socket Pointer to TCP socket object

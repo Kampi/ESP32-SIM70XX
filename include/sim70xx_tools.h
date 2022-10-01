@@ -64,6 +64,12 @@ void SIM70XX_Tools_Buf2Hex(const void* const p_Buffer, uint32_t Length, std::str
  */
 void SIM70XX_Tools_Hex2ASCII(std::string Hex, uint8_t* const p_Buffer);
 
+/** @brief          Convert a hexadecimal ASCII string into a buffer.
+ *  @param Hex      Hex string
+ *  @param p_Buffer Pointer to output string
+ */
+void SIM70XX_Tools_Hex2ASCII(std::string Hex, std::string* const p_Buffer);
+
 /** @brief          Convert a buffer into a Base64 string.
  *  @param p_Buffer Input buffer
  *  @param Length   Input buffer length

@@ -51,7 +51,6 @@ void SIM70XX_Tools_Buf2Hex(const void* const p_Buffer, uint32_t Length, std::str
 void SIM70XX_Tools_Hex2ASCII(std::string Hex, uint8_t* const p_Buffer)
 {
     uint8_t Offset;
-    uint8_t Low = 0;
     uint8_t High = 0;
 
     if((p_Buffer == NULL) || ((Hex.size() % 2) != 0))
@@ -60,6 +59,45 @@ void SIM70XX_Tools_Hex2ASCII(std::string Hex, uint8_t* const p_Buffer)
     }
 
     Offset = 0;
+    for(uint32_t i = 0; i < Hex.size(); i++)
+    {
+        uint8_t Temp = 0;
+
+        if((Hex.at(i) >= '0') && (Hex.at(i) <= '9'))
+        {
+            Temp = (uint8_t)Hex.at(i) - 48;
+        }
+        else if((Hex.at(i) >= 'a') && (Hex.at(i) <= 'f'))
+        {
+            Temp = (uint8_t)Hex.at(i) - 'a' + 10;
+        }
+        else if((Hex.at(i) >= 'A') && (Hex.at(i) <= 'F'))
+        {
+            Temp = (uint8_t)Hex.at(i) - 'A' + 10;
+        }
+
+        // Save the high byte.
+        if((i % 2) == 0)
+        {
+            High = Temp;
+        }
+        // Save the low byte and push the result to the string.
+        else
+        {
+            *(p_Buffer + (Offset++)) = (High << 0x04) + Temp;
+        }
+    }
+}
+
+void SIM70XX_Tools_Hex2ASCII(std::string Hex, std::string* const p_Buffer)
+{
+    uint8_t High = 0;
+
+    if((p_Buffer == NULL) || ((Hex.size() % 2) != 0))
+    {
+        return;
+    }
+
     for(uint32_t i = 0; i < Hex.size(); i++)
     {
         uint8_t Temp = 0;
@@ -85,9 +123,7 @@ void SIM70XX_Tools_Hex2ASCII(std::string Hex, uint8_t* const p_Buffer)
         // Save the low byte and push the result to the string.
         else
         {
-            Low = Temp;
-
-            *(p_Buffer + (Offset++)) = (High << 0x04) + Low;
+            p_Buffer->push_back((char)(int)(((High << 0x04) + Temp)));
         }
     }
 }

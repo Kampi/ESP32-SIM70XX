@@ -70,7 +70,6 @@ void SIM70XX_Evt_MessageFilter(void* p_Device, std::string* p_Message)
 		if(p_Message->find("+CSONMI") != std::string::npos)
 		{
 			SIM7020_Evt_on_TCP_Data(Device, p_Message);
-			Processed = true;
 		}
 	#endif
 
@@ -94,15 +93,9 @@ void SIM70XX_Evt_MessageFilter(void* p_Device, std::string* p_Message)
 		}
 	#endif
 
-	// Delete the old event string object.
-	if(Processed)
+	if((Processed == true) || (xQueueSend(Device->Internal.EventQueue, &p_Message, 0) != pdPASS))
 	{
 		delete p_Message;
-	}
-	// Handle all other messages by putting them into the event queue.
-	else
-	{
-		xQueueSend(Device->Internal.EventQueue, &p_Message, 0);
 	}
 }
 
