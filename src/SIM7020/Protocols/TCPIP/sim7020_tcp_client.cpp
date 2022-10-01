@@ -1,5 +1,5 @@
  /*
- * sim7020_tcpip.cpp
+ * sim7020_tcp_client.cpp
  *
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -25,52 +25,15 @@
 
 #include "sim7020.h"
 #include "sim7020_tcpip.h"
-#include "../../Private/Queue/sim70xx_queue.h"
-#include "../../Private/Commands/sim70xx_commands.h"
+#include "Private/sim7020_client.h"
+#include "../../../Private/Queue/sim70xx_queue.h"
+#include "../../../Private/Commands/sim70xx_commands.h"
 
 static const char* TAG = "SIM7020_TCPIP_Client";
 
 SIM70XX_Error_t SIM7020_TCP_Client_Create(SIM7020_t& p_Device, std::string IP, uint16_t Port, SIM7020_TCP_Socket_t* p_Socket, uint16_t Timeout, uint8_t CID, SIM7020_TCP_Domain_t Domain, SIM7020_TCP_Protocol_t Protocol)
 {
-    std::string Response;
-    std::string CommandStr;
-    SIM70XX_TxCmd_t* Command;
-
-    if(p_Socket == NULL)
-    {
-        return SIM70XX_ERR_INVALID_ARG;
-    }
-    else if(p_Device.Internal.isInitialized == false)
-    {
-        return SIM70XX_ERR_NOT_INITIALIZED;
-    }
-
-    p_Socket->IP = IP;
-    p_Socket->Port = Port;
-    p_Socket->Timeout = Timeout;
-    p_Socket->Internal.CID = CID;
-    p_Socket->Domain = Domain;
-    p_Socket->Internal.Type = SIM7020_TCP_TYPE_TCP;
-    p_Socket->Protocol = Protocol;
-
-    CommandStr = "AT+CSOC=" + std::to_string(p_Socket->Domain) + "," + std::to_string(p_Socket->Internal.Type) + "," + std::to_string(p_Socket->Internal.CID);
-    SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7020_AT_CSOC(CommandStr);
-    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, p_Socket->Timeout) == false)
-    {
-        return SIM70XX_ERR_FAIL;
-    }
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
-
-    p_Socket->Internal.ID = (uint8_t)std::stoi(Response);
-    p_Device.TCP.Sockets.push_back(p_Socket);
-    p_Socket->Internal.isConnected = false;
-    p_Socket->Internal.isCreated = true;
-
-    ESP_LOGD(TAG, "Socket %u created...", p_Socket->Internal.ID);
-
-    return SIM70XX_ERR_OK;    
+    return SIM7020_Client_CreateSocket(p_Device, SIM7020_TCP_TYPE_TCP, IP, Port, p_Socket, Timeout, CID, Domain, Protocol);
 }
 
 SIM70XX_Error_t SIM7020_TCP_Client_Connect(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket)
@@ -78,7 +41,7 @@ SIM70XX_Error_t SIM7020_TCP_Client_Connect(SIM7020_t& p_Device, SIM7020_TCP_Sock
     std::string Response;
     SIM70XX_TxCmd_t* Command;
 
-    if(p_Socket == NULL)
+    if((p_Socket == NULL) || (p_Socket->Internal.Type != SIM7020_TCP_TYPE_TCP))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
@@ -177,7 +140,7 @@ SIM70XX_Error_t SIM7020_TCP_Client_Receive(SIM7020_t& p_Device, SIM7020_TCP_Sock
     std::string Response;
     SIM70XX_TxCmd_t Command;
 
-    if((p_Socket == NULL) || (p_Socket->Internal.Type != SIM7020_TCP_TYPE_TCP) || (p_Buffer == NULL))
+    if((p_Socket == NULL) || (p_Buffer == NULL) || (p_Socket->Internal.Type != SIM7020_TCP_TYPE_TCP))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
@@ -219,40 +182,7 @@ SIM70XX_Error_t SIM7020_TCP_Client_Receive(SIM7020_t& p_Device, SIM7020_TCP_Sock
 
 SIM70XX_Error_t SIM7020_TCP_Client_Destroy(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket)
 {
-    SIM70XX_TxCmd_t* Command;
-
-    if(p_Socket == NULL)
-    {
-        return SIM70XX_ERR_INVALID_ARG;
-    }
-    else if(p_Device.Internal.isInitialized == false)
-    {
-        return SIM70XX_ERR_NOT_INITIALIZED;
-    }
-    else if(p_Socket->Internal.isCreated == false)
-    {
-        return SIM70XX_ERR_NOT_CREATED;
-    }
-    else if(p_Socket->Internal.isConnected == false)
-    {
-        return SIM70XX_ERR_OK;
-    }
-
-    SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7020_AT_CSOCL(p_Socket->Internal.ID);
-    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
-    {
-        return SIM70XX_ERR_FAIL;
-    }
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
-
-    // TODO: Remove socket from list
-
-    p_Socket->Internal.isConnected = false;
-    p_Socket->Internal.isCreated = false;
-
-    return SIM70XX_ERR_OK;
+    return SIM7020_Client_DestroySocket(p_Device, p_Socket);
 }
 
 #endif
