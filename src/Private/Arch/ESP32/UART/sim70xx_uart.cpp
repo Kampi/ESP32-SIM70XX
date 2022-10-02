@@ -1,10 +1,10 @@
  /*
  * sim70xx_uart.cpp
- *
+ * 
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
  *  File info: SIM70XX driver for ESP32.
- *
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), 
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
  * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -30,6 +30,7 @@
 
 #include "sim70xx_uart.h"
 #include "sim70xx_tools.h"
+#include "../Timer/sim70xx_timer.h"
 
 #include <sdkconfig.h>
 
@@ -81,7 +82,7 @@ static int SIM7020_UART_TimedRead(SIM70XX_UART_Conf_t& p_Config, uint32_t Timeou
     int c;
     unsigned long Now;
 
-    Now = SIM70XX_Tools_GetmsTimer();
+    Now = SIM70XX_Timer_GetMilliseconds();
     do
     {
         c = SIM70XX_UART_Read(p_Config);
@@ -89,7 +90,7 @@ static int SIM7020_UART_TimedRead(SIM70XX_UART_Conf_t& p_Config, uint32_t Timeou
         {
             return c;
         }
-    } while((SIM70XX_Tools_GetmsTimer() - Now) < Timeout);
+    } while((SIM70XX_Timer_GetMilliseconds() - Now) < Timeout);
 
     return -1;
 }

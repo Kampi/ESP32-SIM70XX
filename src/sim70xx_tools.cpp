@@ -1,10 +1,10 @@
  /*
  * sim70xx_tools.cpp
- *
+ * 
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
  *  File info: SIM70XX driver for ESP32.
- *
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), 
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
  * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -25,8 +25,8 @@
 #include <stdio.h>
 
 #include "sim70xx_tools.h"
-#include "Private/UART/sim70xx_uart.h"
-#include "Private/GPIO/sim70xx_gpio.h"
+#include "Private/Arch/ESP32/UART/sim70xx_uart.h"
+#include "Private/Arch/ESP32/GPIO/sim70xx_gpio.h"
 
 static const char* TAG = "SIM70XX_Tools";
 
@@ -160,11 +160,6 @@ bool SIM70XX_Tools_ToBase64(const void* const p_Buffer, uint32_t Length, std::st
     free(OutputBuffer);
 
     return true;
-}
-
-unsigned long IRAM_ATTR SIM70XX_Tools_GetmsTimer(void)
-{
-    return (unsigned long)(esp_timer_get_time() / 1000ULL);
 }
 
 bool SIM70XX_Tools_EnableModule(SIM70XX_UART_Conf_t& p_Config, uint8_t Cycles)

@@ -26,6 +26,7 @@ set(COMPONENT_SRCS
 
     # SIM7020
     "src/SIM7020/sim7020.cpp"
+    "src/SIM7020/TLS/sim7020_tls.cpp"
     "src/SIM7020/FOTA/sim7020_fota.cpp"
     "src/SIM7020/Protocols/sim7020_coap.cpp"
     "src/SIM7020/Protocols/sim7020_dns.cpp"
@@ -51,8 +52,9 @@ set(COMPONENT_SRCS
     # Driver internal
     "src/Private/Events/sim70xx_evt.cpp"
     "src/Private/Queue/sim70xx_queue.cpp"
-    "src/Private/UART/sim70xx_uart.cpp"
-    "src/Private/GPIO/sim70xx_gpio.cpp"
+    "src/Private/Arch/ESP32/Timer/sim70xx_timer.cpp"
+    "src/Private/Arch/ESP32/UART/sim70xx_uart.cpp"
+    "src/Private/Arch/ESP32/GPIO/sim70xx_gpio.cpp"
     )
 
 set(COMPONENT_ADD_INCLUDEDIRS
@@ -78,6 +80,7 @@ set(COMPONENT_ADD_INCLUDEDIRS
     # SIM7020
     "include/SIM7020"
 	"include/SIM7020/PDP"
+	"include/SIM7020/TLS"
     "include/SIM7020/FOTA"
 	"include/SIM7020/Misc"
 	"include/SIM7020/NVRAM"

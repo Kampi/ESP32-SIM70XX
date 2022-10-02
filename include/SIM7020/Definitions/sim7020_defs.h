@@ -1,10 +1,10 @@
  /*
  * sim7020_defs.h
- *
+ * 
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
  *  File info: SIM70XX driver for ESP32.
- *
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), 
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
  * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -164,7 +164,7 @@ typedef struct
     #ifdef CONFIG_SIM70XX_DRIVER_WITH_TCPIP
         struct
         {
-            std::vector<SIM7020_TCP_Socket_t*> Sockets;     /**< List with pointer to connected TCP sockets.
+            std::vector<SIM7020_TCP_Socket_t*> Sockets;     /**< List with pointer to connected TCP/UDP sockets.
                                                                  NOTE: Managed by the device driver. */
         } TCP;
     #endif
@@ -179,8 +179,6 @@ typedef struct
         struct
         {
             std::vector<SIM7020_MQTT_Socket_t*> Sockets;    /**< List with pointer to connected MQTT sockets.
-                                                                 NOTE: Managed by the device driver. */
-            uint32_t SubTopics;                             /**< Subscribe counter.
                                                                  NOTE: Managed by the device driver. */
         } MQTT;
     #endif

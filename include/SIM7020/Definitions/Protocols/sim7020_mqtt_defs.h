@@ -1,10 +1,10 @@
  /*
  * sim7020_mqtt_defs.h
- *
+ * 
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
  *  File info: SIM70XX driver for ESP32.
- *
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), 
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
  * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -85,14 +85,17 @@ typedef struct
     std::string Password;                           /**< Optional password. */
     struct
     {
-        QueueHandle_t SubQueue;                     /**< Subscribe event queue.
-                                                         NOTE: Managed by the device driver. */
         uint8_t ID;                                 /**< Socket ID from the module.
                                                          NOTE: Handled by the device driver. */
+
         bool isConnected;                           /**< Socket connected.
                                                          NOTE: Handled by the device driver. */
         bool isCreated;                             /**< #true when the socket is created.
                                                          NOTE: Handled by the device driver. */
+        QueueHandle_t SubQueue;                     /**< Subscribe event queue.
+                                                         NOTE: Managed by the device driver. */
+        uint32_t SubTopics;                         /**< Topic subscription counter.
+                                                         NOTE: Managed by the device driver. */
     } Internal;
 } SIM7020_MQTT_Socket_t;
 

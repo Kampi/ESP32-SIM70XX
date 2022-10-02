@@ -1,10 +1,10 @@
  /*
  * sim7020_http.cpp
- *
+ * 
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
  *  File info: SIM70XX driver for ESP32.
- *
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), 
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
  * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -240,10 +240,10 @@ SIM70XX_Error_t SIM7020_HTTP_POST(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_
     } while(Length_Temp != 0);
 
     // Get the response from the server.
-    Now = SIM70XX_Tools_GetmsTimer();
+    Now = SIM70XX_Timer_GetMilliseconds();
     while(SIM70XX_Queue_isEvent(p_Device.Internal.EventQueue, "+CHTTPNMIH" + std::to_string(p_Socket->ID), &Packet) == false)
     {
-        if((SIM70XX_Tools_GetmsTimer() - Now) > (p_Socket->Timeout * 1000UL))
+        if((SIM70XX_Timer_GetMilliseconds() - Now) > (p_Socket->Timeout * 1000UL))
         {
             return SIM70XX_ERR_TIMEOUT;
         }
@@ -308,10 +308,10 @@ SIM70XX_Error_t SIM7020_HTTP_GET(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_S
     SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
 
     // Get the response from the server.
-    Now = SIM70XX_Tools_GetmsTimer();
+    Now = SIM70XX_Timer_GetMilliseconds();
     while(SIM70XX_Queue_isEvent(p_Device.Internal.EventQueue, "+CHTTPNMIH" + std::to_string(p_Socket->ID), &Response) == false)
     {
-        if((SIM70XX_Tools_GetmsTimer() - Now) > (p_Socket->Timeout * 1000UL))
+        if((SIM70XX_Timer_GetMilliseconds() - Now) > (p_Socket->Timeout * 1000UL))
         {
             return SIM70XX_ERR_TIMEOUT;
         }

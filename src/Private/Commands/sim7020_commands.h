@@ -1,10 +1,10 @@
  /*
  * sim7020_commands.h
- *
+ * 
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
  *  File info: SIM70XX driver for ESP32.
- *
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), 
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
  * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -99,8 +99,8 @@
  * Used in SIM7020 SNTP driver.
  *
  */
-#define SIM7020_AT_CSNTPSTART_TZ(Server, Zone)                  SIM70XX_CMD("AT+CSNTPSTART=\"" + Server + "\",\"" + Zone + "\"", false, 10, 1)
-#define SIM7020_AT_CSNTPSTART(Server)                           SIM70XX_CMD("AT+CSNTPSTART=\"" + Server + "\"", false, 10, 1)
+#define SIM7020_AT_CSNTPSTART_TZ(Server, Zone)                  SIM70XX_CMD("AT+CSNTPSTART=\"" + Server + "\",\"" + Zone + "\"", false, 300, 1)
+#define SIM7020_AT_CSNTPSTART(Server)                           SIM70XX_CMD("AT+CSNTPSTART=\"" + Server + "\"", false, 300, 1)
 #define SIM7020_AT_CSNTPSTOP                                    SIM70XX_CMD("AT+CSNTPSTOP", false, 60, 1)
 #define SIM7020_AT_CCLK_R                                       SIM70XX_CMD("AT+CCLK?", true, 1, 1)
 

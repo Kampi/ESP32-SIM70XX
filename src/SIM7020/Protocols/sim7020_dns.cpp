@@ -1,10 +1,10 @@
  /*
  * sim7020_dns.cpp
- *
+ * 
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
  *  File info: SIM70XX driver for ESP32.
- *
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), 
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
  * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -27,6 +27,7 @@
 #include "sim7020_dns.h"
 #include "../../Private/Queue/sim70xx_queue.h"
 #include "../../Private/Commands/sim70xx_commands.h"
+#include "../../Private/Arch/ESP32/Timer/sim70xx_timer.h"
 
 static const char* TAG = "SIM7020_DNS";
 
@@ -59,10 +60,10 @@ SIM70XX_Error_t SIM7020_DNS_FetchAddress(SIM7020_t& p_Device, std::string Host, 
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
 
-    Now = SIM70XX_Tools_GetmsTimer();
+    Now = SIM70XX_Timer_GetMilliseconds();
     while(SIM70XX_Queue_isEvent(p_Device.Internal.EventQueue, "+CDNSGIP", &Response) == false)
     {
-        if((SIM70XX_Tools_GetmsTimer() - Now) > (Timeout * 1000UL))
+        if((SIM70XX_Timer_GetMilliseconds() - Now) > (Timeout * 1000UL))
         {
             return SIM70XX_ERR_TIMEOUT;
         }

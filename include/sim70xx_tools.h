@@ -1,10 +1,10 @@
  /*
  * sim70xx_tools.h
- *
+ * 
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
  *  File info: SIM70XX driver for ESP32.
- *
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), 
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
  * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -19,8 +19,6 @@
 
 #ifndef SIM70XX_TOOLS_H_
 #define SIM70XX_TOOLS_H_
-
-#include <esp_attr.h>
 
 #include <string>
 #include <stdint.h>
@@ -77,11 +75,6 @@ void SIM70XX_Tools_Hex2ASCII(std::string Hex, std::string* const p_Buffer);
  *  @return         #true when successful
  */
 bool SIM70XX_Tools_ToBase64(const void* const p_Buffer, uint32_t Length, std::string* const p_Base64);
-
-/** @brief  Get the milliseconds from the ESP timer.
- *  @return Milliseconds since boot
- */
-unsigned long IRAM_ATTR SIM70XX_Tools_GetmsTimer(void);
 
 /** @brief          Enable the module.
  *  @param p_Config Pointer to SIM70XX UART configuration object

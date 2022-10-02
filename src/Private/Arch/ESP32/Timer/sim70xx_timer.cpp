@@ -1,10 +1,10 @@
  /*
- * sim70xx_gpio.h
- *
+ * sim70xx_gpio.cpp
+ * 
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
  *  File info: SIM70XX driver for ESP32.
- *
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), 
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
  * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -17,28 +17,13 @@
  * Errors and commissions should be reported to DanielKampert@kampis-elektroecke.de.
  */
 
-#ifndef SIM70XX_GPIO_H_
-#define SIM70XX_GPIO_H_
+#include <esp_err.h>
+#include <esp_log.h>
+#include <esp_timer.h>
 
-#include "sim70xx_defs.h"
-#include "sim70xx_errors.h"
+#include "sim70xx_timer.h"
 
-#include <sdkconfig.h>
-
-/** @brief          Enable / Disable the PwrKey pin.
- *  @param Enable   Enable / Disable
- */
-inline __attribute__((always_inline)) void SIM70XX_GPIO_SetPwrKey(bool Enable)
+unsigned long IRAM_ATTR SIM70XX_Timer_GetMilliseconds(void)
 {
-    #ifdef CONFIG_SIM70XX_GPIO_PWRKEY_INVERT
-        gpio_set_level((gpio_num_t)CONFIG_SIM70XX_GPIO_PWRKEY_PIN, Enable);
-    #else
-        gpio_set_level((gpio_num_t)CONFIG_SIM70XX_GPIO_PWRKEY_PIN, !Enable);
-    #endif
+    return (unsigned long)(esp_timer_get_time() / 1000ULL);
 }
-
-/** @brief Initialize the GPIO support for the module.
- */
-void SIM70XX_GPIO_Init(void);
-
-#endif /* SIM70XX_GPIO_H_ */

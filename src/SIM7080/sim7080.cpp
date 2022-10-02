@@ -1,10 +1,10 @@
  /*
  * sim7080.cpp
- *
+ * 
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
  *  File info: SIM70XX driver for ESP32.
- *
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), 
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
  * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -24,7 +24,7 @@
 #include <esp_log.h>
 
 #include "sim7080.h"
-#include "../Private/UART/sim70xx_uart.h"
+#include "../Private/Arch/ESP32/UART/sim70xx_uart.h"
 #include "../Private/Events/sim70xx_evt.h"
 #include "../Private/Queue/sim70xx_queue.h"
 #include "../Private/Commands/sim7080_commands.h"
@@ -188,7 +188,7 @@ SIM70XX_Error_t SIM7080_SoftReset(SIM7080_t& p_Device, uint32_t Timeout)
     }
 
     ESP_LOGI(TAG, "Performing soft reset...");
-    Now = SIM70XX_Tools_GetmsTimer();
+    Now = SIM70XX_Timer_GetMilliseconds();
     do
     {
         // Reset the module.
@@ -212,7 +212,7 @@ SIM70XX_Error_t SIM7080_SoftReset(SIM7080_t& p_Device, uint32_t Timeout)
         }
 
         vTaskDelay(100 / portTICK_PERIOD_MS);
-    } while((SIM70XX_Tools_GetmsTimer() - Now) < (Timeout * 1000UL));
+    } while((SIM70XX_Timer_GetMilliseconds() - Now) < (Timeout * 1000UL));
 
     ESP_LOGE(TAG, "     Software reset timeout!");
 
@@ -241,7 +241,7 @@ SIM70XX_Error_t SIM7080_IP_AutoAPN(SIM7080_t& p_Device, SIM70XX_APN_t APN, uint8
     SIM70XX_ERROR_CHECK(SIM7080_SetFunctionality(p_Device, SIM7080_FUNC_FULL));
 
     isAttached = false;
-    Now = SIM70XX_Tools_GetmsTimer();
+    Now = SIM70XX_Timer_GetMilliseconds();
     do
     {
         SIM70XX_Qual_t Report;
@@ -253,7 +253,7 @@ SIM70XX_Error_t SIM7080_IP_AutoAPN(SIM7080_t& p_Device, SIM70XX_APN_t APN, uint8
         }
 
         vTaskDelay(1000 / portTICK_PERIOD_MS);
-    } while((isAttached == false) && ((SIM70XX_Tools_GetmsTimer() - Now) < (Timeout * 1000)));
+    } while((isAttached == false) && ((SIM70XX_Timer_GetMilliseconds() - Now) < (Timeout * 1000)));
 
     if(isAttached == false)
     {
@@ -599,13 +599,13 @@ SIM70XX_Error_t SIM7080_SetFunctionality(SIM7080_t& p_Device, SIM7080_Func_t Fun
     vTaskSuspend(p_Device.Internal.TaskHandle);
     ESP_LOGI(TAG, "Tranmit command: %s", Command.Command.c_str());
     SIM70XX_UART_SendLine(p_Device.UART, Command.Command);
-    Now = SIM70XX_Tools_GetmsTimer();
+    Now = SIM70XX_Timer_GetMilliseconds();
     do
     {
         Line = SIM70XX_UART_ReadStringUntil(p_Device.UART);
         Response += Line + "\n";
 
-        if((SIM70XX_Tools_GetmsTimer() - Now) > (Command.Timeout * 1000UL))
+        if((SIM70XX_Timer_GetMilliseconds() - Now) > (Command.Timeout * 1000UL))
         {
             break;
         }
@@ -617,7 +617,6 @@ SIM70XX_Error_t SIM7080_SetFunctionality(SIM7080_t& p_Device, SIM7080_Func_t Fun
     if(Response.find("OK") == std::string::npos)
     {
         return SIM70XX_ERR_FAIL;
-        
     }
 
     p_Device.Connection.Functionality = Func;

@@ -1,10 +1,10 @@
  /*
  * sim7080_mqtt.h
- *
+ * 
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
  *  File info: SIM70XX driver for ESP32.
- *
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), 
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
  * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -38,7 +38,7 @@ uint32_t inline __attribute__((always_inline)) SIM7080_MQTT_MessagesAvailable(SI
     return uxQueueMessagesWaiting(p_Socket->Internal.SubQueue);
 }
 
-/** @brief          Create a MQTT socket.
+/** @brief          Create a MQTT socket by using default settings.
  *  @param p_Device SIM7080 device object
  *  @param p_Socket Pointer to MQTT socket object
  *  @param Broker   MQTT broker address

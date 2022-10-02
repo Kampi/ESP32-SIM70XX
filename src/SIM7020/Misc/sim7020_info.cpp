@@ -1,10 +1,10 @@
  /*
  * sim7020_info.cpp
- *
+ * 
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
  *  File info: SIM70XX driver for ESP32.
- *
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), 
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
  * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -361,19 +361,19 @@ SIM70XX_Error_t SIM7020_Info_GetNetworkStatus(SIM7020_t& p_Device, SIM7020_NetSt
         p_Status->sc_re_rsrp = (int16_t)std::stoi(Dummy);
     }
 
-    ESP_LOGI(TAG, "sc_earfcn: %u", p_Status->sc_earfcn);
-    ESP_LOGI(TAG, "sc_earfcn_offset: %i", p_Status->sc_earfcn_offset);
-    ESP_LOGI(TAG, "sc_pci: %i", p_Status->sc_pci);
-    ESP_LOGI(TAG, "sc_cellid: %s", p_Status->sc_cellid.c_str());
-    ESP_LOGI(TAG, "sc_rsrp: %i", p_Status->sc_rsrp);
-    ESP_LOGI(TAG, "sc_rsrq: %i", p_Status->sc_rsrq);
-    ESP_LOGI(TAG, "sc_rssi: %i", p_Status->sc_rssi);
-    ESP_LOGI(TAG, "sc_snr: %i", p_Status->sc_snr);
-    ESP_LOGI(TAG, "sc_band: %u", p_Status->sc_band);
-    ESP_LOGI(TAG, "sc_tac: %s", p_Status->sc_tac.c_str());
-    ESP_LOGI(TAG, "sc_ecl: %u", p_Status->sc_ecl);
-    ESP_LOGI(TAG, "sc_tx_pwr: %i", p_Status->sc_tx_pwr);
-    ESP_LOGI(TAG, "sc_re_rsrp: %i", p_Status->sc_re_rsrp);
+    ESP_LOGD(TAG, "sc_earfcn: %u", p_Status->sc_earfcn);
+    ESP_LOGD(TAG, "sc_earfcn_offset: %i", p_Status->sc_earfcn_offset);
+    ESP_LOGD(TAG, "sc_pci: %i", p_Status->sc_pci);
+    ESP_LOGD(TAG, "sc_cellid: %s", p_Status->sc_cellid.c_str());
+    ESP_LOGD(TAG, "sc_rsrp: %i", p_Status->sc_rsrp);
+    ESP_LOGD(TAG, "sc_rsrq: %i", p_Status->sc_rsrq);
+    ESP_LOGD(TAG, "sc_rssi: %i", p_Status->sc_rssi);
+    ESP_LOGD(TAG, "sc_snr: %i", p_Status->sc_snr);
+    ESP_LOGD(TAG, "sc_band: %u", p_Status->sc_band);
+    ESP_LOGD(TAG, "sc_tac: %s", p_Status->sc_tac.c_str());
+    ESP_LOGD(TAG, "sc_ecl: %u", p_Status->sc_ecl);
+    ESP_LOGD(TAG, "sc_tx_pwr: %i", p_Status->sc_tx_pwr);
+    ESP_LOGD(TAG, "sc_re_rsrp: %i", p_Status->sc_re_rsrp);
 
     return SIM70XX_ERR_OK;
 }

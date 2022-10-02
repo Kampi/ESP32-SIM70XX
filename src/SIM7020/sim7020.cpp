@@ -1,10 +1,10 @@
  /*
  * sim7020.cpp
- *
+ * 
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
  *  File info: SIM70XX driver for ESP32.
- *
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), 
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
  * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -24,7 +24,8 @@
 #include <esp_log.h>
 
 #include "sim7020.h"
-#include "../Private/UART/sim70xx_uart.h"
+#include "../Private/Arch/ESP32/UART/sim70xx_uart.h"
+#include "../Private/Arch/ESP32/Timer/sim70xx_timer.h"
 #include "../Private/Events/sim70xx_evt.h"
 #include "../Private/Queue/sim70xx_queue.h"
 #include "../Private/Commands/sim70xx_commands.h"
@@ -171,7 +172,7 @@ SIM70XX_Error_t SIM7020_SoftReset(SIM7020_t& p_Device, uint32_t Timeout)
     }
 
     ESP_LOGI(TAG, "Performing soft reset...");
-    Now = SIM70XX_Tools_GetmsTimer();
+    Now = SIM70XX_Timer_GetMilliseconds();
     do
     {
         // Reset the module.
@@ -195,7 +196,7 @@ SIM70XX_Error_t SIM7020_SoftReset(SIM7020_t& p_Device, uint32_t Timeout)
         }
 
         vTaskDelay(100 / portTICK_PERIOD_MS);
-    } while((SIM70XX_Tools_GetmsTimer() - Now) < (Timeout * 1000UL));
+    } while((SIM70XX_Timer_GetMilliseconds() - Now) < (Timeout * 1000UL));
 
     ESP_LOGE(TAG, "     Software reset timeout!");
 
@@ -463,10 +464,10 @@ SIM70XX_Error_t SIM7020_GetBand(SIM7020_t& p_Device, SIM7020_Band_t* p_Band)
 
 SIM70XX_Error_t SIM7020_SetFunctionality(SIM7020_t& p_Device, SIM7020_Func_t Func, SIM7020_Reset_t Reset)
 {
-    std::string Status;
+    uint32_t Now;
+    std::string Line;
     std::string Response;
-    SIM70XX_TxCmd_t* Command;
-    SIM70XX_Error_t Error = SIM70XX_ERR_FAIL;
+    SIM70XX_TxCmd_t Command;
 
     if(p_Device.Internal.isInitialized == false)
     {
@@ -477,49 +478,33 @@ SIM70XX_Error_t SIM7020_SetFunctionality(SIM7020_t& p_Device, SIM7020_Func_t Fun
         return SIM70XX_ERR_OK;
     }
 
-    SIM70XX_CREATE_CMD(Command);
-    *Command = SIM70XX_AT_CFUN_W(Func, Reset);
-    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    Command = SIM70XX_AT_CFUN_W(Func, Reset);
+    vTaskSuspend(p_Device.Internal.TaskHandle);
+    ESP_LOGI(TAG, "Tranmit command: %s", Command.Command.c_str());
+    SIM70XX_UART_SendLine(p_Device.UART, Command.Command);
+    Now = SIM70XX_Timer_GetMilliseconds();
+    do
+    {
+        Line = SIM70XX_UART_ReadStringUntil(p_Device.UART);
+        Response += Line + "\n";
+
+        if((SIM70XX_Timer_GetMilliseconds() - Now) > (Command.Timeout * 1000UL))
+        {
+            break;
+        }
+    } while(Line.size() > 0);
+    vTaskResume(p_Device.Internal.TaskHandle);
+
+    ESP_LOGI(TAG, "Response: %s", Response.c_str());
+
+    if(Response.find("OK") == std::string::npos)
     {
         return SIM70XX_ERR_FAIL;
     }
 
-    // NOTE: Do not use the error macro, because the response and status depends on the current state of the device.
-    Error = SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response, &Status);
+    p_Device.Connection.Functionality = Func;
 
-    // Device is in minimum functionality -> Transition into another functionality
-    //  Response = OK
-    //  Status = +CPIN: READY
-    if(p_Device.Connection.Functionality == SIM7020_FUNC_MIN)
-    {
-        ESP_LOGI(TAG, "Last: Minimum functionality...");
-
-        if(Response.find("OK") != std::string::npos)
-        {
-            p_Device.Connection.Functionality = Func;
-
-            Error = SIM70XX_ERR_OK;
-        }
-    }
-    // Device is in full functionality -> Transition into another functionality
-    //  Response = +CPIN: NOT READY
-    //  Status = OK
-    else if(p_Device.Connection.Functionality == SIM7020_FUNC_FULL)
-    {
-        ESP_LOGI(TAG, "Last: Full functionality...");
-
-        if(Status.find("OK") != std::string::npos)
-        {
-            p_Device.Connection.Functionality = Func;
-
-            Error = SIM70XX_ERR_OK;
-        }
-    }
-
-    ESP_LOGI(TAG, "Set functionality: %u", p_Device.Connection.Functionality);
-
-    return Error;
+    return SIM70XX_ERR_OK;
 }
 
 SIM70XX_Error_t SIM7020_GetFunctionality(SIM7020_t& p_Device)

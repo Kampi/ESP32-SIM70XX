@@ -1,10 +1,10 @@
  /*
  * sim7020_evt_mqtt.cpp
- *
+ * 
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
  *  File info: SIM70XX driver for ESP32.
- *
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), 
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
  * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -31,6 +31,7 @@ static const char* TAG = "SIM7020_Evt_MQTT";
 
 void SIM7020_Evt_on_MQTT_Pub(SIM7020_t* const p_Device, std::string* p_Message)
 {
+    size_t Index;
     SIM7020_Pub_t* Packet;
 
     ESP_LOGI(TAG, "MQTT subscribe event!");
@@ -67,7 +68,7 @@ void SIM7020_Evt_on_MQTT_Pub(SIM7020_t* const p_Device, std::string* p_Message)
     Packet->Topic.replace(Packet->Topic.find("\""), std::string("\"").size(), "");
     Packet->Payload.replace(Packet->Payload.find("\""), std::string("\"").size(), "");
 
-    if((p_Device->MQTT.SubQueue == NULL) || (xQueueSend(p_Device->MQTT.SubQueue, &Packet, 0) != pdPASS))
+    if((p_Device->MQTT.Sockets.at(Packet->ID)->Internal.SubQueue == NULL) || (xQueueSend(p_Device->MQTT.Sockets.at(Packet->ID)->Internal.SubQueue, &Packet, 0) != pdPASS))
     {
         delete Packet;
     }

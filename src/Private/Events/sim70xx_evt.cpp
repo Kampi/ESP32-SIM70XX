@@ -1,10 +1,10 @@
  /*
  * sim70xx_evt.cpp
- *
+ * 
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
  *  File info: SIM70XX driver for ESP32.
- *
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), 
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
  * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -27,7 +27,8 @@
 #include <list>
 
 #include "sim70xx_evt.h"
-#include "../UART/sim70xx_uart.h"
+#include "../Arch/ESP32/UART/sim70xx_uart.h"
+#include "../Arch/ESP32/Timer/sim70xx_timer.h"
 #include "../Queue/sim70xx_queue.h"
 #include "../Commands/sim7020_commands.h"
 
@@ -75,11 +76,11 @@ static void SIM70XX_Evt_Task(void* p_Arg)
         // Get all pending messages from the queue.
         Messages = uxQueueMessagesWaiting(Device->Internal.TxQueue);
 
-        if((SIM70XX_Tools_GetmsTimer() - StatusUpdate) > 1000)
+        if((SIM70XX_Timer_GetMilliseconds() - StatusUpdate) > 1000)
         {
             ESP_LOGD(TAG, "%u messages queued for transmission...", Messages);
 
-            StatusUpdate = SIM70XX_Tools_GetmsTimer();
+            StatusUpdate = SIM70XX_Timer_GetMilliseconds();
         }
 
         if(Device->UART.isInitialized == false)
@@ -163,7 +164,7 @@ static void SIM70XX_Evt_Task(void* p_Arg)
             if((*it)->recData)
             {
                 // Wait for the device response and process the response.
-                Now = SIM70XX_Tools_GetmsTimer();
+                Now = SIM70XX_Timer_GetMilliseconds();
                 do
                 {
                     std::string Line;
@@ -225,7 +226,7 @@ static void SIM70XX_Evt_Task(void* p_Arg)
                     }
                     // Abort when a timeout occurs.
                     // NOTE: Value 0 will disable the timeout function. This can be used by commands which will report a result anyway.
-                    else if(((*it)->Timeout != 0) && (SIM70XX_Tools_GetmsTimer() - Now) > (*it)->Timeout)
+                    else if(((*it)->Timeout != 0) && (SIM70XX_Timer_GetMilliseconds() - Now) > (*it)->Timeout)
                     {
                         ESP_LOGE(TAG, "     Device response timout!");
 
@@ -243,7 +244,7 @@ static void SIM70XX_Evt_Task(void* p_Arg)
             {
                 // Wait for the status code with the layout
                 //  <CR><LF>Status<CR><LF>
-                Now = SIM70XX_Tools_GetmsTimer();
+                Now = SIM70XX_Timer_GetMilliseconds();
                 do
                 {
                     // Read a new line from the serial interface.
@@ -251,7 +252,7 @@ static void SIM70XX_Evt_Task(void* p_Arg)
                     (*it)->Status.append(SIM70XX_UART_ReadStringUntil(Device->UART));
 
                     // Abort when a timeout occurs.
-                    if(((*it)->Timeout != 0) && (SIM70XX_Tools_GetmsTimer() - Now) > (*it)->Timeout)
+                    if(((*it)->Timeout != 0) && (SIM70XX_Timer_GetMilliseconds() - Now) > (*it)->Timeout)
                     {
                         ESP_LOGE(TAG, "     Device status timout!");
 
