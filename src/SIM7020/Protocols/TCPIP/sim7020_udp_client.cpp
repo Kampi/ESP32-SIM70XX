@@ -36,6 +36,16 @@ SIM70XX_Error_t SIM7020_UDP_Client_Create(SIM7020_t& p_Device, std::string IP, u
     return SIM7020_Client_CreateSocket(p_Device, SIM7020_TCP_TYPE_UDP, IP, Port, p_Socket, Timeout, CID, Domain, Protocol);
 }
 
+SIM70XX_Error_t SIM7020_UDP_Client_Connect(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket)
+{
+    return SIM7020_Client_ConnectSocket(p_Device, p_Socket);
+}
+
+SIM70XX_Error_t SIM7020_UDP_Client_Disconnect(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket)
+{
+    return SIM7020_Client_DisconnectSocket(p_Device, p_Socket);
+}
+
 SIM70XX_Error_t SIM7020_UDP_Client_Destroy(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket)
 {
     return SIM7020_Client_DestroySocket(p_Device, p_Socket);

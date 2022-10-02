@@ -27,12 +27,12 @@
 #include "sim7020.h"
 #include "sim7020_tcpip.h"
 
-/** @brief          Create a common TCPIP / UDP socket.
+/** @brief          Create a common TCP / UDP socket.
  *  @param p_Device SIM7020 device object
  *  @param Type     Socket type
  *  @param IP       IP address
  *  @param Port     TCP port
- *  @param p_Socket Pointer to TCP socket object
+ *  @param p_Socket Pointer to TCPIP socket object
  *  @param Timeout  (Optional) Timeout in seconds
  *  @param CID      (Optional) Context Identifier
  *  @param Domain   (Optional) Socket IP domain
@@ -41,9 +41,23 @@
  */
 SIM70XX_Error_t SIM7020_Client_CreateSocket(SIM7020_t& p_Device, SIM7020_TCP_Type_t Type, std::string IP, uint16_t Port, SIM7020_TCP_Socket_t* p_Socket, uint16_t Timeout = 60, uint8_t CID = 1, SIM7020_TCP_Domain_t Domain = SIM7020_TCP_DOMAIN_IPV4, SIM7020_TCP_Protocol_t Protocol = SIM7020_TCP_PROT_IP);
 
+/** @brief          Open a common TCP / UDP connection to a remote server.
+ *  @param p_Device SIM7020 device object
+ *  @param p_Socket Pointer to TCPIP socket object
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7020_Client_ConnectSocket(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket);
+
+/** @brief          Disconnect a common TCP / UDP connection from a remote server.
+ *  @param p_Device SIM7020 device object
+ *  @param p_Socket Pointer to TCPIP socket object
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7020_Client_DisconnectSocket(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket);
+
 /** @brief          Close a common TCPIP / UDP socket.
  *  @param p_Device SIM7020 device object
- *  @param p_Socket Pointer to TCP socket object
+ *  @param p_Socket Pointer to TCPIP socket object
  *  @return         SIM70XX_ERR_OK when successful
  */
 SIM70XX_Error_t SIM7020_Client_DestroySocket(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket);

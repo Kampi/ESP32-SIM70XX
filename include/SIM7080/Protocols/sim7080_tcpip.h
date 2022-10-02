@@ -37,13 +37,13 @@
  *  @param IPv6     (Optional) Set to #true to perform an IPv6 ping
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_TCP_Ping(SIM7080_t& p_Device, SIM7080_Ping_t* p_Config, std::vector<SIM7080_PingRes_t>* p_Result, bool IPv6 = false);
+SIM70XX_Error_t SIM7080_TCPIP_Ping(SIM7080_t& p_Device, const SIM7080_Ping_t* const p_Config, std::vector<SIM7080_PingRes_t>* p_Result, bool IPv6 = false);
 
 /** @brief          Check if data are received for a specific socket.
  *  @param p_Socket Pointer to TCP socket object
  *  @return         #true when data are received
  */
-bool inline __attribute__((always_inline)) SIM7080_TCP_Client_isDataAvailable(SIM7080_TCP_Socket_t* p_Socket)
+inline __attribute__((always_inline)) bool SIM7080_TCP_Client_isDataAvailable(SIM7080_TCP_Socket_t* p_Socket)
 {
     if(p_Socket == NULL)
     {
@@ -96,6 +96,13 @@ SIM70XX_Error_t SIM7080_TCP_Client_Transmit(SIM7080_t& p_Device, SIM7080_TCP_Soc
  *  @return         SIM70XX_ERR_OK when successful
  */
 SIM70XX_Error_t SIM7080_TCP_Client_Receive(SIM7080_t& p_Device, SIM7080_TCP_Socket_t* p_Socket, std::string* p_Buffer, uint32_t Length = 1024);
+
+/** @brief          Disconnect a TCP connection from a remote server.
+ *  @param p_Device SIM7080 device object
+ *  @param p_Socket Pointer to TCPIP socket object
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_TCP_Client_Disconnect(SIM7080_t& p_Device, SIM7080_TCP_Socket_t* p_Socket);
 
 /** @brief          Close a TCP connection and release the socket.
  *  @param p_Device SIM7080 device object

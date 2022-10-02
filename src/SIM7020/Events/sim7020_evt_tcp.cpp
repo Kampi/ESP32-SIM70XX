@@ -38,9 +38,9 @@ void SIM7020_Evt_on_TCP_Disconnect(SIM7020_t* const p_Device, std::string* p_Mes
     ESP_LOGI(TAG, "TCP disconnect event!");
 
     Index = p_Message->find("+CSOERR");
-    Index = p_Message->find(",");
+    Index = p_Message->find(",", Index);
     ID = std::stoi(p_Message->substr(Index - 1, 1));
-    TCP_Error = (SIM7020_TCP_Error_t)std::stoi(p_Message->substr(Index));
+    TCP_Error = (SIM7020_TCP_Error_t)std::stoi(p_Message->substr(Index + 1));
 
     // Iterate through the list of active sockets and close the socket with the given ID.
     for(std::vector<SIM7020_TCP_Socket_t*>::iterator it = p_Device->TCP.Sockets.begin(); it != p_Device->TCP.Sockets.end(); ++it)

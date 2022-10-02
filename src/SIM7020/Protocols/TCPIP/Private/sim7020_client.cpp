@@ -72,11 +72,47 @@ SIM70XX_Error_t SIM7020_Client_CreateSocket(SIM7020_t& p_Device, SIM7020_TCP_Typ
     return SIM70XX_ERR_OK;    
 }
 
-SIM70XX_Error_t SIM7020_Client_DestroySocket(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket)
+SIM70XX_Error_t SIM7020_Client_ConnectSocket(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket)
+{
+    std::string Response;
+    SIM70XX_TxCmd_t* Command;
+
+    if(p_Socket == NULL)
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+    else if(p_Device.Internal.isInitialized == false)
+    {
+        return SIM70XX_ERR_NOT_INITIALIZED;
+    }
+    else if(p_Socket->Internal.isCreated == false)
+    {
+        return SIM70XX_ERR_NOT_CREATED;
+    }
+    else if(p_Socket->Internal.isConnected == true)
+    {
+        return SIM70XX_ERR_OK;
+    }
+
+    SIM70XX_CREATE_CMD(Command);
+    *Command = SIM7020_AT_CSOCON(p_Socket->Internal.ID, p_Socket->Port, p_Socket->IP);
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, p_Socket->Timeout) == false)
+    {
+        return SIM70XX_ERR_FAIL;
+    }
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
+
+    p_Socket->Internal.isConnected = true;
+
+    return SIM70XX_ERR_OK;
+}
+
+SIM70XX_Error_t SIM7020_Client_DisconnectSocket(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket)
 {
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Socket == NULL) || (p_Socket->Internal.Type != SIM7020_TCP_TYPE_TCP))
+    if(p_Socket == NULL)
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
@@ -102,6 +138,26 @@ SIM70XX_Error_t SIM7020_Client_DestroySocket(SIM7020_t& p_Device, SIM7020_TCP_So
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
 
+    p_Socket->Internal.isConnected = false;
+
+    return SIM70XX_ERR_OK;
+}
+
+SIM70XX_Error_t SIM7020_Client_DestroySocket(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket)
+{
+    if(p_Socket == NULL)
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+    else if(p_Device.Internal.isInitialized == false)
+    {
+        return SIM70XX_ERR_NOT_INITIALIZED;
+    }
+    else if(p_Socket->Internal.isCreated == false)
+    {
+        return SIM70XX_ERR_NOT_CREATED;
+    }
+
     for(std::vector<SIM7020_TCP_Socket_t*>::iterator it = p_Device.TCP.Sockets.begin(); it != p_Device.TCP.Sockets.end(); ++it)
     {
         if((*it)->Internal.ID == p_Socket->Internal.ID)
@@ -113,7 +169,6 @@ SIM70XX_Error_t SIM7020_Client_DestroySocket(SIM7020_t& p_Device, SIM7020_TCP_So
         }
     }
 
-    p_Socket->Internal.isConnected = false;
     p_Socket->Internal.isCreated = false;
 
     return SIM70XX_ERR_OK;

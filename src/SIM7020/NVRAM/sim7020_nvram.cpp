@@ -75,7 +75,12 @@ SIM70XX_Error_t SIM7020_NVRAM_Write(SIM7020_t& p_Device, std::string Key, const 
 {
     std::string HexString;
 
-    SIM70XX_Tools_ASCII2Hex(p_Buffer, Length, &HexString);
+    if(p_Buffer == NULL)
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+
+    SIM70XX_Tools_Buf2Hex(p_Buffer, Length, &HexString);
 
     return SIM7020_NVRAM_Write(p_Device, Key, HexString, p_Error);
 }
@@ -185,7 +190,7 @@ SIM70XX_Error_t SIM7020_NVRAM_GetKeys(SIM7020_t& p_Device, std::vector<std::stri
     std::string Response;
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Keys == NULL))
+    if(p_Keys == NULL)
     {
         return SIM70XX_ERR_INVALID_ARG;
     }

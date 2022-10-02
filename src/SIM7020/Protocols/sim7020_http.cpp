@@ -27,6 +27,7 @@
 #include "sim7020_http.h"
 #include "../../Private/Queue/sim70xx_queue.h"
 #include "../../Private/Commands/sim70xx_commands.h"
+#include "../../Private/Arch/ESP32/Timer/sim70xx_timer.h"
 
 static const char* TAG = "SIM7020_HTTP";
 
@@ -60,7 +61,7 @@ SIM70XX_Error_t SIM7020_HTTP_Create(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* 
     // Check if the URL is valid.
     std::for_each(p_Socket->Host.begin(), p_Socket->Host.end(), [](char& c)
     {
-        c = ::tolower(c);
+        c = std::tolower(c);
     });
     if((p_Socket->Host.find("http") == std::string::npos) && (p_Socket->Host.find("https") == std::string::npos))
     {
@@ -158,7 +159,7 @@ SIM70XX_Error_t SIM7020_HTTP_POST(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_
     }
 
     // Prepare the header packet.
-    SIM70XX_Tools_ASCII2Hex(Header.c_str(), Header.size(), &Buffer_Hex);
+    SIM70XX_Tools_Buf2Hex(Header.c_str(), Header.size(), &Buffer_Hex);
     Packet = std::to_string(p_Socket->ID) + "," +
              std::to_string(SIM7020_HTTP_REQ_POST) + "," +
              std::to_string(Path.size()) + "," +
@@ -205,7 +206,7 @@ SIM70XX_Error_t SIM7020_HTTP_POST(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_
             isAdditionalPackets = false;
         }
 
-        SIM70XX_Tools_ASCII2Hex(Buffer_Temp, BytesToTransmit, &Buffer_Hex);
+        SIM70XX_Tools_Buf2Hex(Buffer_Temp, BytesToTransmit, &Buffer_Hex);
 
         if(isFirstPacket == true)
         {

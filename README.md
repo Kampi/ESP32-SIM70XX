@@ -15,7 +15,7 @@ Multi driver for SIMCom cellular modules with UART interface.
 
 ## Driver status
 
-| Driver        | SIM7020       | SIM7080       | 
+| Driver        | SIM7020       | SIM7080       |
 |---------------|---------------|---------------|
 | NTP           | Basic         | Basic         |
 | DNS           | Advanced      | Advanced      |

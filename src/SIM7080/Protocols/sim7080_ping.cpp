@@ -30,9 +30,12 @@
 #include "../../Private/Queue/sim70xx_queue.h"
 #include "../../Private/Commands/sim70xx_commands.h"
 
-SIM70XX_Error_t SIM7080_TCP_Ping(SIM7080_t& p_Device, SIM7080_Ping_t* p_Config, std::vector<SIM7080_PingRes_t>* p_Result, bool IPv6)
+SIM70XX_Error_t SIM7080_TCPIP_Ping(SIM7080_t& p_Device, const SIM7080_Ping_t* const p_Config, std::vector<SIM7080_PingRes_t>* p_Result, bool IPv6)
 {
     size_t Index;
+    uint8_t Retries;
+    uint16_t Size;
+    uint16_t Timeout;
     std::string Response;
     std::string CommandStr;
     SIM70XX_TxCmd_t* Command;
@@ -50,40 +53,40 @@ SIM70XX_Error_t SIM7080_TCP_Ping(SIM7080_t& p_Device, SIM7080_Ping_t* p_Config, 
 
     if(p_Config->Retries <= -1)
     {
-        p_Config->Retries = 4;
+        Retries = 4;
     }
     else
     {
-        p_Config->Retries = std::min(p_Config->Retries, (int16_t)500);
+        Retries = std::min(p_Config->Retries, (int16_t)500);
     }
 
     if(p_Config->Size <= -1)
     {
-        p_Config->Size = 32;
+        Size = 32;
     }
     else
     {
-        p_Config->Size = std::min(p_Config->Size, (int16_t)1400);
+        Size = std::min(p_Config->Size, (int16_t)1400);
     }
 
     if(p_Config->Timeout <= -1)
     {
-        p_Config->Timeout = 100;
+        Timeout = 100;
     }
     else
     {
-        p_Config->Timeout = std::min(p_Config->Timeout, (int32_t)60000);
+        Timeout = std::min(p_Config->Timeout, (int32_t)60000);
     }
 
     SIM70XX_CREATE_CMD(Command);
 
     if(IPv6)
     {
-        *Command = SIM7080_AT_SNPING6(p_Config->Host, p_Config->Retries, p_Config->Size, p_Config->Timeout, (uint16_t)p_Config->Retries);
+        *Command = SIM7080_AT_SNPING6(p_Config->Host, Retries, Size, Timeout, (uint16_t)Retries);
     }
     else
     {
-        *Command = SIM7080_AT_SNPING4(p_Config->Host, p_Config->Retries, p_Config->Size, p_Config->Timeout, (uint16_t)p_Config->Retries);
+        *Command = SIM7080_AT_SNPING4(p_Config->Host, Retries, Size, Timeout, (uint16_t)Retries);
     }
 
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);

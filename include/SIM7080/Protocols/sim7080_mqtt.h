@@ -28,7 +28,7 @@
  *  @param p_Socket Pointer to MQTT socket object
  *  @return         Number of messages ready.
  */
-uint32_t inline __attribute__((always_inline)) SIM7080_MQTT_MessagesAvailable(SIM7080_MQTT_Socket_t* p_Socket)
+inline __attribute__((always_inline)) uint32_t SIM7080_MQTT_MessagesAvailable(SIM7080_MQTT_Socket_t* p_Socket)
 {
     if(p_Socket->Internal.isConnected == false)
     {

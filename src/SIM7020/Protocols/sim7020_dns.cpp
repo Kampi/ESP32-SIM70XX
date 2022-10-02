@@ -31,9 +31,6 @@
 
 static const char* TAG = "SIM7020_DNS";
 
-// TODO: Add configuration for DNS Server (CDNSCFG)
-// TODO: Add selection of PDP index for DNS (CDNSPDPID)
-
 SIM70XX_Error_t SIM7020_DNS_FetchAddress(SIM7020_t& p_Device, std::string Host, std::string* p_IP, SIM7020_DNS_Error_t* p_Error, uint32_t Timeout)
 {
     size_t Index;
@@ -106,6 +103,124 @@ SIM70XX_Error_t SIM7020_DNS_FetchAddress(SIM7020_t& p_Device, std::string Host, 
     }
 
     return SIM70XX_ERR_FAIL;
+}
+
+SIM70XX_Error_t SIM7020_DNS_SetIndex(SIM7020_t& p_Device, uint8_t Index)
+{
+    SIM70XX_TxCmd_t* Command;
+
+    if(Index > 4)
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+    else if(p_Device.Internal.isInitialized == false)
+    {
+        return SIM70XX_ERR_NOT_INITIALIZED;
+    }
+
+    SIM70XX_CREATE_CMD(Command);
+    *Command = SIM7020_AT_CDNSPDPID_W(Index);
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    {
+        return SIM70XX_ERR_FAIL;
+    }
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
+
+    return SIM70XX_ERR_OK;
+}
+
+SIM70XX_Error_t SIM7020_DNS_GetIndex(SIM7020_t& p_Device, uint8_t* p_Index)
+{
+    std::string Response;
+    SIM70XX_TxCmd_t* Command;
+
+    if(p_Index == NULL)
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+    else if(p_Device.Internal.isInitialized == false)
+    {
+        return SIM70XX_ERR_NOT_INITIALIZED;
+    }
+
+    SIM70XX_CREATE_CMD(Command);
+    *Command = SIM7020_AT_CDNSPDPID_R;
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    {
+        return SIM70XX_ERR_FAIL;
+    }
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
+
+    *p_Index = std::stoi(Response);
+
+    return SIM70XX_ERR_OK;
+}
+
+SIM70XX_Error_t SIM7020_DNS_SetServer(SIM7020_t& p_Device, SIM7020_DNS_Server_t Server)
+{
+    SIM70XX_TxCmd_t* Command;
+
+    if(p_Device.Internal.isInitialized == false)
+    {
+        return SIM70XX_ERR_NOT_INITIALIZED;
+    }
+
+    SIM70XX_CREATE_CMD(Command);
+    *Command = SIM7020_AT_CDNSCFG_W(Server.Prim, Server.Sec);
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    {
+        return SIM70XX_ERR_FAIL;
+    }
+
+    return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
+}
+
+SIM70XX_Error_t SIM7020_DNS_GetServer(SIM7020_t& p_Device, SIM7020_DNS_Server_t* p_IPv4, SIM7020_DNS_Server_t* p_IPv6)
+{
+    size_t Index;
+    std::string Response;
+    SIM70XX_TxCmd_t* Command;
+
+    if(p_IPv4 == NULL)
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+    else if(p_Device.Internal.isInitialized == false)
+    {
+        return SIM70XX_ERR_NOT_INITIALIZED;
+    }
+
+    SIM70XX_CREATE_CMD(Command);
+    *Command = SIM7020_AT_CDNSCFG_R;
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    {
+        return SIM70XX_ERR_FAIL;
+    }
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
+
+    Index = Response.find(":");
+    p_IPv4->Prim = Response.substr(Index + 2, Response.find("\n") - Index - 2);
+    Response.erase(0, Response.find("\n") + 1);
+
+    Index = Response.find(":");
+    p_IPv4->Sec = Response.substr(Index + 2, Response.find("\n") - Index - 2);
+    Response.erase(0, Response.find("\n") + 1);
+
+    if(p_IPv6 != NULL)
+    {
+        Index = Response.find(":");
+        p_IPv6->Prim = Response.substr(Index + 2, Response.find("\n") - Index - 2);
+        Response.erase(0, Response.find("\n") + 1);
+
+        Index = Response.find(":");
+        p_IPv6->Sec = Response.substr(Index + 2, Response.find("\n") - Index - 2);
+    }
+
+    return SIM70XX_ERR_OK;
 }
 
 #endif

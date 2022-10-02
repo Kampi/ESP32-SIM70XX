@@ -262,7 +262,7 @@ SIM70XX_Error_t SIM7080_TCP_Client_Receive(SIM7080_t& p_Device, SIM7080_TCP_Sock
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7080_TCP_Client_Destroy(SIM7080_t& p_Device, SIM7080_TCP_Socket_t* p_Socket)
+SIM70XX_Error_t SIM7080_TCP_Client_Disconnect(SIM7080_t& p_Device, SIM7080_TCP_Socket_t* p_Socket)
 {
     SIM70XX_TxCmd_t* Command;
 
@@ -293,6 +293,27 @@ SIM70XX_Error_t SIM7080_TCP_Client_Destroy(SIM7080_t& p_Device, SIM7080_TCP_Sock
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
 
     p_Socket->Internal.isConnected = false;
+
+    return SIM70XX_ERR_OK;
+}
+
+SIM70XX_Error_t SIM7080_TCP_Client_Destroy(SIM7080_t& p_Device, SIM7080_TCP_Socket_t* p_Socket)
+{
+    SIM70XX_TxCmd_t* Command;
+
+    if(p_Socket == NULL)
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+    else if(p_Device.Internal.isInitialized == false)
+    {
+        return SIM70XX_ERR_NOT_INITIALIZED;
+    }
+    else if(p_Socket->Internal.isCreated == false)
+    {
+        return SIM70XX_ERR_NOT_CREATED;
+    }
+
     p_Socket->Internal.isCreated = false;
 
     return SIM70XX_ERR_OK;

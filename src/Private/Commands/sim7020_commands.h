@@ -88,6 +88,10 @@
  *
  */
 #define SIM7020_AT_CDNSGIP(Host)                                SIM70XX_CMD("AT+CDNSGIP=\"" + Host + "\"", false, 1, 1)
+#define SIM7020_AT_CDNSPDPID_W(Index)                           SIM70XX_CMD("AT+CDNSPDPID=" + std::to_string(Index), false, 1, 1)
+#define SIM7020_AT_CDNSPDPID_R                                  SIM70XX_CMD("AT+CDNSPDPID?", true, 1, 1)
+#define SIM7020_AT_CDNSCFG_W(Prim, Sec)                         SIM70XX_CMD("AT+CDNSPDPID=\"" + Prim + "\",\"" + Sec + "\"", false, 1, 1)
+#define SIM7020_AT_CDNSCFG_R                                    SIM70XX_CMD("AT+CDNSCFG?", true, 10, 4)
 #define SIM7020_AT_CIPPING(Command)                             SIM70XX_CMD(Command, false, 60, 1)
 #define SIM7020_AT_CSOC(Command)                                SIM70XX_CMD(Command, true, 60, 1)
 #define SIM7020_AT_CSOCON(ID, Port, Address)                    SIM70XX_CMD("AT+CSOCON=" + std::to_string(ID) + "," + std::to_string(Port) + ",\"" + Address + "\"", false, 60, 1)

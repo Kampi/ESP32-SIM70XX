@@ -103,7 +103,7 @@ SIM70XX_Error_t SIM7020_CoAP_Transmit(SIM7020_t& p_Device, SIM7020_CoAP_Socket_t
         return SIM70XX_ERR_NOT_CONNECTED;
     }
 
-    SIM70XX_Tools_ASCII2Hex(p_Buffer, Length, &Buffer_Hex);
+    SIM70XX_Tools_Buf2Hex(p_Buffer, Length, &Buffer_Hex);
 
     CommandStr = "AT+CCOAPCSEND=" + std::to_string(p_Socket->ID) + "," + std::to_string(Length) + ",\"" + Buffer_Hex + "\"";
     SIM70XX_CREATE_CMD(Command);

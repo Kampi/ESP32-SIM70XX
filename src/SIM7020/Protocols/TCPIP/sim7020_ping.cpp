@@ -32,9 +32,12 @@
 
 static const char* TAG = "SIM7020_TCPIP";
 
-SIM70XX_Error_t SIM7020_TCP_Ping(SIM7020_t& p_Device, SIM7020_Ping_t* p_Config, std::vector<SIM7020_PingRes_t>* p_Result)
+SIM70XX_Error_t SIM7020_TCPIP_Ping(SIM7020_t& p_Device, const SIM7020_Ping_t* const p_Config, std::vector<SIM7020_PingRes_t>* p_Result)
 {
+    uint8_t Retries;
     uint8_t Pings;
+    uint16_t DataLength;
+    uint16_t Timeout;
     std::string Status;
     std::string Response;
     std::string CommandStr;
@@ -54,32 +57,32 @@ SIM70XX_Error_t SIM7020_TCP_Ping(SIM7020_t& p_Device, SIM7020_Ping_t* p_Config, 
 
     if(p_Config->Retries <= -1)
     {
-        p_Config->Retries = 4;
+        Retries = 4;
     }
     else
     {
-        p_Config->Retries = std::min(p_Config->Retries, (int8_t)100);
+        Retries = std::min(p_Config->Retries, (int8_t)100);
     }
 
     if(p_Config->DataLength <= -1)
     {
-        p_Config->DataLength = 32;
+        DataLength = 32;
     }
     else
     {
-        p_Config->DataLength = std::min(p_Config->DataLength, (int16_t)5120);
+        DataLength = std::min(p_Config->DataLength, (int16_t)5120);
     }
 
     if(p_Config->Timeout <= -1)
     {
-        p_Config->Timeout = 100;
+        Timeout = 100;
     }
     else
     {
-        p_Config->Timeout = std::min(p_Config->Timeout, (int16_t)600);
+        Timeout = std::min(p_Config->Timeout, (int16_t)600);
     }
 
-    CommandStr = "AT+CIPPING=\"" + p_Config->Host + "\"," + std::to_string(p_Config->Retries) + "," + std::to_string(p_Config->DataLength) + "," + std::to_string(p_Config->Timeout);
+    CommandStr = "AT+CIPPING=\"" + p_Config->Host + "\"," + std::to_string(Retries) + "," + std::to_string(DataLength) + "," + std::to_string(Timeout);
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CIPPING(CommandStr);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);

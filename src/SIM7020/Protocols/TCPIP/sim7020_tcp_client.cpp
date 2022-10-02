@@ -38,38 +38,7 @@ SIM70XX_Error_t SIM7020_TCP_Client_Create(SIM7020_t& p_Device, std::string IP, u
 
 SIM70XX_Error_t SIM7020_TCP_Client_Connect(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket)
 {
-    std::string Response;
-    SIM70XX_TxCmd_t* Command;
-
-    if((p_Socket == NULL) || (p_Socket->Internal.Type != SIM7020_TCP_TYPE_TCP))
-    {
-        return SIM70XX_ERR_INVALID_ARG;
-    }
-    else if(p_Device.Internal.isInitialized == false)
-    {
-        return SIM70XX_ERR_NOT_INITIALIZED;
-    }
-    else if(p_Socket->Internal.isCreated == false)
-    {
-        return SIM70XX_ERR_NOT_CREATED;
-    }
-    else if(p_Socket->Internal.isConnected == true)
-    {
-        return SIM70XX_ERR_OK;
-    }
-
-    SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7020_AT_CSOCON(p_Socket->Internal.ID, p_Socket->Port, p_Socket->IP);
-    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, p_Socket->Timeout) == false)
-    {
-        return SIM70XX_ERR_FAIL;
-    }
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
-
-    p_Socket->Internal.isConnected = true;
-
-    return SIM70XX_ERR_OK;
+    return SIM7020_Client_ConnectSocket(p_Device, p_Socket);
 }
 
 SIM70XX_Error_t SIM7020_TCP_Client_Transmit(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket, const void* p_Buffer, uint32_t Length)
@@ -178,6 +147,11 @@ SIM70XX_Error_t SIM7020_TCP_Client_Receive(SIM7020_t& p_Device, SIM7020_TCP_Sock
     }
 
     return SIM70XX_ERR_OK;
+}
+
+SIM70XX_Error_t SIM7020_TCP_Client_Disconnect(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket)
+{
+    return SIM7020_Client_DisconnectSocket(p_Device, p_Socket);
 }
 
 SIM70XX_Error_t SIM7020_TCP_Client_Destroy(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket)

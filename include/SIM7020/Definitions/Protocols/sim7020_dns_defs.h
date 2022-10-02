@@ -33,4 +33,12 @@ typedef enum
     SIM7020_DNS_ERROR_COMMON  	= 8,                /**< Common DNS error. */
 } SIM7020_DNS_Error_t;
 
+/** @brief SIM7020 DNS server address object definitions.
+ */
+typedef struct
+{
+    std::string Prim;                               /**< Primary DNS server. */
+    std::string Sec;                                /**< Secondary DNS server. */
+} SIM7020_DNS_Server_t;
+
 #endif /* SIM7020_DNS_DEFS_H_ */
