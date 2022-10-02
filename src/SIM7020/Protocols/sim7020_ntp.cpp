@@ -82,6 +82,13 @@ SIM70XX_Error_t SIM7020_NTP_Sync(SIM7020_t& p_Device, std::string Server, int8_t
     {
         if((SIM70XX_Tools_GetmsTimer() - Now) > (Timeout * 1000UL))
         {
+            // Timeout - Stop the query.
+            SIM70XX_CREATE_CMD(Command);
+            *Command = SIM7020_AT_CSNTPSTOP;
+            SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+            SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout);
+            SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
+
             return SIM70XX_ERR_TIMEOUT;
         }
 
