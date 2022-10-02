@@ -270,6 +270,7 @@ SIM70XX_Error_t SIM7020_Info_GetNetworkStatus(SIM7020_t& p_Device, SIM7020_NetSt
 {
     size_t Index;
     std::string Response;
+    std::string Dummy;
     SIM70XX_TxCmd_t* Command;
 
     if(p_Status == NULL)
@@ -296,19 +297,69 @@ SIM70XX_Error_t SIM7020_Info_GetNetworkStatus(SIM7020_t& p_Device, SIM7020_NetSt
         return SIM70XX_ERR_FAIL;
     }
 
+    ESP_LOGI(TAG, "Response: %s", Response.c_str());
+
     p_Status->sc_earfcn = std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
     p_Status->sc_earfcn_offset = (int8_t)std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
     p_Status->sc_pci = std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
+
     p_Status->sc_cellid = SIM70XX_Tools_SubstringSplitErase(&Response);
-    p_Status->sc_rsrp = (int16_t)std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
-    p_Status->sc_rsrq = (int16_t)std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
-    p_Status->sc_rssi = (int16_t)std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
-    p_Status->sc_snr = (int16_t)std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
-    p_Status->sc_band = std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
-    p_Status->sc_tac = SIM70XX_Tools_SubstringSplitErase(&Response);
-    p_Status->sc_ecl = std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
-    p_Status->sc_tx_pwr = (int16_t)std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
-    p_Status->sc_re_rsrp = (int16_t)std::stoi(Response);
+    p_Status->sc_cellid.erase(std::remove(p_Status->sc_cellid.begin(), p_Status->sc_cellid.end(), '\"'), p_Status->sc_cellid.end());
+
+    Dummy = SIM70XX_Tools_SubstringSplitErase(&Response);
+    if(Dummy.size())
+    {
+        p_Status->sc_rsrp = (int16_t)std::stoi(Dummy);
+    }
+
+    Dummy = SIM70XX_Tools_SubstringSplitErase(&Response);
+    if(Dummy.size())
+    {
+        p_Status->sc_rsrq = (int16_t)std::stoi(Dummy);
+    }
+
+    Dummy = SIM70XX_Tools_SubstringSplitErase(&Response);
+    if(Dummy.size())
+    {
+        p_Status->sc_rssi = (int16_t)std::stoi(Dummy);
+    }
+
+    Dummy = SIM70XX_Tools_SubstringSplitErase(&Response);
+    if(Dummy.size())
+    {
+        p_Status->sc_snr = (int16_t)std::stoi(Dummy);
+    }
+
+    Dummy = SIM70XX_Tools_SubstringSplitErase(&Response);
+    if(Dummy.size())
+    {
+        p_Status->sc_band = (int16_t)std::stoi(Dummy);
+    }
+
+    Dummy = SIM70XX_Tools_SubstringSplitErase(&Response);
+    if(Dummy.size())
+    {
+        p_Status->sc_tac = Dummy;
+        p_Status->sc_tac.erase(std::remove(p_Status->sc_tac.begin(), p_Status->sc_tac.end(), '\"'), p_Status->sc_tac.end());
+    }
+
+    Dummy = SIM70XX_Tools_SubstringSplitErase(&Response);
+    if(Dummy.size())
+    {
+        p_Status->sc_ecl = (int16_t)std::stoi(Dummy);
+    }
+
+    Dummy = SIM70XX_Tools_SubstringSplitErase(&Response);
+    if(Dummy.size())
+    {
+        p_Status->sc_tx_pwr = (int16_t)std::stoi(Dummy);
+    }
+
+    Dummy = SIM70XX_Tools_SubstringSplitErase(&Response);
+    if(Dummy.size())
+    {
+        p_Status->sc_re_rsrp = (int16_t)std::stoi(Dummy);
+    }
 
     ESP_LOGI(TAG, "sc_earfcn: %u", p_Status->sc_earfcn);
     ESP_LOGI(TAG, "sc_earfcn_offset: %i", p_Status->sc_earfcn_offset);
