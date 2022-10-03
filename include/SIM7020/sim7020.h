@@ -121,8 +121,11 @@ SIM70XX_Error_t SIM7020_Init(SIM7020_t& p_Device, SIM7020_Config_t& p_Config, ui
 
 /** @brief          Deinitialize the SIM7020 module.
  *  @param p_Device SIM7020 device object
+ *  @param Skip     (Optional) Skip the shutdown command for the modem
+ *                  NOTE: This is usefull when you have used \ref SIM70XX_Tools_DisableModule to shutdown the modem.
+ *  @return         SIM70XX_ERR_OK when successful
  */
-void SIM7020_Deinit(SIM7020_t& p_Device);
+SIM70XX_Error_t SIM7020_Deinit(SIM7020_t& p_Device, bool Skip = false);
 
 #ifdef CONFIG_SIM70XX_RESET_USE_HW
     /** @brief          Perform a hardware reset of the module.
@@ -138,21 +141,6 @@ void SIM7020_Deinit(SIM7020_t& p_Device);
  */
 SIM70XX_Error_t SIM7020_SoftReset(SIM7020_t& p_Device, uint32_t Timeout = 10);
 
-/** @brief          Automatically set an enable an IP APN.
- *  @param p_Device SIM7020 device object
- *  @param APN      APN configuration object
- *  @return         SIM70XX_ERR_OK when successful
- */
-SIM70XX_Error_t SIM7020_IP_AutoAPN(SIM7020_t& p_Device, SIM70XX_APN_t APN);
-
-/** @brief          Manually set an enable an IP APN.
- *  @param p_Device SIM7020 device object
- *  @param APN      APN configuration object
- *  @param CID      (Optional) Context Identifier
- *  @return         SIM70XX_ERR_OK when successful
- */
-SIM70XX_Error_t SIM7020_IP_ManualAPN(SIM7020_t& p_Device, SIM70XX_APN_t APN, uint8_t CID = 0);
-
 /** @brief          Set the default PSD connection settings.
  *  @param p_Device SIM7020 device object
  *  @param PDP      Packet Data Protocol (PDP) type
@@ -161,7 +149,7 @@ SIM70XX_Error_t SIM7020_IP_ManualAPN(SIM7020_t& p_Device, SIM70XX_APN_t APN, uin
  */
 SIM70XX_Error_t SIM7020_SetPSD(SIM7020_t& p_Device, SIM7020_PDP_Type_t PDP, SIM70XX_APN_t APN);
 
-/** @brief          Set the operator for the communication.
+/** @brief          Set the device operator.
  *  @param p_Device SIM7020 device object
  *  @param Mode     Operator selection mode
  *  @param Format   Operator format
@@ -170,15 +158,21 @@ SIM70XX_Error_t SIM7020_SetPSD(SIM7020_t& p_Device, SIM7020_PDP_Type_t PDP, SIM7
  */
 SIM70XX_Error_t SIM7020_SetOperator(SIM7020_t& p_Device, SIM70XX_OpMode_t Mode, SIM70XX_OpForm_t Format, std::string Operator);
 
-/** @brief              Enable the device and get a list with available operators.
- *                      NOTE: Additional information: https://www.mcc-mnc.com/
+/** @brief              Get the current selected operator.
  *  @param p_Device     SIM7020 device object
- *  @param p_Operator   Pointer to list with operators
- *  @param p_Modes      Pointer to modes
- *  @param p_Formats    Pointer to formats
+ *  @param p_Operator   Pointer to operator
+ *  @param p_Modes      Pointer to Operator mode
+ *  @param p_Format     Pointer to Operator format
  *  @return             SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_GetOperator(SIM7020_t& p_Device, std::vector<SIM70XX_Operator_t>* p_Operator, std::string* p_Modes, std::string* p_Formats);
+SIM70XX_Error_t SIM7020_GetOperator(SIM7020_t& p_Device, SIM70XX_Operator_t* p_Operator, SIM70XX_OpMode_t* p_Mode, SIM70XX_OpForm_t* p_Format);
+
+/** @brief              Get the available operators.
+ *  @param p_Device     SIM7020 device object
+ *  @param p_Operators  Pointer for list of available operators
+ *  @return             SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7020_GetAvailOperators(SIM7020_t& p_Device, std::vector<SIM70XX_Operator_t>* p_Operators);
 
 /** @brief          Set the frequency band of the module.
  *  @param p_Device SIM7020 device object

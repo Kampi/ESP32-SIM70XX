@@ -109,6 +109,7 @@ typedef struct
 typedef struct
 {
     SIM70XX_OpStat_t Stat;                          /**< Operator status. */
+    SIM70XX_OpForm_t Format;                        /**< Used operator format. */
     std::string Long;                               /**< Long alphanumeric name. */
     std::string Short;                              /**< Short alphanumeric name. */
     std::string Numeric;                            /**< Numeric name. */

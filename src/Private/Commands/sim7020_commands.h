@@ -24,12 +24,14 @@
 
 /**
  *
- *Common SIM7020 commands.
+ * Common SIM7020 commands.
  *
  */
 #define SIM7020_AT_MCGDEFCONT(Command)                          SIM70XX_CMD(Command, false, 60, 1)
 #define SIM7020_AT_COPS_W(Command)                              SIM70XX_CMD(Command, false, 300, 1)
+#define SIM7020_AT_COPS                                         SIM70XX_CMD("AT+COPS?", true, 10, 1)
 #define SIM7020_AT_COPS_R                                       SIM70XX_CMD("AT+COPS=?", true, 300, 1)
+#define SIM7020_AT_CPOWD(Urgently)                              SIM70XX_CMD("AT+CPOWD=" + std::to_string(Urgently), true, 1, 1)
 
 /**
  *

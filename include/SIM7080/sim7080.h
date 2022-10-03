@@ -107,7 +107,7 @@ SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t& p_Conf
 /** @brief          Deinitialize the SIM7080 module by using the serial interface.
  *  @param p_Device SIM7080 device object
  *  @param Skip     (Optional) Skip the shutdown command for the modem
- *                  NOTE: This is usefull when you have used \ref SIM70XX_Tools_DisableModule to shutdown the modem
+ *                  NOTE: This is usefull when you have used \ref SIM70XX_Tools_DisableModule to shutdown the modem.
  *  @return         SIM70XX_ERR_OK when successful
  */
 SIM70XX_Error_t SIM7080_Deinit(SIM7080_t& p_Device, bool Skip = false);
@@ -147,11 +147,21 @@ SIM70XX_Error_t SIM7080_IP_ManualAPN(SIM7080_t& p_Device, SIM70XX_APN_t APN, uin
  */
 SIM70XX_Error_t SIM7080_SetOperator(SIM7080_t& p_Device, SIM70XX_OpMode_t Mode, SIM70XX_OpForm_t Format, std::string Operator, SIM7080_AcT_t AcT = SIM7080_ACT_USER_LTE_M1);
 
-/** @brief          
- *  @param p_Device SIM7080 device object
- *  @return         SIM70XX_ERR_OK when successful
+/** @brief              Get the current selected operator.
+ *  @param p_Device     SIM7080 device object
+ *  @param p_Operator   Pointer to operator
+ *  @param p_Modes      Pointer to operation mode
+ *  @param p_Format     Pointer to operation format
+ *  @return             SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_GetCurrentOperator(SIM7080_t& p_Device);
+SIM70XX_Error_t SIM7080_GetOperator(SIM7080_t& p_Device, SIM70XX_Operator_t* p_Operator, SIM70XX_OpMode_t* p_Mode, SIM70XX_OpForm_t* p_Format);
+
+/** @brief              Get the available operators.
+ *  @param p_Device     SIM7080 device object
+ *  @param p_Operators  Pointer for list of available operators
+ *  @return             SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_GetAvailOperators(SIM7080_t& p_Device, std::vector<SIM70XX_Operator_t>* p_Operators);
 
 /** @brief          Configure the frequency bands for CAT-M or NB-IoT mode.
  *  @param p_Device SIM7080 device object

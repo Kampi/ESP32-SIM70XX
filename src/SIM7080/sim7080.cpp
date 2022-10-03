@@ -129,9 +129,6 @@ SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t& p_Conf
 
 SIM70XX_Error_t SIM7080_Deinit(SIM7080_t& p_Device, bool Skip)
 {
-    std::string Response;
-    SIM70XX_TxCmd_t* Command;
-
     if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_OK;
@@ -140,6 +137,9 @@ SIM70XX_Error_t SIM7080_Deinit(SIM7080_t& p_Device, bool Skip)
     // Shutdown the modem.
     if(Skip == false)
     {
+        SIM70XX_TxCmd_t* Command;
+        std::string Response;
+
         SIM70XX_CREATE_CMD(Command);
         *Command = SIM7080_AT_CPOWD(true);
         SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
@@ -260,7 +260,7 @@ SIM70XX_Error_t SIM7080_IP_AutoAPN(SIM7080_t& p_Device, SIM70XX_APN_t APN, uint8
         return SIM70XX_ERR_TIMEOUT;
     }
 
-    SIM70XX_ERROR_CHECK(SIM7080_GetCurrentOperator(p_Device));
+    SIM70XX_ERROR_CHECK(SIM7080_GetOperator(p_Device));
     SIM70XX_ERROR_CHECK(SIM7080_PDP_IP_Configure(p_Device, SIM7080_PDP_IP_IP, APN, PDP));
 
     return SIM7080_PDP_IP_Action(p_Device, PDP, SIM7080_PDP_ENABLE);
@@ -314,14 +314,80 @@ SIM70XX_Error_t SIM7080_SetOperator(SIM7080_t& p_Device, SIM70XX_OpMode_t Mode, 
     return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
 }
 
-SIM70XX_Error_t SIM7080_GetCurrentOperator(SIM7080_t& p_Device)
+SIM70XX_Error_t SIM7080_GetOperator(SIM7080_t& p_Device, SIM70XX_Operator_t* p_Operator, SIM70XX_OpMode_t* p_Mode, SIM70XX_OpForm_t* p_Format)
 {
+    std::string Response;
     SIM70XX_TxCmd_t* Command;
 
-    if(p_Device.Internal.isInitialized == false)
+    if((p_Operator == NULL) || (p_Mode == NULL))
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+    else if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
+
+    // The device must be active to check the operators.
+    SIM70XX_ERROR_CHECK(SIM7080_SetFunctionality(p_Device, SIM7080_FUNC_FULL));
+
+    SIM70XX_CREATE_CMD(Command);
+    *Command = SIM7080_AT_COPS;
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    {
+        return SIM70XX_ERR_FAIL;
+    }
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
+
+    ESP_LOGI(TAG, "Response: %s", Response.c_str());
+
+    if(Response.size())
+    {
+        *p_Mode = (SIM70XX_OpMode_t)stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
+        p_Operator->Format = (SIM70XX_OpForm_t)stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
+
+        if(p_Operator->Format == SIM_FORM_LONG)
+        {
+            p_Operator->Long = SIM70XX_Tools_SubstringSplitErase(&Response);
+            p_Operator->Long.erase(std::remove(p_Operator->Long.begin(), p_Operator->Long.end(), '\"'), p_Operator->Long.end());
+        }
+        if(p_Operator->Format == SIM_FORM_SHORT)
+        {
+            p_Operator->Short = SIM70XX_Tools_SubstringSplitErase(&Response);
+            p_Operator->Short.erase(std::remove(p_Operator->Short.begin(), p_Operator->Short.end(), '\"'), p_Operator->Short.end());
+        }
+        else
+        {
+            p_Operator->Numeric = SIM70XX_Tools_SubstringSplitErase(&Response);
+            p_Operator->Numeric.erase(std::remove(p_Operator->Numeric.begin(), p_Operator->Numeric.end(), '\"'), p_Operator->Numeric.end());
+        }
+
+        p_Operator->Stat = SIM_OP_CUR;
+        p_Operator->Act = stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
+    }
+
+    return SIM70XX_ERR_OK;
+}
+
+SIM70XX_Error_t SIM7080_GetAvailOperators(SIM7080_t& p_Device, std::vector<SIM70XX_Operator_t>* p_Operators)
+{
+    size_t Start;
+    std::string List;
+    std::string Response;
+    SIM70XX_TxCmd_t* Command;
+
+    if(p_Operators == NULL) 
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+    else if(p_Device.Internal.isInitialized == false)
+    {
+        return SIM70XX_ERR_NOT_INITIALIZED;
+    }
+
+    // The device must be active to check the operators.
+    SIM70XX_ERROR_CHECK(SIM7080_SetFunctionality(p_Device, SIM7080_FUNC_FULL));
 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_COPS_R;
@@ -330,8 +396,43 @@ SIM70XX_Error_t SIM7080_GetCurrentOperator(SIM7080_t& p_Device)
     {
         return SIM70XX_ERR_FAIL;
     }
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
+    ESP_LOGD(TAG, "Response: %s", Response.c_str());
+
+    // We start with the response
+    //      "(2,\"D1\",\"TMO D\",\"26201\",9),(2,\"CHINA MOBILE\",\"CMCC\",\"46000\",0),(1,\"CHINA MOBILE\",\"CMCC\",\"46000\",9),,(0-4),(0-2)"
+    // here.
+    // Filter out the list of supported modes and formats.
+    List = Response.substr(0, Response.find(",,"));
+
+    // Process the remaining list
+    do
+    {
+        Start = List.find("(");
+        if(Start != std::string::npos)
+        {
+            std::string Entry;
+            SIM70XX_Operator_t Operator;
+
+            // Get the next list entry.
+            Entry = List.substr(Start + 1, List.find(")") - Start - 1);
+            List.erase(Start, Entry.size() + 2);
+
+            Operator.Stat = (SIM70XX_OpStat_t)stoi(SIM70XX_Tools_SubstringSplitErase(&Entry));
+            Operator.Long = SIM70XX_Tools_SubstringSplitErase(&Entry);
+            Operator.Long.erase(std::remove(Operator.Long.begin(), Operator.Long.end(), '\"'), Operator.Long.end());
+            Operator.Short = SIM70XX_Tools_SubstringSplitErase(&Entry);
+            Operator.Short.erase(std::remove(Operator.Short.begin(), Operator.Short.end(), '\"'), Operator.Short.end());
+            Operator.Numeric = SIM70XX_Tools_SubstringSplitErase(&Entry);
+            Operator.Numeric.erase(std::remove(Operator.Numeric.begin(), Operator.Numeric.end(), '\"'), Operator.Numeric.end());
+            Operator.Act = stoi(SIM70XX_Tools_SubstringSplitErase(&Entry));
+
+            p_Operators->push_back(Operator);
+        }
+    } while(Start != std::string::npos);
+
+    return SIM70XX_ERR_OK;
 }
 
 SIM70XX_Error_t SIM7080_SetBandConfig(SIM7080_t& p_Device, SIM7080_Mode_t Mode, std::vector<uint8_t> Bands)

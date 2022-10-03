@@ -111,8 +111,6 @@ SIM70XX_Error_t SIM7020_Init(SIM7020_t& p_Device, SIM7020_Config_t& p_Config, ui
     SIM70XX_ERROR_CHECK(SIM7020_SetOperator(p_Device, SIM_MODE_MANUAL, p_Config.OperatorFormat, p_Config.Operator));
     SIM70XX_ERROR_CHECK(SIM7020_SetBand(p_Device, p_Config.Band));
     SIM70XX_ERROR_CHECK(SIM7020_Info_GetNetworkRegistrationStatus(p_Device));
-    //SIM70XX_ERROR_CHECK(SIM7020_PDP_ReadDynamicParameters(p_Device));
-    //SIM70XX_ERROR_CHECK(SIM7020_PSM_GetEventStatus(p_Device, &p_Device.Internal.isPSMEvent));
 
 /*
     SIM7020_PSM_Enable(p_Device, 3, 15, 0, 15);
@@ -123,22 +121,50 @@ SIM70XX_Error_t SIM7020_Init(SIM7020_t& p_Device, SIM7020_Config_t& p_Config, ui
     return SIM70XX_ERR_OK;
 }
 
-void SIM7020_Deinit(SIM7020_t& p_Device)
+SIM70XX_Error_t SIM7020_Deinit(SIM7020_t& p_Device, bool Skip)
 {
+    if(p_Device.Internal.isInitialized == false)
+    {
+        return SIM70XX_ERR_OK;
+    }
+
+    // Shutdown the modem.
+    if(Skip == false)
+    {
+        SIM70XX_TxCmd_t* Command;
+        std::string Response;
+
+        SIM70XX_CREATE_CMD(Command);
+        *Command = SIM7020_AT_CPOWD(true);
+        SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+        if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+        {
+            return SIM70XX_ERR_FAIL;
+        }
+
+        SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response);
+        if(Response.find("NORMAL POWER DOWN") == std::string::npos)
+        {
+            return SIM70XX_ERR_FAIL;
+        }
+    }
+
+    p_Device.Internal.isInitialized = false;
+
+    ESP_LOGI(TAG, "Modem inactive...");
+
     // Stop the receive task.
     vTaskSuspend(p_Device.Internal.TaskHandle);
     vTaskDelete(p_Device.Internal.TaskHandle);
     p_Device.Internal.TaskHandle = NULL;
 
-    // Delete the queues.
+    // Delete the message queues.
     vQueueDelete(p_Device.Internal.RxQueue);
     vQueueDelete(p_Device.Internal.TxQueue);
     vQueueDelete(p_Device.Internal.EventQueue);
 
-    // TODO: Shutdown modem
-
-    // Deinitialize the modem.
-    SIM70XX_UART_Deinit(p_Device.UART);
+    // Deinitialize the UART interface.
+    return SIM70XX_UART_Deinit(p_Device.UART);
 }
 
 #ifdef CONFIG_SIM70XX_RESET_USE_HW
@@ -208,18 +234,6 @@ SIM70XX_Error_t SIM7020_SoftReset(SIM7020_t& p_Device, uint32_t Timeout)
     return SIM70XX_ERR_FAIL;
 }
 
-SIM70XX_Error_t SIM7020_IP_AutoAPN(SIM7020_t& p_Device, SIM70XX_APN_t APN)
-{
-    // TODO:
-    return SIM70XX_ERR_OK;
-}
-
-SIM70XX_Error_t SIM7080_IP_ManualAPN(SIM7020_t& p_Device, SIM70XX_APN_t APN, uint8_t CID)
-{
-    // TODO:
-    return SIM70XX_ERR_OK;
-}
-
 SIM70XX_Error_t SIM7020_SetPSD(SIM7020_t& p_Device, SIM7020_PDP_Type_t PDP, SIM70XX_APN_t APN)
 {
     std::string CommandStr;
@@ -270,9 +284,7 @@ SIM70XX_Error_t SIM7020_SetPSD(SIM7020_t& p_Device, SIM7020_PDP_Type_t PDP, SIM7
         return Error;
     }
 
-    SIM70XX_ERROR_CHECK(SIM7020_SetFunctionality(p_Device, SIM7020_FUNC_FULL));
-
-    return SIM70XX_ERR_OK;
+    return SIM7020_SetFunctionality(p_Device, SIM7020_FUNC_FULL);
 }
 
 SIM70XX_Error_t SIM7020_SetOperator(SIM7020_t& p_Device, SIM70XX_OpMode_t Mode, SIM70XX_OpForm_t Format, std::string Operator)
@@ -303,13 +315,12 @@ SIM70XX_Error_t SIM7020_SetOperator(SIM7020_t& p_Device, SIM70XX_OpMode_t Mode, 
     return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
 }
 
-SIM70XX_Error_t SIM7020_GetOperator(SIM7020_t& p_Device, std::vector<SIM70XX_Operator_t>* p_Operator, std::string* p_Modes, std::string* p_Formats)
+SIM70XX_Error_t SIM7020_GetOperator(SIM7020_t& p_Device, SIM70XX_Operator_t* p_Operator, SIM70XX_OpMode_t* p_Mode)
 {
-    int End;
-    int Start;
-    std::string OperatorList;
+    std::string Response;
+    SIM70XX_TxCmd_t* Command;
 
-    if((p_Operator == NULL) || (p_Modes == NULL) || (p_Formats == NULL))
+    if((p_Operator == NULL) || (p_Mode == NULL))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
@@ -318,92 +329,110 @@ SIM70XX_Error_t SIM7020_GetOperator(SIM7020_t& p_Device, std::vector<SIM70XX_Ope
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
-    p_Operator->clear();
+    // The device must be active to check the operators.
+    SIM70XX_ERROR_CHECK(SIM7020_SetFunctionality(p_Device, SIM7020_FUNC_FULL));
+
+    SIM70XX_CREATE_CMD(Command);
+    *Command = SIM7020_AT_COPS;
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    {
+        return SIM70XX_ERR_FAIL;
+    }
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
+
+    ESP_LOGI(TAG, "Response: %s", Response.c_str());
+
+    if(Response.size())
+    {
+        *p_Mode = (SIM70XX_OpMode_t)stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
+        p_Operator->Format = (SIM70XX_OpForm_t)stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
+
+        if(p_Operator->Format == SIM_FORM_LONG)
+        {
+            p_Operator->Long = SIM70XX_Tools_SubstringSplitErase(&Response);
+            p_Operator->Long.erase(std::remove(p_Operator->Long.begin(), p_Operator->Long.end(), '\"'), p_Operator->Long.end());
+        }
+        if(p_Operator->Format == SIM_FORM_SHORT)
+        {
+            p_Operator->Short = SIM70XX_Tools_SubstringSplitErase(&Response);
+            p_Operator->Short.erase(std::remove(p_Operator->Short.begin(), p_Operator->Short.end(), '\"'), p_Operator->Short.end());
+        }
+        else
+        {
+            p_Operator->Numeric = SIM70XX_Tools_SubstringSplitErase(&Response);
+            p_Operator->Numeric.erase(std::remove(p_Operator->Numeric.begin(), p_Operator->Numeric.end(), '\"'), p_Operator->Numeric.end());
+        }
+
+        p_Operator->Stat = SIM_OP_CUR;
+        p_Operator->Act = stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
+    }
+
+    return SIM70XX_ERR_OK;
+}
+
+SIM70XX_Error_t SIM7020_GetAvailOperators(SIM7020_t& p_Device, std::vector<SIM70XX_Operator_t>* p_Operators)
+{
+    size_t Start;
+    std::string List;
+    std::string Response;
+    SIM70XX_TxCmd_t* Command;
+
+    if(p_Operators == NULL) 
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+    else if(p_Device.Internal.isInitialized == false)
+    {
+        return SIM70XX_ERR_NOT_INITIALIZED;
+    }
 
     // The device must be active to check the operators.
-    /*
-    Error = SIM7020_SetFunctionality(p_Device, SIM7020_FUNC_FULL);
-    if(Error)
+    SIM70XX_ERROR_CHECK(SIM7020_SetFunctionality(p_Device, SIM7020_FUNC_FULL));
+
+    SIM70XX_CREATE_CMD(Command);
+    *Command = SIM7020_AT_COPS_R;
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
-        return Error;
+        return SIM70XX_ERR_FAIL;
     }
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    _TxCommand = SIM7020_AT_COPS_R;
-    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, _TxCommand);
+    ESP_LOGD(TAG, "Response: %s", Response.c_str());
 
-    //SIM70XX_ERROR_CHECK(SIM7020_Wait(p_Device, &_RxCommand));
+    // We start with the response
+    //      "(2,\"D1\",\"TMO D\",\"26201\",9),(2,\"CHINA MOBILE\",\"CMCC\",\"46000\",0),(1,\"CHINA MOBILE\",\"CMCC\",\"46000\",9),,(0-4),(0-2)"
+    // here.
+    // Filter out the list of supported modes and formats.
+    List = Response.substr(0, Response.find(",,"));
 
-    // Get the modes list.
-    Start = _RxCommand.Response.indexOf(",,") + 3;
-    End = _RxCommand.Response.indexOf("),(", Start);
-    *p_Modes = _RxCommand.Response.substring(Start, End);
-
-    // Get the formats list.
-    *p_Formats = _RxCommand.Response.substring(End + 3, _RxCommand.Response.size() - 1);
-
-    // Get the operators list.
-    _RxCommand.Response.remove(Start, _RxCommand.Response.size() - Start);
-    OperatorList = _RxCommand.Response.substring(_RxCommand.Response.indexOf("("), _RxCommand.Response.lastIndexOf(")") + 1);
-
-    ESP_LOGD(TAG, "Operator list: %s", OperatorList.c_str());
-
-    // Get each operator.
-    String Dummy;
+    // Process the remaining list
     do
     {
-        int Start;
-
-        Start = OperatorList.indexOf("(");
-
-        Dummy = OperatorList.substring(Start, OperatorList.indexOf(")", Start));
-        OperatorList.replace(Dummy, "");
-        Dummy.replace("(", "");
-        Dummy.replace(")", "");
-
-        if(Dummy.size() > 0)
+        Start = List.find("(");
+        if(Start != std::string::npos)
         {
-            int End;
-            int Index = 0;
-            SIM7020_Operator_t Operator;
+            std::string Entry;
+            SIM70XX_Operator_t Operator;
 
-            Index = 0;
-            End = Dummy.indexOf(",", Index);
-            Operator.Stat = (SIM7020_OpStat_t)Dummy.substring(Index, End).toInt();
+            // Get the next list entry.
+            Entry = List.substr(Start + 1, List.find(")") - Start - 1);
+            List.erase(Start, Entry.size() + 2);
 
-            Index = End + 1;
-            End = Dummy.indexOf(",", Index);
-            Operator.Long = Dummy.substring(Index, End);
+            Operator.Stat = (SIM70XX_OpStat_t)stoi(SIM70XX_Tools_SubstringSplitErase(&Entry));
+            Operator.Long = SIM70XX_Tools_SubstringSplitErase(&Entry);
+            Operator.Long.erase(std::remove(Operator.Long.begin(), Operator.Long.end(), '\"'), Operator.Long.end());
+            Operator.Short = SIM70XX_Tools_SubstringSplitErase(&Entry);
+            Operator.Short.erase(std::remove(Operator.Short.begin(), Operator.Short.end(), '\"'), Operator.Short.end());
+            Operator.Numeric = SIM70XX_Tools_SubstringSplitErase(&Entry);
+            Operator.Numeric.erase(std::remove(Operator.Numeric.begin(), Operator.Numeric.end(), '\"'), Operator.Numeric.end());
+            Operator.Act = stoi(SIM70XX_Tools_SubstringSplitErase(&Entry));
 
-            Index = End + 1;
-            End = Dummy.indexOf(",", Index);
-            Operator.Short = Dummy.substring(Index, End);
-
-            Index = End + 1;
-            End = Dummy.indexOf(",", Index);
-            Operator.Numeric = Dummy.substring(Index, End);
-
-            Index = End + 1;
-            End = Dummy.indexOf(",", Index);
-            Operator.Act = Dummy.substring(Index, End).toInt();
-
-            p_Operator->push_back(Operator);
+            p_Operators->push_back(Operator);
         }
-    } while(Dummy.size() > 0);
+    } while(Start != std::string::npos);
 
-    ESP_LOGD(TAG, "Found %u operators...", p_Operator->size());
-
-    for(std::list<SIM7020_Operator_t>::const_iterator it = p_Operator->begin(); it != p_Operator->end(); ++it)
-    {
-        ESP_LOGD(TAG, "     Stat: %u", it->Stat);
-        ESP_LOGD(TAG, "     Long: %s", it->Long.c_str());
-        ESP_LOGD(TAG, "     Short: %s", it->Short.c_str());
-        ESP_LOGD(TAG, "     Numeric: %s", it->Numeric.c_str());
-        ESP_LOGD(TAG, "     Stat: %u", it->Act);
-    }
-
-    ESP_LOGD(TAG, "Modes: %s", p_Modes->c_str());
-    ESP_LOGD(TAG, "Formats: %s", p_Formats->c_str());
-*/
     return SIM70XX_ERR_OK;
 }
 
@@ -423,9 +452,8 @@ SIM70XX_Error_t SIM7020_SetBand(SIM7020_t& p_Device, SIM7020_Band_t Band)
     {
         return SIM70XX_ERR_FAIL;
     }
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
 
-    return SIM70XX_ERR_OK;
+    return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
 }
 
 SIM70XX_Error_t SIM7020_GetBand(SIM7020_t& p_Device, SIM7020_Band_t* p_Band)
