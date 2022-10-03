@@ -39,15 +39,10 @@ void SIM70XX_Evt_MessageFilter(void* p_Device, std::string* p_Message)
 	if(p_Message->find("NORMAL POWER DOWN") != std::string::npos)
 	{
 		Device->Internal.isActive = false;
-
-		// TODO: Event?
-
-		delete p_Message;
+		Processed = true;
 
 		ESP_LOGI(TAG, "Power down event!");
 	}
-
-	// TODO: New Event filter logic (see SIM7080)
 
 	if(p_Message->find("EXIT PSM") != std::string::npos)
 	{
