@@ -27,6 +27,7 @@
 #include "sim7080_dns.h"
 #include "../../Private/Queue/sim70xx_queue.h"
 #include "../../Private/Commands/sim70xx_commands.h"
+#include "../../Private/Arch/ESP32/Timer/sim70xx_timer.h"
 
 static const char* TAG = "SIM7080_DNS";
 

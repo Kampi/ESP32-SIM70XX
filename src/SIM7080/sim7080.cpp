@@ -24,10 +24,11 @@
 #include <esp_log.h>
 
 #include "sim7080.h"
-#include "../Private/Arch/ESP32/UART/sim70xx_uart.h"
 #include "../Private/Events/sim70xx_evt.h"
 #include "../Private/Queue/sim70xx_queue.h"
 #include "../Private/Commands/sim7080_commands.h"
+#include "../Private/Arch/ESP32/UART/sim70xx_uart.h"
+#include "../Private/Arch/ESP32/Timer/sim70xx_timer.h"
 
 static const char* TAG = "SIM7080";
 
@@ -260,7 +261,7 @@ SIM70XX_Error_t SIM7080_IP_AutoAPN(SIM7080_t& p_Device, SIM70XX_APN_t APN, uint8
         return SIM70XX_ERR_TIMEOUT;
     }
 
-    SIM70XX_ERROR_CHECK(SIM7080_GetOperator(p_Device));
+    //SIM70XX_ERROR_CHECK(SIM7080_GetOperator(p_Device));
     SIM70XX_ERROR_CHECK(SIM7080_PDP_IP_Configure(p_Device, SIM7080_PDP_IP_IP, APN, PDP));
 
     return SIM7080_PDP_IP_Action(p_Device, PDP, SIM7080_PDP_ENABLE);

@@ -391,12 +391,14 @@ SIM70XX_Error_t SIM7080_MQTT_Disconnect(SIM7080_t& p_Device, SIM7080_MQTT_Socket
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7080_MQTT_Destroy(SIM7080_MQTT_Socket_t* p_Socket)
+SIM70XX_Error_t SIM7080_MQTT_Destroy(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* p_Socket)
 {
     if(p_Socket == NULL)
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
+
+    (void)p_Device;
 
     p_Socket->Internal.isCreated = false;
 

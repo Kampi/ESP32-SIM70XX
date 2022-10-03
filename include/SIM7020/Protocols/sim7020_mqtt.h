@@ -107,7 +107,7 @@ SIM70XX_Error_t SIM7020_MQTT_Unsubscribe(SIM7020_t& p_Device, SIM7020_MQTT_Socke
  */
 SIM70XX_Error_t SIM7020_MQTT_Disconnect(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* p_Socket);
 
-/** @brief          Close a MQTT connection and release the socket.
+/** @brief          Release and destroy a socket.
  *  @param p_Device SIM7020 device object
  *  @param p_Socket Pointer to MQTT socket object
  *  @return         SIM70XX_ERR_OK when successful

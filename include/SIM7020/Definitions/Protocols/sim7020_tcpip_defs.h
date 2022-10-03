@@ -28,7 +28,7 @@
  */
 typedef enum
 {
-    SIM7080_TCP_ERROR_OK                = 0,        /**< No error. */
+    SIM7020_TCP_ERROR_OK                = 0,        /**< No error. */
     SIM7020_TCP_ERROR_COMMON            = -1,       /**< Common error. */
     SIM7020_TCP_ERROR_ROUTE             = 1,        /**< Route error. */
     SIM7020_TCP_ERROR_ABORT,                        /**< Connection abort error. */

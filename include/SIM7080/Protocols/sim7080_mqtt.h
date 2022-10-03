@@ -115,10 +115,11 @@ SIM70XX_Error_t SIM7080_MQTT_Unsubscribe(SIM7080_t& p_Device, SIM7080_MQTT_Socke
  */
 SIM70XX_Error_t SIM7080_MQTT_Disconnect(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* p_Socket);
 
-/** @brief          Destroy a MQTT socket.
+/** @brief          Release and destroy a socket.
+ *  @param p_Device SIM7080 device object
  *  @param p_Socket Pointer to MQTT socket object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_MQTT_Destroy(SIM7080_MQTT_Socket_t* p_Socket);
+SIM70XX_Error_t SIM7080_MQTT_Destroy(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* p_Socket);
 
 #endif /* SIM7080_MQTT_H_ */
