@@ -194,6 +194,10 @@ SIM70XX_Error_t SIM7080_TCP_Client_Transmit(SIM7080_t& p_Device, SIM7080_TCP_Soc
             if(RetryCounter < Retries)
             {
                 RetryCounter++;
+
+                // Give a short break to allow the modem to handle the error.
+                vTaskDelay(1000 / portTICK_PERIOD_MS);
+
                 continue;
             }
             else

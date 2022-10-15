@@ -35,11 +35,7 @@
 
 static const char* TAG = "SIM7080_FS";
 
-/** @brief          Initialize the file system.
- *  @param p_Device SIM7080 device object
- *  @return         SIM70XX_ERR_OK when successful
- */
-static SIM70XX_Error_t SIM7080_FS_Init(SIM7080_t& p_Device)
+SIM70XX_Error_t SIM7080_FS_Init(SIM7080_t& p_Device)
 {
     SIM70XX_TxCmd_t* Command;
 
@@ -54,11 +50,7 @@ static SIM70XX_Error_t SIM7080_FS_Init(SIM7080_t& p_Device)
     return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
 }
 
-/** @brief          Deinitialize the file system.
- *  @param p_Device SIM7080 device object
- *  @return         SIM70XX_ERR_OK when successful
- */
-static SIM70XX_Error_t SIM7080_FS_Deinit(SIM7080_t& p_Device)
+SIM70XX_Error_t SIM7080_FS_Deinit(SIM7080_t& p_Device)
 {
     SIM70XX_TxCmd_t* Command;
 

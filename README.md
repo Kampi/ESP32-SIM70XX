@@ -20,7 +20,7 @@ Multi driver for SIMCom cellular modules with UART interface.
 | NTP           | Basic         | Basic         |
 | DNS           | Advanced      | Advanced      |
 | Ping          | Basic         | Basic         |
-| GPS           |               | Not started   |
+| GPS           |               | Open          |
 | E-Mail        |               | Open          |
 | File system   |               | Basic         |
 | SSL   		    |               | Open          |

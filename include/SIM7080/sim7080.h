@@ -68,6 +68,10 @@
     #include "sim7080_coap.h"
 #endif
 
+#ifdef CONFIG_SIM70XX_DRIVER_WITH_GPS
+    #include "sim7080_gps.h"
+#endif
+
 /** @brief          Check if the module is initialized.
  *  @param p_Device SIM7080 device object
  *  @return         #true when the module is initialized

@@ -103,6 +103,7 @@ SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t& p_Conf
     SIM70XX_ERROR_CHECK(SIM7080_SetFunctionality(p_Device, SIM7080_FUNC_FULL));
 
     #ifdef CONFIG_SIM70XX_DRIVER_WITH_FS
+        SIM7080_FS_Deinit(p_Device);
         SIM70XX_ERROR_CHECK(SIM7080_FS_GetFree(p_Device, &p_Device.FS.Free));
     #endif
 

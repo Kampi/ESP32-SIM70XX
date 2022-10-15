@@ -44,7 +44,7 @@
                                                                         .OperatorFormat = SIM_FORM_NUMERIC,                 \
                                                                         .Operator = "26201",                                \
                                                                         .NetMode = SIM7080_NETMODE_LTE,                     \
-                                                                        .Mode = SIM7080_MODE_NB,                            \
+                                                                        .Mode = SIM7080_MODE_BOTH,                          \
                                                                         .Bandlist = std::vector<uint8_t>(),                 \
                                                                     };
 

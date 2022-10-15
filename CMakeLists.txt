@@ -5,6 +5,7 @@ set(COMPONENT_SRCS
     # SIM7080
     "src/SIM7080/sim7080.cpp"
     "src/SIM7080/SSL/sim7080_ssl.cpp"
+    "src/SIM7080/GPS/sim7080_gps.cpp"
     "src/SIM7080/Protocols/sim7080_ntp.cpp"
     "src/SIM7080/Protocols/sim7080_dns.cpp"
     "src/SIM7080/Protocols/sim7080_dns.cpp"
@@ -21,6 +22,7 @@ set(COMPONENT_SRCS
     "src/SIM7080/FileSystem/sim7080_fs.cpp"
     "src/SIM7080/Events/sim7080_evt.cpp"
     "src/SIM7080/Events/sim7080_evt_mqtt.cpp"
+    "src/SIM7080/Events/sim7080_evt_gps.cpp"
     "src/SIM7080/Events/sim7080_evt_tcp.cpp"
     "src/SIM7080/Events/sim7080_evt_pwrmgnt.cpp"
 
@@ -62,6 +64,7 @@ set(COMPONENT_ADD_INCLUDEDIRS
 
     # SIM7080
     "include/SIM7080"
+	"include/SIM7080/GPS"
 	"include/SIM7080/PDP"
 	"include/SIM7080/SSL"
 	"include/SIM7080/Misc"
@@ -69,6 +72,7 @@ set(COMPONENT_ADD_INCLUDEDIRS
 	"include/SIM7080/FileSystem"
 	"include/SIM7080/Definitions"
 	"include/SIM7080/PowerManagement"
+	"include/SIM7080/Definitions/GPS"
 	"include/SIM7080/Definitions/PDP"
 	"include/SIM7080/Definitions/SSL"
 	"include/SIM7080/Definitions/Misc"

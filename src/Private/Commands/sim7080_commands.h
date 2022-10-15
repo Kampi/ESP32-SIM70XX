@@ -150,4 +150,11 @@
 #define SIM7080_AT_SMTPSEND                                     SIM70XX_CMD("AT+SMTPSEND", false, 300, 1)
 #define SIM7080_AT_EMAILSSL(Type, Config)                       SIM70XX_CMD("AT+EMAILSSL=" + std::to_string(Type) + "," + std::to_string(Config), false, 1, 1)
 
+/**
+ *
+ * Used in SIM7080 GPS driver.
+ *
+ */
+#define SIM7080_AT_SGNSCMD(Command)                             SIM70XX_CMD(Command, false, 1, 1)
+
 #endif /* SIM7080_COMMANDS_H_ */
