@@ -27,16 +27,74 @@
 /** @brief          Configure the GPS module.
  *  @param p_Device SIM7080 device object
  *  @param p_Config Pointer to SIM7080 GPS configuration object
- *  @return         #true when the module is initialized
+ *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_GPS_Config(SIM7080_t& p_Device, const SIM7080_GPS_Config_t const* p_Config);
+SIM70XX_Error_t SIM7080_GPS_Config(SIM7080_t& p_Device, const SIM7080_GPS_Config_t* const p_Config);
 
-/** @brief          
+/** @brief          Perform a cold start.
  *  @param p_Device SIM7080 device object
- *  @param Power    
- *  @param p_Error  (Optional) 
- *  @return         #true when the module is initialized
+ *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_GPS_GetSingleLocation(SIM7080_t& p_Device, SIM7080_GPS_PwrLevel_t Power, SIM7080_GPS_Error_t* p_Error = NULL);
+SIM70XX_Error_t SIM7080_GPS_ColdStart(SIM7080_t& p_Device);
+
+/** @brief          Perform a warm start.
+ *  @param p_Device SIM7080 device object
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_GPS_WarmStart(SIM7080_t& p_Device);
+
+/** @brief          Perform a hot start.
+ *  @param p_Device SIM7080 device object
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_GPS_HotStart(SIM7080_t& p_Device);
+
+/** @brief          Enable / Disable GNSS power.
+ *  @param p_Device SIM7080 device object
+ *  @param Enable   Enable / Disable
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_GPS_Enable(SIM7080_t& p_Device, bool Enable);
+
+/** @brief          Get the status of the GNSS power.
+ *  @param p_Device SIM7080 device object
+ *  @param p_Enable Pointer to power enable status
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_GPS_isEnable(SIM7080_t& p_Device, bool* p_Enable);
+
+/** @brief          Turn on GNSS and get location information once.
+ *  @param p_Device SIM7080 device object
+ *  @param p_Data   Pointer to GPS data
+ *  @param Power    (Optional) Receiver power option
+ *  @param p_Error  (Optional) Pointer to GPS error
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_GPS_GetSingleLocation(SIM7080_t& p_Device, SIM7080_GPS_Data_t* p_Data, SIM7080_GPS_PwrLevel_t Power = SIM7080_GPS_PWR_FULL, SIM7080_GPS_Error_t* p_Error = NULL);
+
+/** @brief          Get the GNSS navigation information.
+ *  @param p_Device SIM7080 device object
+ *  @param p_Data   Pointer to GPS data
+ *  @param Power    (Optional) Receiver power option
+ *  @param p_Error  (Optional) Pointer to GPS error
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_GPS_GetNavInfo(SIM7080_t& p_Device, SIM7080_GPS_Info_t* p_Data);
+
+/** @brief              Turn on GNSS and start to get location informations.
+ *  @param p_Device     SIM7080 device object
+ *  @param Accuracy     (Optional) Accuracy settings
+ *  @param minDistance  (Optional) Minimum distance in meters that must be traversed between position reports. 
+ *                      Setting this interval to 0 will be a pure time-based tracking/batching.
+ *  @param minInterval  (Optional) minInterval is the minimum time interval in milliseconds that must elapse between position reports
+ *  @return             SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_GPS_Start(SIM7080_t& p_Device, SIM7080_GPS_Accuracy_t Accuracy = SIM7080_GPS_ACCURACY_LOW, uint32_t minDistance = 0, uint32_t minInterval = 1000);
+
+/** @brief          Turn off GNSS and stop listening for location informations.
+ *  @param p_Device SIM7080 device object
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_GPS_Stop(SIM7080_t& p_Device);
 
 #endif /* SIM7080_INFO_H_ */

@@ -155,6 +155,13 @@
  * Used in SIM7080 GPS driver.
  *
  */
-#define SIM7080_AT_SGNSCMD(Command)                             SIM70XX_CMD(Command, false, 1, 1)
+#define SIM7080_AT_CGNSPWR_W(Enable)                            SIM70XX_CMD("AT+CGNSPWR=" + std::to_string(Enable), false, 10, 1)
+#define SIM7080_AT_CGNSPWR_R                                    SIM70XX_CMD("AT+CGNSPWR?", true, 10, 1)
+#define SIM7080_AT_CGNSINF                                      SIM70XX_CMD("AT+CGNSINF", true, 10, 1)
+#define SIM7080_AT_CGNSCOLD                                     SIM70XX_CMD("AT+CGNSCOLD", false, 10, 1)
+#define SIM7080_AT_CGNSWARM                                     SIM70XX_CMD("AT+CGNSWARM", false, 10, 1)
+#define SIM7080_AT_CGNSHOT                                      SIM70XX_CMD("AT+CGNSHOT", false, 10, 1)
+#define SIM7080_AT_SGNSCFG(Type, Value)                         SIM70XX_CMD("AT+SGNSCFG=\"" + std::string(Type) + "\"," + std::to_string(Value), false, 1, 1)
+#define SIM7080_AT_SGNSCMD(Command)                             SIM70XX_CMD(Command, false, 10, 1)
 
 #endif /* SIM7080_COMMANDS_H_ */

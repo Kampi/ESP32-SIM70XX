@@ -70,6 +70,7 @@
 
 #ifdef CONFIG_SIM70XX_DRIVER_WITH_GPS
     #include "sim7080_gps.h"
+    #include "sim7080_config_gps.h"
 #endif
 
 /** @brief          Check if the module is initialized.

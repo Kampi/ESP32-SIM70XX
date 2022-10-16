@@ -57,6 +57,15 @@ SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t& p_Conf
         return SIM70XX_ERR_NO_MEM;
     }
 
+    #ifdef CONFIG_SIM70XX_DRIVER_WITH_GPS
+        p_Device.GPS.EventQueue = xQueueCreate(CONFIG_SIM70XX_QUEUE_LENGTH, sizeof(SIM7080_GPS_Data_t*));
+        if(p_Device.GPS.EventQueue == NULL)
+        {
+            return SIM70XX_ERR_NO_MEM;
+        }
+        p_Device.GPS.isListening = false;
+    #endif
+
     p_Device.UART.Interface = p_Config.UART.Interface;
     p_Device.UART.Rx = p_Config.UART.Rx;
     p_Device.UART.Tx = p_Config.UART.Tx;
@@ -167,6 +176,10 @@ SIM70XX_Error_t SIM7080_Deinit(SIM7080_t& p_Device, bool Skip)
     p_Device.Internal.TaskHandle = NULL;
 
     // Delete the message queues.
+    #ifdef CONFIG_SIM70XX_DRIVER_WITH_GPS
+        vQueueDelete(p_Device.GPS.EventQueue);
+    #endif
+
     vQueueDelete(p_Device.Internal.RxQueue);
     vQueueDelete(p_Device.Internal.TxQueue);
     vQueueDelete(p_Device.Internal.EventQueue);

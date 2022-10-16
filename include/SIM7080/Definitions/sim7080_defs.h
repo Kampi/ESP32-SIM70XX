@@ -178,6 +178,15 @@ typedef struct
                                                                  NOTE: Managed by the device driver. */
         } TCP;
     #endif
+    #ifdef CONFIG_SIM70XX_DRIVER_WITH_GPS
+        struct
+        {
+            bool isListening;                               /**< #true when the driver is listening for GPS data.
+                                                                 NOTE: Managed by the device driver. */
+            QueueHandle_t EventQueue;                       /**< GPS event queue.
+                                                                 NOTE: Managed by the device driver. */
+        } GPS;
+    #endif
     struct
     {
         QueueHandle_t RxQueue;                              /**< Message receive (Module -> ESP32) queue.

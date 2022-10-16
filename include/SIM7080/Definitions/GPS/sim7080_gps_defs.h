@@ -20,6 +20,7 @@
 #ifndef SIM7080_GPS_DEFS_H_
 #define SIM7080_GPS_DEFS_H_
 
+#include <string>
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -28,7 +29,7 @@
 typedef enum
 {
     SIM7080_GPS_PORT_OFF        = 0,                        /**< Turn off GNSS NMEA data output. */
-    SIM7080_GPS_PORT_USB,                                   /**< Turn on GNSS NMEA data output to USB’s NMEA port. */
+    SIM7080_GPS_PORT_USB,                                   /**< Turn on GNSS NMEA data output to USB´s NMEA port. */
     SIM7080_GPS_PORT_UART,                                  /**< Turn on GNSS NMEA data output to UART3 port. */
 } SIM7080_GPS_Port_t;
 
@@ -59,10 +60,10 @@ typedef enum
 {
     SIM7080_GPS_MODE_OFF        = 0,                        /**< Turn off GNSS. */
     SIM7080_GPS_MODE_ON_SINGLE,                             /**< Turn on GNSS and get location information once. */
-    SIM7080_GPS_MODE_ON_MULT,                               /**< Turn on GNSS and get multiple location information. */
+    SIM7080_GPS_MODE_ON_CONT,                               /**< Turn on GNSS and get multiple location information. */
 } SIM7080_GPS_Mode_t;
 
-/** @brief SIM7080 GPS power level definitions.
+/** @brief SIM7080 GPS power level options definitions.
  */
 typedef enum
 {
@@ -71,7 +72,7 @@ typedef enum
     SIM7080_GPS_PWR_LOW,                                    /**< Use only low and medium power technologies to calculate location. */
 } SIM7080_GPS_PwrLevel_t;
 
-/** @brief SIM7080 GPS accuracy definitions.
+/** @brief SIM7080 GPS accuracy options definitions.
  */
 typedef enum
 {
@@ -81,11 +82,22 @@ typedef enum
     SIM7080_GPS_ACCURACY_HIGH,                              /**< Only High Accuracy for location is acceptable. */
 } SIM7080_GPS_Accuracy_t;
 
+/** @brief SIM7080 GPS start options definitions.
+ */
+typedef enum
+{
+    SIM7080_GPS_START_HOT           = 0,                    /**< Do not delete any data. Perform hot start if the conditions are permitted after starting GNSS. */
+    SIM7080_GPS_START_WARM,                                 /**< Delete some related data. Perform warm start if the conditions are permitted after starting GNSS. */
+    SIM7080_GPS_START_COLD,                                 /**< Delete all assistance data except almanac data. Enforce cold start after starting GNSS. */
+    SIM7080_GPS_START_XTRA_COLD,                            /**< Delete all assistance data except almanac and sv health data. Enforce xtra cold start after starting GNSS. */
+    SIM7080_GPS_START_RESET,                                /**< Delete all assistance data. Enforce reset start after starting GNSS. */
+} SIM7080_GPS_Start_t;
+
 /** @brief SIM7080 GPS error codes definition.
  */
 typedef enum
 {
-    SIM7080_GPS_ERR_OK         = 0,                         /**< Device disconnected. */
+    SIM7080_GPS_ERR_OK                  = 0,                /**< Device disconnected. */
     SIM7080_GPS_ERR_FAILURE,                                /**< General failure. */
     SIM7080_GPS_ERR_CALLBACK,                               /**< Callback is missing. */
     SIM7080_GPS_ERR_PARAM,                                  /**< Invalid parameter. */
@@ -114,8 +126,51 @@ typedef struct
     uint32_t Timeout;                                       /**< Timeout for Single-shot position session. The range from 10000 to 180000 (Milliseconds).
                                                                  Set to 0 to use the default value 30000 milliseconds. */
     SIM7080_GPS_Network_t Network;                          /**< Select the GPS network. */
+    SIM7080_GPS_Start_t ADSS;                               /**< Start options. */
+    uint8_t NMEA;                                           /**< Bit mask.
+                                                                 Each bit enables an NMEA sentence output as follows:
+                                                                 Bit 0 GPGSV (GPS satellites in view).
+                                                                 Bit 1 GLGSV (GLONASS satellites in view GLONASS fixes only).
+                                                                 Bit 2 GAGSV (GALILEO satellites in view).
+                                                                 Bit 3 BDGSV/QZGSV (BEIDOU/QZSS satellites in view)
+                                                                 Bit 4 GPGSA/GLGSA/GAGSA/BDGSA/QZGSA (1. GPS/2. GLONASS/3. GALILEO/4. BEIDOU/5. QZSS)
+                                                                 Bit 5 GNVTG/GPVTG (track made good and ground speed).
+                                                                 Bit 6 GNRMC/GPRMC (recommended minimum specific GPS/TRANSIT data).
+                                                                 Bit 7 GNGGA/GPGGA (global positioning system fix data). */
     bool Flag;                                              /**< Set to #true to get GPS extra info. */
     bool EnableURC;                                         /**< Set to #true to enable navigation data URC report. */
 } SIM7080_GPS_Config_t;
+
+/** @brief SIM7080 GPS information object definition.
+ */
+typedef struct
+{
+    std::string Date;                                       /**< Date string from GPS payload.
+                                                                 NOTE: Empty when not available. */
+    std::string Time;                                       /**< Time string from GPS payload (UTC). */
+    float Latitude;                                         /**< Latitude string from GPS payload (±dd.ddddd). */
+    float Longitude;                                        /**< Longitude string from GPS payload (±ddd.ddddd). */
+    float Accuracy;                                         /**< MSL Accuracy (meters). */
+    float Altitude;                                         /**< MSL Altitude (meters). */
+    float SeaLevel;                                         /**< MSL Altitude sea level (meters). */
+    float Speed;                                            /**< Speed Over Ground (km/h). */
+    float Course;                                           /**< Course Over Ground (degrees). */
+} SIM7080_GPS_Info_t;
+
+/** @brief SIM7080 GPS data object definition.
+ */
+typedef struct
+{
+    std::string Date;                                       /**< Date string from GPS payload.
+                                                                 NOTE: Empty when not available. */
+    std::string Time;                                       /**< Time string from GPS payload (UTC). */
+    float Latitude;                                         /**< Latitude string from GPS payload (±dd.ddddd). */
+    float Longitude;                                        /**< Longitude string from GPS payload (±ddd.ddddd). */
+    float Accuracy;                                         /**< MSL Accuracy (meters). */
+    float Altitude;                                         /**< MSL Altitude (meters). */
+    float SeaLevel;                                         /**< MSL Altitude sea level (meters). */
+    float Speed;                                            /**< Speed Over Ground (km/h). */
+    float Course;                                           /**< Course Over Ground (degrees). */
+} SIM7080_GPS_Data_t;
 
 #endif /* SIM7080_GPS_DEFS_H_ */

@@ -303,8 +303,6 @@ SIM70XX_Error_t SIM7080_TCP_Client_Disconnect(SIM7080_t& p_Device, SIM7080_TCP_S
 
 SIM70XX_Error_t SIM7080_TCP_Client_Destroy(SIM7080_t& p_Device, SIM7080_TCP_Socket_t* p_Socket)
 {
-    SIM70XX_TxCmd_t* Command;
-
     if(p_Socket == NULL)
     {
         return SIM70XX_ERR_INVALID_ARG;

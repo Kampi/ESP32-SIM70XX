@@ -55,6 +55,15 @@ void SIM70XX_Evt_MessageFilter(void* p_Device, std::string* p_Message)
 		Processed = true;
 	}
 
+	#ifdef CONFIG_SIM70XX_DRIVER_WITH_GPS
+		if(p_Message->find("+SGNSCMD") != std::string::npos)
+		{
+			ESP_LOGI(TAG, "GPS event!");
+
+			SIM7080_Evt_on_GPS(Device, p_Message);
+		}
+	#endif
+
 	#ifdef CONFIG_SIM70XX_DRIVER_WITH_TCPIP
 		// NOTE: The modem can output the event messages combined. So we have to search and process each message one by one.
 		if(p_Message->find("+CASTATE") != std::string::npos)
