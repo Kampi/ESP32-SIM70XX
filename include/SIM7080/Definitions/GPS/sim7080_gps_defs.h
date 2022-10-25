@@ -145,16 +145,18 @@ typedef struct
  */
 typedef struct
 {
-    std::string Date;                                       /**< Date string from GPS payload.
-                                                                 NOTE: Empty when not available. */
-    std::string Time;                                       /**< Time string from GPS payload (UTC). */
+    std::string DateTime;                                   /**< Date & Time string from GPS payload (yyyyMMddhhmmss.sss). */
     float Latitude;                                         /**< Latitude string from GPS payload (±dd.ddddd). */
     float Longitude;                                        /**< Longitude string from GPS payload (±ddd.ddddd). */
-    float Accuracy;                                         /**< MSL Accuracy (meters). */
     float Altitude;                                         /**< MSL Altitude (meters). */
-    float SeaLevel;                                         /**< MSL Altitude sea level (meters). */
     float Speed;                                            /**< Speed Over Ground (km/h). */
     float Course;                                           /**< Course Over Ground (degrees). */
+    float HDOP;                                             /**< */
+    float PDOP;                                             /**< */
+    float VDOP;                                             /**< */
+    uint8_t Satellites;                                     /**< Satellites in view. */
+    float HPA;                                              /**< */
+    float VPA;                                              /**< */
 } SIM7080_GPS_Info_t;
 
 /** @brief SIM7080 GPS data object definition.

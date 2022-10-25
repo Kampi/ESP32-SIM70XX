@@ -56,12 +56,12 @@ SIM70XX_Error_t SIM7080_GPS_HotStart(SIM7080_t& p_Device);
  */
 SIM70XX_Error_t SIM7080_GPS_Enable(SIM7080_t& p_Device, bool Enable);
 
-/** @brief          Get the status of the GNSS power.
+/** @brief          Check if the GPS module is enabled.
  *  @param p_Device SIM7080 device object
  *  @param p_Enable Pointer to power enable status
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_GPS_isEnable(SIM7080_t& p_Device, bool* p_Enable);
+SIM70XX_Error_t SIM7080_GPS_isEnabled(SIM7080_t& p_Device, bool* p_Enable);
 
 /** @brief          Turn on GNSS and get location information once.
  *  @param p_Device SIM7080 device object
@@ -69,17 +69,19 @@ SIM70XX_Error_t SIM7080_GPS_isEnable(SIM7080_t& p_Device, bool* p_Enable);
  *  @param Power    (Optional) Receiver power option
  *  @param p_Error  (Optional) Pointer to GPS error
  *  @return         SIM70XX_ERR_OK when successful
+ *                  SIM70XX_ERR_INVALID_STATE when GNSS is already powered on. Call \ref SIM7080_GPS_Enable to disable GNSS.
  */
 SIM70XX_Error_t SIM7080_GPS_GetSingleLocation(SIM7080_t& p_Device, SIM7080_GPS_Data_t* p_Data, SIM7080_GPS_PwrLevel_t Power = SIM7080_GPS_PWR_FULL, SIM7080_GPS_Error_t* p_Error = NULL);
 
 /** @brief          Get the GNSS navigation information.
+ *                  NOTE: You have to call \ref SIM7080_GPS_Enable first to enable the GPS module power!
  *  @param p_Device SIM7080 device object
- *  @param p_Data   Pointer to GPS data
- *  @param Power    (Optional) Receiver power option
- *  @param p_Error  (Optional) Pointer to GPS error
+ *  @param p_Info   Pointer to GPS information
+ *  @param Timeout  (Optional) Power on and lock timeout in seconds
  *  @return         SIM70XX_ERR_OK when successful
+ *                  SIM70XX_ERR_INVALID_STATE when the GPS power is not enabled
  */
-SIM70XX_Error_t SIM7080_GPS_GetNavInfo(SIM7080_t& p_Device, SIM7080_GPS_Info_t* p_Data);
+SIM70XX_Error_t SIM7080_GPS_GetNavInfo(SIM7080_t& p_Device, SIM7080_GPS_Info_t* p_Info, uint32_t Timeout = 120);
 
 /** @brief              Turn on GNSS and start to get location informations.
  *  @param p_Device     SIM7080 device object

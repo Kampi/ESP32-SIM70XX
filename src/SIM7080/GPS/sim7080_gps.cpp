@@ -27,6 +27,7 @@
 #include "sim7080_gps.h"
 #include "../../Private/Queue/sim70xx_queue.h"
 #include "../../Private/Commands/sim70xx_commands.h"
+#include "../../Private/Arch/ESP32/Timer/sim70xx_timer.h"
 
 static const char* TAG = "SIM7080_GPS";
 
@@ -203,7 +204,7 @@ SIM70XX_Error_t SIM7080_GPS_Enable(SIM7080_t& p_Device, bool Enable)
     return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
 }
 
-SIM70XX_Error_t SIM7080_GPS_isEnable(SIM7080_t& p_Device, bool* p_Enable)
+SIM70XX_Error_t SIM7080_GPS_isEnabled(SIM7080_t& p_Device, bool* p_Enable)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;
@@ -226,13 +227,14 @@ SIM70XX_Error_t SIM7080_GPS_isEnable(SIM7080_t& p_Device, bool* p_Enable)
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    *p_Enable = (bool)std::stoi(Response);
+    *p_Enable = (bool)SIM70XX_Tools_StringToUnsigned(Response);
 
     return SIM70XX_ERR_OK;
 }
 
 SIM70XX_Error_t SIM7080_GPS_GetSingleLocation(SIM7080_t& p_Device, SIM7080_GPS_Data_t* p_Data, SIM7080_GPS_PwrLevel_t Power, SIM7080_GPS_Error_t* p_Error)
 {
+    bool Enabled;
     SIM70XX_TxCmd_t* Command;
     SIM7080_GPS_Error_t Error;
 
@@ -243,6 +245,13 @@ SIM70XX_Error_t SIM7080_GPS_GetSingleLocation(SIM7080_t& p_Device, SIM7080_GPS_D
     else if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
+    }
+
+    // Check if GPS is enabled.
+    SIM70XX_ERROR_CHECK(SIM7080_GPS_isEnabled(p_Device, &Enabled));
+    if(Enabled)
+    {
+        return SIM70XX_ERR_INVALID_STATE;
     }
 
     SIM70XX_CREATE_CMD(Command);
@@ -271,13 +280,13 @@ SIM70XX_Error_t SIM7080_GPS_GetSingleLocation(SIM7080_t& p_Device, SIM7080_GPS_D
             SIM70XX_Tools_SubstringSplitErase(&Event);
 
             p_Data->Time = SIM70XX_Tools_SubstringSplitErase(&Event);
-            p_Data->Latitude = std::stof(SIM70XX_Tools_SubstringSplitErase(&Event));
-            p_Data->Longitude = std::stof(SIM70XX_Tools_SubstringSplitErase(&Event));
-            p_Data->Accuracy = std::stof(SIM70XX_Tools_SubstringSplitErase(&Event));
-            p_Data->Altitude = std::stof(SIM70XX_Tools_SubstringSplitErase(&Event));
-            p_Data->SeaLevel = std::stof(SIM70XX_Tools_SubstringSplitErase(&Event));
-            p_Data->Speed = std::stof(SIM70XX_Tools_SubstringSplitErase(&Event));
-            p_Data->Course = std::stof(SIM70XX_Tools_SubstringSplitErase(&Event));
+            p_Data->Latitude = SIM70XX_Tools_StringToFloat(SIM70XX_Tools_SubstringSplitErase(&Event));
+            p_Data->Longitude = SIM70XX_Tools_StringToFloat(SIM70XX_Tools_SubstringSplitErase(&Event));
+            p_Data->Accuracy = SIM70XX_Tools_StringToFloat(SIM70XX_Tools_SubstringSplitErase(&Event));
+            p_Data->Altitude = SIM70XX_Tools_StringToFloat(SIM70XX_Tools_SubstringSplitErase(&Event));
+            p_Data->SeaLevel = SIM70XX_Tools_StringToFloat(SIM70XX_Tools_SubstringSplitErase(&Event));
+            p_Data->Speed = SIM70XX_Tools_StringToFloat(SIM70XX_Tools_SubstringSplitErase(&Event));
+            p_Data->Course = SIM70XX_Tools_StringToFloat(SIM70XX_Tools_SubstringSplitErase(&Event));
 
             break;
         }
@@ -293,11 +302,14 @@ SIM70XX_Error_t SIM7080_GPS_GetSingleLocation(SIM7080_t& p_Device, SIM7080_GPS_D
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7080_GPS_GetNavInfo(SIM7080_t& p_Device, SIM7080_GPS_Info_t* p_Data)
+SIM70XX_Error_t SIM7080_GPS_GetNavInfo(SIM7080_t& p_Device, SIM7080_GPS_Info_t* p_Info, uint32_t Timeout)
 {
+    bool Enabled;
+    uint32_t Now;
+    std::string Response;
     SIM70XX_TxCmd_t* Command;
 
-    if(p_Data == NULL)
+    if(p_Info == NULL)
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
@@ -306,14 +318,97 @@ SIM70XX_Error_t SIM7080_GPS_GetNavInfo(SIM7080_t& p_Device, SIM7080_GPS_Info_t* 
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
-    SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7080_AT_CGNSINF;
-    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    // Check if GPS is enabled.
+    SIM70XX_ERROR_CHECK(SIM7080_GPS_isEnabled(p_Device, &Enabled));
+    if(Enabled == false)
     {
-        return SIM70XX_ERR_NOT_READY;
+        ESP_LOGE(TAG, "GPS not enabled!");
+
+        return SIM70XX_ERR_INVALID_STATE;
     }
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
+
+    Enabled = false;
+    Now = SIM70XX_Timer_GetMilliseconds();
+    do
+    {
+        SIM70XX_CREATE_CMD(Command);
+        *Command = SIM7080_AT_CGNSINF;
+        SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+        if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+        {
+            return SIM70XX_ERR_NOT_READY;
+        }
+        SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
+
+        // Check if GPS is on.
+        if((bool)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response)))
+        {
+            std::string Substring;
+
+            ESP_LOGI(TAG, "GPS enabled...");
+
+            Substring = SIM70XX_Tools_SubstringSplitErase(&Response);
+            if(Substring.size() > 0)
+            {
+                Enabled = (bool)SIM70XX_Tools_StringToUnsigned(Substring);
+            }
+            else
+            {
+                Enabled = false;
+            }
+
+            // Check if GPS is locked.
+            if(Enabled)
+            {
+                ESP_LOGI(TAG, "GPS locked...");
+
+                p_Info->DateTime = SIM70XX_Tools_SubstringSplitErase(&Response);
+                p_Info->Latitude = SIM70XX_Tools_StringToFloat(SIM70XX_Tools_SubstringSplitErase(&Response));
+                p_Info->Longitude = SIM70XX_Tools_StringToFloat(SIM70XX_Tools_SubstringSplitErase(&Response));
+                p_Info->Altitude = SIM70XX_Tools_StringToFloat(SIM70XX_Tools_SubstringSplitErase(&Response));
+                p_Info->Speed = SIM70XX_Tools_StringToFloat(SIM70XX_Tools_SubstringSplitErase(&Response));
+                p_Info->Course = SIM70XX_Tools_StringToFloat(SIM70XX_Tools_SubstringSplitErase(&Response));
+
+                // Fix mode.
+                SIM70XX_Tools_SubstringSplitErase(&Response);
+
+                // Reserved.
+                SIM70XX_Tools_SubstringSplitErase(&Response);
+
+                p_Info->HDOP = SIM70XX_Tools_StringToFloat(SIM70XX_Tools_SubstringSplitErase(&Response));
+                p_Info->PDOP = SIM70XX_Tools_StringToFloat(SIM70XX_Tools_SubstringSplitErase(&Response));
+                p_Info->VDOP = SIM70XX_Tools_StringToFloat(SIM70XX_Tools_SubstringSplitErase(&Response));
+
+                // Reserved.
+                SIM70XX_Tools_SubstringSplitErase(&Response);
+
+                p_Info->Satellites = (uint8_t)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response));
+
+                // Reserved.
+                SIM70XX_Tools_SubstringSplitErase(&Response);
+
+                p_Info->HPA = SIM70XX_Tools_StringToFloat(SIM70XX_Tools_SubstringSplitErase(&Response));
+                p_Info->VPA = SIM70XX_Tools_StringToFloat(SIM70XX_Tools_SubstringSplitErase(&Response));
+
+                break;
+            }
+            else
+            {
+                ESP_LOGI(TAG, "GPS not locked...");
+            }
+        }
+        else
+        {
+            ESP_LOGI(TAG, "GPS not enabled...");
+        }
+
+        if((SIM70XX_Timer_GetMilliseconds() - Now) > (Timeout * 1000UL))
+        {
+            return SIM70XX_ERR_TIMEOUT;
+        }
+
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    } while (true);
 
     return SIM70XX_ERR_OK;
 }
