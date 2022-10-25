@@ -22,6 +22,7 @@
 
 #include <mbedtls/base64.h>
 
+#include <cmath>
 #include <stdio.h>
 
 #include "sim70xx_tools.h"
@@ -339,7 +340,7 @@ SIM70XX_Error_t SIM70XX_Tools_SetBaudrate(SIM70XX_UART_Conf_t& p_Config, SIM70XX
 std::string SIM70XX_Tools_SubstringSplitErase(std::string* p_Input, std::string Delimiter)
 {
     size_t Index;
-    std::string Result = *p_Input;
+    std::string Result = std::string();
 
     assert(p_Input);
 
@@ -347,9 +348,77 @@ std::string SIM70XX_Tools_SubstringSplitErase(std::string* p_Input, std::string 
     if(Index != std::string::npos)
     {
         Result = p_Input->substr(0, Index);
+        p_Input->erase(0, Index + 1);
     }
 
-    p_Input->erase(0, Index + 1);
-
     return Result;
+}
+
+uint32_t SIM70XX_Tools_StringToUnsigned(std::string Input)
+{
+    #if __cpp_exceptions
+        try
+        {
+            return (uint32_t)std::stoi(Input);
+        }
+        catch(...)
+        {
+            return INT_MAX;
+        }
+    #else
+        if(Input.size() > 0)
+        {
+            return (uint32_t)std::stoi(Input);
+        }
+        else
+        {
+            return INT_MAX;
+        }
+    #endif
+}
+
+int32_t SIM70XX_Tools_StringToSigned(std::string Input)
+{
+    #if __cpp_exceptions
+        try
+        {
+            return (int32_t)std::stoi(Input);
+        }
+        catch(...)
+        {
+            return INT_MAX;
+        }
+    #else
+        if(Input.size() > 0)
+        {
+            return (int32_t)std::stoi(Input);
+        }
+        else
+        {
+            return INT_MAX;
+        }
+    #endif
+}
+
+float SIM70XX_Tools_StringToFloat(std::string Input)
+{
+    #if __cpp_exceptions
+        try
+        {
+            return std::stof(Input);
+        }
+        catch(...)
+        {
+            return std::nanf("");
+        }
+    #else
+        if(Input.size() > 0)
+        {
+            return std::stof(Input);
+        }
+        else
+        {
+            return std::nanf("");
+        }
+    #endif
 }

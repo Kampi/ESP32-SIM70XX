@@ -121,4 +121,22 @@ SIM70XX_Error_t SIM70XX_Tools_SetBaudrate(SIM70XX_UART_Conf_t& p_Config, SIM70XX
  */
 std::string SIM70XX_Tools_SubstringSplitErase(std::string* p_Input, std::string Delimiter = ",");
 
+/** @brief          Perform an error check and convert the input string into a unsigned value.
+ *  @param Input    Input value as string
+ *  @return         Unsigned integer or INT_MAX when the input is invalid
+ */
+uint32_t SIM70XX_Tools_StringToUnsigned(std::string Input);
+
+/** @brief          Perform an error check and convert the input string into a signed value.
+ *  @param Input    Input value as string
+ *  @return         Unsigned integer or INT_MAX when the input is invalid
+ */
+int32_t SIM70XX_Tools_StringToSigned(std::string Input);
+
+/** @brief          Perform an error check and convert the input string into a floating point value.
+ *  @param Input    Input value as string
+ *  @return         Float number or NaN when the input is invalid
+ */
+float SIM70XX_Tools_StringToFloat(std::string Input);
+
 #endif /* SIM70XX_TOOLS_H_ */
