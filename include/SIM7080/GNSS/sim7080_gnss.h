@@ -1,5 +1,5 @@
  /*
- * sim7080_gps.h
+ * sim7080_gnss.h
  * 
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -17,51 +17,51 @@
  * Errors and commissions should be reported to DanielKampert@kampis-elektroecke.de.
  */
 
-#ifndef SIM7080_GPS_H_
-#define SIM7080_GPS_H_
+#ifndef SIM7080_GNSS_H_
+#define SIM7080_GNSS_H_
 
 #include "sim70xx_errors.h"
 #include "sim7080_defs.h"
-#include "sim7080_gps_defs.h"
+#include "sim7080_gnss_defs.h"
 
 /** @brief          Configure the GPS module.
  *  @param p_Device SIM7080 device object
  *  @param p_Config Pointer to SIM7080 GPS configuration object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_GPS_Config(SIM7080_t& p_Device, const SIM7080_GPS_Config_t* const p_Config);
+SIM70XX_Error_t SIM7080_GNSS_Config(SIM7080_t& p_Device, const SIM7080_GNSS_Config_t* const p_Config);
 
 /** @brief          Perform a cold start.
  *  @param p_Device SIM7080 device object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_GPS_ColdStart(SIM7080_t& p_Device);
+SIM70XX_Error_t SIM7080_GNSS_ColdStart(SIM7080_t& p_Device);
 
 /** @brief          Perform a warm start.
  *  @param p_Device SIM7080 device object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_GPS_WarmStart(SIM7080_t& p_Device);
+SIM70XX_Error_t SIM7080_GNSS_WarmStart(SIM7080_t& p_Device);
 
 /** @brief          Perform a hot start.
  *  @param p_Device SIM7080 device object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_GPS_HotStart(SIM7080_t& p_Device);
+SIM70XX_Error_t SIM7080_GNSS_HotStart(SIM7080_t& p_Device);
 
 /** @brief          Enable / Disable GNSS power.
  *  @param p_Device SIM7080 device object
  *  @param Enable   Enable / Disable
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_GPS_Enable(SIM7080_t& p_Device, bool Enable);
+SIM70XX_Error_t SIM7080_GNSS_Enable(SIM7080_t& p_Device, bool Enable);
 
 /** @brief          Check if the GPS module is enabled.
  *  @param p_Device SIM7080 device object
  *  @param p_Enable Pointer to power enable status
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_GPS_isEnabled(SIM7080_t& p_Device, bool* p_Enable);
+SIM70XX_Error_t SIM7080_GNSS_isEnabled(SIM7080_t& p_Device, bool* p_Enable);
 
 /** @brief          Turn on GNSS and get location information once.
  *  @param p_Device SIM7080 device object
@@ -69,19 +69,19 @@ SIM70XX_Error_t SIM7080_GPS_isEnabled(SIM7080_t& p_Device, bool* p_Enable);
  *  @param Power    (Optional) Receiver power option
  *  @param p_Error  (Optional) Pointer to GPS error
  *  @return         SIM70XX_ERR_OK when successful
- *                  SIM70XX_ERR_INVALID_STATE when GNSS is already powered on. Call \ref SIM7080_GPS_Enable to disable GNSS.
+ *                  SIM70XX_ERR_INVALID_STATE when GNSS is already powered on. Call \ref SIM7080_GNSS_Enable to disable GNSS.
  */
-SIM70XX_Error_t SIM7080_GPS_GetSingleLocation(SIM7080_t& p_Device, SIM7080_GPS_Data_t* p_Data, SIM7080_GPS_PwrLevel_t Power = SIM7080_GPS_PWR_FULL, SIM7080_GPS_Error_t* p_Error = NULL);
+SIM70XX_Error_t SIM7080_GNSS_GetSingleLocation(SIM7080_t& p_Device, SIM7080_GNSS_Data_t* p_Data, SIM7080_GNSS_PwrLevel_t Power = SIM7080_GNSS_PWR_FULL, SIM7080_GNSS_Error_t* p_Error = NULL);
 
 /** @brief          Get the GNSS navigation information.
- *                  NOTE: You have to call \ref SIM7080_GPS_Enable first to enable the GPS module power!
+ *                  NOTE: You have to call \ref SIM7080_GNSS_Enable first to enable the GPS module power!
  *  @param p_Device SIM7080 device object
  *  @param p_Info   Pointer to GPS information
  *  @param Timeout  (Optional) Power on and lock timeout in seconds
  *  @return         SIM70XX_ERR_OK when successful
  *                  SIM70XX_ERR_INVALID_STATE when the GPS power is not enabled
  */
-SIM70XX_Error_t SIM7080_GPS_GetNavInfo(SIM7080_t& p_Device, SIM7080_GPS_Info_t* p_Info, uint32_t Timeout = 120);
+SIM70XX_Error_t SIM7080_GNSS_GetNavInfo(SIM7080_t& p_Device, SIM7080_GNSS_Info_t* p_Info, uint32_t Timeout = 120);
 
 /** @brief              Turn on GNSS and start to get location informations.
  *  @param p_Device     SIM7080 device object
@@ -91,12 +91,12 @@ SIM70XX_Error_t SIM7080_GPS_GetNavInfo(SIM7080_t& p_Device, SIM7080_GPS_Info_t* 
  *  @param minInterval  (Optional) minInterval is the minimum time interval in milliseconds that must elapse between position reports
  *  @return             SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_GPS_Start(SIM7080_t& p_Device, SIM7080_GPS_Accuracy_t Accuracy = SIM7080_GPS_ACCURACY_LOW, uint32_t minDistance = 0, uint32_t minInterval = 1000);
+SIM70XX_Error_t SIM7080_GNSS_Start(SIM7080_t& p_Device, SIM7080_GNSS_Accuracy_t Accuracy = SIM7080_GNSS_ACCURACY_LOW, uint32_t minDistance = 0, uint32_t minInterval = 1000);
 
 /** @brief          Turn off GNSS and stop listening for location informations.
  *  @param p_Device SIM7080 device object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_GPS_Stop(SIM7080_t& p_Device);
+SIM70XX_Error_t SIM7080_GNSS_Stop(SIM7080_t& p_Device);
 
 #endif /* SIM7080_INFO_H_ */

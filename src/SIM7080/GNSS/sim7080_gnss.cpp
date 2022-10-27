@@ -1,5 +1,5 @@
  /*
- * sim7080_gps.cpp
+ * sim7080_gnss.cpp
  * 
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -19,25 +19,25 @@
 
 #include <sdkconfig.h>
 
-#if((CONFIG_SIMXX_DEV == 7080) && (defined CONFIG_SIM70XX_DRIVER_WITH_GPS))
+#if((CONFIG_SIMXX_DEV == 7080) && (defined CONFIG_SIM70XX_DRIVER_WITH_GNSS))
 
 #include <esp_log.h>
 
 #include "sim7080.h"
-#include "sim7080_gps.h"
+#include "sim7080_gnss.h"
 #include "../../Private/Queue/sim70xx_queue.h"
 #include "../../Private/Commands/sim70xx_commands.h"
 #include "../../Private/Arch/ESP32/Timer/sim70xx_timer.h"
 
-static const char* TAG = "SIM7080_GPS";
+static const char* TAG = "SIM7080_GNSS";
 
-SIM70XX_Error_t SIM7080_GPS_Config(SIM7080_t& p_Device, const SIM7080_GPS_Config_t* const p_Config)
+SIM70XX_Error_t SIM7080_GNSS_Config(SIM7080_t& p_Device, const SIM7080_GNSS_Config_t* const p_Config)
 {
     uint16_t Threshold;
     uint32_t Timeout;
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Config == NULL) || (p_Config->Port != SIM7080_GPS_PORT_OFF) ||
+    if((p_Config == NULL) || (p_Config->Port != SIM7080_GNSS_PORT_OFF) ||
        ((p_Config->Threshold > 0) && (p_Config->Threshold > 10000)) ||
        ((p_Config->Timeout > 0) && ((p_Config->Timeout < 10000) || (p_Config->Timeout > 180000)))
        )
@@ -128,7 +128,7 @@ SIM70XX_Error_t SIM7080_GPS_Config(SIM7080_t& p_Device, const SIM7080_GPS_Config
     return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
 }
 
-SIM70XX_Error_t SIM7080_GPS_ColdStart(SIM7080_t& p_Device)
+SIM70XX_Error_t SIM7080_GNSS_ColdStart(SIM7080_t& p_Device)
 {
     SIM70XX_TxCmd_t* Command;
 
@@ -147,7 +147,7 @@ SIM70XX_Error_t SIM7080_GPS_ColdStart(SIM7080_t& p_Device)
     return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
 }
 
-SIM70XX_Error_t SIM7080_GPS_WarmStart(SIM7080_t& p_Device)
+SIM70XX_Error_t SIM7080_GNSS_WarmStart(SIM7080_t& p_Device)
 {
     SIM70XX_TxCmd_t* Command;
 
@@ -166,7 +166,7 @@ SIM70XX_Error_t SIM7080_GPS_WarmStart(SIM7080_t& p_Device)
     return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
 }
 
-SIM70XX_Error_t SIM7080_GPS_HotStart(SIM7080_t& p_Device)
+SIM70XX_Error_t SIM7080_GNSS_HotStart(SIM7080_t& p_Device)
 {
     SIM70XX_TxCmd_t* Command;
 
@@ -185,7 +185,7 @@ SIM70XX_Error_t SIM7080_GPS_HotStart(SIM7080_t& p_Device)
     return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
 }
 
-SIM70XX_Error_t SIM7080_GPS_Enable(SIM7080_t& p_Device, bool Enable)
+SIM70XX_Error_t SIM7080_GNSS_Enable(SIM7080_t& p_Device, bool Enable)
 {
     SIM70XX_TxCmd_t* Command;
 
@@ -204,7 +204,7 @@ SIM70XX_Error_t SIM7080_GPS_Enable(SIM7080_t& p_Device, bool Enable)
     return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
 }
 
-SIM70XX_Error_t SIM7080_GPS_isEnabled(SIM7080_t& p_Device, bool* p_Enable)
+SIM70XX_Error_t SIM7080_GNSS_isEnabled(SIM7080_t& p_Device, bool* p_Enable)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;
@@ -232,11 +232,11 @@ SIM70XX_Error_t SIM7080_GPS_isEnabled(SIM7080_t& p_Device, bool* p_Enable)
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7080_GPS_GetSingleLocation(SIM7080_t& p_Device, SIM7080_GPS_Data_t* p_Data, SIM7080_GPS_PwrLevel_t Power, SIM7080_GPS_Error_t* p_Error)
+SIM70XX_Error_t SIM7080_GNSS_GetSingleLocation(SIM7080_t& p_Device, SIM7080_GNSS_Data_t* p_Data, SIM7080_GNSS_PwrLevel_t Power, SIM7080_GNSS_Error_t* p_Error)
 {
     bool Enabled;
     SIM70XX_TxCmd_t* Command;
-    SIM7080_GPS_Error_t Error;
+    SIM7080_GNSS_Error_t Error;
 
     if(p_Data == NULL)
     {
@@ -248,14 +248,14 @@ SIM70XX_Error_t SIM7080_GPS_GetSingleLocation(SIM7080_t& p_Device, SIM7080_GPS_D
     }
 
     // Check if GPS is enabled.
-    SIM70XX_ERROR_CHECK(SIM7080_GPS_isEnabled(p_Device, &Enabled));
+    SIM70XX_ERROR_CHECK(SIM7080_GNSS_isEnabled(p_Device, &Enabled));
     if(Enabled)
     {
         return SIM70XX_ERR_INVALID_STATE;
     }
 
     SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7080_AT_SGNSCMD(std::string("AT+SGNSCMD=" + std::to_string(SIM7080_GPS_MODE_ON_SINGLE) + "," + std::to_string(Power)));
+    *Command = SIM7080_AT_SGNSCMD(std::string("AT+SGNSCMD=" + std::to_string(SIM7080_GNSS_MODE_ON_SINGLE) + "," + std::to_string(Power)));
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
     if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
@@ -263,7 +263,7 @@ SIM70XX_Error_t SIM7080_GPS_GetSingleLocation(SIM7080_t& p_Device, SIM7080_GPS_D
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
 
-    Error = SIM7080_GPS_ERR_OK;
+    Error = SIM7080_GNSS_ERR_OK;
     while(true)
     {
         std::string Event;
@@ -302,7 +302,7 @@ SIM70XX_Error_t SIM7080_GPS_GetSingleLocation(SIM7080_t& p_Device, SIM7080_GPS_D
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7080_GPS_GetNavInfo(SIM7080_t& p_Device, SIM7080_GPS_Info_t* p_Info, uint32_t Timeout)
+SIM70XX_Error_t SIM7080_GNSS_GetNavInfo(SIM7080_t& p_Device, SIM7080_GNSS_Info_t* p_Info, uint32_t Timeout)
 {
     bool Enabled;
     uint32_t Now;
@@ -319,7 +319,7 @@ SIM70XX_Error_t SIM7080_GPS_GetNavInfo(SIM7080_t& p_Device, SIM7080_GPS_Info_t* 
     }
 
     // Check if GPS is enabled.
-    SIM70XX_ERROR_CHECK(SIM7080_GPS_isEnabled(p_Device, &Enabled));
+    SIM70XX_ERROR_CHECK(SIM7080_GNSS_isEnabled(p_Device, &Enabled));
     if(Enabled == false)
     {
         ESP_LOGE(TAG, "GPS not enabled!");
@@ -413,7 +413,7 @@ SIM70XX_Error_t SIM7080_GPS_GetNavInfo(SIM7080_t& p_Device, SIM7080_GPS_Info_t* 
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7080_GPS_Start(SIM7080_t& p_Device, SIM7080_GPS_Accuracy_t Accuracy, uint32_t minDistance, uint32_t minInterval)
+SIM70XX_Error_t SIM7080_GNSS_Start(SIM7080_t& p_Device, SIM7080_GNSS_Accuracy_t Accuracy, uint32_t minDistance, uint32_t minInterval)
 {
     SIM70XX_TxCmd_t* Command;
 
@@ -423,7 +423,7 @@ SIM70XX_Error_t SIM7080_GPS_Start(SIM7080_t& p_Device, SIM7080_GPS_Accuracy_t Ac
     }
 
     SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7080_AT_SGNSCMD(std::string("AT+SGNSCMD=" + std::to_string(SIM7080_GPS_MODE_ON_CONT) + "," + std::to_string(minInterval) + "," + std::to_string(minDistance) + "," + std::to_string(Accuracy)));
+    *Command = SIM7080_AT_SGNSCMD(std::string("AT+SGNSCMD=" + std::to_string(SIM7080_GNSS_MODE_ON_CONT) + "," + std::to_string(minInterval) + "," + std::to_string(minDistance) + "," + std::to_string(Accuracy)));
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
     if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
@@ -431,12 +431,12 @@ SIM70XX_Error_t SIM7080_GPS_Start(SIM7080_t& p_Device, SIM7080_GPS_Accuracy_t Ac
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
 
-    p_Device.GPS.isListening = true;
+    p_Device.GNSS.isListening = true;
 
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7080_GPS_Stop(SIM7080_t& p_Device)
+SIM70XX_Error_t SIM7080_GNSS_Stop(SIM7080_t& p_Device)
 {
     SIM70XX_TxCmd_t* Command;
 
@@ -444,13 +444,13 @@ SIM70XX_Error_t SIM7080_GPS_Stop(SIM7080_t& p_Device)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
-    else if(p_Device.GPS.isListening == false)
+    else if(p_Device.GNSS.isListening == false)
     {
         return SIM70XX_ERR_OK;
     }
 
     SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7080_AT_SGNSCMD(std::string("AT+SGNSCMD=" + std::to_string(SIM7080_GPS_MODE_OFF)));
+    *Command = SIM7080_AT_SGNSCMD(std::string("AT+SGNSCMD=" + std::to_string(SIM7080_GNSS_MODE_OFF)));
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
     if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
     {
@@ -458,7 +458,7 @@ SIM70XX_Error_t SIM7080_GPS_Stop(SIM7080_t& p_Device)
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
 
-    p_Device.GPS.isListening = false;
+    p_Device.GNSS.isListening = false;
 
     return SIM70XX_ERR_OK;
 }
