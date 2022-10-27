@@ -121,7 +121,7 @@ typedef enum
  */
 typedef enum
 {
-    SIM7080_NET_NOT_SEARCHING = 0,                          /**< Not registered, MT is not currently searching an operator to
+    SIM7080_NET_NOT_SEARCHING   = 0,                        /**< Not registered, MT is not currently searching an operator to
                                                                  register to. The GPRS service is disabled, the UE is allowed to attach
                                                                  for GPRS if requested by the user. */
     SIM7080_NET_REG_HOME,                                   /**< Registered, home network. */
@@ -178,14 +178,14 @@ typedef struct
                                                                  NOTE: Managed by the device driver. */
         } TCP;
     #endif
-    #ifdef CONFIG_SIM70XX_DRIVER_WITH_GPS
+    #ifdef CONFIG_SIM70XX_DRIVER_WITH_GNSS
         struct
         {
-            bool isListening;                               /**< #true when the driver is listening for GPS data.
+            bool isListening;                               /**< #true when the driver is listening for GNSS data.
                                                                  NOTE: Managed by the device driver. */
-            QueueHandle_t EventQueue;                       /**< GPS event queue.
+            QueueHandle_t EventQueue;                       /**< GNSS event queue.
                                                                  NOTE: Managed by the device driver. */
-        } GPS;
+        } GNSS;
     #endif
     struct
     {

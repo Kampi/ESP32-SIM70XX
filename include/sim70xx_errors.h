@@ -74,7 +74,7 @@ typedef int SIM70XX_Error_t;
  */
 #define SIM70XX_ERR_QUEUE_FULL                                  SIM70XX_ERR_BASE + 9
 
-/** @brief The message queue is empty.
+/** @brief Empty message queue.
  */
 #define SIM70XX_ERR_QUEUE_EMPTY                                 SIM70XX_ERR_BASE + 10
 
@@ -82,11 +82,11 @@ typedef int SIM70XX_Error_t;
  */
 #define SIM70XX_ERR_NOT_CREATED                                 SIM70XX_ERR_BASE + 11
 
-/** @brief Not connected error.
+/** @brief Device not connected.
  */
 #define SIM70XX_ERR_NOT_CONNECTED                               SIM70XX_ERR_BASE + 12
 
-/** @brief No Update available
+/** @brief No Update available.
  */
 #define SIM70XX_ERR_NO_UPDATE                                   SIM70XX_ERR_BASE + 13
 

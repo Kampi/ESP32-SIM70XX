@@ -20,10 +20,6 @@
 #ifndef SIM70XX_TOOLS_H_
 #define SIM70XX_TOOLS_H_
 
-#include <string>
-#include <stdint.h>
-#include <stdbool.h>
-
 #include "sim70xx_defs.h"
 #include "sim70xx_errors.h"
 
@@ -116,7 +112,7 @@ SIM70XX_Error_t SIM70XX_Tools_SetBaudrate(SIM70XX_UART_Conf_t& p_Config, SIM70XX
 /** @brief              Get a substring from the input string. The substring is delimited by the given delimiter.
  *  @param p_Input      Pointer to input string
  *                      NOTE: The input string will be modified!
- *  @param Delimiter    Substring delimiter
+ *  @param Delimiter    (Optional) Substring delimiter
  *  @return             Substring
  */
 std::string SIM70XX_Tools_SubstringSplitErase(std::string* p_Input, std::string Delimiter = ",");
