@@ -44,7 +44,6 @@ SIM70XX_Error_t SIM7080_MQTT_Create(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* 
     p_Socket->Port = Port;
     p_Socket->ClientID = "SIM7080-MQTT";
     p_Socket->CleanSession = true;
-    p_Socket->QoS = SIM7080_MQTT_QOS_0;
 
     return SIM7080_MQTT_Create(p_Device, p_Socket);
 }
@@ -103,24 +102,52 @@ SIM70XX_Error_t SIM7080_MQTT_Create(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* 
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
 
-    CommandStr = "AT+SMCONF=\"QOS\"," + std::to_string(p_Socket->QoS);
-    SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7080_AT_SMCONF(CommandStr);
-    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
-    {
-        return SIM70XX_ERR_FAIL;
-    }
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
-
     if(p_Socket->p_LastWill != NULL)
     {
-        // TODO:
+        CommandStr = "AT+SMCONF=\"QOS\"," + std::to_string(p_Socket->p_LastWill->QoS);
+        SIM70XX_CREATE_CMD(Command);
+        *Command = SIM7080_AT_SMCONF(CommandStr);
+        SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+        if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+        {
+            return SIM70XX_ERR_FAIL;
+        }
+        SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
+
+        CommandStr = "AT+SMCONF=\"TOPIC\",\"" + p_Socket->p_LastWill->Topic + "\"";
+        SIM70XX_CREATE_CMD(Command);
+        *Command = SIM7080_AT_SMCONF(CommandStr);
+        SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+        if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+        {
+            return SIM70XX_ERR_FAIL;
+        }
+        SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
+
+        CommandStr = "AT+SMCONF=\"MESSAGE\",\"" + p_Socket->p_LastWill->Message + "\"";
+        SIM70XX_CREATE_CMD(Command);
+        *Command = SIM7080_AT_SMCONF(CommandStr);
+        SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+        if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+        {
+            return SIM70XX_ERR_FAIL;
+        }
+        SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
+
+        CommandStr = "AT+SMCONF=\"RETAIN\"," + std::to_string(p_Socket->p_LastWill->Retained);
+        SIM70XX_CREATE_CMD(Command);
+        *Command = SIM7080_AT_SMCONF(CommandStr);
+        SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+        if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+        {
+            return SIM70XX_ERR_FAIL;
+        }
+        SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
     }
 
     if(p_Socket->Username.size() > 0)
     {
-        CommandStr = "AT+SMCONF=\"USERNAME\"," + p_Socket->Username + "\"";
+        CommandStr = "AT+SMCONF=\"USERNAME\",\"" + p_Socket->Username + "\"";
         SIM70XX_CREATE_CMD(Command);
         *Command = SIM7080_AT_SMCONF(CommandStr);
         SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
@@ -133,7 +160,7 @@ SIM70XX_Error_t SIM7080_MQTT_Create(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* 
 
     if(p_Socket->Password.size() > 0)
     {
-        CommandStr = "AT+SMCONF=\"PASSWORD\"," + p_Socket->Password + "\"";
+        CommandStr = "AT+SMCONF=\"PASSWORD\",\"" + p_Socket->Password + "\"";
         SIM70XX_CREATE_CMD(Command);
         *Command = SIM7080_AT_SMCONF(CommandStr);
         SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);

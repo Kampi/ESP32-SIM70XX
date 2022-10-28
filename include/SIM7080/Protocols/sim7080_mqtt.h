@@ -42,7 +42,7 @@ inline __attribute__((always_inline)) uint32_t SIM7080_MQTT_MessagesAvailable(SI
     return uxQueueMessagesWaiting(p_Socket->Internal.SubQueue);
 }
 
-/** @brief          Create a MQTT socket by using default settings.
+/** @brief          Create a MQTT socket by using default the settings.
  *  @param p_Device SIM7080 device object
  *  @param p_Socket Pointer to MQTT socket object
  *  @param Broker   MQTT broker address

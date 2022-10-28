@@ -37,8 +37,8 @@ typedef enum
  */
 typedef struct
 {
-    std::string Topic;                              /**< Last will topic. */
     SIM7080_MQTT_QoS_t QoS;                         /**< Last will quality of service. */
+    std::string Topic;                              /**< Last will topic. */
     std::string Message;                            /**< Last will message. */
     bool Retained;                                  /**< Retained flag. */
 } SIM7080_MQTT_Will_t;
