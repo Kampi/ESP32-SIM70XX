@@ -24,6 +24,10 @@
 #include "sim70xx_errors.h"
 #include "sim7080_mqtt_defs.h"
 
+/** @brief Maximum number of bytes for a single MQTT transmission.
+ */
+#define SIM7080_MQTT_MAX_PAYLOAD_SIZE                       1024
+
 /** @brief          Get the available messages in the subscription queue.
  *  @param p_Socket Pointer to MQTT socket object
  *  @return         Number of messages ready.
@@ -72,17 +76,19 @@ SIM70XX_Error_t SIM7080_MQTT_Connect(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t*
  */
 SIM70XX_Error_t SIM7080_MQTT_Publish(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* p_Socket, std::string Topic, std::string Message, SIM7080_MQTT_QoS_t QoS = SIM7080_MQTT_QOS_0, bool Retained = false);
 
-/** @brief          Publish a message over MQTT.
- *  @param p_Device SIM7080 device object
- *  @param p_Socket Pointer to MQTT socket object
- *  @param Topic    Message topic
- *  @param p_Buffer Pointer to message buffer
- *  @param Length   Buffer length
- *  @param QoS      (Optional) Quality of Service
- *  @param Retained (Optional) Retained flag
- *  @return         SIM70XX_ERR_OK when successful
+/** @brief              Publish a message over MQTT.
+ *  @param p_Device     SIM7080 device object
+ *  @param p_Socket     Pointer to MQTT socket object
+ *  @param Topic        Message topic
+ *  @param p_Buffer     Pointer to message buffer
+ *  @param Length       Buffer length
+ *  @param QoS          (Optional) Quality of Service
+ *  @param Retained     (Optional) Retained flag
+ *  @param Retries      (Optional) Number of retries to transmit a packet
+ *  @param PacketSize   (Optional) Transmission size in bytes
+ *  @return             SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_MQTT_Publish(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* p_Socket, std::string Topic, const void* p_Buffer, uint16_t Length, SIM7080_MQTT_QoS_t QoS = SIM7080_MQTT_QOS_0, bool Retained = false);
+SIM70XX_Error_t SIM7080_MQTT_Publish(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* p_Socket, std::string Topic, const void* p_Buffer, uint32_t Length, SIM7080_MQTT_QoS_t QoS = SIM7080_MQTT_QOS_0, bool Retained = false, uint8_t Retries = 20, uint16_t PacketSize = SIM7080_MQTT_MAX_PAYLOAD_SIZE);
 
 /** @brief          Subscribe to a MQTT topic.
  *  @param p_Device SIM7080 device object

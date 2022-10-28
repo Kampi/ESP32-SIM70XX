@@ -22,6 +22,7 @@
 #if((CONFIG_SIMXX_DEV == 7080) && (defined CONFIG_SIM70XX_DRIVER_WITH_MQTT))
 
 #include <esp_log.h>
+#include <esp_task_wdt.h>
 
 #include "sim7080.h"
 #include "sim7080_mqtt.h"
@@ -42,6 +43,8 @@ SIM70XX_Error_t SIM7080_MQTT_Create(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* 
     p_Socket->Broker = Broker;
     p_Socket->Port = Port;
     p_Socket->ClientID = "SIM7080-MQTT";
+    p_Socket->CleanSession = true;
+    p_Socket->QoS = SIM7080_MQTT_QOS_0;
 
     return SIM7080_MQTT_Create(p_Device, p_Socket);
 }
@@ -200,13 +203,17 @@ SIM70XX_Error_t SIM7080_MQTT_Publish(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t*
     return SIM7080_MQTT_Publish(p_Device, p_Socket, Topic, Message.c_str(), Message.size(), QoS, Retained);
 }
 
-SIM70XX_Error_t SIM7080_MQTT_Publish(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* p_Socket, std::string Topic, const void* p_Buffer, uint16_t Length, SIM7080_MQTT_QoS_t QoS, bool Retained)
+SIM70XX_Error_t SIM7080_MQTT_Publish(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* p_Socket, std::string Topic, const void* p_Buffer, uint32_t Length, SIM7080_MQTT_QoS_t QoS, bool Retained, uint8_t Retries, uint16_t PacketSize)
 {
     std::string Response;
     std::string CommandStr;
     SIM70XX_TxCmd_t Command;
+    uint8_t* Buffer = (uint8_t*)p_Buffer;
+    uint32_t Remaining = Length;
+    uint8_t RetryCounter;
+    SIM70XX_Error_t Error = SIM70XX_ERR_OK;
 
-    if((p_Socket == NULL) || (p_Buffer == NULL) || (Topic.size() > 128) || (QoS < SIM7080_MQTT_QOS_0) || (QoS > SIM7080_MQTT_QOS_2) || (Length > 1024))
+    if((p_Socket == NULL) || (p_Buffer == NULL) || (Topic.size() > 128) || (QoS < SIM7080_MQTT_QOS_0) || (QoS > SIM7080_MQTT_QOS_2) || (PacketSize > SIM7080_MQTT_MAX_PAYLOAD_SIZE))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
@@ -219,35 +226,79 @@ SIM70XX_Error_t SIM7080_MQTT_Publish(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t*
         return SIM70XX_ERR_NOT_CONNECTED;
     }
 
-    Command = SIM7080_AT_SMPUB(Topic, Length, QoS, Retained);
-
-    // Transmit the command.
-    SIM70XX_UART_SendLine(p_Device.UART, Command.Command);
-
-    // Wait for the empty space after the ">".
-    Response = SIM70XX_UART_ReadStringUntil(p_Device.UART, ' ', Command.Timeout * 1000UL);
-    if(Response.find(">") == std::string::npos)
+    vTaskSuspend(p_Device.Internal.TaskHandle);
+    ESP_LOGI(TAG, "Total %u bytes to transmit...", Remaining);
+    RetryCounter = 0;
+    do
     {
-        ESP_LOGE(TAG, "Invalid response. Expect '>', got: %s", Response.c_str());
+        uint32_t BytesToSend;
+        std::string Response;
 
-        return SIM70XX_ERR_FAIL;
-    }
+        esp_task_wdt_reset();
 
-    // Send the data.
-    SIM70XX_UART_Send(p_Device.UART, p_Buffer, Length);
+        if(Remaining > PacketSize)
+        {
+            BytesToSend = PacketSize;
+        }
+        else
+        {
+            BytesToSend = Remaining;
+        }
 
-    // Read and parse the status code.
-    SIM70XX_UART_ReadStringUntil(p_Device.UART);
-    Response = SIM70XX_UART_ReadStringUntil(p_Device.UART, '\n', Command.Timeout * 1000UL);
+        ESP_LOGI(TAG, "     Transmit %u bytes...", BytesToSend);
 
-    ESP_LOGI(TAG, "Response: %s", Response.c_str());
+        Command = SIM7080_AT_SMPUB(Topic, Length, QoS, Retained);
 
-    if(Response.find("OK") != std::string::npos)
-    {
-        return SIM70XX_ERR_FAIL;
-    }
+        // Transmit the command.
+        SIM70XX_UART_SendLine(p_Device.UART, Command.Command);
 
-    return SIM70XX_ERR_OK;
+        // Wait for the empty space after the ">".
+        Response = SIM70XX_UART_ReadStringUntil(p_Device.UART, ' ', Command.Timeout * 1000UL);
+        if(Response.find(">") == std::string::npos)
+        {
+            ESP_LOGE(TAG, "Invalid response. Expect '>', got: %s", Response.c_str());
+
+            return SIM70XX_ERR_FAIL;
+        }
+
+        // Send the data.
+        SIM70XX_UART_Send(p_Device.UART, p_Buffer, Length);
+
+        // Read and parse the device status.
+        SIM70XX_UART_ReadStringUntil(p_Device.UART);
+        Response = SIM70XX_UART_ReadStringUntil(p_Device.UART, '\n', Command.Timeout * 1000UL);
+
+        ESP_LOGW(TAG, "Response: %s", Response.c_str());
+    
+        // Transmission error. Repeat the last packet.
+        if(Response.find("ERROR") != std::string::npos)
+        {
+            if(RetryCounter < Retries)
+            {
+                RetryCounter++;
+
+                // Give a short break to allow the modem to handle the error.
+                vTaskDelay(1000 / portTICK_PERIOD_MS);
+                continue;
+            }
+            else
+            {
+                Error = SIM70XX_ERR_TIMEOUT;
+                break;
+            }
+        }
+        // Response "OK" - transmit the next packet.
+        else if(Response.find("OK") != std::string::npos)
+        {
+            RetryCounter = 0;
+            Buffer += BytesToSend;
+            Remaining -= BytesToSend;
+        }
+    } while(Remaining > 0);
+
+    vTaskResume(p_Device.Internal.TaskHandle);
+
+    return Error;
 }
 
 SIM70XX_Error_t SIM7080_MQTT_Subscribe(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* p_Socket, std::string Topic, SIM7080_MQTT_QoS_t QoS)

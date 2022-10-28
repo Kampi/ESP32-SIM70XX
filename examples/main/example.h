@@ -1,9 +1,9 @@
  /*
- * sim7020_pdp.cpp
+ * example.h
  * 
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
- *  File info: SIM70XX driver for ESP32.
+ *  File info: SIM70XX example application.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), 
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
@@ -17,41 +17,44 @@
  * Errors and commissions should be reported to DanielKampert@kampis-elektroecke.de.
  */
 
+#ifndef EXAMPLE_H_
+#define EXAMPLE_H_
+
+#include "sim70xx.h"
+
 #include <sdkconfig.h>
 
 #if(CONFIG_SIMXX_DEV == 7020)
-
-#include <esp_log.h>
-
-#include "sim7020.h"
-#include "sim7020_pdp_defs.h"
-#include "../../Private/Queue/sim70xx_queue.h"
-#include "../../Private/Commands/sim70xx_commands.h"
-
-static const char* TAG = "SIM7020_PDP";
-
-// TODO: Check for GPRS and IP (see SIM7080)
-
-bool SIM7020_PGP_GPRS_isAttached(SIM7020_t& p_Device)
-{
-    std::string Response;
-    SIM70XX_TxCmd_t* Command;
-
-    if(p_Device.Internal.isInitialized == false)
-    {
-        return false;
-    }
-
-    SIM70XX_CREATE_CMD(Command);
-    *Command = SIM70XX_AT_CGATT_R;
-    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
-    {
-        return false;
-    }
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
-
-    return (bool)SIM70XX_Tools_StringToUnsigned(Response);
-}
-
+    #define DEVICE_TYPE                     SIM7020_t
+#elif(CONFIG_SIMXX_DEV == 7080)
+    #define DEVICE_TYPE                     SIM7080_t
+#else
+    #error "No device specified!"
 #endif
+
+/** @brief Start the SIM70XX examples.
+ */
+void StartExamples(void);
+
+#ifdef CONFIG_DEMO_USE_FS
+    /** @brief          Run the file system example.
+     *  @param p_Device Pointer to device object
+     */
+    void FileSystem_Run(DEVICE_TYPE& p_Device);
+#endif
+
+#ifdef CONFIG_DEMO_USE_EMAIL
+    /** @brief          Run the E-Mail example.
+     *  @param p_Device Pointer to device object
+     */
+    void EMail_Run(DEVICE_TYPE& p_Device);
+#endif
+
+#ifdef CONFIG_DEMO_USE_SNTP
+    /** @brief          Run the NTP example.
+     *  @param p_Device Pointer to device object
+     */
+    void NTP_Run(DEVICE_TYPE& p_Device);
+#endif
+
+#endif /* EXAMPLE_H_ */

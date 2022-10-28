@@ -1,7 +1,7 @@
 {
   "name": "SIM70XX",
   "version": "0.0.1",
-  "keywords": "esp-idf, sim7020, sim7080, nb-iot, lte cat-m1, cellular",
+  "keywords": "esp-idf, sim7020, sim7080, nb-iot, lte cat-m1, cellular, gnss, gps, glonass, mqtt, tcp, ntp, dns, coap",
   "description": "SIM70XX driver for the esp-idf framework.",
   "repository": {
     "type": "git",

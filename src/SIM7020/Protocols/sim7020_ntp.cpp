@@ -147,7 +147,7 @@ SIM70XX_Error_t SIM7020_NTP_GetTime(SIM7020_t& p_Device, struct tm* p_Time, int8
     Index = Response.find("+");
     if(p_Timezone != NULL)
     {
-        *p_Timezone = std::stoi(Response.substr(Index + 1));
+        *p_Timezone = (int8_t)SIM70XX_Tools_StringToSigned(Response.substr(Index + 1));
     }
     Response.erase(Index);
 

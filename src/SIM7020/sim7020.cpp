@@ -483,7 +483,7 @@ SIM70XX_Error_t SIM7020_GetBand(SIM7020_t& p_Device, SIM7020_Band_t* p_Band)
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    *p_Band = (SIM7020_Band_t)std::stoi(Response);
+    *p_Band = (SIM7020_Band_t)sSIM70XX_Tools_StringToUnsigned(Response);
 
     ESP_LOGD(TAG, "Band: %u", *p_Band);
 
@@ -554,7 +554,7 @@ SIM70XX_Error_t SIM7020_GetFunctionality(SIM7020_t& p_Device)
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    p_Device.Connection.Functionality = (SIM7020_Func_t)std::stoi(Response);
+    p_Device.Connection.Functionality = (SIM7020_Func_t)SIM70XX_Tools_StringToUnsigned(Response);
 
     ESP_LOGI(TAG, "Functionality: %u", p_Device.Connection.Functionality);
 

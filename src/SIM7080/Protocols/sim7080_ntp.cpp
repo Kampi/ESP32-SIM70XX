@@ -82,18 +82,24 @@ SIM70XX_Error_t SIM7080_NTP_Sync(SIM7080_t& p_Device, std::string Server, int8_t
     // No "," detected -> We have a response without time.
     if(Index == std::string::npos)
     {
-        NTP_Error = (SIM7080_NTP_Error_t)std::stoi(Response);
+        NTP_Error = (SIM7080_NTP_Error_t)SIM70XX_Tools_StringToUnsigned(Response);
     }
     // "," detected -> We have a response with time.
     else
     {
-        NTP_Error = (SIM7080_NTP_Error_t)std::stoi(Response.substr(Index - 1, Index));
-        Response.erase(0, Index + 1);
+        NTP_Error = (SIM7080_NTP_Error_t)SIM70XX_Tools_StringToUnsigned(Response.substr(Index - 1, Index));
 
-        Response.replace(Response.find("\""), std::string("\"").size(), "");
-        Response.replace(Response.find("\""), std::string("\"").size(), "");
+        ESP_LOGI(TAG, "NTP Error: %u", NTP_Error);
 
-        strptime((char*)Response.c_str(), "%Y/%m/%d,%H:%M:%S", p_Time);
+        if(NTP_Error == SIM7080_NTP_ERROR_OK)
+        {
+            Response.erase(0, Index + 1);
+
+            Response.replace(Response.find("\""), std::string("\"").size(), "");
+            Response.replace(Response.find("\""), std::string("\"").size(), "");
+
+            strptime((char*)Response.c_str(), "%Y/%m/%d,%H:%M:%S", p_Time);
+        }
     }
 
     if(NTP_Error == SIM7080_NTP_ERROR_OK)
@@ -141,7 +147,7 @@ SIM70XX_Error_t SIM7080_NTP_GetTime(SIM7080_t& p_Device, struct tm* p_Time, int8
     Index = Response.find("+");
     if(p_Timezone != NULL)
     {
-        *p_Timezone = std::stoi(Response.substr(Index + 1));
+        *p_Timezone = (int8_t)SIM70XX_Tools_StringToSigned(Response.substr(Index + 1));
     }
     Response.erase(Index);
 

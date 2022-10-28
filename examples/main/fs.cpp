@@ -1,9 +1,9 @@
  /*
- * sim7020_pdp.cpp
+ * fs.cpp
  * 
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
- *  File info: SIM70XX driver for ESP32.
+ *  File info: SIM70XX File System example.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), 
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
@@ -19,39 +19,47 @@
 
 #include <sdkconfig.h>
 
-#if(CONFIG_SIMXX_DEV == 7020)
+#ifdef CONFIG_DEMO_USE_FS
 
 #include <esp_log.h>
 
-#include "sim7020.h"
-#include "sim7020_pdp_defs.h"
-#include "../../Private/Queue/sim70xx_queue.h"
-#include "../../Private/Commands/sim70xx_commands.h"
+#include "example.h"
 
-static const char* TAG = "SIM7020_PDP";
+static const char* TAG          = "FS";
 
-// TODO: Check for GPRS and IP (see SIM7080)
-
-bool SIM7020_PGP_GPRS_isAttached(SIM7020_t& p_Device)
+void FileSystem_Run(DEVICE_TYPE& p_Device)
 {
-    std::string Response;
-    SIM70XX_TxCmd_t* Command;
+    char* p_Buffer;
+    uint32_t Size;
+    std::string Data;
+    std::string File;
+    std::string NewFile;
 
-    if(p_Device.Internal.isInitialized == false)
+    File = "Test.txt";
+    NewFile = "NewFile.txt";
+    Data = "Hello, World!";
+
+    ESP_LOGI(TAG, "Write file '%s'...", File.c_str());
+    SIM7080_FS_Write(p_Device, SIM7080_FS_PATH_CUSTOMER, File, Data.c_str(), Data.size());
+
+    ESP_LOGI(TAG, "Reading file size...");
+    SIM7080_FS_GetFileSize(p_Device, SIM7080_FS_PATH_CUSTOMER, File, &Size);
+    ESP_LOGI(TAG, "     Size: %u", Size);
+
+    ESP_LOGI(TAG, "Read file '%s'...", File.c_str());
+    p_Buffer = (char*)calloc((Size + 1), sizeof(char));
+    if(p_Buffer != NULL)
     {
-        return false;
+        SIM7080_FS_Read(p_Device, SIM7080_FS_PATH_CUSTOMER, File, p_Buffer, Size);
+
+        ESP_LOGI(TAG, "     %s", p_Buffer);
     }
 
-    SIM70XX_CREATE_CMD(Command);
-    *Command = SIM70XX_AT_CGATT_R;
-    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
-    {
-        return false;
-    }
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
+    ESP_LOGI(TAG, "Rename file '%s' into '%s'...", File.c_str(), NewFile.c_str());
+    SIM7080_FS_Rename(p_Device, SIM7080_FS_PATH_CUSTOMER, File, NewFile);
 
-    return (bool)SIM70XX_Tools_StringToUnsigned(Response);
+    ESP_LOGI(TAG, "Remove file '%s'...", NewFile.c_str());
+    SIM7080_FS_Delete(p_Device, SIM7080_FS_PATH_CUSTOMER, NewFile);
 }
 
 #endif

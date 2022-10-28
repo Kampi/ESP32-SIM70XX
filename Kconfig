@@ -97,12 +97,12 @@ menu "SIM70XX"
             help
                 Enable this option if you want DNS support added to the driver.
 	
-        config SIM70XX_DRIVER_WITH_GPS
-            bool "Enable GPS support"
+        config SIM70XX_DRIVER_WITH_GNSS
+            bool "Enable GNSS support"
             depends on SIM70XX_DEV_SIM7080
             default n
             help
-                Enable this option if you want GPS support added to the driver.
+                Enable this option if you want GNSS support added to the driver.
 
         config SIM70XX_DRIVER_WITH_FS
             bool "Enable File System support"

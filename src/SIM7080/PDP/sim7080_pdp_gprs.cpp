@@ -101,7 +101,7 @@ bool SIM7080_PGP_GRPS_isAttached(SIM7080_t& p_Device)
         return false;
     }
 
-    return (bool)std::stoi(Response);
+    return (bool)SIM70XX_Tools_StringToUnsigned(Response);
 }
 
 #endif

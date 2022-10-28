@@ -94,7 +94,7 @@ SIM70XX_Error_t SIM7080_TCP_Client_Connect(SIM7080_t& p_Device, SIM7080_TCP_Sock
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
     SIM70XX_Tools_SubstringSplitErase(&Response);
-    Result = (SIM7080_TCP_Error_t)std::stoi(Response);
+    Result = (SIM7080_TCP_Error_t)SIM70XX_Tools_StringToUnsigned(Response);
 
     if(p_Result != NULL)
     {
@@ -186,7 +186,7 @@ SIM70XX_Error_t SIM7080_TCP_Client_Transmit(SIM7080_t& p_Device, SIM7080_TCP_Soc
         SIM70XX_UART_ReadStringUntil(p_Device.UART);
         Response = SIM70XX_UART_ReadStringUntil(p_Device.UART, '\n', Command.Timeout * 1000UL);
 
-        ESP_LOGE(TAG, "Response: %s", Response.c_str());
+        ESP_LOGW(TAG, "Response: %s", Response.c_str());
     
         // Transmission error. Repeat the last packet.
         if(Response.find("ERROR") != std::string::npos)
@@ -197,7 +197,6 @@ SIM70XX_Error_t SIM7080_TCP_Client_Transmit(SIM7080_t& p_Device, SIM7080_TCP_Soc
 
                 // Give a short break to allow the modem to handle the error.
                 vTaskDelay(1000 / portTICK_PERIOD_MS);
-
                 continue;
             }
             else

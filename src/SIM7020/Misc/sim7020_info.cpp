@@ -199,7 +199,7 @@ SIM70XX_Error_t SIM7020_Info_GetNetworkRegistrationStatus(SIM7020_t& p_Device)
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    p_Device.Connection.Status = (SIM7020_NetRegistration_t)std::stoi(Response.substr(Response.find(",") + 1));
+    p_Device.Connection.Status = (SIM7020_NetRegistration_t)SIM70XX_Tools_StringToUnsigned(Response.substr(Response.find(",") + 1));
 
     return SIM70XX_ERR_OK;
 }
@@ -231,8 +231,8 @@ SIM70XX_Error_t SIM7020_Info_GetQuality(SIM7020_t& p_Device, SIM70XX_Qual_t* p_R
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
     Index = Response.find(",");
-    RSSI = std::stoi(Response.substr(0, Index));
-    RXQual = std::stoi(Response.substr(Response.find_last_of(",") + 1));
+    RSSI = (int8_t)SIM70XX_Tools_StringToUnsigned(Response.substr(0, Index));
+    RXQual = (uint8_t)SIM70XX_Tools_StringToUnsigned(Response.substr(Response.find_last_of(",") + 1));
 
     if(RSSI == 0)
     {
@@ -299,9 +299,9 @@ SIM70XX_Error_t SIM7020_Info_GetNetworkStatus(SIM7020_t& p_Device, SIM7020_NetSt
 
     ESP_LOGI(TAG, "Response: %s", Response.c_str());
 
-    p_Status->sc_earfcn = std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
-    p_Status->sc_earfcn_offset = (int8_t)std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
-    p_Status->sc_pci = std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
+    p_Status->sc_earfcn = SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response));
+    p_Status->sc_earfcn_offset = (int8_t)SIM70XX_Tools_StringToSigned(SIM70XX_Tools_SubstringSplitErase(&Response));
+    p_Status->sc_pci = (uint16_t)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response));
 
     p_Status->sc_cellid = SIM70XX_Tools_SubstringSplitErase(&Response);
     p_Status->sc_cellid.erase(std::remove(p_Status->sc_cellid.begin(), p_Status->sc_cellid.end(), '\"'), p_Status->sc_cellid.end());
@@ -309,31 +309,31 @@ SIM70XX_Error_t SIM7020_Info_GetNetworkStatus(SIM7020_t& p_Device, SIM7020_NetSt
     Dummy = SIM70XX_Tools_SubstringSplitErase(&Response);
     if(Dummy.size())
     {
-        p_Status->sc_rsrp = (int16_t)std::stoi(Dummy);
+        p_Status->sc_rsrp = (int16_t)SIM70XX_Tools_StringToSigned(Dummy);
     }
 
     Dummy = SIM70XX_Tools_SubstringSplitErase(&Response);
     if(Dummy.size())
     {
-        p_Status->sc_rsrq = (int16_t)std::stoi(Dummy);
+        p_Status->sc_rsrq = (int16_t)SIM70XX_Tools_StringToSigned(Dummy);
     }
 
     Dummy = SIM70XX_Tools_SubstringSplitErase(&Response);
     if(Dummy.size())
     {
-        p_Status->sc_rssi = (int16_t)std::stoi(Dummy);
+        p_Status->sc_rssi = (int16_t)SIM70XX_Tools_StringToSigned(Dummy);
     }
 
     Dummy = SIM70XX_Tools_SubstringSplitErase(&Response);
     if(Dummy.size())
     {
-        p_Status->sc_snr = (int16_t)std::stoi(Dummy);
+        p_Status->sc_snr = (int16_t)SIM70XX_Tools_StringToSigned(Dummy);
     }
 
     Dummy = SIM70XX_Tools_SubstringSplitErase(&Response);
     if(Dummy.size())
     {
-        p_Status->sc_band = (int16_t)std::stoi(Dummy);
+        p_Status->sc_band = (int16_t)SIM70XX_Tools_StringToSigned(Dummy);
     }
 
     Dummy = SIM70XX_Tools_SubstringSplitErase(&Response);
@@ -346,19 +346,19 @@ SIM70XX_Error_t SIM7020_Info_GetNetworkStatus(SIM7020_t& p_Device, SIM7020_NetSt
     Dummy = SIM70XX_Tools_SubstringSplitErase(&Response);
     if(Dummy.size())
     {
-        p_Status->sc_ecl = (int16_t)std::stoi(Dummy);
+        p_Status->sc_ecl = (int16_t)SIM70XX_Tools_StringToSigned(Dummy);
     }
 
     Dummy = SIM70XX_Tools_SubstringSplitErase(&Response);
     if(Dummy.size())
     {
-        p_Status->sc_tx_pwr = (int16_t)std::stoi(Dummy);
+        p_Status->sc_tx_pwr = (int16_t)SIM70XX_Tools_StringToSigned(Dummy);
     }
 
     Dummy = SIM70XX_Tools_SubstringSplitErase(&Response);
     if(Dummy.size())
     {
-        p_Status->sc_re_rsrp = (int16_t)std::stoi(Dummy);
+        p_Status->sc_re_rsrp = (int16_t)SIM70XX_Tools_StringToSigned(Dummy);
     }
 
     ESP_LOGD(TAG, "sc_earfcn: %u", p_Status->sc_earfcn);

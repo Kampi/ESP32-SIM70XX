@@ -95,7 +95,7 @@ SIM70XX_Error_t SIM7080_FS_GetFileSize(SIM7080_t& p_Device, SIM7080_FS_Path_t Pa
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    *p_Size = (size_t)std::stoi(Response);
+    *p_Size = (size_t)SIM70XX_Tools_StringToUnsigned(Response);
 
     return SIM7080_FS_Deinit(p_Device);
 }
@@ -304,7 +304,7 @@ SIM70XX_Error_t SIM7080_FS_GetFree(SIM7080_t& p_Device, uint32_t* const p_Free)
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    p_Device.FS.Free = std::stoi(Response);
+    p_Device.FS.Free = SIM70XX_Tools_StringToUnsigned(Response);
     *p_Free = p_Device.FS.Free;
 
     return SIM7080_FS_Deinit(p_Device);

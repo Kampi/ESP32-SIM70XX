@@ -132,7 +132,7 @@ SIM70XX_Error_t SIM7020_PSM_GetEventStatus(SIM7020_t& p_Device, bool* p_Enable)
 
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    *p_Enable = (bool)std::stoi(Response);
+    *p_Enable = (bool)SIM70XX_Tools_StringToUnsigned(Response);
 
     return SIM70XX_ERR_OK;
 }

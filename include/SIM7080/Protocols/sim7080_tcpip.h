@@ -83,7 +83,7 @@ SIM70XX_Error_t SIM7080_TCP_Client_Connect(SIM7080_t& p_Device, SIM7080_TCP_Sock
  *  @param Length       Data length
  *  @param Retries      (Optional) Number of retries to transmit a packet
  *  @param Timeout      (Optional) Transmission timeout in milliseconds
- *  @param PacketSize   (Optional) Message transmission packet size in bytes
+ *  @param PacketSize   (Optional) Transmission size in bytes
  *  @return             SIM70XX_ERR_OK when successful
  */
 SIM70XX_Error_t SIM7080_TCP_Client_Transmit(SIM7080_t& p_Device, SIM7080_TCP_Socket_t* p_Socket, const void* p_Buffer, uint32_t Length, uint8_t Retries = 20, uint16_t Timeout = 1000, uint16_t PacketSize = SIM7080_TCP_MAX_PAYLOAD_SIZE);

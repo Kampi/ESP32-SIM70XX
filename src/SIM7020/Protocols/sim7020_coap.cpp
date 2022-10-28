@@ -73,7 +73,7 @@ SIM70XX_Error_t SIM7020_CoAP_Create(SIM7020_t& p_Device, SIM7020_CoAP_Socket_t* 
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    p_Socket->ID = (uint8_t)std::stoi(Response);
+    p_Socket->ID = (uint8_t)SIM70XX_Tools_StringToUnsigned(Response);
 
     // Everything okay. The socket is active now.
     ESP_LOGI(TAG, "Socket %u opened...", p_Socket->ID);

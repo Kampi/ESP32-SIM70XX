@@ -35,7 +35,7 @@ SIM70XX_Error_t SIM7020_DNS_FetchAddress(SIM7020_t& p_Device, std::string Host, 
 {
     size_t Index;
     uint32_t Now;
-    uint8_t DNS_Error;
+    SIM7020_DNS_Error_t DNS_Error;
     std::string Response;
     SIM70XX_TxCmd_t* Command;
 
@@ -72,9 +72,9 @@ SIM70XX_Error_t SIM7020_DNS_FetchAddress(SIM7020_t& p_Device, std::string Host, 
 
     // Filter out the error code.
     Index = Response.find(",");
-    DNS_Error = std::stoi(Response.substr(Index - 1, 1));
+    DNS_Error = (SIM7020_DNS_Error_t)SIM70XX_Tools_StringToUnsigned(Response.substr(Index - 1, 1));
 
-    if(DNS_Error == 1)
+    if(DNS_Error == SIM7020_DNS_ERROR_OK)
     {
         // Remove the command and the error code
         Response.replace(0, Index + 1, "");
@@ -92,7 +92,7 @@ SIM70XX_Error_t SIM7020_DNS_FetchAddress(SIM7020_t& p_Device, std::string Host, 
     // Handle the error codes.
     else if(DNS_Error != SIM7020_DNS_ERROR_OK)
     {
-        DNS_Error = std::stoi(Response.substr(Index + 1));
+        DNS_Error = (SIM7020_DNS_Error_t)SIM70XX_Tools_StringToUnsigned(Response.substr(Index + 1));
 
         ESP_LOGE(TAG, "DNS_Error: %u", DNS_Error);
     }
@@ -153,7 +153,7 @@ SIM70XX_Error_t SIM7020_DNS_GetIndex(SIM7020_t& p_Device, uint8_t* p_Index)
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    *p_Index = std::stoi(Response);
+    *p_Index = SIM70XX_Tools_StringToUnsigned(Response);
 
     return SIM70XX_ERR_OK;
 }

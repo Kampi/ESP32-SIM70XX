@@ -124,8 +124,8 @@ SIM70XX_Error_t SIM7080_PDP_IP_CheckNetworks(SIM7080_t& p_Device, std::vector<SI
         Dummy = Response.substr(0, Index).c_str();
         Response.erase(0, Index + 1);
 
-        Result.ID = std::stoi(SIM70XX_Tools_SubstringSplitErase(&Dummy));
-        Result.Status = (SIM7080_PDP_Status_t)std::stoi(SIM70XX_Tools_SubstringSplitErase(&Dummy));
+        Result.ID = (uint8_t)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Dummy));
+        Result.Status = (SIM7080_PDP_Status_t)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Dummy));
         Result.IP = SIM70XX_Tools_SubstringSplitErase(&Dummy);
 
         p_Networks->push_back(Result);

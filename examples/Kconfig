@@ -1,0 +1,131 @@
+menu "Demo"
+    menu "NTP"
+	    depends on SIM70XX_DRIVER_WITH_NTP
+
+        config DEMO_USE_SNTP
+            bool "Enable the SNTP demo"
+
+        config DEMO_SNTP_HOST
+	        depends on DEMO_USE_SNTP
+            string "Server address"
+			default "de.pool.ntp.org"
+
+		config DEMO_SNTP_TIMEZONE
+	        depends on DEMO_USE_SNTP
+            int "Timezone"
+			default 0
+			range -47 48
+	endmenu
+
+	menu "E-Mail"
+	    depends on SIM70XX_DRIVER_WITH_EMAIL
+
+        config DEMO_USE_EMAIL
+            bool "Enable the E-Mail demo"
+
+        config DEMO_SNTP_SERVER
+	        depends on DEMO_USE_EMAIL
+            string "Server address"
+
+        config DEMO_SNTP_PORT
+	        depends on DEMO_USE_EMAIL
+            int "Server port"
+            range 0 65535
+			default 465
+
+        config DEMO_SNTP_USER
+	        depends on DEMO_USE_EMAIL
+            string "SNTP user"
+
+        config DEMO_SNTP_PASSWORD
+	        depends on DEMO_USE_EMAIL
+            string "SNTP password"
+	endmenu
+
+	menu "TCP/IP"
+	    depends on SIM70XX_DRIVER_WITH_TCPIP
+
+        config DEMO_USE_TCPIP
+            bool "Enable the TCP/IP demo"
+
+        config DEMO_TCP_HOST
+	        depends on DEMO_USE_TCPIP
+            string "Server address"
+            default "webhook.site"
+
+		config DEMO_TCP_PORT
+	        depends on DEMO_USE_TCPIP
+            int "Server port"
+            range 0 65535
+			default 65432
+
+        config DEMO_UDP_HOST
+	        depends on DEMO_USE_TCPIP
+            string "Server address"
+
+		config DEMO_UDP_PORT
+	        depends on DEMO_USE_TCPIP
+            int "Server port"
+            range 0 65535
+			default 65431
+	endmenu
+
+	menu "File System"
+	    depends on SIM70XX_DRIVER_WITH_FS
+
+        config DEMO_USE_FS
+            bool "Enable the FS demo"
+	endmenu
+
+	menu "NVRAM"
+	    depends on SIM70XX_DRIVER_WITH_NVRAM
+
+        config DEMO_USE_NVRAM
+            bool "Enable the NVRAM demo"
+	endmenu
+
+	menu "SSL"
+	    depends on SIM70XX_DRIVER_WITH_SSL
+
+        config DEMO_USE_SSL
+            bool "Enable the SSL support for the demos"
+	endmenu
+
+	menu "MQTT"
+	    depends on SIM70XX_DRIVER_WITH_MQTT
+
+        config DEMO_USE_MQTT
+            bool "Enable the MQTT demo"
+
+        config DEMO_MQTT_BROKER
+	        depends on DEMO_USE_MQTT
+            string "Broker address"
+            default "test.mosquitto.org"
+
+		config DEMO_MQTT_PORT
+	        depends on DEMO_USE_MQTT
+            int "Broker port"
+            range 0 65535
+			default 1883
+
+        config DEMO_MQTT_USE_LOGIN
+	        depends on DEMO_USE_MQTT
+            bool "Use login credentials"
+
+		config DEMO_MQTT_USER
+	        depends on DEMO_USE_MQTT
+            string "MQTT user"
+            depends on DEMO_MQTT_USE_LOGIN
+
+		config DEMO_MQTT_PASSWORT
+	        depends on DEMO_USE_MQTT
+            string "MQTT password"
+            depends on DEMO_MQTT_USE_LOGIN
+
+        config DEMO_MQTT_KEEPALIVE
+	        depends on DEMO_USE_MQTT
+            int "Connection keep alive time"
+            range 0 65535
+            default 60
+	endmenu
+endmenu

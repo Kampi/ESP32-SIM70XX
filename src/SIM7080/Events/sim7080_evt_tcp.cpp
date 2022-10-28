@@ -41,8 +41,8 @@ void SIM7080_Evt_on_TCP_Disconnect(SIM7080_t* const p_Device, std::string* p_Mes
     Index = p_Message->find("+CASTATE");
     Message = p_Message->substr(Index, p_Message->find("\r\n\r\n", Index) - Index);
     Index = Message.find(",");
-    CID = std::stoi(Message.substr((Index - 1), Index));
-    Error = (SIM7080_TCP_Error_t)std::stoi(Message.substr(Index + 1));
+    CID = SIM70XX_Tools_StringToUnsigned(Message.substr((Index - 1), Index));
+    Error = (SIM7080_TCP_Error_t)SIM70XX_Tools_StringToUnsigned(Message.substr(Index + 1));
 
     for(std::vector<SIM7080_TCP_Socket_t*>::iterator it = p_Device->TCP.Sockets.begin(); it != p_Device->TCP.Sockets.end(); ++it)
     {
@@ -67,7 +67,7 @@ void SIM7080_Evt_on_TCP_DataReady(SIM7080_t* const p_Device, std::string* p_Mess
     Index = p_Message->find("+CADATAIND");
     Message = p_Message->substr(Index, p_Message->find("\r\n\r\n", Index) - Index);
     Index = Message.find(":");
-    CID = std::stoi(Message.substr(Index + 1, Message.find("\r\n\r\n", Index) - Index + 1));
+    CID = SIM70XX_Tools_StringToUnsigned(Message.substr(Index + 1, Message.find("\r\n\r\n", Index) - Index + 1));
 
     for(std::vector<SIM7080_TCP_Socket_t*>::iterator it = p_Device->TCP.Sockets.begin(); it != p_Device->TCP.Sockets.end(); ++it)
     {

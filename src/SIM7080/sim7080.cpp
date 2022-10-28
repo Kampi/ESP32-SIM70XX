@@ -57,13 +57,13 @@ SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t& p_Conf
         return SIM70XX_ERR_NO_MEM;
     }
 
-    #ifdef CONFIG_SIM70XX_DRIVER_WITH_GPS
-        p_Device.GPS.EventQueue = xQueueCreate(CONFIG_SIM70XX_QUEUE_LENGTH, sizeof(SIM7080_GPS_Data_t*));
-        if(p_Device.GPS.EventQueue == NULL)
+    #ifdef CONFIG_SIM70XX_DRIVER_WITH_GNSS
+        p_Device.GNSS.EventQueue = xQueueCreate(CONFIG_SIM70XX_QUEUE_LENGTH, sizeof(SIM7080_GNSS_Data_t*));
+        if(p_Device.GNSS.EventQueue == NULL)
         {
             return SIM70XX_ERR_NO_MEM;
         }
-        p_Device.GPS.isListening = false;
+        p_Device.GNSS.isListening = false;
     #endif
 
     p_Device.UART.Interface = p_Config.UART.Interface;
@@ -176,8 +176,8 @@ SIM70XX_Error_t SIM7080_Deinit(SIM7080_t& p_Device, bool Skip)
     p_Device.Internal.TaskHandle = NULL;
 
     // Delete the message queues.
-    #ifdef CONFIG_SIM70XX_DRIVER_WITH_GPS
-        vQueueDelete(p_Device.GPS.EventQueue);
+    #ifdef CONFIG_SIM70XX_DRIVER_WITH_GNSS
+        vQueueDelete(p_Device.GNSS.EventQueue);
     #endif
 
     vQueueDelete(p_Device.Internal.RxQueue);
@@ -577,7 +577,7 @@ SIM70XX_Error_t SIM7080_GetBand(SIM7080_t& p_Device, SIM7080_Band_t* p_Band)
     }
     else
     {
-        *p_Band = (SIM7080_Band_t)std::stoi(Response);
+        *p_Band = (SIM7080_Band_t)SIM70XX_Tools_StringToUnsigned(Response);
     }
 
     ESP_LOGD(TAG, "Band: %u", *p_Band);
@@ -633,7 +633,7 @@ SIM70XX_Error_t SIM7080_GetNetMode(SIM7080_t& p_Device, SIM7080_NetMode_t* p_Mod
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    *p_Mode = (SIM7080_NetMode_t)std::stoi(Response);
+    *p_Mode = (SIM7080_NetMode_t)SIM70XX_Tools_StringToUnsigned(Response);
 
     ESP_LOGD(TAG, "Mode: %u", *p_Mode);
 
@@ -688,7 +688,7 @@ SIM70XX_Error_t SIM7080_GetSelectedMode(SIM7080_t& p_Device, SIM7080_Mode_t* p_M
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    *p_Mode = (SIM7080_Mode_t)std::stoi(Response);
+    *p_Mode = (SIM7080_Mode_t)SIM70XX_Tools_StringToUnsigned(Response);
 
     ESP_LOGD(TAG, "Selected mode: %u", *p_Mode);
 
@@ -759,7 +759,7 @@ SIM70XX_Error_t SIM7080_GetFunctionality(SIM7080_t& p_Device)
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    p_Device.Connection.Functionality = (SIM7080_Func_t)std::stoi(Response);
+    p_Device.Connection.Functionality = (SIM7080_Func_t)SIM70XX_Tools_StringToUnsigned(Response);
 
     ESP_LOGI(TAG, "Functionality: %u", p_Device.Connection.Functionality);
 

@@ -20,9 +20,6 @@
 #ifndef SIM7080_H_
 #define SIM7080_H_
 
-#include <stdint.h>
-#include <stdbool.h>
-
 #include "sim7080_pdp.h"
 #include "sim7080_info.h"
 #include "sim7080_defs.h"
@@ -68,9 +65,9 @@
     #include "sim7080_coap.h"
 #endif
 
-#ifdef CONFIG_SIM70XX_DRIVER_WITH_GPS
-    #include "sim7080_gps.h"
-    #include "sim7080_config_gps.h"
+#ifdef CONFIG_SIM70XX_DRIVER_WITH_GNSS
+    #include "sim7080_gnss.h"
+    #include "sim7080_config_gnss.h"
 #endif
 
 /** @brief          Check if the module is initialized.

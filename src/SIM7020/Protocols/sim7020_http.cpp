@@ -79,7 +79,7 @@ SIM70XX_Error_t SIM7020_HTTP_Create(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* 
 
     p_Socket->isConnected = false;
     p_Socket->isCreated = true;
-    p_Socket->ID = (uint8_t)std::stoi(Response);
+    p_Socket->ID = (uint8_t)SIM70XX_Tools_StringToUnsigned(Response);
 
     ESP_LOGI(TAG, "Socket %u created...", p_Socket->ID);
 
@@ -256,7 +256,7 @@ SIM70XX_Error_t SIM7020_HTTP_POST(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_
     Packet.replace(Packet.find("+CHTTPNMIH: " + std::to_string(p_Socket->ID) + ","), std::string("+CHTTPNMIH: " + std::to_string(p_Socket->ID) + ",").size(), "");
 
     // Get the response code.
-    ResponseCode = std::stoi(Packet.substr(0, Packet.find(",")));
+    ResponseCode = SIM70XX_Tools_StringToUnsigned(Packet.substr(0, Packet.find(",")));
 
     if(p_ResponseCode != NULL)
     {
@@ -325,7 +325,7 @@ SIM70XX_Error_t SIM7020_HTTP_GET(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_S
     Response.replace(Index, std::string("+CHTTPNMIH: " + std::to_string(p_Socket->ID) + ",").size(), "");
 
     // Get the response code.
-    ResponseCode = std::stoi(Response.substr(0, Response.find(",")));
+    ResponseCode = SIM70XX_Tools_StringToUnsigned(Response.substr(0, Response.find(",")));
 
     // Remove the header and the command from the response.
     Index = Response.find("+CHTTPNMIC: " + std::to_string(p_Socket->ID) + ",");
@@ -333,13 +333,13 @@ SIM70XX_Error_t SIM7020_HTTP_GET(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_S
 
     // Get the additional data flag.
     // TODO: Must be implemented
-    isAdditionalData = (bool)std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
+    isAdditionalData = (bool)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response));
 
     // Remove the total length.
     SIM70XX_Tools_SubstringSplitErase(&Response);
 
     // Get the payload length.
-    *p_Length = (uint32_t)std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
+    *p_Length = (uint32_t)sSIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response));
 
     *p_Buffer = (uint8_t*)malloc(*p_Length);
 

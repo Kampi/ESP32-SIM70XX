@@ -198,7 +198,7 @@ SIM70XX_Error_t SIM7080_Info_GetNetworkRegistrationStatus(SIM7080_t& p_Device)
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    p_Device.Connection.Status = (SIM7080_NetRegistration_t)std::stoi(Response.substr(Response.find(",") + 1));
+    p_Device.Connection.Status = (SIM7080_NetRegistration_t)SIM70XX_Tools_StringToUnsigned(Response.substr(Response.find(",") + 1));
 
     return SIM70XX_ERR_OK;
 }
@@ -233,7 +233,7 @@ SIM70XX_Error_t SIM7080_Info_GetQuality(SIM7080_t& p_Device, SIM70XX_Qual_t* p_R
         return SIM70XX_ERR_FAIL;
     }
 
-    p_Report->RSSI = std::stoi(Response.substr(0, Index));
+    p_Report->RSSI = (int8_t)SIM70XX_Tools_StringToSigned(Response.substr(0, Index));
     if(p_Report->RSSI == 99)
     {
         p_Report->RSSI = 0;
@@ -255,7 +255,7 @@ SIM70XX_Error_t SIM7080_Info_GetQuality(SIM7080_t& p_Device, SIM70XX_Qual_t* p_R
         p_Report->RSSI = -110 + ((p_Report->RSSI - 2) * 2);
     }
 
-    p_Report->RXQual = std::stoi(Response.substr(Response.find_last_of(",") + 1));
+    p_Report->RXQual = (uint8_t)SIM70XX_Tools_StringToUnsigned(Response.substr(Response.find_last_of(",") + 1));
     if(p_Report->RXQual == 99)
     {
         p_Report->RXQual = 0;
@@ -310,15 +310,15 @@ SIM70XX_Error_t SIM7080_Info_GetEquipmentInfo(SIM7080_t& p_Device, SIM7080_UEInf
     else
     {
         p_Info->CAT.TAC = SIM70XX_Tools_SubstringSplitErase(&Response);
-        p_Info->CAT.SCellID = std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
+        p_Info->CAT.SCellID = SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response));
         p_Info->CAT.Band = SIM70XX_Tools_SubstringSplitErase(&Response);
-        p_Info->CAT.earfcn = std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
-        p_Info->CAT.dlbw = std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
-        p_Info->CAT.ulbw = std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
-        p_Info->CAT.RSRQ = std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
-        p_Info->CAT.RSRP = std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
-        p_Info->CAT.RSSI = std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
-        p_Info->CAT.RSSNR = std::stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
+        p_Info->CAT.earfcn = SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response));
+        p_Info->CAT.dlbw = SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response));
+        p_Info->CAT.ulbw = SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response));
+        p_Info->CAT.RSRQ = SIM70XX_Tools_StringToSigned(SIM70XX_Tools_SubstringSplitErase(&Response));
+        p_Info->CAT.RSRP = SIM70XX_Tools_StringToSigned(SIM70XX_Tools_SubstringSplitErase(&Response));
+        p_Info->CAT.RSSI = SIM70XX_Tools_StringToSigned(SIM70XX_Tools_SubstringSplitErase(&Response));
+        p_Info->CAT.RSSNR = SIM70XX_Tools_StringToSigned(SIM70XX_Tools_SubstringSplitErase(&Response));
     }
 
     return SIM70XX_ERR_OK;

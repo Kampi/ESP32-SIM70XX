@@ -55,12 +55,12 @@ void SIM70XX_Evt_MessageFilter(void* p_Device, std::string* p_Message)
 		Processed = true;
 	}
 
-	#ifdef CONFIG_SIM70XX_DRIVER_WITH_GPS
+	#ifdef CONFIG_SIM70XX_DRIVER_WITH_GNSS
 		if(p_Message->find("+SGNSCMD") != std::string::npos)
 		{
-			ESP_LOGI(TAG, "GPS event!");
+			ESP_LOGI(TAG, "GNSS event!");
 
-			SIM7080_Evt_on_GPS(Device, p_Message);
+			SIM7080_Evt_on_GNSS(Device, p_Message);
 		}
 	#endif
 

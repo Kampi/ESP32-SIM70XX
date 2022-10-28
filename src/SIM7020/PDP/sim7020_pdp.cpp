@@ -119,8 +119,8 @@ SIM70XX_Error_t SIM7020_PDP_GetStatus(SIM7020_t& p_Device, std::vector<SIM7020_P
         Index = Dummy.find(",");
         if(Index != std::string::npos)
         {
-            Status.CID = std::stoi(Dummy.substr(Index - 1, 1));
-            Status.Status = (bool)std::stoi(Dummy.substr(Index + 1, 1));
+            Status.CID = (uint8_t)SIM70XX_Tools_StringToUnsigned(Dummy.substr(Index - 1, 1));
+            Status.Status = (bool)SIM70XX_Tools_StringToUnsigned(Dummy.substr(Index + 1, 1));
             Dummy.erase(0, Index + 1);
         }
 
@@ -196,10 +196,10 @@ SIM70XX_Error_t SIM7020_PDP_ReadDynamicParameters(SIM7020_t& p_Device)
     // Get the CID.
     Dummy = Response.substr(Response.find_last_of(",") + 1);
     Response.replace(Response.find("," + Dummy), std::string("," + Dummy).size(), "");
-    p_Device.PDP.CID = std::stoi(Dummy);
+    p_Device.PDP.CID = (uint8_t)SIM70XX_Tools_StringToUnsigned(Dummy);
 
     // Get the Baerer.
-    p_Device.PDP.Baerer = std::stoi(Response);
+    p_Device.PDP.Baerer = (uint8_t)SIM70XX_Tools_StringToUnsigned(Response);
 
     ESP_LOGD(TAG, "IP: %s", p_Device.PDP.IP.c_str());
     ESP_LOGD(TAG, "Subnet: %s", p_Device.PDP.Subnet.c_str());

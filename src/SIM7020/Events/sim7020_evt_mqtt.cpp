@@ -43,19 +43,19 @@ void SIM7020_Evt_on_MQTT_Pub(SIM7020_t* const p_Device, std::string* p_Message)
     p_Message->replace(p_Message->find("+CMQPUB: "), std::string("+CMQPUB: ").size(), "");
 
     // Get the socket ID.
-    Packet->ID = std::stoi(SIM70XX_Tools_SubstringSplitErase(p_Message));
+    Packet->ID = SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(p_Message));
 
     // Get the message topic.
     Packet->Topic = SIM70XX_Tools_SubstringSplitErase(p_Message);
 
     // Get the quality of service.
-    Packet->QoS = (SIM7020_MQTT_QoS_t)std::stoi(SIM70XX_Tools_SubstringSplitErase(p_Message));
+    Packet->QoS = (SIM7020_MQTT_QoS_t)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(p_Message));
 
     // Get the retained flag.
-    Packet->Retained = (bool)std::stoi(SIM70XX_Tools_SubstringSplitErase(p_Message));
+    Packet->Retained = (bool)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(p_Message));
 
     // Get the duplicate flag.
-    Packet->Dup = (bool)std::stoi(SIM70XX_Tools_SubstringSplitErase(p_Message));
+    Packet->Dup = (bool)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(p_Message));
 
     // Skip the length.
     Index = p_Message->find(",");

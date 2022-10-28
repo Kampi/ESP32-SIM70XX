@@ -65,13 +65,13 @@
     void SIM7080_Evt_on_MQTT_Subscribe(SIM7080_t* const p_Device, std::string* p_Message);
 #endif
 
-#ifdef CONFIG_SIM70XX_DRIVER_WITH_GPS
-    /** @brief              GPS on event handler.
+#ifdef CONFIG_SIM70XX_DRIVER_WITH_GNSS
+    /** @brief              GNSS on event handler.
      *                      This function will filter out the receive message from the event message.
      *  @param p_Device     Pointer to device
      *  @param p_Message    Pointer to message string
      */
-    void SIM7080_Evt_on_GPS(SIM7080_t* const p_Device, std::string* p_Message);
+    void SIM7080_Evt_on_GNSS(SIM7080_t* const p_Device, std::string* p_Message);
 #endif
 
 /** @brief              PSM event handler.

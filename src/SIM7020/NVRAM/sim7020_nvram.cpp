@@ -56,7 +56,7 @@ SIM70XX_Error_t SIM7020_NVRAM_Write(SIM7020_t& p_Device, std::string Key, const 
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    Error = (SIM7020_NVRAM_Error_t)std::stoi(Response);
+    Error = (SIM7020_NVRAM_Error_t)SIM70XX_Tools_StringToSigned(Response);
 
     if(p_Error != NULL)
     {
@@ -112,7 +112,7 @@ SIM70XX_Error_t SIM7020_NVRAM_Read(SIM7020_t& p_Device, std::string Key, std::st
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
     // Filter out the error code.
-    Error = (SIM7020_NVRAM_Error_t)std::stoi(Response.substr(0, Response.find(",")));
+    Error = (SIM7020_NVRAM_Error_t)SIM70XX_Tools_StringToSigned(Response.substr(0, Response.find(",")));
     Response.erase(0, Response.find(",") + 1);
 
     if(p_Error != NULL)
@@ -169,7 +169,7 @@ SIM70XX_Error_t SIM7020_NVRAM_Erase(SIM7020_t& p_Device, std::string Key, SIM702
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
     // Filter out the error code.
-    Error = (SIM7020_NVRAM_Error_t)std::stoi(Response.substr(0, Response.find(",")));
+    Error = (SIM7020_NVRAM_Error_t)SIM70XX_Tools_StringToSigned(Response.substr(0, Response.find(",")));
 
     if(p_Error != NULL)
     {
