@@ -24,6 +24,10 @@
 #include "sim70xx_errors.h"
 #include "sim7080_fs_defs.h"
 
+/** @brief Maximum size for a single file.
+ */
+#define SIM7080_FS_MAX_FILE_SIZE                            10240
+
 /** @brief          Initialize the file system.
  *  @param p_Device SIM7080 device object
  *  @return         SIM70XX_ERR_OK when successful

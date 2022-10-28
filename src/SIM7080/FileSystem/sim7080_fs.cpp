@@ -29,10 +29,6 @@
 #include "../../Private/Queue/sim70xx_queue.h"
 #include "../../Private/Commands/sim70xx_commands.h"
 
-/** @brief Maximum file size.
- */
-#define SIM7080_FS_MAX_FILE_SIZE                            10240
-
 static const char* TAG = "SIM7080_FS";
 
 SIM70XX_Error_t SIM7080_FS_Init(SIM7080_t& p_Device)
@@ -239,7 +235,6 @@ SIM70XX_Error_t SIM7080_FS_Delete(SIM7080_t& p_Device, SIM7080_FS_Path_t Path, s
     }
 
     SIM70XX_ERROR_CHECK(SIM7080_FS_GetFileSize(p_Device, Path, Name, &Size))
-
     SIM70XX_ERROR_CHECK(SIM7080_FS_Init(p_Device));
 
     SIM70XX_CREATE_CMD(Command);
