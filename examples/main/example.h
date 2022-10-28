@@ -50,6 +50,15 @@ void StartExamples(void);
     void EMail_Run(DEVICE_TYPE& p_Device);
 #endif
 
+#ifdef CONFIG_DEMO_USE_MQTT
+    /** @brief          Run the MQTT example.
+     *  @param p_Device Pointer to device object
+     *  @param SubTopic (Optional) Subscription topic
+     *  @param PubTopic (Optional) Publish topic
+     */
+    void MQTT_Run(DEVICE_TYPE& p_Device, std::string SubTopic = "foo/bar", std::string PubTopic = "foo/bar");
+#endif
+
 #ifdef CONFIG_DEMO_USE_SNTP
     /** @brief          Run the NTP example.
      *  @param p_Device Pointer to device object

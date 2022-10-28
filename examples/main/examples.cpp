@@ -95,6 +95,10 @@ void StartExamples(void)
             NTP_Run(_Device);
         #endif
 
+        #ifdef CONFIG_DEMO_USE_MQTT
+            MQTT_Run(_Device);
+        #endif
+
         ESP_LOGI(TAG, "Done...");
     }
 }
