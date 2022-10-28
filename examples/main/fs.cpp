@@ -27,6 +27,14 @@
 
 static const char* TAG          = "FS";
 
+#if(CONFIG_SIMXX_DEV == 7080)
+    #define SIMXX_WriteFile(Device, File, Data, Size)               SIM7080_FS_Write(Device, SIM7080_FS_PATH_CUSTOMER, File, Data, Size)
+    #define SIMXX_GetFileSize(Device, File, Size)                   SIM7080_FS_GetFileSize(Device, SIM7080_FS_PATH_CUSTOMER, File, Size)
+    #define SIMXX_ReadFile(Device, File, Data, Size)                SIM7080_FS_Read(Device, SIM7080_FS_PATH_CUSTOMER, File, Data, Size)
+    #define SIMXX_RenameFile(Device, Old, New)                      SIM7080_FS_Rename(Device, SIM7080_FS_PATH_CUSTOMER, Old, New)
+    #define SIMXX_DeleteFile(Device, File)                          SIM7080_FS_Delete(Device, SIM7080_FS_PATH_CUSTOMER, File)
+#endif
+
 void FileSystem_Run(DEVICE_TYPE& p_Device)
 {
     char* p_Buffer;
@@ -34,32 +42,59 @@ void FileSystem_Run(DEVICE_TYPE& p_Device)
     std::string Data;
     std::string File;
     std::string NewFile;
+    SIM70XX_Error_t Error;
 
     File = "Test.txt";
     NewFile = "NewFile.txt";
     Data = "Hello, World!";
 
     ESP_LOGI(TAG, "Write file '%s'...", File.c_str());
-    SIM7080_FS_Write(p_Device, SIM7080_FS_PATH_CUSTOMER, File, Data.c_str(), Data.size());
+    Error = SIMXX_WriteFile(p_Device, File, Data.c_str(), Data.size());
+    if(Error != SIM70XX_ERR_OK)
+    {
+        ESP_LOGE(TAG, "Can not write file! Error: 0x%X", Error);
+        return;
+    }
 
     ESP_LOGI(TAG, "Reading file size...");
-    SIM7080_FS_GetFileSize(p_Device, SIM7080_FS_PATH_CUSTOMER, File, &Size);
+    Error = SIMXX_GetFileSize(p_Device, File, &Size);
+    if(Error != SIM70XX_ERR_OK)
+    {
+        ESP_LOGE(TAG, "Can not read file size! Error: 0x%X", Error);
+        return;
+    }
+
     ESP_LOGI(TAG, "     Size: %u", Size);
 
     ESP_LOGI(TAG, "Read file '%s'...", File.c_str());
     p_Buffer = (char*)calloc((Size + 1), sizeof(char));
     if(p_Buffer != NULL)
     {
-        SIM7080_FS_Read(p_Device, SIM7080_FS_PATH_CUSTOMER, File, p_Buffer, Size);
+        Error = SIMXX_ReadFile(p_Device, File, p_Buffer, Size);
+        if(Error != SIM70XX_ERR_OK)
+        {
+            ESP_LOGE(TAG, "Can not read file! Error: 0x%X", Error);
+            return;
+        }
 
         ESP_LOGI(TAG, "     %s", p_Buffer);
     }
 
     ESP_LOGI(TAG, "Rename file '%s' into '%s'...", File.c_str(), NewFile.c_str());
-    SIM7080_FS_Rename(p_Device, SIM7080_FS_PATH_CUSTOMER, File, NewFile);
+    Error = SIMXX_RenameFile(p_Device, File, NewFile);
+    if(Error != SIM70XX_ERR_OK)
+    {
+        ESP_LOGE(TAG, "Can not rename file! Error: 0x%X", Error);
+        return;
+    }
 
     ESP_LOGI(TAG, "Remove file '%s'...", NewFile.c_str());
-    SIM7080_FS_Delete(p_Device, SIM7080_FS_PATH_CUSTOMER, NewFile);
+    Error = SIMXX_DeleteFile(p_Device, NewFile);
+    if(Error != SIM70XX_ERR_OK)
+    {
+        ESP_LOGE(TAG, "Can not remove file! Error: 0x%X", Error);
+        return;
+    }
 }
 
 #endif
