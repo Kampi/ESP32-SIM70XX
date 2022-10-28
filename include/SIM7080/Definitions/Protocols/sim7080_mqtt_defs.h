@@ -63,7 +63,6 @@ typedef struct
     bool WillFlag;                                  /**< Last will flag. */
     std::string Username;                           /**< Optional username. */
     std::string Password;                           /**< Optional password. */
-    SIM7080_MQTT_QoS_t QoS;                         /**< Quality of service settings. */
     SIM7080_MQTT_Will_t* p_LastWill;                /**< Pointer to last will configuration object. */
     struct
     {

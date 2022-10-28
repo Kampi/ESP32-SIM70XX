@@ -25,7 +25,7 @@
 
 #include "example.h"
 
-static const char* TAG          = "MQTT";
+static const char* TAG          									= "MQTT";
 
 #if(CONFIG_SIMXX_DEV == 7020)
     static SIM7020_MQTT_Socket_t _MQTT_Socket;

@@ -85,7 +85,7 @@ void StartExamples(void)
             SIM7080_Info_GetEquipmentInfo(_Device, &UEInfo);
         #endif
 
-        ESP_LOGI(TAG, "Run examples...");
+        ESP_LOGI(TAG, "Run the examples...");
 
         #ifdef CONFIG_DEMO_USE_FS
             FileSystem_Run(_Device);
