@@ -25,8 +25,8 @@
 
 #include "sim7080.h"
 #include "PDP/sim7080_pdp_defs.h"
-#include "../../Private/Queue/sim70xx_queue.h"
-#include "../../Private/Commands/sim70xx_commands.h"
+#include "../../Core/Queue/sim70xx_queue.h"
+#include "../../Core/Commands/sim70xx_commands.h"
 
 SIM70XX_Error_t SIM7080_PDP_GPRS_Define(SIM7080_t& p_Device, SIM7080_PDP_GPRS_Type_t Type, SIM70XX_APN_t APN, uint8_t PDP)
 {

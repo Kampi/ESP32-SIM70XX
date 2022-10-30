@@ -27,8 +27,8 @@
 
 #include "sim7020.h"
 #include "sim7020_tcpip.h"
-#include "../../../Private/Queue/sim70xx_queue.h"
-#include "../../../Private/Commands/sim70xx_commands.h"
+#include "../../../Core/Queue/sim70xx_queue.h"
+#include "../../../Core/Commands/sim70xx_commands.h"
 
 static const char* TAG = "SIM7020_TCPIP";
 

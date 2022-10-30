@@ -31,9 +31,9 @@
 
 #include "sim7080.h"
 #include "sim7080_pwrmgnt.h"
-#include "../../Private/Queue/sim70xx_queue.h"
-#include "../../Private/Commands/sim70xx_commands.h"
-#include "../../Private/Arch/ESP32/GPIO/sim70xx_gpio.h"
+#include "../../Core/Queue/sim70xx_queue.h"
+#include "../../Core/Commands/sim70xx_commands.h"
+#include "../../Core/Arch/ESP32/GPIO/sim70xx_gpio.h"
 
 SIM70XX_Error_t SIM7080_PSM_Init(SIM7080_t& p_Device)
 {

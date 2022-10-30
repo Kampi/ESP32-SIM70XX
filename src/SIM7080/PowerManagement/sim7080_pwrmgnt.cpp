@@ -29,10 +29,10 @@
 
 #include "sim7080.h"
 #include "sim7080_pwrmgnt.h"
-#include "../../Private/Queue/sim70xx_queue.h"
-#include "../../Private/Commands/sim70xx_commands.h"
-#include "../../Private/Arch/ESP32/GPIO/sim70xx_gpio.h"
-#include "../../Private/Arch/ESP32/Timer/sim70xx_timer.h"
+#include "../../Core/Queue/sim70xx_queue.h"
+#include "../../Core/Commands/sim70xx_commands.h"
+#include "../../Core/Arch/ESP32/GPIO/sim70xx_gpio.h"
+#include "../../Core/Arch/ESP32/Timer/sim70xx_timer.h"
 
 SIM70XX_Error_t SIM7080_PwrMgnt_WakeUp(SIM7080_t& p_Device, uint8_t Timeout)
 {

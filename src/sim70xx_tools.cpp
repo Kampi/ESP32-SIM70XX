@@ -26,8 +26,8 @@
 #include <stdio.h>
 
 #include "sim70xx_tools.h"
-#include "Private/Arch/ESP32/UART/sim70xx_uart.h"
-#include "Private/Arch/ESP32/GPIO/sim70xx_gpio.h"
+#include "Core/Arch/ESP32/UART/sim70xx_uart.h"
+#include "Core/Arch/ESP32/GPIO/sim70xx_gpio.h"
 
 static const char* TAG = "SIM70XX_Tools";
 

@@ -24,11 +24,11 @@
 #include <esp_log.h>
 
 #include "sim7020.h"
-#include "../Private/Arch/ESP32/UART/sim70xx_uart.h"
-#include "../Private/Arch/ESP32/Timer/sim70xx_timer.h"
-#include "../Private/Events/sim70xx_evt.h"
-#include "../Private/Queue/sim70xx_queue.h"
-#include "../Private/Commands/sim70xx_commands.h"
+#include "../Core/Arch/ESP32/UART/sim70xx_uart.h"
+#include "../Core/Arch/ESP32/Timer/sim70xx_timer.h"
+#include "../Core/Events/sim70xx_evt.h"
+#include "../Core/Queue/sim70xx_queue.h"
+#include "../Core/Commands/sim70xx_commands.h"
 
 static const char* TAG = "SIM7020";
 

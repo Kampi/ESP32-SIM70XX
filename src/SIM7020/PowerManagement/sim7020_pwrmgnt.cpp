@@ -27,8 +27,8 @@
 
 #include "sim7020.h"
 #include "sim7020_pwrmgnt.h"
-#include "../../Private/Queue/sim70xx_queue.h"
-#include "../../Private/Commands/sim70xx_commands.h"
+#include "../../Core/Queue/sim70xx_queue.h"
+#include "../../Core/Commands/sim70xx_commands.h"
 
 SIM70XX_Error_t SIM7020_PSM_Enable(SIM7020_t& p_Device, uint8_t Base_T, uint8_t Value_T, uint8_t Base_A, uint8_t Value_A, bool UseRetention)
 {

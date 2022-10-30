@@ -53,12 +53,12 @@ set(COMPONENT_SRCS
     "src/SIM7020/Events/sim7020_evt_psm.cpp"
 
     # Driver internal
-    "src/Private/Events/sim70xx_evt.cpp"
-    "src/Private/Queue/sim70xx_queue.cpp"
-    "src/Private/Arch/ESP32/Timer/sim70xx_timer.cpp"
-    "src/Private/Arch/ESP32/UART/sim70xx_uart.cpp"
-    "src/Private/Arch/ESP32/GPIO/sim70xx_gpio.cpp"
-    )
+    "src/Core/Events/sim70xx_evt.cpp"
+    "src/Core/Queue/sim70xx_queue.cpp"
+    "src/Core/Arch/ESP32/Timer/sim70xx_timer.cpp"
+    "src/Core/Arch/ESP32/UART/sim70xx_uart.cpp"
+    "src/Core/Arch/ESP32/GPIO/sim70xx_gpio.cpp"
+)
 
 set(COMPONENT_ADD_INCLUDEDIRS
 	"include"
@@ -99,7 +99,7 @@ set(COMPONENT_ADD_INCLUDEDIRS
 	"include/SIM7020/Definitions/Configs"
 	"include/SIM7020/Definitions/Protocols"
 	"include/SIM7020/Definitions/PowerManagement"
-	)
+)
 
 set(COMPONENT_PRIV_REQUIRES freertos mbedtls)
 

@@ -26,8 +26,8 @@
 #include "sim7080.h"
 #include "sim7080_fs.h"
 #include "sim7080_ssl.h"
-#include "../../Private/Queue/sim70xx_queue.h"
-#include "../../Private/Commands/sim70xx_commands.h"
+#include "../../Core/Queue/sim70xx_queue.h"
+#include "../../Core/Commands/sim70xx_commands.h"
 
 /** @brief              Execute a SSL convert command.
  *  @param p_Device     SIM7080 device object

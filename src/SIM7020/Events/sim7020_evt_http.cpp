@@ -25,7 +25,7 @@
 
 #include "sim7020.h"
 #include "sim7020_evt.h"
-#include "../../Private/Queue/sim70xx_queue.h"
+#include "../../Core/Queue/sim70xx_queue.h"
 
 static const char* TAG = "SIM7020_Evt_HTTP";
 
