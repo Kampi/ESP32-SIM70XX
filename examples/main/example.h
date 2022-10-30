@@ -36,6 +36,14 @@
  */
 void StartExamples(void);
 
+#ifdef CONFIG_DEMO_USE_NVRAM
+    /** @brief          Run the NVRAM example.
+     *  @param p_Device Pointer to device object
+	 *	@param Key		(Optional) Key for demo application
+     */
+    void NVRAM_Run(DEVICE_TYPE& p_Device, std::string Key = "Demo");
+#endif
+
 #ifdef CONFIG_DEMO_USE_FS
     /** @brief          Run the file system example.
      *  @param p_Device Pointer to device object

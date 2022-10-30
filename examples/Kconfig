@@ -17,72 +17,6 @@ menu "Demo"
 			range -47 48
 	endmenu
 
-	menu "E-Mail"
-	    depends on SIM70XX_DRIVER_WITH_EMAIL
-
-        config DEMO_USE_EMAIL
-            bool "Enable the E-Mail demo"
-
-        config DEMO_SNTP_SERVER
-	        depends on DEMO_USE_EMAIL
-            string "Server address"
-
-        config DEMO_SNTP_PORT
-	        depends on DEMO_USE_EMAIL
-            int "Server port"
-            range 0 65535
-			default 465
-
-        config DEMO_SNTP_USER
-	        depends on DEMO_USE_EMAIL
-            string "SNTP user"
-
-        config DEMO_SNTP_PASSWORD
-	        depends on DEMO_USE_EMAIL
-            string "SNTP password"
-
-        config DEMO_USE_POP3
-            bool "Enable POP3 support to receive e-mails"
-
-        config DEMO_POP3_SERVER
-	        depends on DEMO_USE_POP3
-            string "POP3 Server address"
-
-        config DEMO_POP3_PORT
-	        depends on DEMO_USE_POP3
-            int "POP3 Server port"
-            range 0 65535
-			default 995
-	endmenu
-
-	menu "TCP/IP"
-	    depends on SIM70XX_DRIVER_WITH_TCPIP
-
-        config DEMO_USE_TCPIP
-            bool "Enable the TCP/IP demo"
-
-        config DEMO_TCP_HOST
-	        depends on DEMO_USE_TCPIP
-            string "Server address"
-            default "webhook.site"
-
-		config DEMO_TCP_PORT
-	        depends on DEMO_USE_TCPIP
-            int "Server port"
-            range 0 65535
-			default 65432
-
-        config DEMO_UDP_HOST
-	        depends on DEMO_USE_TCPIP
-            string "Server address"
-
-		config DEMO_UDP_PORT
-	        depends on DEMO_USE_TCPIP
-            int "Server port"
-            range 0 65535
-			default 65431
-	endmenu
-
 	menu "File System"
 	    depends on SIM70XX_DRIVER_WITH_FS
 
@@ -95,13 +29,6 @@ menu "Demo"
 
         config DEMO_USE_NVRAM
             bool "Enable the NVRAM demo"
-	endmenu
-
-	menu "SSL"
-	    depends on SIM70XX_DRIVER_WITH_SSL
-
-        config DEMO_USE_SSL
-            bool "Enable the SSL support for the demos"
 	endmenu
 
 	menu "MQTT"

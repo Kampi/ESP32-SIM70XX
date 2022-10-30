@@ -87,20 +87,24 @@ void StartExamples(void)
 
         ESP_LOGI(TAG, "Run the examples...");
 
+        #ifdef CONFIG_DEMO_USE_NVRAM
+            NVRAM_Run(_Device);
+        #endif
+
         #ifdef CONFIG_DEMO_USE_FS
             FileSystem_Run(_Device);
         #endif
 
-        #ifdef CONFIG_DEMO_USE_SNTP
-            NTP_Run(_Device);
+        #ifdef CONFIG_DEMO_USE_EMAIL
+            EMail_Run(_Device);
         #endif
 
         #ifdef CONFIG_DEMO_USE_MQTT
             MQTT_Run(_Device);
         #endif
 
-        #ifdef CONFIG_DEMO_USE_EMAIL
-            EMail_Run(_Device);
+        #ifdef CONFIG_DEMO_USE_SNTP
+            NTP_Run(_Device);
         #endif
 
         ESP_LOGI(TAG, "Done...");

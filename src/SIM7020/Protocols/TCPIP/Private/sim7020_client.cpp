@@ -212,7 +212,6 @@ SIM70XX_Error_t SIM7020_Client_Receive(SIM7020_t& p_Device, SIM7020_TCPIP_Socket
     if(p_Buffer->empty() == false)
     {
         p_Buffer->pop_back();
-        p_Buffer->pop_back();
     }
 
     return SIM70XX_ERR_OK;

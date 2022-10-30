@@ -13,13 +13,13 @@
       - [Complete](#complete)
   - [Examples](#examples)
     - [Using esp-idf](#using-esp-idf)
+    - [NVRAM](#nvram)
     - [File System](#file-system)
     - [E-Mail](#e-mail)
-    - [NTP](#ntp)
-      - [Configure the NTP project](#configure-the-ntp-project)
     - [MQTT](#mqtt)
       - [Prepare the broker](#prepare-the-broker)
       - [Configure the MQTT project](#configure-the-mqtt-project)
+    - [NTP](#ntp)
   - [Maintainer](#maintainer)
 
 ## About
@@ -38,8 +38,8 @@ Multidevice driver for SIMCom cellular modules with UART interface.
 | File system   |               | Complete      |
 | SSL           |               | Open          |
 | NVRAM         | Complete      |               |
-| TCP (Client)  | Basic         | Basic         |
-| UDP (Client)  | Open          | Open          |
+| TCP (Client)  | Complete      | Complete      |
+| UDP (Client)  | Complete      | Complete      |
 | TCP (Server)  | Open          | Open          |
 | UDP (Server)  | Open          | Open          |
 | HTTP          | Open          | Not started   |
@@ -78,6 +78,16 @@ The component contains an `examples` directory with several examples to test the
 - Go back to the `Demo` menu and enable the demos for the selected submodules.
 - Run `make` to compile the demo
 
+### NVRAM
+
+This demo writes and read data from a specific NVRAM key. In the next step all keys are read out and the demo key gets erased from NVRAM.
+
+- Run `make menuconfig`
+- Open the menu `Demo` -> `NVRAM`
+- Select `Enable the NVRAM demo`
+- Run `make`
+- Execute the demo application
+
 ### File System
 
 This demo is writing data into a file. Then the data from the file is read and the file gets renamed and the original file will be deleted.
@@ -101,22 +111,7 @@ This demo is sending a E-mail to the given recipient. At next all E-Mails from t
 
 > **Warning**
 > Please make sure that the inbox doesn´t contain any important E-Mails!
-
-> **Warning**
 > Depending on your e-mail service you have to enable SSL too!
-
-### NTP
-
-#### Configure the NTP project
-
-This demo demo is fetching the time from the given NTP server. After fetching the time the demo ends.
-
-- Run `make menuconfig`
-- Open the menu `Demo` -> `NTP`
-- Select `Enable the SNTP demo`
-- Fill in the required informations
-- Run `make`
-- Execute the demo application
 
 ### MQTT
 
@@ -148,6 +143,18 @@ mosquitto -c /etc/mosquitto/mosquitto.conf
 - Run `make menuconfig`
 - Open the menu `Demo` -> `MQTT`
 - Select `Enable the MQTT demo`
+- Fill in the required informations
+- Run `make`
+- Execute the demo application
+
+
+### NTP
+
+This demo demo is fetching the time from the given NTP server. After fetching the time the demo ends.
+
+- Run `make menuconfig`
+- Open the menu `Demo` -> `NTP`
+- Select `Enable the SNTP demo`
 - Fill in the required informations
 - Run `make`
 - Execute the demo application

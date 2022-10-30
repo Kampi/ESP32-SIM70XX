@@ -205,7 +205,7 @@ static void SIM70XX_Evt_Task(void* p_Arg)
                             Line = Line.replace(Line.find(Dummy), Dummy.size(), "");
                         }
 
-                        // Add the received line to the response when the number of lines is 0.
+                        // Add the received line to the response when the number of lines is greater than 1.
                         if((*it)->Lines > 1)
                         {
                             (*it)->Response += Line + '\n';

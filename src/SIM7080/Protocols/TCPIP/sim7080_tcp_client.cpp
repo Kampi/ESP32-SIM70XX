@@ -220,7 +220,6 @@ SIM70XX_Error_t SIM7080_TCP_Client_Transmit(SIM7080_t& p_Device, SIM7080_TCPIP_S
             Remaining -= BytesToSend;
         }
     } while(Remaining > 0);
-
     vTaskResume(p_Device.Internal.TaskHandle);
 
     return Error;

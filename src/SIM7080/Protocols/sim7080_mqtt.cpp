@@ -322,7 +322,6 @@ SIM70XX_Error_t SIM7080_MQTT_Publish(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t*
             Remaining -= BytesToSend;
         }
     } while(Remaining > 0);
-
     vTaskResume(p_Device.Internal.TaskHandle);
 
     return Error;

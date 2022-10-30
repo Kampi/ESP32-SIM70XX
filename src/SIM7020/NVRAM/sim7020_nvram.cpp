@@ -25,6 +25,7 @@
 
 #include "sim7020.h"
 #include "sim7020_nvram.h"
+#include "../../Private/Arch/ESP32/UART/sim70xx_uart.h"
 #include "../../Private/Queue/sim70xx_queue.h"
 #include "../../Private/Commands/sim70xx_commands.h"
 
@@ -112,9 +113,7 @@ SIM70XX_Error_t SIM7020_NVRAM_Read(SIM7020_t& p_Device, std::string Key, std::st
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
     // Filter out the error code.
-    Error = (SIM7020_NVRAM_Error_t)SIM70XX_Tools_StringToSigned(Response.substr(0, Response.find(",")));
-    Response.erase(0, Response.find(",") + 1);
-
+    Error = (SIM7020_NVRAM_Error_t)SIM70XX_Tools_StringToSigned(SIM70XX_Tools_SubstringSplitErase(&Response));
     if(p_Error != NULL)
     {
         *p_Error = Error;
@@ -126,16 +125,13 @@ SIM70XX_Error_t SIM7020_NVRAM_Read(SIM7020_t& p_Device, std::string Key, std::st
     }
 
     // Filter out the key.
-    Response.substr(0, Response.find(","));
-    Response.erase(0, Response.find(",") + 1);
+    SIM70XX_Tools_SubstringSplitErase(&Response);
 
     // Filter out the length.
-    Response.substr(0, Response.find(","));
-    Response.erase(0, Response.find(",") + 1);
+    SIM70XX_Tools_SubstringSplitErase(&Response);
 
     // Filter out the payload.
-    *p_Payload = Response.substr(0);
-    p_Payload->replace(p_Payload->begin(), p_Payload->end(), "\"", "");
+    *p_Payload = Response;
 
     ESP_LOGD(TAG, "Error: %i", Error);
     ESP_LOGD(TAG, "Length: %i", p_Payload->length());
@@ -169,7 +165,7 @@ SIM70XX_Error_t SIM7020_NVRAM_Erase(SIM7020_t& p_Device, std::string Key, SIM702
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
     // Filter out the error code.
-    Error = (SIM7020_NVRAM_Error_t)SIM70XX_Tools_StringToSigned(Response.substr(0, Response.find(",")));
+    Error = (SIM7020_NVRAM_Error_t)SIM70XX_Tools_StringToSigned(Response);
 
     if(p_Error != NULL)
     {
@@ -186,9 +182,8 @@ SIM70XX_Error_t SIM7020_NVRAM_Erase(SIM7020_t& p_Device, std::string Key, SIM702
 
 SIM70XX_Error_t SIM7020_NVRAM_GetKeys(SIM7020_t& p_Device, std::vector<std::string>* p_Keys)
 {
-    int32_t Index;
-    std::string Response;
-    SIM70XX_TxCmd_t* Command;
+    SIM70XX_Error_t Error = SIM70XX_ERR_OK;
+    SIM70XX_TxCmd_t Command;
 
     if(p_Keys == NULL)
     {
@@ -201,40 +196,59 @@ SIM70XX_Error_t SIM7020_NVRAM_GetKeys(SIM7020_t& p_Device, std::vector<std::stri
 
     p_Keys->clear();
 
-    SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7020_AT_CNVMGET;
-    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
-    {
-        return SIM70XX_ERR_FAIL;
-    }
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
+    // We have to pause the UART thread here and receive the response line by line, because we don´t know the exakt number of keys.
+    vTaskSuspend(p_Device.Internal.TaskHandle);
 
-    // Split the response into the different keys.
+    // Transmit the command.
+    Command = SIM7020_AT_CNVMGET;
+    SIM70XX_UART_SendLine(p_Device.UART, Command.Command);
+
+    // Get the responses.
     do
     {
-        std::string Key;
+        std::string Response;
 
-        Index = Response.find('\n');
+        Response = SIM70XX_UART_ReadStringUntil(p_Device.UART);
 
-        Key = Response.substr(0, Index);
-
-        if(Key.size() < 1)
+        // We have received something.
+        if(Response.size() > 2)
         {
-            break;
+            ESP_LOGD(TAG, "Response: %s", Response.c_str());
+
+            // OK received. Abort here.
+            if((Response.find("OK") != std::string::npos) && (Response.size() < 4))
+            {
+                break;
+            }
+            // We got a valid entry here.
+            else if(Response.find("+CNVMGET:") != std::string::npos)
+            {
+                // Remove the command and the index.
+                SIM70XX_Tools_SubstringSplitErase(&Response);
+
+                // Remove the group name.
+                SIM70XX_Tools_SubstringSplitErase(&Response);
+
+                // Replace the quotations.
+                Response.erase(std::remove(Response.begin(), Response.end(), '\"'), Response.end());
+
+                ESP_LOGD(TAG, "Key: %s", Response.c_str());
+
+                p_Keys->push_back(Response);
+            }
+            // Unknown response. Abort here.
+            else
+            {
+                Error = SIM70XX_ERR_FAIL;
+                break;
+            }
         }
 
-        Response.erase(0, Index + 1);
-        Key.replace(Key.begin(), Key.end(), "\n", "");
-
-        Key = Key.substr(Key.find_last_of(",") + 1);
-        Key.replace(Key.begin(), Key.end(), "\"", "");
-
-        p_Keys->push_back(Key);
-        ESP_LOGI(TAG, "Key: %s", Key.c_str());
+        vTaskDelay(100 / portTICK_PERIOD_MS);
     } while(true);
+    vTaskResume(p_Device.Internal.TaskHandle);
 
-    return SIM70XX_ERR_OK;
+    return Error;
 }
 
 #endif

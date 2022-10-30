@@ -25,7 +25,7 @@
 
 #include "example.h"
 
-static const char* TAG          = "FS";
+static const char* TAG                                              = "FS";
 
 #if(CONFIG_SIMXX_DEV == 7080)
     #define SIMXX_WriteFile(Device, File, Data, Size)               SIM7080_FS_Write(Device, SIM7080_FS_PATH_CUSTOMER, File, Data, Size)
