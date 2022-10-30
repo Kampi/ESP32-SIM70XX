@@ -90,6 +90,14 @@ typedef int SIM70XX_Error_t;
  */
 #define SIM70XX_ERR_NO_UPDATE                                   SIM70XX_ERR_BASE + 13
 
+/** @brief Generic E-Mail error.
+ */
+#define SIM70XX_ERR_MAIL_INVALID_RESPONSE                       SIM70XX_ERR_BASE + 14
+
+/** @brief E-Mail not available.
+ */
+#define SIM70XX_ERR_MAIL_NOT_AVAILABLE                          SIM70XX_ERR_BASE + 15
+
 /** @brief      Generic error check macro.
  *  @param Func Function call
  */

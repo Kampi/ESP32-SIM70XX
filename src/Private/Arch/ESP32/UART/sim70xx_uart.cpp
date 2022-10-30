@@ -222,7 +222,7 @@ std::string SIM70XX_UART_ReadStringUntil(SIM70XX_UART_Conf_t& p_Config, char Ter
     return Return;
 }
 
-std::string SIM70XX_UART_ReadString(SIM70XX_UART_Conf_t& p_Config)
+std::string SIM70XX_UART_ReadString(SIM70XX_UART_Conf_t& p_Config, uint32_t Timeout)
 {
     int c;
     std::string Return;
@@ -232,11 +232,11 @@ std::string SIM70XX_UART_ReadString(SIM70XX_UART_Conf_t& p_Config)
         return std::string();
     }
 
-    c = SIM7020_UART_TimedRead(p_Config);
+    c = SIM7020_UART_TimedRead(p_Config, Timeout);
     while(c >= 0)
     {
         Return += (char)c;
-        c = SIM7020_UART_TimedRead(p_Config);
+        c = SIM7020_UART_TimedRead(p_Config, Timeout);
     }
 
     return Return;

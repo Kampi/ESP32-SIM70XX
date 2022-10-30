@@ -99,6 +99,10 @@ void StartExamples(void)
             MQTT_Run(_Device);
         #endif
 
+        #ifdef CONFIG_DEMO_USE_EMAIL
+            EMail_Run(_Device);
+        #endif
+
         ESP_LOGI(TAG, "Done...");
     }
 }

@@ -72,14 +72,14 @@ void SIM70XX_Tools_Hex2ASCII(std::string Hex, std::string* const p_Buffer);
  */
 bool SIM70XX_Tools_ToBase64(const void* const p_Buffer, uint32_t Length, std::string* const p_Base64);
 
-/** @brief          Enable the module.
+/** @brief          Enable the module by switching the PWRKEY pin.
  *  @param p_Config Pointer to SIM70XX UART configuration object
  *  @param Cycles   (Optional) Number of activation cycles
  *  @return         #true when the module is enabled
  */
 bool SIM70XX_Tools_EnableModule(SIM70XX_UART_Conf_t& p_Config, uint8_t Cycles = 20);
 
-/** @brief          Disable the module by using the PwrKey signal.
+/** @brief          Disable the module by using the PWRKEY signal.
  *  @param p_Config Pointer to SIM70XX UART configuration object
  *  @return         #true when the module is disabled
  */

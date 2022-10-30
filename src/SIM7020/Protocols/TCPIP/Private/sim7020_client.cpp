@@ -62,7 +62,7 @@ SIM70XX_Error_t SIM7020_Client_CreateSocket(SIM7020_t& p_Device, SIM7020_TCP_Typ
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    p_Socket->Internal.ID = (uint8_t)sSIM70XX_Tools_StringToUnsigned(Response);
+    p_Socket->Internal.ID = (uint8_t)SIM70XX_Tools_StringToUnsigned(Response);
     p_Device.TCP.Sockets.push_back(p_Socket);
     p_Socket->Internal.isConnected = false;
     p_Socket->Internal.isCreated = true;

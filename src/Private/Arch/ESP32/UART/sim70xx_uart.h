@@ -78,9 +78,10 @@ std::string SIM70XX_UART_ReadStringUntil(SIM70XX_UART_Conf_t& p_Config, char Ter
 
 /** @brief          Receive a string from the UART interface.
  *  @param p_Config Pointer to SIM70XX UART configuration object
+ *  @param Timeout  (Optional) Timeout in milliseconds
  *  @return         Received string
  */
-std::string SIM70XX_UART_ReadString(SIM70XX_UART_Conf_t& p_Config);
+std::string SIM70XX_UART_ReadString(SIM70XX_UART_Conf_t& p_Config, uint32_t Timeout = 1000UL);
 
 /** @brief              Flush the UART receive buffer.
  *  @param p_Config     Pointer to SIM70XX UART configuration object

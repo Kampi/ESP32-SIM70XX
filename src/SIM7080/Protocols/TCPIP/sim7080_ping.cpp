@@ -27,8 +27,8 @@
 
 #include "sim7080.h"
 #include "sim7080_tcpip.h"
-#include "../../Private/Queue/sim70xx_queue.h"
-#include "../../Private/Commands/sim70xx_commands.h"
+#include "../../../Private/Queue/sim70xx_queue.h"
+#include "../../../Private/Commands/sim70xx_commands.h"
 
 SIM70XX_Error_t SIM7080_TCPIP_Ping(SIM7080_t& p_Device, const SIM7080_Ping_t* const p_Config, std::vector<SIM7080_PingRes_t>* p_Result, bool IPv6)
 {

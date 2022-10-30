@@ -26,9 +26,9 @@
 
 #include "sim7080.h"
 #include "sim7080_tcpip.h"
-#include "../../Private/Arch/ESP32/UART/sim70xx_uart.h"
-#include "../../Private/Queue/sim70xx_queue.h"
-#include "../../Private/Commands/sim70xx_commands.h"
+#include "../../../Private/Arch/ESP32/UART/sim70xx_uart.h"
+#include "../../../Private/Queue/sim70xx_queue.h"
+#include "../../../Private/Commands/sim70xx_commands.h"
 
 static const char* TAG = "SIM7080_TCPIP_Client";
 
@@ -120,7 +120,6 @@ SIM70XX_Error_t SIM7080_TCP_Client_Transmit(SIM7080_t& p_Device, SIM7080_TCP_Soc
     uint8_t* Buffer = (uint8_t*)p_Buffer;
     uint32_t Remaining = Length;
     SIM70XX_Error_t Error = SIM70XX_ERR_OK;
-    SIM70XX_TxCmd_t Command;
 
     if((p_Socket == NULL) || (p_Socket->Internal.Type != SIM7080_TCP_TYPE_TCP) || ((p_Buffer == NULL) && (Length > 0)) || (PacketSize > SIM7080_TCP_MAX_PAYLOAD_SIZE))
     {
@@ -151,6 +150,7 @@ SIM70XX_Error_t SIM7080_TCP_Client_Transmit(SIM7080_t& p_Device, SIM7080_TCP_Soc
     {
         uint32_t BytesToSend;
         std::string Response;
+        SIM70XX_TxCmd_t Command;
 
         esp_task_wdt_reset();
 

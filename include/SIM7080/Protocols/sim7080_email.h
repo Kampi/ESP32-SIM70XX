@@ -24,6 +24,10 @@
 #include "sim70xx_errors.h"
 #include "sim7080_email_defs.h"
 
+/** @brief Maximum number of bytes for a single POP3 read transmission.
+ */
+#define SIM7080_EMAIL_POP3_MAX_PAYLOAD_SIZE                 1460
+
 /** @brief          Send a text E-Mail.
  *  @param p_Device SIM7080 device object
  *  @param p_Config SIM7080 E-Mail configuration object
@@ -34,6 +38,7 @@
  *  @param p_Error  (Optional) Pointer to E-Mail transmission error code
  *  @param CID      (Optional) Context Identifier
  *  @return         SIM70XX_ERR_OK when successful
+ *                  SIM70XX_ERR_MAIL_INVALID_RESPONSE when an E-Mail error occurs. See \ref p_Error for more informations.
  */
 SIM70XX_Error_t SIM7080_EMail_SendText(SIM7080_t& p_Device, SIM7080_EMail_Config_t* p_Config, SIM7080_EMail_User_t* p_Sender, SIM7080_EMail_User_t* p_To, std::string Subject, std::string Body, SIM7080_EMail_Error_t* p_Error = NULL, uint8_t CID = 0);
 
@@ -49,16 +54,79 @@ SIM70XX_Error_t SIM7080_EMail_SendText(SIM7080_t& p_Device, SIM7080_EMail_Config
  *  @param p_Error  (Optional) Pointer to E-Mail transmission error code
  *  @param CID      (Optional) Context Identifier
  *  @return         SIM70XX_ERR_OK when successful
+ *                  SIM70XX_ERR_MAIL_INVALID_RESPONSE when an E-Mail error occurs. See \ref p_Error for more informations.
  */
 SIM70XX_Error_t SIM7080_EMail_SendText(SIM7080_t& p_Device, SIM7080_EMail_Config_t* p_Config, SIM7080_EMail_User_t* p_Sender, SIM7080_EMail_User_t* p_To, std::string Subject, std::string Body, SIM7080_EMail_User_t* p_CC, SIM7080_EMail_User_t* p_BCC, SIM7080_EMail_Error_t* p_Error = NULL, uint8_t CID = 0);
 
+/** @brief          Login to a POP3 server.
+ *  @param p_Device SIM7080 device object
+ *  @param p_Config SIM7080 E-Mail configuration object
+ *  @param p_Error  (Optional) Pointer to E-Mail transmission error code
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_EMail_POP3_Login(SIM7080_t& p_Device, SIM7080_EMail_Config_t* p_Config, SIM7080_EMail_Error_t* p_Error = NULL);
+
+/** @brief          Get the available E-Mails and the total size.
+ *                  NOTE: You have to call \ref SIM7080_EMail_POP3_Login first
+ *  @param p_Device SIM7080 device object
+ *  @param p_Num    Pointer to number of E-Mails available
+ *  @param p_Size   Pointer to total E-Mail size in bytes
+ *  @param p_Error  (Optional) Pointer to E-Mail transmission error code
+ *  @return         SIM70XX_ERR_OK when successful
+ *                  SIM70XX_ERR_MAIL_INVALID_RESPONSE when an E-Mail error occurs. See \ref p_Error for more informations.
+ */
+SIM70XX_Error_t SIM7080_EMail_POP3_ReadInbox(SIM7080_t& p_Device, uint32_t* p_Num, uint32_t* p_Size, SIM7080_EMail_Error_t* p_Error = NULL);
+
+/** @brief          Get the unique ID and the size for a specific E-Mail.
+ *                  NOTE: You have to call \ref SIM7080_EMail_POP3_Login first
+ *  @param p_Device SIM7080 device object
+ *  @param Mail     Target E-Mail index
+ *  @param p_Size   Pointer to E-Mail size in bytes
+ *  @param p_ID     Pointer to unique ID
+ *  @param p_Error  (Optional) Pointer to E-Mail transmission error code
+ *  @return         SIM70XX_ERR_OK when successful
+ *                  SIM70XX_ERR_MAIL_INVALID_RESPONSE when an E-Mail error occurs. See \ref p_Error for more informations.
+ */
+SIM70XX_Error_t SIM7080_EMail_POP3_ReadEMailMeta(SIM7080_t& p_Device, uint32_t Mail, uint32_t* p_Size, std::string* p_ID, SIM7080_EMail_Error_t* p_Error = NULL);
+
+/** @brief              Get the unique ID and the size for a specific E-Mail.
+ *                      NOTE: You have to call \ref SIM7080_EMail_POP3_Login first
+ *  @param p_Device     SIM7080 device object
+ *  @param ID           Target E-Mail index
+ *  @param p_Mail       Pointer to E-Mail data
+ *  @param p_Error      (Optional) Pointer to E-Mail transmission error code
+ *  @param PacketSize   (Optional) Read packet size in bytes
+ *                      NOTE: Only values between 1 and 1460 are allowed!
+ *  @return             SIM70XX_ERR_OK when successful
+ *                      SIM70XX_ERR_MAIL_INVALID_RESPONSE when an E-Mail error occurs. See \ref p_Error for more informations.
+ */
+SIM70XX_Error_t SIM7080_EMail_POP3_ReadEMail(SIM7080_t& p_Device, uint32_t ID, std::string* p_Mail, SIM7080_EMail_Error_t* p_Error = NULL, uint16_t PacketSize = SIM7080_EMAIL_POP3_MAX_PAYLOAD_SIZE);
+
+/** @brief          Delete an E-Mail from the inbox.
+ *                  NOTE: You have to call \ref SIM7080_EMail_POP3_Login first
+ *  @param p_Device SIM7080 device object
+ *  @param ID       Target E-Mail index
+ *  @param p_Error  (Optional) Pointer to E-Mail transmission error code
+ *  @return         SIM70XX_ERR_OK when successful
+ *                  SIM70XX_ERR_MAIL_INVALID_RESPONSE when an E-Mail error occurs. See \ref p_Error for more informations.
+ */
+SIM70XX_Error_t SIM7080_EMail_POP3_DeleteEMail(SIM7080_t& p_Device, uint32_t ID, SIM7080_EMail_Error_t* p_Error = NULL);
+
+/** @brief          Logout from a POP3 server.
+ *  @param p_Device SIM7080 device object
+ *  @param p_Error  (Optional) Pointer to E-Mail transmission error code
+ *  @return         SIM70XX_ERR_OK when successful
+ *                  SIM70XX_ERR_MAIL_INVALID_RESPONSE when an E-Mail error occurs. See \ref p_Error for more informations.
+ */
+SIM70XX_Error_t SIM7080_EMail_POP3_Logout(SIM7080_t& p_Device, SIM7080_EMail_Error_t* p_Error = NULL);
+
 #ifdef CONFIG_SIM70XX_DRIVER_WITH_SSL
-    /** @brief                  Enable / Disable SSL support for the E-Mail client.
-     *  @param p_Device         SIM7080 device object
-     *  @param Enable           Enable / Disable SSL
-     *  @param SSL_Config       (Optional) SSL configuration identifier
-     *  @param SSL_Opts         (Optional) SSL options
-     *  @return                 SIM70XX_ERR_OK when successful
+    /** @brief              Enable / Disable SSL support for the E-Mail client.
+     *  @param p_Device     SIM7080 device object
+     *  @param Enable       Enable / Disable SSL
+     *  @param SSL_Config   (Optional) SSL configuration identifier
+     *  @param SSL_Opts     (Optional) SSL options
+     *  @return             SIM70XX_ERR_OK when successful
      */
     SIM70XX_Error_t SIM7080_EMail_EnableSSL(SIM7080_t& p_Device, bool Enable, uint8_t SSL_Config = 0, SIM7080_EMail_SSL_t SSL_Opts = SIM7080_EMAIL_SSL_ENABLE);
 #endif

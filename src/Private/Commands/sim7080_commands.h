@@ -140,6 +140,7 @@
  *
  */
 #define SIM7080_AT_EMAILCID(ID)                                 SIM70XX_CMD("AT+EMAILCID=" + std::to_string(ID), false, 1, 1)
+#define SIM7080_AT_SMTPCS(Encoding)                             SIM70XX_CMD("AT+SMTPCS=\"" + Encoding + "\"", false, 1, 1)
 #define SIM7080_AT_EMAILTO(Timeout)                             SIM70XX_CMD("AT+EMAILTO=" + std::to_string(Timeout), false, 1, 1)
 #define SIM7080_AT_SMTPSRV(Address, Port)                       SIM70XX_CMD("AT+SMTPSRV=\"" + Address + "\"," + std::to_string(Port), false, 1, 1)
 #define SIM7080_AT_SMTPAUTH(User, Password)                     SIM70XX_CMD("AT+SMTPAUTH=1,\"" + User + "\",\"" + Password + "\"", false, 1, 1)
@@ -147,8 +148,17 @@
 #define SIM7080_AT_SMTPRCPT(Type, Address, Name)                SIM70XX_CMD("AT+SMTPRCPT=" + std::to_string(Type) + ",0,\"" + Address + "\",\"" + Name + "\"", false, 1, 1)
 #define SIM7080_AT_SMTPSUB(Subject)                             SIM70XX_CMD("AT+SMTPSUB=" + Subject, false, 1, 1)
 #define SIM7080_AT_SMTPBODY(Size)                               SIM70XX_CMD("AT+SMTPBODY=" + std::to_string(Size), false, 1, 1)
-#define SIM7080_AT_SMTPSEND                                     SIM70XX_CMD("AT+SMTPSEND", false, 300, 1)
+#define SIM7080_AT_SMTPSEND                                     SIM70XX_CMD("AT+SMTPSEND", false, 1, 1)
 #define SIM7080_AT_EMAILSSL(Type, Config)                       SIM70XX_CMD("AT+EMAILSSL=" + std::to_string(Type) + "," + std::to_string(Config), false, 1, 1)
+#define SIM7080_AT_POP3SRV(Server, User, Password, Port)        SIM70XX_CMD("AT+POP3SRV=\"" + Server + "\",\"" + User + "\",\"" + Password + "\"," + std::to_string(Port), false, 1, 1)
+#define SIM7080_AT_POP3IN                                       SIM70XX_CMD("AT+POP3IN", false, 1, 1)
+#define SIM7080_AT_POP3NUM                                      SIM70XX_CMD("AT+POP3NUM", false, 1, 1)
+#define SIM7080_AT_POP3LIST(Index)                              SIM70XX_CMD("AT+POP3LIST=" + std::to_string(Index), false, 1, 1)
+#define SIM7080_AT_POP3UIDL(Index)                              SIM70XX_CMD("AT+POP3UIDL=" + std::to_string(Index), false, 1, 1)
+#define SIM7080_AT_POP3OUT                                      SIM70XX_CMD("AT+POP3OUT", false, 1, 1)
+#define SIM7080_AT_POP3CMD(Command, Index)                      SIM70XX_CMD("AT+POP3CMD=" + std::to_string(Command) + "," + std::to_string(Index), false, 1, 1)
+#define SIM7080_AT_POP3READ(Size)                               SIM70XX_CMD("AT+POP3READ=" + std::to_string(Size), false, 1, 1)
+#define SIM7080_AT_POP3DEL(Index)                               SIM70XX_CMD("AT+POP3DEL=" + std::to_string(Index), false, 1, 1)
 
 /**
  *
@@ -162,6 +172,6 @@
 #define SIM7080_AT_CGNSWARM                                     SIM70XX_CMD("AT+CGNSWARM", false, 10, 1)
 #define SIM7080_AT_CGNSHOT                                      SIM70XX_CMD("AT+CGNSHOT", false, 10, 1)
 #define SIM7080_AT_SGNSCFG(Type, Value)                         SIM70XX_CMD("AT+SGNSCFG=\"" + std::string(Type) + "\"," + std::to_string(Value), false, 1, 1)
-#define SIM7080_AT_SGNSCMD(Command)                             SIM70XX_CMD(Command, false, 10, 1)
+#define SIM7080_AT_SGNSCMD(Command)                             SIM70XX_CMD(Command, false, 1, 1)
 
 #endif /* SIM7080_COMMANDS_H_ */

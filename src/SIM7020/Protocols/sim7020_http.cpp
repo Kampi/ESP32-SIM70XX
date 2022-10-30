@@ -339,7 +339,7 @@ SIM70XX_Error_t SIM7020_HTTP_GET(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_S
     SIM70XX_Tools_SubstringSplitErase(&Response);
 
     // Get the payload length.
-    *p_Length = (uint32_t)sSIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response));
+    *p_Length = (uint32_t)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response));
 
     *p_Buffer = (uint8_t*)malloc(*p_Length);
 
