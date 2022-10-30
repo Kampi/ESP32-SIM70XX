@@ -48,6 +48,8 @@ void FileSystem_Run(DEVICE_TYPE& p_Device)
     NewFile = "NewFile.txt";
     Data = "Hello, World!";
 
+	ESP_LOGI(TAG, "Run File System example...");
+
     ESP_LOGI(TAG, "Write file '%s'...", File.c_str());
     Error = SIMXX_WriteFile(p_Device, File, Data.c_str(), Data.size());
     if(Error != SIM70XX_ERR_OK)

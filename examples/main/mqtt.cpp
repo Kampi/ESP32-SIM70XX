@@ -53,6 +53,8 @@ void MQTT_Run(DEVICE_TYPE& p_Device, std::string SubTopic, std::string PubTopic)
 {
     SIM70XX_Error_t Error;
 
+	ESP_LOGI(TAG, "Run MQTT example...");
+
     _MQTT_Socket.KeepAlive = 60;
     _MQTT_Socket.Broker = CONFIG_DEMO_MQTT_BROKER;
     _MQTT_Socket.Port = CONFIG_DEMO_MQTT_PORT;

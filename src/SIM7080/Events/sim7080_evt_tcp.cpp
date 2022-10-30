@@ -44,7 +44,7 @@ void SIM7080_Evt_on_TCP_Disconnect(SIM7080_t* const p_Device, std::string* p_Mes
     CID = SIM70XX_Tools_StringToUnsigned(Message.substr((Index - 1), Index));
     Error = (SIM7080_TCP_Error_t)SIM70XX_Tools_StringToUnsigned(Message.substr(Index + 1));
 
-    for(std::vector<SIM7080_TCP_Socket_t*>::iterator it = p_Device->TCP.Sockets.begin(); it != p_Device->TCP.Sockets.end(); ++it)
+    for(std::vector<SIM7080_TCPIP_Socket_t*>::iterator it = p_Device->TCP.Sockets.begin(); it != p_Device->TCP.Sockets.end(); ++it)
     {
         if((*it)->Internal.CID == CID)
         {
@@ -69,7 +69,7 @@ void SIM7080_Evt_on_TCP_DataReady(SIM7080_t* const p_Device, std::string* p_Mess
     Index = Message.find(":");
     CID = SIM70XX_Tools_StringToUnsigned(Message.substr(Index + 1, Message.find("\r\n\r\n", Index) - Index + 1));
 
-    for(std::vector<SIM7080_TCP_Socket_t*>::iterator it = p_Device->TCP.Sockets.begin(); it != p_Device->TCP.Sockets.end(); ++it)
+    for(std::vector<SIM7080_TCPIP_Socket_t*>::iterator it = p_Device->TCP.Sockets.begin(); it != p_Device->TCP.Sockets.end(); ++it)
     {
         if((*it)->Internal.CID == CID)
         {

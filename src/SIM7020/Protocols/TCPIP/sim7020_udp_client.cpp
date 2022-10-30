@@ -31,23 +31,58 @@
 
 static const char* TAG = "SIM7020_UDP_Client";
 
-SIM70XX_Error_t SIM7020_UDP_Client_Create(SIM7020_t& p_Device, std::string IP, uint16_t Port, SIM7020_TCP_Socket_t* p_Socket, uint16_t Timeout, uint8_t CID, SIM7020_TCP_Domain_t Domain, SIM7020_TCP_Protocol_t Protocol)
+SIM70XX_Error_t SIM7020_UDP_Client_Create(SIM7020_t& p_Device, std::string IP, uint16_t Port, SIM7020_TCPIP_Socket_t* p_Socket, uint16_t Timeout, uint8_t CID, SIM7020_TCP_Domain_t Domain, SIM7020_TCP_Protocol_t Protocol)
 {
     return SIM7020_Client_CreateSocket(p_Device, SIM7020_TCP_TYPE_UDP, IP, Port, p_Socket, Timeout, CID, Domain, Protocol);
 }
 
-SIM70XX_Error_t SIM7020_UDP_Client_Connect(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket)
+SIM70XX_Error_t SIM7020_UDP_Client_Connect(SIM7020_t& p_Device, SIM7020_TCPIP_Socket_t* p_Socket)
 {
+    if(p_Socket->Internal.Type != SIM7020_TCP_TYPE_UDP)
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+
     return SIM7020_Client_ConnectSocket(p_Device, p_Socket);
 }
 
-SIM70XX_Error_t SIM7020_UDP_Client_Disconnect(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket)
+SIM70XX_Error_t SIM7020_UDP_Client_Transmit(SIM7020_t& p_Device, SIM7020_TCPIP_Socket_t* p_Socket, const void* p_Buffer, uint32_t Length, uint16_t PacketSize)
 {
+    if(p_Socket->Internal.Type != SIM7020_TCP_TYPE_UDP)
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+
+    return SIM7020_Client_Transmit(p_Device, p_Socket, p_Buffer, Length, PacketSize);
+}
+
+SIM70XX_Error_t SIM7020_UDP_Client_Receive(SIM7020_t& p_Device, SIM7020_TCPIP_Socket_t* p_Socket, std::string* p_Buffer)
+{
+    if(p_Socket->Internal.Type != SIM7020_TCP_TYPE_UDP)
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+
+    return SIM7020_Client_Receive(p_Device, p_Socket, p_Buffer);
+}
+
+SIM70XX_Error_t SIM7020_UDP_Client_Disconnect(SIM7020_t& p_Device, SIM7020_TCPIP_Socket_t* p_Socket)
+{
+    if(p_Socket->Internal.Type != SIM7020_TCP_TYPE_UDP)
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+
     return SIM7020_Client_DisconnectSocket(p_Device, p_Socket);
 }
 
-SIM70XX_Error_t SIM7020_UDP_Client_Destroy(SIM7020_t& p_Device, SIM7020_TCP_Socket_t* p_Socket)
+SIM70XX_Error_t SIM7020_UDP_Client_Destroy(SIM7020_t& p_Device, SIM7020_TCPIP_Socket_t* p_Socket)
 {
+    if(p_Socket->Internal.Type != SIM7020_TCP_TYPE_UDP)
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+
     return SIM7020_Client_DestroySocket(p_Device, p_Socket);
 }
 

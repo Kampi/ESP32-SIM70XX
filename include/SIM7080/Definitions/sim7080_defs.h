@@ -174,7 +174,7 @@ typedef struct
     #ifdef CONFIG_SIM70XX_DRIVER_WITH_TCPIP
         struct
         {
-            std::vector<SIM7080_TCP_Socket_t*> Sockets;     /**< List with pointer to connected TCP sockets.
+            std::vector<SIM7080_TCPIP_Socket_t*> Sockets;   /**< List with pointer to connected TCP sockets.
                                                                  NOTE: Managed by the device driver. */
         } TCP;
     #endif
@@ -208,7 +208,7 @@ typedef struct
         {
             bool isEnabled;                                 /**< #true when PSM is enabled.
                                                                  NOTE: Managed by the device driver. */
-            bool isActive;                                 /**< #true when PSM is is active.
+            bool isActive;                                  /**< #true when PSM is is active.
                                                                  NOTE: Managed by the device driver. */
         } PSM;
     } PwrMgnt;

@@ -43,7 +43,7 @@ SIM70XX_Error_t SIM7080_TCPIP_Ping(SIM7080_t& p_Device, const SIM7080_Ping_t* co
  *  @param p_Socket Pointer to TCP socket object
  *  @return         #true when data are received
  */
-inline __attribute__((always_inline)) bool SIM7080_TCP_Client_isDataAvailable(SIM7080_TCP_Socket_t* p_Socket)
+inline __attribute__((always_inline)) bool SIM7080_TCP_Client_isDataAvailable(SIM7080_TCPIP_Socket_t* p_Socket)
 {
     if(p_Socket == NULL)
     {
@@ -63,7 +63,7 @@ inline __attribute__((always_inline)) bool SIM7080_TCP_Client_isDataAvailable(SI
  *                      NOTE: Not supported yet
  *  @return             SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_TCP_Client_Create(SIM7080_t& p_Device, std::string IP, uint16_t Port, SIM7080_TCP_Socket_t* p_Socket, uint8_t CID = 0, bool ReadManually = false);
+SIM70XX_Error_t SIM7080_TCP_Client_Create(SIM7080_t& p_Device, std::string IP, uint16_t Port, SIM7080_TCPIP_Socket_t* p_Socket, uint8_t CID = 0, bool ReadManually = false);
 
 /** @brief          Open a TCP connection to a remote server.
  *  @param p_Device SIM7080 device object
@@ -74,7 +74,7 @@ SIM70XX_Error_t SIM7080_TCP_Client_Create(SIM7080_t& p_Device, std::string IP, u
  *  @param Timeout  (Optional) Transmission timeout in milliseconds
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_TCP_Client_Connect(SIM7080_t& p_Device, SIM7080_TCP_Socket_t* p_Socket, uint8_t PDP = 0, SIM7080_TCP_Error_t* p_Result = NULL);
+SIM70XX_Error_t SIM7080_TCP_Client_Connect(SIM7080_t& p_Device, SIM7080_TCPIP_Socket_t* p_Socket, uint8_t PDP = 0, SIM7080_TCP_Error_t* p_Result = NULL);
 
 /** @brief              Transmit a TCP message.
  *  @param p_Device     SIM7080 device object
@@ -86,7 +86,7 @@ SIM70XX_Error_t SIM7080_TCP_Client_Connect(SIM7080_t& p_Device, SIM7080_TCP_Sock
  *  @param PacketSize   (Optional) Transmission size in bytes
  *  @return             SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_TCP_Client_Transmit(SIM7080_t& p_Device, SIM7080_TCP_Socket_t* p_Socket, const void* p_Buffer, uint32_t Length, uint8_t Retries = 20, uint16_t Timeout = 1000, uint16_t PacketSize = SIM7080_TCP_MAX_PAYLOAD_SIZE);
+SIM70XX_Error_t SIM7080_TCP_Client_Transmit(SIM7080_t& p_Device, SIM7080_TCPIP_Socket_t* p_Socket, const void* p_Buffer, uint32_t Length, uint8_t Retries = 20, uint16_t Timeout = 1000, uint16_t PacketSize = SIM7080_TCP_MAX_PAYLOAD_SIZE);
 
 /** @brief          Receive a TCP message.
  *  @param p_Device SIM7080 device object
@@ -95,20 +95,20 @@ SIM70XX_Error_t SIM7080_TCP_Client_Transmit(SIM7080_t& p_Device, SIM7080_TCP_Soc
  *  @param Length   (Optional) Number of bytes to read from the buffer
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_TCP_Client_Receive(SIM7080_t& p_Device, SIM7080_TCP_Socket_t* p_Socket, std::string* p_Buffer, uint32_t Length = 1024);
+SIM70XX_Error_t SIM7080_TCP_Client_Receive(SIM7080_t& p_Device, SIM7080_TCPIP_Socket_t* p_Socket, std::string* p_Buffer, uint32_t Length = 1024);
 
 /** @brief          Disconnect a TCP connection from a remote server.
  *  @param p_Device SIM7080 device object
  *  @param p_Socket Pointer to TCPIP socket object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_TCP_Client_Disconnect(SIM7080_t& p_Device, SIM7080_TCP_Socket_t* p_Socket);
+SIM70XX_Error_t SIM7080_TCP_Client_Disconnect(SIM7080_t& p_Device, SIM7080_TCPIP_Socket_t* p_Socket);
 
 /** @brief          Close a TCP connection and release the socket.
  *  @param p_Device SIM7080 device object
  *  @param p_Socket Pointer to TCP socket object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_TCP_Client_Destroy(SIM7080_t& p_Device, SIM7080_TCP_Socket_t* p_Socket);
+SIM70XX_Error_t SIM7080_TCP_Client_Destroy(SIM7080_t& p_Device, SIM7080_TCPIP_Socket_t* p_Socket);
 
 #endif /* SIM7080_TCPIP_H_ */

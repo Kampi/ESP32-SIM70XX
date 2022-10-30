@@ -55,6 +55,8 @@ void EMail_Run(DEVICE_TYPE& p_Device)
 {
     SIM70XX_Error_t Error;
 
+	ESP_LOGI(TAG, "Run E-Mail example...");
+
     #ifdef CONFIG_DEMO_USE_SSL
         Error = SIM70XX_SSL_Enable(p_Device, true);
         if(Error != SIM70XX_ERR_OK)

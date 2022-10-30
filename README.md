@@ -13,6 +13,8 @@
       - [Complete](#complete)
   - [Examples](#examples)
     - [Using esp-idf](#using-esp-idf)
+    - [File System](#file-system)
+    - [E-Mail](#e-mail)
     - [NTP](#ntp)
       - [Configure the NTP project](#configure-the-ntp-project)
     - [MQTT](#mqtt)
@@ -30,9 +32,9 @@ Multidevice driver for SIMCom cellular modules with UART interface.
 |---------------|---------------|---------------|
 | NTP           | Complete      | Complete      |
 | DNS           | Complete      | Complete      |
-| Ping          | Basic         | Basic         |
+| Ping          | Complete      | Complete      |
 | GNSS          |               | Basic         |
-| E-Mail        |               | Open          |
+| E-Mail        |               | Basic         |
 | File system   |               | Complete      |
 | SSL           |               | Open          |
 | NVRAM         | Complete      |               |
@@ -76,9 +78,38 @@ The component contains an `examples` directory with several examples to test the
 - Go back to the `Demo` menu and enable the demos for the selected submodules.
 - Run `make` to compile the demo
 
+### File System
+
+This demo is writing data into a file. Then the data from the file is read and the file gets renamed and the original file will be deleted.
+
+- Run `make menuconfig`
+- Open the menu `Demo` -> `File System`
+- Select `Enable the File System demo`
+- Run `make`
+- Execute the demo application
+
+### E-Mail
+
+This demo is sending a E-mail to the given recipient. At next all E-Mails from the inbox are read and then deleted.
+
+- Run `make menuconfig`
+- Open the menu `Demo` -> `E-Mail`
+- Select `Enable the E-Mail demo`
+- Fill in the required informations
+- Run `make`
+- Execute the demo application
+
+> **Warning**
+> Please make sure that the inbox doesn´t contain any important E-Mails!
+
+> **Warning**
+> Depending on your e-mail service you have to enable SSL too!
+
 ### NTP
 
 #### Configure the NTP project
+
+This demo demo is fetching the time from the given NTP server. After fetching the time the demo ends.
 
 - Run `make menuconfig`
 - Open the menu `Demo` -> `NTP`
@@ -86,10 +117,10 @@ The component contains an `examples` directory with several examples to test the
 - Fill in the required informations
 - Run `make`
 - Execute the demo application
-- The demo is fetching the time from the given NTP server
-- After fetching the time the demo end
 
 ### MQTT
+
+This demo open a connection to a given MQTT broker. The demo will subscribe and publish data to the given topics. After receiving a message from the subscripted topic the demo ends.
 
 #### Prepare the broker
 
@@ -120,8 +151,6 @@ mosquitto -c /etc/mosquitto/mosquitto.conf
 - Fill in the required informations
 - Run `make`
 - Execute the demo application
-- The demo is subscribing and publishing to the given topic
-- After receiving a message from the subscription topic the demo ends
 
 ## Maintainer
 

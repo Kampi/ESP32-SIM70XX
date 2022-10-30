@@ -42,6 +42,8 @@ void NTP_Run(DEVICE_TYPE& p_Device)
     struct tm NTP_Time;
     struct tm Local_Time;
 
+	ESP_LOGI(TAG, "Run NTP example...");
+
     memset(&NTP_Time, 0, sizeof(NTP_Time));
     memset(&Local_Time, 0, sizeof(Local_Time));
 

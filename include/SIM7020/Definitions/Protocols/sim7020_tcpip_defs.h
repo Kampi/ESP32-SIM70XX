@@ -115,6 +115,6 @@ typedef struct
         SIM7020_TCP_Type_t Type;                    /**< Socket type.
                                                          NOTE: Handled by the device driver. */
     } Internal;
-} SIM7020_TCP_Socket_t;
+} SIM7020_TCPIP_Socket_t;
 
 #endif /* SIM7020_TCPIP_DEFS_H_ */

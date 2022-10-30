@@ -164,7 +164,7 @@ typedef struct
     #ifdef CONFIG_SIM70XX_DRIVER_WITH_TCPIP
         struct
         {
-            std::vector<SIM7020_TCP_Socket_t*> Sockets;     /**< List with pointer to connected TCP/UDP sockets.
+            std::vector<SIM7020_TCPIP_Socket_t*> Sockets;   /**< List with pointer to connected TCP/UDP sockets.
                                                                  NOTE: Managed by the device driver. */
         } TCP;
     #endif

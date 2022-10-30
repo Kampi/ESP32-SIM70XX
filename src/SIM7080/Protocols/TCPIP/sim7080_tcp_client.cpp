@@ -32,7 +32,7 @@
 
 static const char* TAG = "SIM7080_TCPIP_Client";
 
-SIM70XX_Error_t SIM7080_TCP_Client_Create(SIM7080_t& p_Device, std::string IP, uint16_t Port, SIM7080_TCP_Socket_t* p_Socket, uint8_t CID, bool ReadManually)
+SIM70XX_Error_t SIM7080_TCP_Client_Create(SIM7080_t& p_Device, std::string IP, uint16_t Port, SIM7080_TCPIP_Socket_t* p_Socket, uint8_t CID, bool ReadManually)
 {
     if(p_Socket == NULL)
     {
@@ -61,7 +61,7 @@ SIM70XX_Error_t SIM7080_TCP_Client_Create(SIM7080_t& p_Device, std::string IP, u
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7080_TCP_Client_Connect(SIM7080_t& p_Device, SIM7080_TCP_Socket_t* p_Socket, uint8_t PDP, SIM7080_TCP_Error_t* p_Result)
+SIM70XX_Error_t SIM7080_TCP_Client_Connect(SIM7080_t& p_Device, SIM7080_TCPIP_Socket_t* p_Socket, uint8_t PDP, SIM7080_TCP_Error_t* p_Result)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;
@@ -114,7 +114,7 @@ SIM70XX_Error_t SIM7080_TCP_Client_Connect(SIM7080_t& p_Device, SIM7080_TCP_Sock
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7080_TCP_Client_Transmit(SIM7080_t& p_Device, SIM7080_TCP_Socket_t* p_Socket, const void* p_Buffer, uint32_t Length, uint8_t Retries, uint16_t Timeout, uint16_t PacketSize)
+SIM70XX_Error_t SIM7080_TCP_Client_Transmit(SIM7080_t& p_Device, SIM7080_TCPIP_Socket_t* p_Socket, const void* p_Buffer, uint32_t Length, uint8_t Retries, uint16_t Timeout, uint16_t PacketSize)
 {
     uint8_t RetryCounter;
     uint8_t* Buffer = (uint8_t*)p_Buffer;
@@ -226,7 +226,7 @@ SIM70XX_Error_t SIM7080_TCP_Client_Transmit(SIM7080_t& p_Device, SIM7080_TCP_Soc
     return Error;
 }
 
-SIM70XX_Error_t SIM7080_TCP_Client_Receive(SIM7080_t& p_Device, SIM7080_TCP_Socket_t* p_Socket, std::string* p_Buffer, uint32_t Length)
+SIM70XX_Error_t SIM7080_TCP_Client_Receive(SIM7080_t& p_Device, SIM7080_TCPIP_Socket_t* p_Socket, std::string* p_Buffer, uint32_t Length)
 {
     SIM70XX_TxCmd_t Command;
 
@@ -265,7 +265,7 @@ SIM70XX_Error_t SIM7080_TCP_Client_Receive(SIM7080_t& p_Device, SIM7080_TCP_Sock
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7080_TCP_Client_Disconnect(SIM7080_t& p_Device, SIM7080_TCP_Socket_t* p_Socket)
+SIM70XX_Error_t SIM7080_TCP_Client_Disconnect(SIM7080_t& p_Device, SIM7080_TCPIP_Socket_t* p_Socket)
 {
     SIM70XX_TxCmd_t* Command;
 
@@ -300,7 +300,7 @@ SIM70XX_Error_t SIM7080_TCP_Client_Disconnect(SIM7080_t& p_Device, SIM7080_TCP_S
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7080_TCP_Client_Destroy(SIM7080_t& p_Device, SIM7080_TCP_Socket_t* p_Socket)
+SIM70XX_Error_t SIM7080_TCP_Client_Destroy(SIM7080_t& p_Device, SIM7080_TCPIP_Socket_t* p_Socket)
 {
     if(p_Socket == NULL)
     {
