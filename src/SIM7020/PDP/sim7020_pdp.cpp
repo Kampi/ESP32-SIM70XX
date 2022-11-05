@@ -130,17 +130,46 @@ SIM70XX_Error_t SIM7020_PDP_GetStatus(SIM7020_t& p_Device, std::vector<SIM7020_P
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_PDP_ReadDynamicParameters(SIM7020_t& p_Device)
+SIM70XX_Error_t SIM7020_PDP_ReadDynamicParameters(SIM7020_t& p_Device, SIM7020_PDP_Params_t* p_Params)
 {
-    uint8_t Parts = 0;
-    std::string Dummy;
-    std::string Octett;
     std::string Response;
     SIM70XX_TxCmd_t* Command;
 
-    if(p_Device.Internal.isInitialized == false)
+    if(p_Params == NULL)
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+    else if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
+    }
+
+    // Get the PDP type.
+    SIM70XX_CREATE_CMD(Command);
+    *Command = SIM7020_AT_MCGDEFCONT_R;
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    {
+        return SIM70XX_ERR_FAIL;
+    }
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
+
+    Response = SIM70XX_Tools_SubstringSplitErase(&Response);
+    if(Response.find("IP") != std::string::npos)
+    {
+        p_Params->Type = SIM7020_PDP_IP;
+    }
+    else if(Response.find("IPV6") != std::string::npos)
+    {
+        p_Params->Type = SIM7020_PDP_IPV6;
+    }
+    else if(Response.find("IP4V6") != std::string::npos)
+    {
+        p_Params->Type = SIM7020_PDP_IPV4V6;
+    }
+    else if(Response.find("Non-IP") != std::string::npos)
+    {
+        p_Params->Type = SIM7020_PDP_NO_IP;
     }
 
     SIM70XX_CREATE_CMD(Command);
@@ -150,62 +179,42 @@ SIM70XX_Error_t SIM7020_PDP_ReadDynamicParameters(SIM7020_t& p_Device)
     {
         return SIM70XX_ERR_FAIL;
     }
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    // TODO: Wait for the Response event.
+    p_Params->CID = (uint8_t)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response));
+    p_Params->Baerer = (uint8_t)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response));
+    p_Params->APN = SIM70XX_Tools_SubstringSplitErase(&Response);
+    SIM70XX_Tools_StringRemove(&p_Params->APN);
 
-/* TODO
-    if(p_Device.PDP_Type == SIM7020_PDP_IPV6)
+    // Process the IP address and the subnet.
+    SIM70XX_Tools_StringRemove(&Response);
+    if(p_Params->Type == SIM7020_PDP_IP)
     {
-        Parts = 16;
+        p_Params->IP = SIM70XX_Tools_SubstringSplitErase(&Response, ".") + "." +
+                       SIM70XX_Tools_SubstringSplitErase(&Response, ".") + "." +
+                       SIM70XX_Tools_SubstringSplitErase(&Response, ".") + "." +
+                       SIM70XX_Tools_SubstringSplitErase(&Response, ".");
+        p_Params->Subnet = Response;
     }
-    else
+    else if(p_Params->Type == SIM7020_PDP_IP)
     {
-        Parts = 4;
+        p_Params->IP = SIM70XX_Tools_SubstringSplitErase(&Response, ".") + "." +
+                       SIM70XX_Tools_SubstringSplitErase(&Response, ".") + "." +
+                       SIM70XX_Tools_SubstringSplitErase(&Response, ".") + "." +
+                       SIM70XX_Tools_SubstringSplitErase(&Response, ".") + "." +
+                       SIM70XX_Tools_SubstringSplitErase(&Response, ".") + "." +
+                       SIM70XX_Tools_SubstringSplitErase(&Response, ".") + "." +
+                       SIM70XX_Tools_SubstringSplitErase(&Response, ".") + "." +
+                       SIM70XX_Tools_SubstringSplitErase(&Response, ".");
+        p_Params->Subnet = Response;
     }
-*/
-    // Get the IP address and the subnet mask.
-    Dummy = Response.substr(Response.find_last_of(",") + 1);
-    Response.erase(Response.find("," + Dummy), std::string("," + Dummy).size());
-    Dummy.erase(std::remove(Dummy.begin(), Dummy.end(), '\"'), Dummy.end()); 
 
-    // Filter out the IP address.
-    for(uint8_t i = 0; i < (Parts - 1); i++)
-    {
-        Octett = SIM70XX_Tools_SubstringSplitErase(&Dummy);
-        p_Device.PDP.IP += Octett + ".";
-    }
-    Octett = SIM70XX_Tools_SubstringSplitErase(&Dummy);
-    p_Device.PDP.IP += Octett;
-
-    // Filter the subnet mask.
-    for(uint8_t i = 0; i < (Parts - 1); i++)
-    {
-        Octett = SIM70XX_Tools_SubstringSplitErase(&Dummy);
-        p_Device.PDP.Subnet += Octett + ".";
-    }
-    Octett = SIM70XX_Tools_SubstringSplitErase(&Dummy);
-    p_Device.PDP.Subnet += Octett;
-
-    // Get the operator.
-    Dummy = Response.substr(Response.find_last_of(",") + 1);
-    Response.replace(Response.find("," + Dummy), std::string("," + Dummy).size(), "");
-    Dummy.replace(Dummy.find("\""), std::string("\"").size(), "");
-    p_Device.PDP.APN += Dummy;
-
-    // Get the CID.
-    Dummy = Response.substr(Response.find_last_of(",") + 1);
-    Response.replace(Response.find("," + Dummy), std::string("," + Dummy).size(), "");
-    p_Device.PDP.CID = (uint8_t)SIM70XX_Tools_StringToUnsigned(Dummy);
-
-    // Get the Baerer.
-    p_Device.PDP.Baerer = (uint8_t)SIM70XX_Tools_StringToUnsigned(Response);
-
-    ESP_LOGD(TAG, "IP: %s", p_Device.PDP.IP.c_str());
-    ESP_LOGD(TAG, "Subnet: %s", p_Device.PDP.Subnet.c_str());
-    ESP_LOGD(TAG, "Operator: %s", p_Device.PDP.APN.c_str());
-    ESP_LOGD(TAG, "CID: %u", p_Device.PDP.CID);
-    ESP_LOGD(TAG, "Baerer: %u", p_Device.PDP.Baerer);
+    ESP_LOGD(TAG, "Type: %u", p_Params->Type);
+    ESP_LOGD(TAG, "IP: %s", p_Params->IP.c_str());
+    ESP_LOGD(TAG, "Subnet: %s", p_Params->Subnet.c_str());
+    ESP_LOGD(TAG, "Operator: %s", p_Params->APN.c_str());
+    ESP_LOGD(TAG, "CID: %u", p_Params->CID);
+    ESP_LOGD(TAG, "Baerer: %u", p_Params->Baerer);
 
     return SIM70XX_ERR_OK;
 }

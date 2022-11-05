@@ -102,7 +102,7 @@ SIM70XX_Error_t SIM7020_HTTP_Connect(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t*
     }
     else if(p_Socket->isCreated == false)
     {
-        return SIM70XX_ERR_NOT_CREATED;
+        return SIM70XX_ERR_SOCKET_NOT_CREATED;
     }
 
     p_Socket->isConnected = false;

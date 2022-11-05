@@ -1,5 +1,5 @@
  /*
- * sim7080_evt_mqtt.cpp
+ * sim7020_tcpip.h
  * 
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -17,38 +17,27 @@
  * Errors and commissions should be reported to DanielKampert@kampis-elektroecke.de.
  */
 
-#include <sdkconfig.h>
+#ifndef SIM7020_TCPIP_H_
+#define SIM7020_TCPIP_H_
 
-#if((CONFIG_SIMXX_DEV == 7080) && (defined CONFIG_SIM70XX_DRIVER_WITH_MQTT))
+#include "sim7020_defs.h"
+#include "sim70xx_errors.h"
+#include "sim7020_tcpip_defs.h"
 
-#include <esp_log.h>
+/** @brief Maximum number of bytes for a single TCP / UDP transmission.
+ */
+#define SIM7020_TCP_MAX_PAYLOAD_SIZE                        512
 
-#include "sim7080.h"
-#include "sim7080_evt.h"
-#include "../../Core/Queue/sim70xx_queue.h"
+#include "sim7020_tcp_client_api.h"
+#include "sim7020_tcp_server_api.h"
+#include "sim7020_udp_client_api.h"
 
-static const char* TAG = "SIM7080_Evt_MQTT";
+/** @brief          Perform a ping.
+ *  @param p_Device SIM7020 device object
+ *  @param p_Config Pointer to SIM7020 ping configuration object
+ *  @param p_Result Pointer to list with ping results
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7020_TCPIP_Ping(SIM7020_t& p_Device, const SIM7020_Ping_t* const p_Config, std::vector<SIM7020_PingRes_t>* p_Result);
 
-void SIM7080_Evt_on_MQTT_Subscribe(SIM7080_t* const p_Device, std::string* p_Message)
-{
-    SIM7080_Sub_Evt* Message;
-
-    Message = new SIM7080_Sub_Evt;
-
-    p_Message->erase(0, p_Message->find("\""));
-    SIM70XX_Tools_StringRemove(&Response);
-
-    Message->Topic = SIM70XX_Tools_SubstringSplitErase(p_Message, ",");
-    Message->Payload = *p_Message;
-    SIMXX_TOOLS_REMOVE_LINEEND(Message->Payload);
-
-    ESP_LOGD(TAG, "Topic: %s", Message->Topic.c_str());
-    ESP_LOGD(TAG, "Payload: %s", Message->Payload.c_str());
-
-	if(xQueueSend(p_Device->MQTT.Socket->Internal.SubQueue, &Message, 0) != pdPASS)
-    {
-        delete Message;
-    }
-}
-
-#endif
+#endif /* SIM7020_TCPIP_H_ */

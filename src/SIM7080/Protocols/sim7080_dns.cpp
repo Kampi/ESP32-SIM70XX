@@ -83,8 +83,8 @@ SIM70XX_Error_t SIM7080_DNS_FetchAddress(SIM7080_t& p_Device, std::string Host, 
         Response.erase(0, Response.find(",") + 1);
 
         // Filter out the IP address.
-        Response.replace(Response.find("\""), std::string("\"").size(), "");
-        *p_IP = Response.replace(Response.find("\""), std::string("\"").size(), "");
+        SIM70XX_Tools_StringRemove(&Response);
+        *p_IP = Response;
 
         return SIM70XX_ERR_OK;
     }

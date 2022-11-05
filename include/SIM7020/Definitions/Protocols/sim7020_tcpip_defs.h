@@ -106,8 +106,14 @@ typedef struct
                                                          NOTE: Handled by the device driver. */
         uint8_t ID;                                 /**< Socket ID from the module.
                                                          NOTE: Handled by the device driver. */
-        bool isConnected;                           /**< Socket connected.
+        bool isServer;                              /**< #true when this is a server socket.
                                                          NOTE: Handled by the device driver. */
+        bool isConnected;                           /**< Socket connected.
+                                                         NOTE: Handled by the device driver.
+                                                         NOTE: Only used for client sockets! */
+        bool isListening;                           /**< Socket listening.
+                                                         NOTE: Handled by the device driver.
+                                                         NOTE: Only used for server sockets! */
         bool isCreated;                             /**< #true when the socket is created.
                                                          NOTE: Handled by the device driver. */
         bool isDataReceived;                        /**< Set to #true when data are received.

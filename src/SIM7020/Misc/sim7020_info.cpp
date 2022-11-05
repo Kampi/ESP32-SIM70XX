@@ -297,8 +297,6 @@ SIM70XX_Error_t SIM7020_Info_GetNetworkStatus(SIM7020_t& p_Device, SIM7020_NetSt
         return SIM70XX_ERR_FAIL;
     }
 
-    ESP_LOGI(TAG, "Response: %s", Response.c_str());
-
     p_Status->sc_earfcn = SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response));
     p_Status->sc_earfcn_offset = (int8_t)SIM70XX_Tools_StringToSigned(SIM70XX_Tools_SubstringSplitErase(&Response));
     p_Status->sc_pci = (uint16_t)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response));

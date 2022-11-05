@@ -148,16 +148,6 @@ typedef struct
     std::string Formats;                                    /**< */
     struct
     {
-        std::string IP;                                     /**< Device IP address. */
-        std::string Subnet;                                 /**< */
-        std::string APN;                                    /**< A string parameter which is a logical name that was used to select the GGSN or the external packet data network. */
-        uint8_t CID;                                        /**< A numeric parameter which specifies a particular primary PDP \n
-                                                                 context definition. The parameter is local to the TE-UE interface and is \n
-                                                                 used in other PDP context-related commands. */
-        uint8_t Baerer;                                     /**< A numeric parameter which identifies the bearer, EPS Bearer in EPS and NSAPI in UMTS/GPRS. */
-    } PDP;
-    struct
-    {
         SIM7020_NetRegistration_t Status;                   /**< Network status. */
         SIM7020_Func_t Functionality;                       /**< Current device functionality. */
     } Connection;

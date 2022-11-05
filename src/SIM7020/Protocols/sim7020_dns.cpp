@@ -82,8 +82,8 @@ SIM70XX_Error_t SIM7020_DNS_FetchAddress(SIM7020_t& p_Device, std::string Host, 
         // Filter out the domain.
         Response.erase(0, Response.find(",") + 1);
 
-        Response.replace(Response.find("\""), std::string("\"").size(), "");
-        *p_IP = Response.replace(Response.find("\""), std::string("\"").size(), "");
+        SIM70XX_Tools_StringRemove(&Response);
+        *p_IP = Response;
 
         ESP_LOGD(TAG, "IP: %s", p_IP->c_str());
 

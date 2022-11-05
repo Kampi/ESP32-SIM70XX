@@ -28,6 +28,7 @@
  *
  */
 #define SIM7020_AT_MCGDEFCONT(Command)                          SIM70XX_CMD(Command, false, 60, 1)
+#define SIM7020_AT_MCGDEFCONT_R                                 SIM70XX_CMD("AT*MCGDEFCONT?", true, 10, 1)
 #define SIM7020_AT_COPS_W(Command)                              SIM70XX_CMD(Command, false, 300, 1)
 #define SIM7020_AT_COPS                                         SIM70XX_CMD("AT+COPS?", true, 10, 1)
 #define SIM7020_AT_COPS_R                                       SIM70XX_CMD("AT+COPS=?", true, 300, 1)
@@ -95,10 +96,12 @@
 #define SIM7020_AT_CDNSCFG_W(Prim, Sec)                         SIM70XX_CMD("AT+CDNSPDPID=\"" + Prim + "\",\"" + Sec + "\"", false, 1, 1)
 #define SIM7020_AT_CDNSCFG_R                                    SIM70XX_CMD("AT+CDNSCFG?", true, 10, 4)
 #define SIM7020_AT_CIPPING(Command)                             SIM70XX_CMD(Command, false, 60, 1)
-#define SIM7020_AT_CSOC(Command)                                SIM70XX_CMD(Command, true, 60, 1)
+#define SIM7020_AT_CSOC(Domain, Type, Protocol, CID)            SIM70XX_CMD("AT+CSOC=" + std::to_string(Domain) + "," + std::to_string(Type) + "," + std::to_string(Protocol) + "," + std::to_string(CID), true, 60, 1)
 #define SIM7020_AT_CSOCON(ID, Port, Address)                    SIM70XX_CMD("AT+CSOCON=" + std::to_string(ID) + "," + std::to_string(Port) + ",\"" + Address + "\"", false, 60, 1)
 #define SIM7020_AT_CCSOSEND(ID, Length, Data)                   SIM70XX_CMD("AT+CSOSEND=" + std::to_string(ID) + "," + std::to_string(Length) + "," + Data, false, 60, 1)
 #define SIM7020_AT_CSOCL(ID)                                    SIM70XX_CMD("AT+CSOCL=" + std::to_string(ID), false, 60, 1)
+#define SIM7020_AT_CSOB(ID, Port, Address)                      SIM70XX_CMD("AT+CSOB=" + std::to_string(ID) + "," + std::to_string(Port) + ",\"" + Address + "\"", false, 10, 1)
+#define SIM7020_AT_CSOLIS(ID)                                   SIM70XX_CMD("AT+CSOLIS=" + std::to_string(ID), false, 10, 1)
 
 /**
  *

@@ -1,5 +1,5 @@
  /*
- * sim7080_evt_mqtt.cpp
+ * sim7020_tcp_server.cpp
  * 
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -19,36 +19,34 @@
 
 #include <sdkconfig.h>
 
-#if((CONFIG_SIMXX_DEV == 7080) && (defined CONFIG_SIM70XX_DRIVER_WITH_MQTT))
+#if((CONFIG_SIMXX_DEV == 7020) && (defined CONFIG_SIM70XX_DRIVER_WITH_TCPIP))
 
 #include <esp_log.h>
 
-#include "sim7080.h"
-#include "sim7080_evt.h"
-#include "../../Core/Queue/sim70xx_queue.h"
+#include "sim7020.h"
+#include "sim7020_tcpip.h"
+#include "Private/Server/sim7020_server.h"
+#include "../../../Core/Queue/sim70xx_queue.h"
+#include "../../../Core/Commands/sim70xx_commands.h"
 
-static const char* TAG = "SIM7080_Evt_MQTT";
-
-void SIM7080_Evt_on_MQTT_Subscribe(SIM7080_t* const p_Device, std::string* p_Message)
+SIM70XX_Error_t SIM7020_TCP_Server_Create(SIM7020_t& p_Device, std::string IP, uint16_t Port, SIM7020_TCPIP_Socket_t* p_Socket)
 {
-    SIM7080_Sub_Evt* Message;
+    return SIM7020_Server_CreateSocket(p_Device, SIM7020_TCP_TYPE_TCP, IP, Port, p_Socket);
+}
 
-    Message = new SIM7080_Sub_Evt;
+SIM70XX_Error_t SIM7020_TCP_Server_Bind(SIM7020_t& p_Device, SIM7020_TCPIP_Socket_t* p_Socket)
+{
+    return SIM7020_Server_BindSocket(p_Device, p_Socket);
+}
 
-    p_Message->erase(0, p_Message->find("\""));
-    SIM70XX_Tools_StringRemove(&Response);
+SIM70XX_Error_t SIM7020_TCP_Server_Listen(SIM7020_t& p_Device, SIM7020_TCPIP_Socket_t* p_Socket)
+{
+    return SIM7020_Server_Listen(p_Device, p_Socket);
+}
 
-    Message->Topic = SIM70XX_Tools_SubstringSplitErase(p_Message, ",");
-    Message->Payload = *p_Message;
-    SIMXX_TOOLS_REMOVE_LINEEND(Message->Payload);
-
-    ESP_LOGD(TAG, "Topic: %s", Message->Topic.c_str());
-    ESP_LOGD(TAG, "Payload: %s", Message->Payload.c_str());
-
-	if(xQueueSend(p_Device->MQTT.Socket->Internal.SubQueue, &Message, 0) != pdPASS)
-    {
-        delete Message;
-    }
+SIM70XX_Error_t SIM7020_TCP_Server_Destroy(SIM7020_t& p_Device, SIM7020_TCPIP_Socket_t* p_Socket)
+{
+    return SIM7020_Server_DestroySocket(p_Device, p_Socket);
 }
 
 #endif

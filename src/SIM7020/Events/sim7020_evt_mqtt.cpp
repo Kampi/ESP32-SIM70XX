@@ -57,6 +57,8 @@ void SIM7020_Evt_on_MQTT_Pub(SIM7020_t* const p_Device, std::string* p_Message)
     // Get the duplicate flag.
     Packet->Dup = (bool)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(p_Message));
 
+    SIM70XX_Tools_StringRemove(p_Message);
+
     // Skip the length.
     Index = p_Message->find(",");
     p_Message->substr(0, Index);
@@ -64,9 +66,6 @@ void SIM7020_Evt_on_MQTT_Pub(SIM7020_t* const p_Device, std::string* p_Message)
 
     // Get the message payload.
     Packet->Payload = p_Message->substr(0);
-
-    Packet->Topic.replace(Packet->Topic.find("\""), std::string("\"").size(), "");
-    Packet->Payload.replace(Packet->Payload.find("\""), std::string("\"").size(), "");
 
     if((p_Device->MQTT.Sockets.at(Packet->ID)->Internal.SubQueue == NULL) || (xQueueSend(p_Device->MQTT.Sockets.at(Packet->ID)->Internal.SubQueue, &Packet, 0) != pdPASS))
     {

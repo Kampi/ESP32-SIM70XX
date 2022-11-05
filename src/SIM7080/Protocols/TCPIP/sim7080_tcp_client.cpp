@@ -77,7 +77,7 @@ SIM70XX_Error_t SIM7080_TCP_Client_Connect(SIM7080_t& p_Device, SIM7080_TCPIP_So
     }
     else if(p_Socket->Internal.isCreated == false)
     {
-        return SIM70XX_ERR_NOT_CREATED;
+        return SIM70XX_ERR_SOCKET_NOT_CREATED;
     }
     else if(p_Socket->Internal.isConnected == true)
     {
@@ -131,7 +131,7 @@ SIM70XX_Error_t SIM7080_TCP_Client_Transmit(SIM7080_t& p_Device, SIM7080_TCPIP_S
     }
     else if(p_Socket->Internal.isCreated == false)
     {
-        return SIM70XX_ERR_NOT_CREATED;
+        return SIM70XX_ERR_SOCKET_NOT_CREATED;
     }
     else if(p_Socket->Internal.isConnected == false)
     {
@@ -239,7 +239,7 @@ SIM70XX_Error_t SIM7080_TCP_Client_Receive(SIM7080_t& p_Device, SIM7080_TCPIP_So
     }
     else if(p_Socket->Internal.isCreated == false)
     {
-        return SIM70XX_ERR_NOT_CREATED;
+        return SIM70XX_ERR_SOCKET_NOT_CREATED;
     }
     else if((p_Socket->Internal.isDataReceived == false) || (Length == 0))
     {
@@ -278,7 +278,7 @@ SIM70XX_Error_t SIM7080_TCP_Client_Disconnect(SIM7080_t& p_Device, SIM7080_TCPIP
     }
     else if(p_Socket->Internal.isCreated == false)
     {
-        return SIM70XX_ERR_NOT_CREATED;
+        return SIM70XX_ERR_SOCKET_NOT_CREATED;
     }
     else if(p_Socket->Internal.isConnected == false)
     {
@@ -311,7 +311,7 @@ SIM70XX_Error_t SIM7080_TCP_Client_Destroy(SIM7080_t& p_Device, SIM7080_TCPIP_So
     }
     else if(p_Socket->Internal.isCreated == false)
     {
-        return SIM70XX_ERR_NOT_CREATED;
+        return SIM70XX_ERR_SOCKET_NOT_CREATED;
     }
 
     p_Socket->Internal.isCreated = false;

@@ -117,6 +117,13 @@ SIM70XX_Error_t SIM70XX_Tools_SetBaudrate(SIM70XX_UART_Conf_t& p_Config, SIM70XX
  */
 std::string SIM70XX_Tools_SubstringSplitErase(std::string* p_Input, std::string Delimiter = ",");
 
+/** @brief          Remove all given characters from a string.
+ *  @param p_Input  Pointer to input string
+ *                  NOTE: The input string will be modified!
+ *  @param Remove   (Optional) Character to remove
+ */
+void SIM70XX_Tools_StringRemove(std::string* p_Input, std::string Remove = "\"");
+
 /** @brief          Perform an error check and convert the input string into a unsigned value.
  *  @param Input    Input value as string
  *  @return         Unsigned integer or INT_MAX when the input is invalid

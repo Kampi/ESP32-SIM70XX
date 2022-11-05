@@ -407,7 +407,7 @@ SIM70XX_Error_t SIM7020_GetAvailOperators(SIM7020_t& p_Device, std::vector<SIM70
     // Filter out the list of supported modes and formats.
     List = Response.substr(0, Response.find(",,"));
 
-    // Process the remaining list
+    // Process the remaining list.
     do
     {
         Start = List.find("(");

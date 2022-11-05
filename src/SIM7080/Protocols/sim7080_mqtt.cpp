@@ -203,7 +203,7 @@ SIM70XX_Error_t SIM7080_MQTT_Connect(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t*
     }
     else if(p_Socket->Internal.isCreated == false)
     {
-        return SIM70XX_ERR_NOT_CREATED;
+        return SIM70XX_ERR_SOCKET_NOT_CREATED;
     }
     else if(p_Socket->Internal.isConnected == true)
     {
@@ -446,7 +446,7 @@ SIM70XX_Error_t SIM7080_MQTT_Disconnect(SIM7080_t& p_Device, SIM7080_MQTT_Socket
     }
     else if(p_Socket->Internal.isCreated == false)
     {
-        return SIM70XX_ERR_NOT_CREATED;
+        return SIM70XX_ERR_SOCKET_NOT_CREATED;
     }
     else if(p_Socket->Internal.isConnected == false)
     {

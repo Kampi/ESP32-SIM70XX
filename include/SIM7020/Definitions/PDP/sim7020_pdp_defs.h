@@ -29,7 +29,7 @@ typedef enum
 {
     SIM7020_PDP_IP          = 0,                    /**< Internet Protocol (IETF STD 5). */
     SIM7020_PDP_IPV6,                               /**< Internet Protocol, version 6 (IETF RFC 2460). */
-    SIM7020_PDP_IPV4V6,                             /**< Virtual <PDP_type) introduced to handle dual IP stack UE capability(see 3GPP TS 24.301). */
+    SIM7020_PDP_IPV4V6,                             /**< Virtual PDP type introduced to handle dual IP stack UE capability(see 3GPP TS 24.301). */
     SIM7020_PDP_NO_IP,                              /**< Transfer of Non-IP data to external packet data Network (see 3GPP TS 24.301). */
 } SIM7020_PDP_Type_t;
 
@@ -70,6 +70,21 @@ typedef struct
                                                             0 Preference of Non-IP MTU size discovery not influenced by +CGDCONT
                                                             1 Preference of Non-IP MTU size discovery through NAS signaling. */
 } SIM7020_PDP_Context_t;
+
+
+/** @brief SIM7020 PDP context dynamic parameters object definition.
+ */
+typedef struct
+{
+    SIM7020_PDP_Type_t Type;                        /**< PDP context type. */
+    std::string IP;                                 /**< Device IP address. */
+    std::string Subnet;                             /**< */
+    std::string APN;                                /**< A string parameter which is a logical name that was used to select the GGSN or the external packet data network. */
+    uint8_t CID;                                    /**< A numeric parameter which specifies a particular primary PDP
+                                                         context definition. The parameter is local to the TE-UE interface and is
+                                                         used in other PDP context-related commands. */
+    uint8_t Baerer;                                 /**< A numeric parameter which identifies the bearer, EPS Bearer in EPS and NSAPI in UMTS/GPRS. */
+} SIM7020_PDP_Params_t;
 
 /** @brief SIM7020 PDP Context status object definition.
  */

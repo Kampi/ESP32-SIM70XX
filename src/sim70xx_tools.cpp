@@ -354,6 +354,22 @@ std::string SIM70XX_Tools_SubstringSplitErase(std::string* p_Input, std::string 
     return Result;
 }
 
+void SIM70XX_Tools_StringRemove(std::string* p_Input, std::string Remove)
+{
+    size_t Index;
+
+    assert(p_Input);
+
+    do
+    {
+        Index = p_Input->find(Remove);
+        if(Index != std::string::npos)
+        {
+            p_Input->replace(Index, std::string(Remove).size(), "");
+        }
+    } while(Index != std::string::npos);
+}
+
 uint32_t SIM70XX_Tools_StringToUnsigned(std::string Input)
 {
     #if __cpp_exceptions

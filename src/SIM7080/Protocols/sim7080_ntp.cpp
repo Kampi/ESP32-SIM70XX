@@ -95,8 +95,7 @@ SIM70XX_Error_t SIM7080_NTP_Sync(SIM7080_t& p_Device, std::string Server, int8_t
         {
             Response.erase(0, Index + 1);
 
-            Response.replace(Response.find("\""), std::string("\"").size(), "");
-            Response.replace(Response.find("\""), std::string("\"").size(), "");
+            SIM70XX_Tools_StringRemove(&Response);
 
             strptime((char*)Response.c_str(), "%Y/%m/%d,%H:%M:%S", p_Time);
         }
@@ -140,8 +139,7 @@ SIM70XX_Error_t SIM7080_NTP_GetTime(SIM7080_t& p_Device, struct tm* p_Time, int8
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    Response.replace(Response.find("\""), std::string("\"").size(), "");
-    Response.replace(Response.find("\""), std::string("\"").size(), "");
+    SIM70XX_Tools_StringRemove(&Response);
 
     // Get the timezone from the response.
     Index = Response.find("+");

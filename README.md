@@ -2,7 +2,7 @@
 
 ## Table of Contents
 
-- [ESP32 driver for [SIM70XX] cellular modules](#esp32-driver-for-sim70xx-cellular-modules)
+- [ESP32 driver for SIM70XX cellular modules](#esp32-driver-for-sim70xx-cellular-modules)
   - [Table of Contents](#table-of-contents)
   - [About](#about)
   - [Driver status](#driver-status)
@@ -38,10 +38,10 @@ Multidevice driver for SIMCom cellular modules with UART interface.
 | File system   |               | Complete      |
 | SSL           |               | Open          |
 | NVRAM         | Complete      |               |
-| TCP (Client)  | Complete      | Complete      |
-| UDP (Client)  | Complete      | Complete      |
-| TCP (Server)  | Open          | Open          |
-| UDP (Server)  | Open          | Open          |
+| TCP (Client)  | Complete      | Open          |
+| UDP (Client)  | Complete      |               |
+| TCP (Server)  | Open          |               |
+| UDP (Server)  |               |               |
 | HTTP          | Open          | Not started   |
 | CoAP          | Open          | Not started   |
 | MQTT          | Open          | Open          |
