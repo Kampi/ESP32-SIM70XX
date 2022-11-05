@@ -74,4 +74,24 @@ void StartExamples(void);
     void NTP_Run(DEVICE_TYPE& p_Device);
 #endif
 
+#ifdef CONFIG_DEMO_USE_TCPIP_CLIENT
+    /** @brief              Run the TCP client example with a form-data HTTP request.
+     *  @param p_Device     Pointer to device object
+     *  @param IncludeImage (Optional) Include an image to the transmission
+     */
+    void TCP_Client_Run_FormData(DEVICE_TYPE& p_Device, bool IncludeImage = true);
+
+    /** @brief          Run the TCP client example with a JSON HTTP request.
+     *  @param p_Device Pointer to device object
+     */
+    void TCP_Client_Run_JSON(DEVICE_TYPE& p_Device);
+#endif
+
+#ifdef CONFIG_DEMO_USE_UDP_CLIENT
+    /** @brief          Run the UDP example.
+     *  @param p_Device Pointer to device object
+     */
+    void UDP_Client_Run(DEVICE_TYPE& p_Device);
+#endif
+
 #endif /* EXAMPLE_H_ */

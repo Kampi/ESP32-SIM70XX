@@ -17,9 +17,14 @@
     - [File System](#file-system)
     - [E-Mail](#e-mail)
     - [MQTT](#mqtt)
-      - [Prepare the broker](#prepare-the-broker)
+      - [Prepare the MQTT broker](#prepare-the-mqtt-broker)
       - [Configure the MQTT project](#configure-the-mqtt-project)
     - [NTP](#ntp)
+    - [TCP client](#tcp-client)
+      - [Configure the TCP client project](#configure-the-tcp-client-project)
+    - [UDP client](#udp-client)
+      - [Prepare the UDP server](#prepare-the-udp-server)
+      - [Configure the UDP client project](#configure-the-udp-client-project)
   - [Maintainer](#maintainer)
 
 ## About
@@ -38,13 +43,13 @@ Multidevice driver for SIMCom cellular modules with UART interface.
 | File system   |               | Complete      |
 | SSL           |               | Open          |
 | NVRAM         | Complete      |               |
-| TCP (Client)  | Complete      | Open          |
-| UDP (Client)  | Complete      |               |
+| TCP (Client)  | Complete      | Complete      |
+| UDP (Client)  | Complete      | Complete      |
 | TCP (Server)  | Open          |               |
 | UDP (Server)  |               |               |
 | HTTP          | Open          | Not started   |
 | CoAP          | Open          | Not started   |
-| MQTT          | Open          | Open          |
+| MQTT          | Complete      | Complete      |
 | PSM           | Open          | Not started   |
 
 ### Description
@@ -117,7 +122,7 @@ This demo is sending a E-mail to the given recipient. At next all E-Mails from t
 
 This demo open a connection to a given MQTT broker. The demo will subscribe and publish data to the given topics. After receiving a message from the subscripted topic the demo ends.
 
-#### Prepare the broker
+#### Prepare the MQTT broker
 
 Download and install [mosquitto](https://mosquitto.org/).
 
@@ -147,14 +152,45 @@ mosquitto -c /etc/mosquitto/mosquitto.conf
 - Run `make`
 - Execute the demo application
 
-
 ### NTP
 
-This demo demo is fetching the time from the given NTP server. After fetching the time the demo ends.
+This demo demo is fetching the time from the given NTP server. The demo ends after fetching the time.
 
 - Run `make menuconfig`
 - Open the menu `Demo` -> `NTP`
 - Select `Enable the SNTP demo`
+- Fill in the required informations
+- Run `make`
+- Execute the demo application
+
+### TCP client
+
+This demo demo is fetching the IP adress of the given server by using DNS. After that a connection to the server is established and image and JSON data are transmitted. Finally the connection is closed and the demo ends.
+
+#### Configure the TCP client project
+
+- Run `make menuconfig`
+- Open the menu `Demo` -> `TCP`
+- Select `Enable the TCP client demo`
+- Fill in the required informations
+- Run `make`
+- Execute the demo application
+
+### UDP client
+
+This demo demo is sending and receiving data from an UDP server. The demo ends after data from the UDP server were received.
+
+#### Prepare the UDP server
+
+- Open `UDP_Server.py` in the `tools` directory
+- Change `PORT` to the target value
+- Run `python UDP_Server.py`
+
+#### Configure the UDP client project
+
+- Run `make menuconfig`
+- Open the menu `Demo` -> `UDP`
+- Select `Enable the UDP client demo`
 - Fill in the required informations
 - Run `make`
 - Execute the demo application

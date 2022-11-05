@@ -107,6 +107,15 @@ void StartExamples(void)
             NTP_Run(_Device);
         #endif
 
+        #ifdef CONFIG_DEMO_USE_TCPIP_CLIENT
+            TCP_Client_Run_JSON(_Device);
+            TCP_Client_Run_FormData(_Device);
+        #endif
+
+        #ifdef CONFIG_DEMO_USE_UDP_CLIENT
+            UDP_Client_Run(_Device);
+        #endif
+
         ESP_LOGI(TAG, "Done...");
     }
 }

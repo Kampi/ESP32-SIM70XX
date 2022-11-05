@@ -70,4 +70,44 @@ menu "Demo"
             range 0 65535
             default 60
 	endmenu
+
+	menu "UDP"
+	    depends on SIM70XX_DRIVER_WITH_TCPIP
+
+        config DEMO_USE_UDP_CLIENT
+            bool "Enable the UDP client demo"
+
+        config DEMO_UDP_CLIENT_HOST
+	        depends on DEMO_USE_UDP_CLIENT
+            string "Server address"
+
+		config DEMO_UDP_CLIENT_PORT
+	        depends on DEMO_USE_UDP_CLIENT
+            int "Server port"
+            range 0 65535
+			default 5246
+	endmenu
+
+	menu "TCP/IP"
+	    depends on SIM70XX_DRIVER_WITH_TCPIP
+
+        config DEMO_USE_TCPIP_CLIENT
+            select SIM70XX_DRIVER_WITH_DNS
+            bool "Enable the TCP/IP client demo"
+
+        config DEMO_TCP_CLIENT_HOST
+	        depends on DEMO_USE_TCPIP_CLIENT
+            string "Server address"
+            default "webhook.site"
+
+		config DEMO_TCP_CLIENT_PORT
+	        depends on DEMO_USE_TCPIP_CLIENT
+            int "Server port"
+            range 0 65535
+			default 65432
+
+        config DEMO_TCP_CLIENT_ENDPOINT
+	        depends on DEMO_USE_TCPIP_CLIENT
+            string "Server endpoint"
+	endmenu
 endmenu
