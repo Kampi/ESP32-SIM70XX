@@ -259,7 +259,7 @@ SIM70XX_Error_t SIM7080_Client_Receive(SIM7080_t& p_Device, SIM7080_TCPIP_Socket
     {
         return SIM70XX_ERR_SOCKET_NOT_CREATED;
     }
-    else if((p_Socket->Internal.isDataReceived == false) || (Length == 0))
+    else if(p_Socket->Internal.isDataReceived == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -282,6 +282,8 @@ SIM70XX_Error_t SIM7080_Client_Receive(SIM7080_t& p_Device, SIM7080_TCPIP_Socket
 
     // Remove the command and the length from the response.
     SIM70XX_Tools_SubstringSplitErase(p_Buffer);
+
+    p_Socket->Internal.isDataReceived = false;
 
     return SIM70XX_ERR_OK;
 }

@@ -62,7 +62,6 @@ void UDP_Client_Run(DEVICE_TYPE& p_Device)
 	ESP_LOGI(TAG, "Run UDP-Client example...");
 
     SIMXX_RunPing(p_Device, &_UDP_Ping, &_UDP_PingResult);
-
     for(uint8_t i = 0; i < _UDP_PingResult.size(); i++)
     {
         ESP_LOGI(TAG, "Result %u...", i + 1);

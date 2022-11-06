@@ -70,11 +70,13 @@ SIM70XX_Error_t SIM7020_DNS_FetchAddress(SIM7020_t& p_Device, std::string Host, 
 
     SIMXX_TOOLS_REMOVE_LINEEND(Response);
 
+    ESP_LOGD(TAG, "Response: %s", Response.c_str());
+
     // Filter out the error code.
     Index = Response.find(",");
     DNS_Error = (SIM7020_DNS_Error_t)SIM70XX_Tools_StringToUnsigned(Response.substr(Index - 1, 1));
 
-    if(DNS_Error == SIM7020_DNS_ERROR_OK)
+    if(DNS_Error == 1)
     {
         // Remove the command and the error code
         Response.replace(0, Index + 1, "");
@@ -90,7 +92,7 @@ SIM70XX_Error_t SIM7020_DNS_FetchAddress(SIM7020_t& p_Device, std::string Host, 
         return SIM70XX_ERR_OK;
     }
     // Handle the error codes.
-    else if(DNS_Error != SIM7020_DNS_ERROR_OK)
+    else if(DNS_Error != 0)
     {
         DNS_Error = (SIM7020_DNS_Error_t)SIM70XX_Tools_StringToUnsigned(Response.substr(Index + 1));
 

@@ -1,5 +1,5 @@
  /*
- * sim7020_evt_tcp.cpp
+ * sim7020_evt_coap.cpp
  *
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -19,7 +19,7 @@
 
 #include <sdkconfig.h>
 
-#if((CONFIG_SIMXX_DEV == 7020) && (defined CONFIG_SIM70XX_DRIVER_WITH_TCPIP))
+#if((CONFIG_SIMXX_DEV == 7020) && (defined CONFIG_SIM70XX_DRIVER_WITH_COAP))
 
 #include <esp_log.h>
 
@@ -27,46 +27,21 @@
 #include "sim7020_evt.h"
 #include "../../Core/Queue/sim70xx_queue.h"
 
-static const char* TAG = "SIM7020_Evt_TCP";
+static const char* TAG = "SIM7020_Evt_CoAP";
 
-void SIM7020_Evt_on_TCP_Disconnect(SIM7020_t* const p_Device, std::string* p_Message)
+void SIM7020_Evt_on_CoAP(SIM7020_t* const p_Device, std::string* p_Message)
 {
     uint8_t ID;
     size_t Index;
-    SIM7020_TCP_Error_t TCP_Error;
+    std::string Message;
 
-    ESP_LOGI(TAG, "TCP disconnect event!");
+    ESP_LOGI(TAG, "CoAP event!");
 
-    Index = p_Message->find("+CSOERR");
-    Index = p_Message->find(",", Index);
-    ID = (uint8_t)SIM70XX_Tools_StringToUnsigned(p_Message->substr(Index - 1, 1));
-    TCP_Error = (SIM7020_TCP_Error_t)std::stoi(p_Message->substr(Index + 1));
-
-    // Iterate through the list of active sockets and close the socket with the given ID.
-    for(std::vector<SIM7020_TCPIP_Socket_t*>::iterator it = p_Device->TCP.Sockets.begin(); it != p_Device->TCP.Sockets.end(); ++it)
-    {
-        if((*it)->Internal.ID == ID)
-        {
-            (*it)->Internal.isConnected = false;
-
-            ESP_LOGI(TAG, "Disconnect socket %u", ID);
-            ESP_LOGI(TAG, "Error: %i", TCP_Error);
-        }
-    }
-}
-
-void SIM7020_Evt_on_TCP_Data(SIM7020_t* const p_Device, std::string* p_Message)
-{
-    uint8_t ID;
-    size_t Index;
-
-    ESP_LOGD(TAG, "TCP message data event!");
-
-    Index = p_Message->find("+CSONMI");
+    Index = p_Message->find("+CCOAPNMI");
     Index = p_Message->find(",", Index);
     ID = (uint8_t)SIM70XX_Tools_StringToUnsigned(p_Message->substr(Index - 1, 1));
 
-    for(std::vector<SIM7020_TCPIP_Socket_t*>::iterator it = p_Device->TCP.Sockets.begin(); it != p_Device->TCP.Sockets.end(); ++it)
+    for(std::vector<SIM7020_CoAP_Socket_t*>::iterator it = p_Device->CoAP.Sockets.begin(); it != p_Device->CoAP.Sockets.end(); ++it)
     {
         if((*it)->Internal.ID == ID)
         {

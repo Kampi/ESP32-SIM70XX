@@ -78,4 +78,13 @@ void SIM7020_Evt_on_PSM_Event(SIM7020_t* const p_Device, std::string* p_Message,
     void SIM7020_Evt_on_TCP_Data(SIM7020_t* const p_Device, std::string* p_Message);
 #endif
 
+#ifdef CONFIG_SIM70XX_DRIVER_WITH_COAP
+    /** @brief              CoAP event handler.
+     *                      This function will filter out the receive message from the event message and set the \ref isDataReceived flag of the receiving socket.
+     *  @param p_Device     Pointer to device
+     *  @param p_Message    Pointer to message string
+     */
+    void SIM7020_Evt_on_CoAP(SIM7020_t* const p_Device, std::string* p_Message);
+#endif
+
 #endif /* SIM7020_EVT_H_ */

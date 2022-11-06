@@ -94,4 +94,11 @@ void StartExamples(void);
     void UDP_Client_Run(DEVICE_TYPE& p_Device);
 #endif
 
+#ifdef CONFIG_DEMO_USE_COAP
+    /** @brief          Run the CoAP example.
+     *  @param p_Device Pointer to device object
+     */
+    void CoAP_Run(DEVICE_TYPE& p_Device);
+#endif
+
 #endif /* EXAMPLE_H_ */

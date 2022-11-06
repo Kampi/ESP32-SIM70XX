@@ -228,6 +228,8 @@ SIM70XX_Error_t SIM7020_Client_Receive(SIM7020_t& p_Device, SIM7020_TCPIP_Socket
         p_Buffer->pop_back();
     }
 
+    p_Socket->Internal.isDataReceived = false;
+
     return SIM70XX_ERR_OK;
 }
 

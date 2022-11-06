@@ -400,7 +400,7 @@ uint32_t SIM70XX_Tools_StringToUnsigned(std::string Input)
         }
         else
         {
-            return INT_MAX;
+            return 0;
         }
     #endif
 }
@@ -423,7 +423,7 @@ int32_t SIM70XX_Tools_StringToSigned(std::string Input)
         }
         else
         {
-            return INT_MAX;
+            return 0;
         }
     #endif
 }

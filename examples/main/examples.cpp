@@ -66,7 +66,35 @@ void StartExamples(void)
 
     if(SIMXX_Init(_Device, _Config) == SIM70XX_ERR_OK)
     {
-        std::vector<SIM70XX_Operator_t> Operators;
+        #ifdef CONFIG_DEMO_READ_OPERATOR
+            SIM70XX_Error_t Error;
+            std::vector<SIM70XX_Operator_t> Operators;
+
+            Error = SIMXX_GetAvailOperators(_Device, &Operators);
+            if(Error == SIM70XX_ERR_OK)
+            {
+                if(Operators.size() > 0)
+                {
+                    for(uint8_t i = 0; i < Operators.size(); i++)
+                    {
+                        ESP_LOGI(TAG, "Operator %u:", i + 1);
+                        ESP_LOGI(TAG, "     Status: %u", Operators.at(i).Stat);
+                        ESP_LOGI(TAG, "     Act: %u", Operators.at(i).Act);
+                        ESP_LOGI(TAG, "     Long: %s", Operators.at(i).Long.c_str());
+                        ESP_LOGI(TAG, "     Short: %s", Operators.at(i).Short.c_str());
+                        ESP_LOGI(TAG, "     Numeric: %s", Operators.at(i).Numeric.c_str());
+                    }
+                }
+                else
+                {
+                    ESP_LOGI(TAG, "No operators found!");
+                }
+            }
+            else
+            {
+                ESP_LOGE(TAG, "Can not read operators. Error: 0x%X", Error);
+            }
+        #endif
 
         SIMXX_GetDeviceInfo(_Device, &_DeviceInfo);
         SIMXX_PrintDeviceInfo(&_DeviceInfo);
@@ -114,6 +142,10 @@ void StartExamples(void)
 
         #ifdef CONFIG_DEMO_USE_UDP_CLIENT
             UDP_Client_Run(_Device);
+        #endif
+
+        #ifdef CONFIG_DEMO_USE_COAP
+            CoAP_Run(_Device);
         #endif
 
         ESP_LOGI(TAG, "Done...");

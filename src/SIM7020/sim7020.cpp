@@ -403,14 +403,14 @@ SIM70XX_Error_t SIM7020_GetAvailOperators(SIM7020_t& p_Device, std::vector<SIM70
             Entry = List.substr(Start + 1, List.find(")") - Start - 1);
             List.erase(Start, Entry.size() + 2);
 
-            Operator.Stat = (SIM70XX_OpStat_t)stoi(SIM70XX_Tools_SubstringSplitErase(&Entry));
+            Operator.Stat = (SIM70XX_OpStat_t)SIM70XX_Tools_StringToUnsigned((SIM70XX_Tools_SubstringSplitErase(&Entry)));
             Operator.Long = SIM70XX_Tools_SubstringSplitErase(&Entry);
             Operator.Long.erase(std::remove(Operator.Long.begin(), Operator.Long.end(), '\"'), Operator.Long.end());
             Operator.Short = SIM70XX_Tools_SubstringSplitErase(&Entry);
             Operator.Short.erase(std::remove(Operator.Short.begin(), Operator.Short.end(), '\"'), Operator.Short.end());
             Operator.Numeric = SIM70XX_Tools_SubstringSplitErase(&Entry);
             Operator.Numeric.erase(std::remove(Operator.Numeric.begin(), Operator.Numeric.end(), '\"'), Operator.Numeric.end());
-            Operator.Act = stoi(SIM70XX_Tools_SubstringSplitErase(&Entry));
+            Operator.Act = (uint8_t)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Entry));
 
             p_Operators->push_back(Operator);
         }

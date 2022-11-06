@@ -30,6 +30,8 @@ static const char* TAG = "SIM7020_Evt";
 
 void SIM70XX_Evt_MessageFilter(void* p_Device, std::string* p_Message)
 {
+	// This flag is set to #true when the data were processed completely in the event handler. Do not set this flag to #true when
+	// the data should be processed by using the event message queue.
 	bool Processed;
 	SIM7020_t* Device = (SIM7020_t*)p_Device;
 
@@ -54,6 +56,13 @@ void SIM70XX_Evt_MessageFilter(void* p_Device, std::string* p_Message)
 		SIM7020_Evt_on_PSM_Event(Device, p_Message, true);
 		Processed = true;
 	}
+
+	#ifdef CONFIG_SIM70XX_DRIVER_WITH_COAP
+		if(p_Message->find("+CCOAPNMI") != std::string::npos)
+		{
+			SIM7020_Evt_on_CoAP(Device, p_Message);
+		}
+	#endif
 
 	#ifdef CONFIG_SIM70XX_DRIVER_WITH_TCPIP
 		if(p_Message->find("+CSOERR") != std::string::npos)

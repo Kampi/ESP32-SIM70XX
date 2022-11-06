@@ -46,8 +46,8 @@ void SIM7020_Evt_on_HTTP_Event(SIM7020_t* const p_Device, std::string* p_Message
         return;
     }
 
-    ID = std::stoi(p_Message->substr(Index - 1, 1));
-    HTTP_Error = (SIM7020_HTTP_Error_t)std::stoi(p_Message->substr(Index + 1));
+    ID = (uint8_t)SIM70XX_Tools_StringToUnsigned(p_Message->substr(Index - 1, 1));
+    HTTP_Error = (SIM7020_HTTP_Error_t)SIM70XX_Tools_StringToUnsigned(p_Message->substr(Index + 1));
 
     // Iterate through the list of active sockets and close the socket with the given ID.
     for(std::vector<SIM7020_HTTP_Socket_t*>::iterator it = p_Device->HTTP.Sockets.begin(); it != p_Device->HTTP.Sockets.end(); ++it)

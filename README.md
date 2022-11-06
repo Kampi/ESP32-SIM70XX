@@ -25,6 +25,9 @@
     - [UDP client](#udp-client)
       - [Prepare the UDP server](#prepare-the-udp-server)
       - [Configure the UDP client project](#configure-the-udp-client-project)
+    - [CoAP](#coap)
+      - [Prepare the CoAP server](#prepare-the-coap-server)
+      - [Configure the CoAP project](#configure-the-coap-project)
   - [Maintainer](#maintainer)
 
 ## About
@@ -41,16 +44,15 @@ Multidevice driver for SIMCom cellular modules with UART interface.
 | GNSS          |               | Basic         |
 | E-Mail        |               | Basic         |
 | File system   |               | Complete      |
-| SSL           |               | Open          |
+| SSL / TLS     | Open          | Open          |
 | NVRAM         | Complete      |               |
 | TCP (Client)  | Complete      | Complete      |
 | UDP (Client)  | Complete      | Complete      |
-| TCP (Server)  | Open          |               |
-| UDP (Server)  |               |               |
+| TCP (Server)  | Open          | Not started   |
 | HTTP          | Open          | Not started   |
 | CoAP          | Open          | Not started   |
 | MQTT          | Complete      | Complete      |
-| PSM           | Open          | Not started   |
+| PSM           | Open          | Open          |
 
 ### Description
 
@@ -178,7 +180,7 @@ This demo demo is fetching the IP adress of the given server by using DNS. After
 
 ### UDP client
 
-This demo demo is sending and receiving data from an UDP server. The demo ends after data from the UDP server were received.
+This demo demo is sending and receiving data to and from an UDP server. The demo ends after data from the UDP server were received.
 
 #### Prepare the UDP server
 
@@ -186,11 +188,34 @@ This demo demo is sending and receiving data from an UDP server. The demo ends a
 - Change `PORT` to the target value
 - Run `python UDP_Server.py`
 
+> **Warning**
+> Make sure the port isn't blocked by a firewall!
+
 #### Configure the UDP client project
 
 - Run `make menuconfig`
 - Open the menu `Demo` -> `UDP`
 - Select `Enable the UDP client demo`
+- Fill in the required informations
+- Run `make`
+- Execute the demo application
+
+### CoAP
+
+This demo demo is sending and receiving data to and from a CoAP server. The demo ends after data from the UDP server were received.
+
+#### Prepare the CoAP server
+
+- Run `python CoAP_Server.py`
+
+> **Warning**
+> Make sure the port isn't blocked by a firewall!
+
+#### Configure the CoAP project
+
+- Run `make menuconfig`
+- Open the menu `Demo` -> `CoAP`
+- Select `Enable the CoAP client demo`
 - Fill in the required informations
 - Run `make`
 - Execute the demo application

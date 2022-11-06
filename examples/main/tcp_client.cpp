@@ -99,8 +99,19 @@ void TCP_Client_Run_FormData(DEVICE_TYPE& p_Device, bool IncludeImage)
 
 	ESP_LOGI(TAG, "Run TCP-Client example...");
 
-    SIMXX_RunPing(p_Device, &_TCP_Ping, &_TCP_PingResult);
-    SIMXX_ParseDNS(p_Device, _TCP_Ping.Host, &_TCP_DNS_IP);
+    Error = SIMXX_RunPing(p_Device, &_TCP_Ping, &_TCP_PingResult);
+    if(Error != SIM70XX_ERR_OK)
+    {
+        ESP_LOGE(TAG, "Can not ping server! Error: 0x%X", Error);
+        return;
+    }
+
+    Error = SIMXX_ParseDNS(p_Device, _TCP_Ping.Host, &_TCP_DNS_IP);
+    if(Error != SIM70XX_ERR_OK)
+    {
+        ESP_LOGE(TAG, "Can not fetch IP address! Error: 0x%X", Error);
+        return;
+    }
 
     for(uint8_t i = 0; i < _TCP_PingResult.size(); i++)
     {
@@ -133,40 +144,47 @@ void TCP_Client_Run_FormData(DEVICE_TYPE& p_Device, bool IncludeImage)
     Header += "\r\n";
 
     SIMXX_ClientCreate(p_Device, _TCP_DNS_IP, CONFIG_DEMO_TCP_CLIENT_PORT, &_TCP_Socket);
-    Error = SIMXX_ClientConnect(p_Device, &_TCP_Socket);
     if(Error == SIM70XX_ERR_OK)
     {
-        // Transmit the HTTP header.
-        SIMXX_ClientTransmit(p_Device, &_TCP_Socket, Header.c_str(), Header.size());
-
-        // Transmit the form data.
-        SIMXX_ClientTransmit(p_Device, &_TCP_Socket, Body.c_str(), Body.size());
-
-        if(IncludeImage)
+        Error = SIMXX_ClientConnect(p_Device, &_TCP_Socket);
+        if(Error == SIM70XX_ERR_OK)
         {
-            // Transmit the image data.
-            SIMXX_ClientTransmit(p_Device, &_TCP_Socket, HeaderImage.c_str(), HeaderImage.size());
-            SIMXX_ClientTransmit(p_Device, &_TCP_Socket, Data_ImageSmall, Data_ImageSmall_Length);
-            SIMXX_ClientTransmit(p_Device, &_TCP_Socket, std::string("\r\n").c_str(), std::string("\r\n").size());
+            // Transmit the HTTP header.
+            SIMXX_ClientTransmit(p_Device, &_TCP_Socket, Header.c_str(), Header.size());
+
+            // Transmit the form data.
+            SIMXX_ClientTransmit(p_Device, &_TCP_Socket, Body.c_str(), Body.size());
+
+            if(IncludeImage)
+            {
+                // Transmit the image data.
+                SIMXX_ClientTransmit(p_Device, &_TCP_Socket, HeaderImage.c_str(), HeaderImage.size());
+                SIMXX_ClientTransmit(p_Device, &_TCP_Socket, Data_ImageSmall, Data_ImageSmall_Length);
+                SIMXX_ClientTransmit(p_Device, &_TCP_Socket, std::string("\r\n").c_str(), std::string("\r\n").size());
+            }
+
+            // Transmit the message footer.
+            SIMXX_ClientTransmit(p_Device, &_TCP_Socket, Footer.c_str(), Footer.size());
+
+            while(SIMXX_ClientIsDataAvailable(&_TCP_Socket) == false)
+            {
+                vTaskDelay(100 / portTICK_PERIOD_MS);
+            }
+
+            SIMXX_ClientReceive(p_Device, &_TCP_Socket, &Response);
+            ESP_LOGI(TAG, "Response from server: %s", Response.c_str());
+
+            SIMXX_ClientDisconnect(p_Device, &_TCP_Socket);
+            SIMXX_ClientDestroy(p_Device, &_TCP_Socket);
         }
-
-        // Transmit the message footer.
-        SIMXX_ClientTransmit(p_Device, &_TCP_Socket, Footer.c_str(), Footer.size());
-
-        while(SIMXX_ClientIsDataAvailable(&_TCP_Socket) == false)
+        else
         {
-            vTaskDelay(100 / portTICK_PERIOD_MS);
+            ESP_LOGE(TAG, "Can not connect with server! Error: 0x%X", Error);
         }
-
-        SIMXX_ClientReceive(p_Device, &_TCP_Socket, &Response);
-        ESP_LOGI(TAG, "Response from server: %s", Response.c_str());
-
-        SIMXX_ClientDisconnect(p_Device, &_TCP_Socket);
-        SIMXX_ClientDestroy(p_Device, &_TCP_Socket);
     }
     else
     {
-        ESP_LOGE(TAG, "Can not connect with server!");
+        ESP_LOGE(TAG, "Can not create socket! Error: 0x%X", Error);
     }
 }
 
@@ -196,33 +214,40 @@ void TCP_Client_Run_JSON(DEVICE_TYPE& p_Device)
     Header += "Content-Length: " + std::to_string(strlen(cJSON_Print(root))) + "\r\n";
     Header += "\r\n";
 
-    SIMXX_ClientCreate(p_Device, _TCP_DNS_IP, CONFIG_DEMO_TCP_CLIENT_PORT, &_TCP_Socket);
-    Error = SIMXX_ClientConnect(p_Device, &_TCP_Socket);
+    Error = SIMXX_ClientCreate(p_Device, _TCP_DNS_IP, CONFIG_DEMO_TCP_CLIENT_PORT, &_TCP_Socket);
     if(Error == SIM70XX_ERR_OK)
     {
-        // Transmit the HTTP header.
-        SIMXX_ClientTransmit(p_Device, &_TCP_Socket, Header.c_str(), Header.size());
-
-        // Transmit the form data.
-        SIMXX_ClientTransmit(p_Device, &_TCP_Socket, cJSON_Print(root), strlen(cJSON_Print(root)));
-
-        cJSON_Delete(root);
-
-        while(SIMXX_ClientIsDataAvailable(&_TCP_Socket) == false)
+        Error = SIMXX_ClientConnect(p_Device, &_TCP_Socket);
+        if(Error == SIM70XX_ERR_OK)
         {
-            vTaskDelay(100 / portTICK_PERIOD_MS);
+            // Transmit the HTTP header.
+            SIMXX_ClientTransmit(p_Device, &_TCP_Socket, Header.c_str(), Header.size());
+
+            // Transmit the form data.
+            SIMXX_ClientTransmit(p_Device, &_TCP_Socket, cJSON_Print(root), strlen(cJSON_Print(root)));
+
+            cJSON_Delete(root);
+
+            while(SIMXX_ClientIsDataAvailable(&_TCP_Socket) == false)
+            {
+                vTaskDelay(100 / portTICK_PERIOD_MS);
+            }
+
+            ESP_LOGI(TAG, "Data received...");
+            SIMXX_ClientReceive(p_Device, &_TCP_Socket, &Response);
+            ESP_LOGI(TAG, "Response from server: %s", Response.c_str());
+
+            SIMXX_ClientDisconnect(p_Device, &_TCP_Socket);
+            SIMXX_ClientDestroy(p_Device, &_TCP_Socket);
         }
-
-        ESP_LOGI(TAG, "Data received...");
-        SIMXX_ClientReceive(p_Device, &_TCP_Socket, &Response);
-        ESP_LOGI(TAG, "Response from server: %s", Response.c_str());
-
-        SIMXX_ClientDisconnect(p_Device, &_TCP_Socket);
-        SIMXX_ClientDestroy(p_Device, &_TCP_Socket);
+        else
+        {
+            ESP_LOGE(TAG, "Can not connect with server! Error: 0x%X", Error);
+        }
     }
     else
     {
-        ESP_LOGE(TAG, "Can not connect with server!");
+        ESP_LOGE(TAG, "Can not create socket! Error: 0x%X", Error);
     }
 }
 

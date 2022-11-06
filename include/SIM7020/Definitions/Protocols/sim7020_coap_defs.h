@@ -40,11 +40,18 @@ typedef struct
 {
     std::string Server;                             /**< CoAP server IP address. */
     uint16_t Port;                                  /**< CoAP port. */
-    uint8_t CID;                                    /**< Context Identifier. */
-    uint8_t ID;                                     /**< Socket ID from the module.
+    struct
+    {
+        uint8_t CID;                                /**< Context Identifier.
                                                          NOTE: Handled by the device driver. */
-    bool isConnected;                               /**< #true when the socket is connected.
+        uint8_t ID;                                 /**< Socket ID from the module.
                                                          NOTE: Handled by the device driver. */
+        bool isConnected;                           /**< Socket connected.
+                                                         NOTE: Handled by the device driver.
+                                                         NOTE: Only used for client sockets! */
+        bool isDataReceived;                        /**< Set to #true when data are received.
+                                                         NOTE: Managed by the device driver. */
+    } Internal;
 } SIM7020_CoAP_Socket_t;
 
 #endif /* SIM7020_COAP_DEFS_H_ */

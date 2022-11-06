@@ -1,4 +1,7 @@
 menu "Demo"
+    config DEMO_READ_OPERATOR
+        bool "Read the available operators"
+
     menu "NTP"
 	    depends on SIM70XX_DRIVER_WITH_NTP
 
@@ -109,5 +112,24 @@ menu "Demo"
         config DEMO_TCP_CLIENT_ENDPOINT
 	        depends on DEMO_USE_TCPIP_CLIENT
             string "Server endpoint"
+	endmenu
+
+	menu "CoAP"
+	    depends on SIM70XX_DRIVER_WITH_COAP
+
+        config DEMO_USE_COAP
+            select SIM70XX_DRIVER_WITH_DNS
+            bool "Enable the CoAP demo"
+
+        config DEMO_COAP_SERVER
+	        depends on DEMO_USE_COAP
+            string "Server address"
+            default "coap.me"
+
+		config DEMO_COAP_PORT
+	        depends on DEMO_USE_COAP
+            int "Broker port"
+            range 0 65535
+			default 5683
 	endmenu
 endmenu

@@ -55,6 +55,7 @@ set(COMPONENT_SRCS
     "src/SIM7020/Events/sim7020_evt_mqtt.cpp"
     "src/SIM7020/Events/sim7020_evt_tcp.cpp"
     "src/SIM7020/Events/sim7020_evt_psm.cpp"
+    "src/SIM7020/Events/sim7020_evt_coap.cpp"
 
     # Driver internal
     "src/Core/Events/sim70xx_evt.cpp"
