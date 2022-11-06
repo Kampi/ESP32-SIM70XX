@@ -127,13 +127,6 @@ SIM70XX_Error_t SIM7020_Init(SIM7020_t& p_Device, SIM7020_Config_t& p_Config, ui
  */
 SIM70XX_Error_t SIM7020_Deinit(SIM7020_t& p_Device, bool Skip = false);
 
-#ifdef CONFIG_SIM70XX_RESET_USE_HW
-    /** @brief          Perform a hardware reset of the module.
-     *  @param p_Device SIM7020 device object
-     */
-    void SIM7020_HardReset(SIM7020_t& p_Device);
-#endif
-
 /** @brief          Perform a software reset of the device.
  *  @param p_Device SIM7020 device object
  *  @param Timeout  (Optional) Timeout for the device reset in seconds

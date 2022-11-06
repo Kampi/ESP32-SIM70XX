@@ -163,11 +163,13 @@ menu "SIM70XX"
                     Enable this option when the PwrKey is switched by a transistor (see Reference circuit).
 
             config SIM70XX_GPIO_PWRKEY_ENABLE_PULL
-                bool "Enable a Pull-Up / Pull-Down resistor"
+                bool "Enable a Pull-Up / Pull-Down resistor for the PwrKey signal"
                 default n
                 help
                     This option will enable a pull-up / pull-down resistor for the PwrKey pin (depending on the invert option).
+        endmenu
 
+        menu "Status"
             config SIM70XX_GPIO_USE_STATUS
                 bool "Enable support for the Status signal of the module"
                 default n
@@ -176,7 +178,9 @@ menu "SIM70XX"
                 int "Status signal input"
                 depends on SIM70XX_GPIO_USE_STATUS
                 default 34
+        endmenu
 
+        menu "Netlight"
             config SIM70XX_GPIO_USE_NETLIGHT
                 bool "Enable support for the Netlight signal of the module"
                 default n
@@ -186,15 +190,33 @@ menu "SIM70XX"
                 depends on SIM70XX_GPIO_USE_NETLIGHT
                 default 35
         endmenu
-    endmenu
 
-    menu "Reset"
-        depends on SIM70XX_DEV_SIM7020
-        config SIM70XX_RESET_USE_HW
-            bool "Enable hardware reset"
-            default n
-            help
-                Enable this option if you want to use a hardware reset through an IO.
+        menu "Reset"
+            depends on SIM70XX_DEV_SIM7020
+            config SIM70XX_GPIO_USE_RESET
+                bool "Enable hardware reset"
+                default n
+                help
+                    Enable this option if you want to use a hardware reset through an IO.
+
+            config SIM70XX_GPIO_RESET_PIN
+                depends on SIM70XX_GPIO_USE_RESET
+                int "Reset signal output"
+                default 33
+
+            config SIM70XX_GPIO_RESET_INVERT
+                depends on SIM70XX_GPIO_USE_RESET
+                bool "Invert the Reset logic"
+                default n
+
+            config SIM70XX_GPIO_RESET_ENABLE_PULL
+                depends on SIM70XX_GPIO_USE_RESET
+                bool "Enable a Pull-Up / Pull-Down resistor for the Reset signal"
+                default n
+                help
+                    This option will enable a pull-up / pull-down resistor for the Reset pin (depending on the invert option).
+        endmenu
+
     endmenu
 
     menu "Misc"

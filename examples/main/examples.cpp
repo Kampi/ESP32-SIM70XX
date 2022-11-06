@@ -25,6 +25,8 @@
 
 #include "example.h"
 
+static const char* TAG                                              = "SIM70XX_Example";
+
 #if(CONFIG_SIMXX_DEV == 7020)
     static SIM7020_Config_t _Config                                 = SIM70XX_DEFAULT_CONF_1NCE(UART_NUM_1, SIM_BAUD_115200, GPIO_NUM_13, GPIO_NUM_14);
     static SIM7020_t _Device;
@@ -44,8 +46,6 @@
     #define SIMXX_PrintDeviceInfo(Info)                             SIM7080_Info_Print(Info);
     #define SIMXX_GetAvailOperators(Device, List)                   SIM7080_GetAvailOperators(Device, List);
 #endif
-
-static const char* TAG = "SIM70XX_Example";
 
 void StartExamples(void)
 {

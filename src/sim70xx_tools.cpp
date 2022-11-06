@@ -209,8 +209,6 @@ bool SIM70XX_Tools_DisableModule(SIM70XX_UART_Conf_t& p_Config)
     }
 
     SIM70XX_GPIO_Init();
-
-    // TODO: Test this
     SIM70XX_GPIO_SetPwrKey(true);
 
     do
@@ -250,9 +248,23 @@ bool SIM70XX_Tools_isActive(SIM70XX_UART_Conf_t& p_Config)
     return Result;
 }
 
-void SIM70XX_Tools_ResetModule(void)
+bool SIM70XX_Tools_ResetModule(SIM70XX_UART_Conf_t& p_Config)
 {
-    // TODO
+    if(SIM70XX_Tools_DisableModule(p_Config) == false)
+    {
+        ESP_LOGI(TAG, "Can not disable the module!");
+
+		return false;
+    }
+
+    if(SIM70XX_Tools_EnableModule(p_Config) == false)
+    {
+        ESP_LOGE(TAG, "Can not enable module!");
+
+		return false;
+    }
+
+    return true;
 }
 
 SIM70XX_Error_t SIM70XX_Tools_DisableEcho(SIM70XX_UART_Conf_t& p_Config)

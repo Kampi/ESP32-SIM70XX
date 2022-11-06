@@ -27,6 +27,8 @@
 #include "../Core/Events/sim70xx_evt.h"
 #include "../Core/Queue/sim70xx_queue.h"
 #include "../Core/Commands/sim7080_commands.h"
+
+#include "../Core/Arch/ESP32/GPIO/sim70xx_gpio.h"
 #include "../Core/Arch/ESP32/UART/sim70xx_uart.h"
 #include "../Core/Arch/ESP32/Timer/sim70xx_timer.h"
 
@@ -71,6 +73,8 @@ SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t& p_Conf
     p_Device.UART.Tx = p_Config.UART.Tx;
     p_Device.UART.Baudrate = p_Config.UART.Baudrate;
 
+    SIM70XX_GPIO_Init();
+
     SIM70XX_ERROR_CHECK(SIM70XX_UART_Init(p_Device.UART));
 
     // Get all remaining available data to clear the Rx buffer.
@@ -103,12 +107,6 @@ SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t& p_Conf
 
     SIM70XX_ERROR_CHECK(SIM7080_Ping(p_Device));
     SIM70XX_ERROR_CHECK(SIM7080_GetFunctionality(p_Device));
-/*
-    if(p_Device.Connection.Functionality == SIM7080_FUNC_FULL)
-    {
-        SIM70XX_ERROR_CHECK(SIM7080_SetFunctionality(p_Device, SIM7080_FUNC_MIN));
-    }
-*/
     SIM70XX_ERROR_CHECK(SIM7080_SetFunctionality(p_Device, SIM7080_FUNC_FULL));
 
     #ifdef CONFIG_SIM70XX_DRIVER_WITH_FS

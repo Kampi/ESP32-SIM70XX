@@ -104,7 +104,7 @@ menu "Demo"
 	        depends on DEMO_USE_TCPIP_CLIENT
             int "Server port"
             range 0 65535
-			default 65432
+			default 80
 
         config DEMO_TCP_CLIENT_ENDPOINT
 	        depends on DEMO_USE_TCPIP_CLIENT

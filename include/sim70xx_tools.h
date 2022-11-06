@@ -91,9 +91,11 @@ bool SIM70XX_Tools_DisableModule(SIM70XX_UART_Conf_t& p_Config);
  */
 bool SIM70XX_Tools_isActive(SIM70XX_UART_Conf_t& p_Config);
 
-/** @brief Perform a reset of the module.
+/** @brief          Perform a reset of the module.
+ *  @param p_Config Pointer to SIM70XX UART configuration object
+ *  @return         #true when the reset was successful
  */
-void SIM70XX_Tools_ResetModule(void);
+bool SIM70XX_Tools_ResetModule(SIM70XX_UART_Conf_t& p_Config);
 
 /** @brief          Disable the echo mode of the SIM70XX module.
  *  @param p_Config Pointer to SIM70XX UART configuration object

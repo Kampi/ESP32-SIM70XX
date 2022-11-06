@@ -135,14 +135,6 @@ typedef struct
 typedef struct
 {
     SIM70XX_UART_Conf_t UART;                               /**< UART configuration object. */
-    #ifdef CONFIG_SIM70XX_RESET_USE_HW
-        struct
-        {
-            bool Inverted;						            /**< Set to #true to invert the reset pin. */
-            gpio_num_t Pin;						            /**< Reset pin for the module.
-                                                                 NOTE: Can be set to -1 when not used. */
-        } Reset_Conf;
-    #endif
     std::vector<SIM70XX_Operator_t> Operators;              /**< */
     std::string Modes;                                      /**< */
     std::string Formats;                                    /**< */
@@ -205,14 +197,6 @@ typedef struct
 typedef struct
 {
     SIM70XX_UART_Conf_t UART;                               /**< UART configuration object. */
-    #ifdef CONFIG_SIM70XX_RESET_USE_HW
-        struct
-        {
-            bool Inverted;						            /**< Set to #true to invert the reset pin. */
-            gpio_num_t Pin;						            /**< Reset pin for the module.
-                                                                 NOTE: Can be set to -1 when not used. */
-        } Reset_Conf;
-    #endif
     SIM7020_Band_t Band;                                    /**< Selected frequency band. */
     SIM70XX_APN_t APN;                                      /**< APN configuration object. */
     SIM70XX_OpForm_t OperatorFormat;                        /**< Format for the selected operator. */

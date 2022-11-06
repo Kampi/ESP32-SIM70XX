@@ -24,11 +24,13 @@
 #include <esp_log.h>
 
 #include "sim7020.h"
-#include "../Core/Arch/ESP32/UART/sim70xx_uart.h"
-#include "../Core/Arch/ESP32/Timer/sim70xx_timer.h"
 #include "../Core/Events/sim70xx_evt.h"
 #include "../Core/Queue/sim70xx_queue.h"
 #include "../Core/Commands/sim70xx_commands.h"
+
+#include "../Core/Arch/ESP32/GPIO/sim70xx_gpio.h"
+#include "../Core/Arch/ESP32/UART/sim70xx_uart.h"
+#include "../Core/Arch/ESP32/Timer/sim70xx_timer.h"
 
 static const char* TAG = "SIM7020";
 
@@ -62,6 +64,8 @@ SIM70XX_Error_t SIM7020_Init(SIM7020_t& p_Device, SIM7020_Config_t& p_Config, ui
     p_Device.UART.Tx = p_Config.UART.Tx;
     p_Device.UART.Baudrate = p_Config.UART.Baudrate;
 
+    SIM70XX_GPIO_Init();
+
     SIM70XX_ERROR_CHECK(SIM70XX_UART_Init(p_Device.UART));
 
     // Get all remaining available data to clear the Rx buffer.
@@ -87,14 +91,8 @@ SIM70XX_Error_t SIM7020_Init(SIM7020_t& p_Device, SIM7020_Config_t& p_Config, ui
         }
     }
 
-	#ifdef CONFIG_SIM70XX_RESET_USE_HW
-        p_Device.Interface.Reset_Conf.Inverted = p_Config.Interface.Reset_Conf.Inverted;
-        p_Device.Interface.Reset_Conf.Pin = p_Config.Interface.Reset_Conf.Pin;
-		if(p_Device.Interface.Reset_Conf.Pin != GPIO_NUM_NC)
-		{
-		    gpio_set_direction(p_Device.Interface.Reset_Conf.Pin, GPIO_MODE_OUTPUT);
-		    SIM7020_HardReset(p_Device);
-		}
+	#ifdef CONFIG_SIM70XX_GPIO_USE_RESET
+        SIM70XX_GPIO_Hardware_Reset();
     #else
         SIM70XX_ERROR_CHECK(SIM7020_SoftReset(p_Device, Timeout));
 	#endif
@@ -166,21 +164,6 @@ SIM70XX_Error_t SIM7020_Deinit(SIM7020_t& p_Device, bool Skip)
     // Deinitialize the UART interface.
     return SIM70XX_UART_Deinit(p_Device.UART);
 }
-
-#ifdef CONFIG_SIM70XX_RESET_USE_HW
-	void SIM7020_HardReset(SIM7020_t& p_Device )
-	{
-		if(p_Device.Interface.Reset_Conf.Pin != GPIO_NUM_NC)
-		{
-			if(p_Device.Interface.Reset_Conf.Inverted)
-			{
-				gpio_set_level(p_Device.Interface.Reset_Conf.Pin, true);
-				vTaskDelay(1000 / portTICK_PERIOD_MS);
-				gpio_set_level(p_Device.Interface.Reset_Conf.Pin, false);
-			}
-		}
-	}
-#endif
 
 SIM70XX_Error_t SIM7020_SoftReset(SIM7020_t& p_Device, uint32_t Timeout)
 {

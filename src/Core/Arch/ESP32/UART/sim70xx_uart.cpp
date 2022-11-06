@@ -123,7 +123,7 @@ SIM70XX_Error_t SIM70XX_UART_Init(SIM70XX_UART_Conf_t& p_Config)
     }
     xSemaphoreGive(p_Config.Lock);
 
-    ESP_LOGI(TAG, "UART initialized...");
+    ESP_LOGD(TAG, "UART initialized...");
 
     p_Config.isInitialized = true;
 
@@ -149,7 +149,7 @@ SIM70XX_Error_t SIM70XX_UART_Deinit(SIM70XX_UART_Conf_t& p_Config)
 
     vSemaphoreDelete(p_Config.Lock);
 
-    ESP_LOGI(TAG, "UART deinitialized...");
+    ESP_LOGD(TAG, "UART deinitialized...");
 
     p_Config.isInitialized = false;
 

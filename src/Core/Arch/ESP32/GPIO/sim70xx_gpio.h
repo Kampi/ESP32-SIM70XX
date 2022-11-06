@@ -20,12 +20,14 @@
 #ifndef SIM70XX_GPIO_H_
 #define SIM70XX_GPIO_H_
 
-#include "sim70xx_defs.h"
-#include "sim70xx_errors.h"
+#include <driver/gpio.h>
+
+#include <stdbool.h>
 
 #include <sdkconfig.h>
 
 /** @brief          Enable / Disable the PwrKey pin.
+ *                  NOTE: You have to call \ref SIM70XX_GPIO_Init first to initialize the GPIO!
  *  @param Enable   Enable / Disable
  */
 inline __attribute__((always_inline)) void SIM70XX_GPIO_SetPwrKey(bool Enable)
@@ -40,5 +42,12 @@ inline __attribute__((always_inline)) void SIM70XX_GPIO_SetPwrKey(bool Enable)
 /** @brief Initialize the GPIO support for the module.
  */
 void SIM70XX_GPIO_Init(void);
+
+#ifdef CONFIG_SIM70XX_GPIO_USE_RESET
+    /** @brief  Perform a hardware reset of the module.
+     *          NOTE: You have to call \ref SIM70XX_GPIO_Init first to initialize the GPIO!
+     */
+	void SIM70XX_GPIO_Hardware_Reset(void);
+#endif
 
 #endif /* SIM70XX_GPIO_H_ */

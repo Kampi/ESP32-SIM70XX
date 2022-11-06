@@ -17,10 +17,11 @@
  * Errors and commissions should be reported to DanielKampert@kampis-elektroecke.de.
  */
 
-#include <esp_err.h>
 #include <esp_log.h>
 
-#include <driver/gpio.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
+#include <freertos/event_groups.h>
 
 #include "sim70xx_gpio.h"
 
@@ -46,6 +47,8 @@ static gpio_config_t _SIM70XX_PwrKey_Config = {
     static gpio_config_t _SIM70XX_Status_Config = {
         .pin_bit_mask = BIT(CONFIG_SIM70XX_GPIO_STATUS_PIN),
         .mode = GPIO_MODE_OUTPUT,
+        .pull_up_en = GPIO_PULLUP_DISABLE,
+        .pull_down_en = GPIO_PULLDOWN_DISABLE,
         .intr_type = GPIO_INTR_DISABLE,
     };
 #endif
@@ -54,6 +57,28 @@ static gpio_config_t _SIM70XX_PwrKey_Config = {
     static gpio_config_t _SIM70XX_Netlight_Config = {
         .pin_bit_mask = BIT(CONFIG_SIM70XX_GPIO_NETLIGHT_PIN),
         .mode = GPIO_MODE_OUTPUT,
+        .pull_up_en = GPIO_PULLUP_DISABLE,
+        .pull_down_en = GPIO_PULLDOWN_DISABLE,
+        .intr_type = GPIO_INTR_DISABLE,
+    };
+#endif
+
+#ifdef CONFIG_SIM70XX_GPIO_USE_RESET
+    static gpio_config_t _SIM70XX_Reset_Config = {
+        .pin_bit_mask = BIT(SIM70XX_GPIO_RESET_PIN),
+        .mode = GPIO_MODE_OUTPUT,
+        #ifdef SIM70XX_GPIO_RESET_ENABLE_PULL
+            #ifdef SIM70XX_GPIO_RESET_INVERT
+                .pull_up_en = GPIO_PULLUP_DISABLE,
+                .pull_down_en = GPIO_PULLDOWN_ENABLE,
+            #else
+                .pull_up_en = GPIO_PULLUP_ENABLE,
+                .pull_down_en = GPIO_PULLDOWN_DISABLE,
+            #endif
+        #else
+            .pull_up_en = GPIO_PULLUP_DISABLE,
+            .pull_down_en = GPIO_PULLDOWN_DISABLE,
+        #endif
         .intr_type = GPIO_INTR_DISABLE,
     };
 #endif
@@ -64,7 +89,30 @@ void SIM70XX_GPIO_Init(void)
 {
     ESP_LOGI(TAG, "Initialize GPIO...");
 
+    esp_log_level_set("gpio", ESP_LOG_NONE);
+
+    assert(GPIO_IS_VALID_GPIO(CONFIG_SIM70XX_GPIO_PWRKEY_PIN));
+
+    #ifdef CONFIG_SIM70XX_GPIO_USE_RESET
+        assert(GPIO_IS_VALID_GPIO(CONFIG_SIM70XX_GPIO_RESET_PIN));
+    #endif
+
+    #ifdef CONFIG_SIM70XX_GPIO_USE_STATUS
+        assert(GPIO_IS_VALID_GPIO(CONFIG_SIM70XX_GPIO_STATUS_PIN));
+    #endif
+
+    #ifdef CONFIG_SIM70XX_GPIO_USE_NETLIGHT
+        assert(GPIO_IS_VALID_GPIO(CONFIG_SIM70XX_GPIO_NETLIGHT_PIN));
+    #endif
+
     gpio_config(&_SIM70XX_PwrKey_Config);
+
+    #ifdef CONFIG_SIM70XX_GPIO_USE_RESET
+        ESP_LOGI(TAG, "     Reset signal: [x]");
+        gpio_config(&_SIM70XX_Reset_Config);
+    #else
+        ESP_LOGI(TAG, "     Reset signal: [ ]");
+    #endif
 
     #ifdef CONFIG_SIM70XX_GPIO_USE_STATUS
         ESP_LOGI(TAG, "     Status signal: [x]");
@@ -85,4 +133,31 @@ void SIM70XX_GPIO_Init(void)
     #else
         gpio_set_level((gpio_num_t)CONFIG_SIM70XX_GPIO_PWRKEY_PIN, true);
     #endif
+
+    #ifdef CONFIG_SIM70XX_GPIO_USE_RESET
+        #ifdef CONFIG_SIM70XX_GPIO_RESET_INVERT
+            gpio_set_level((gpio_num_t)CONFIG_SIM70XX_GPIO_RESET_PIN, true);
+        #else
+            gpio_set_level((gpio_num_t)CONFIG_SIM70XX_GPIO_RESET_PIN, false);
+        #endif
+    #endif
 }
+
+#ifdef CONFIG_SIM70XX_GPIO_USE_RESET
+	void SIM70XX_GPIO_Hardware_Reset(void)
+	{
+        #ifdef SIM70XX_GPIO_RESET_INVERT
+            gpio_set_level((gpio_num_t)CONFIG_SIM70XX_GPIO_RESET_PIN, true);
+        #else
+            gpio_set_level((gpio_num_t)CONFIG_SIM70XX_GPIO_RESET_PIN, false);
+        #endif
+
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+
+        #ifdef SIM70XX_GPIO_RESET_INVERT
+            gpio_set_level((gpio_num_t)CONFIG_SIM70XX_GPIO_RESET_PIN, false);
+        #else
+            gpio_set_level((gpio_num_t)CONFIG_SIM70XX_GPIO_RESET_PIN, true);
+        #endif
+	}
+#endif
