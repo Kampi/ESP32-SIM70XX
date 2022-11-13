@@ -148,6 +148,10 @@ menu "SIM70XX"
             default 256
             help
                 UART communication buffer size.
+
+        config SIM70XX_UART_USE_FLOWCONTROL
+            bool "Enable UART flow control support reset"
+            default n
     endmenu
 
     menu "GPIO" 

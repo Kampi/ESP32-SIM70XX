@@ -104,7 +104,7 @@ SIM70XX_Error_t SIM7080_MQTT_Subscribe(SIM7080_t& p_Device, SIM7080_MQTT_Socket_
  *  @param p_Message    Pointer to MQTT publish message object
  *  @return             SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_MQTT_GetMessage(SIM7080_MQTT_Socket_t* p_Socket, SIM7080_Sub_Evt* p_Message);
+SIM70XX_Error_t SIM7080_MQTT_GetMessage(SIM7080_MQTT_Socket_t* p_Socket, SIM7080_MQTT_Sub_Evt_t* p_Message);
 
 /** @brief          Unsubscribe a MQTT topic.
  *  @param p_Device SIM7080 device object

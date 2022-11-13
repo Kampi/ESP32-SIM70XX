@@ -27,7 +27,7 @@
  */
 typedef enum
 {
-    SIM7080_PDP_DISABLE     = 0,                    /**< Deactive. */
+    SIM7080_PDP_DISABLE         = 0,                /**< Deactive. */
     SIM7080_PDP_ENABLE,                             /**< Active. */
     SIM7080_PDP_AUTO,                               /**< Deactive. */
 } SIM7080_PDP_Action_t;

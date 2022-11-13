@@ -78,6 +78,7 @@ void SIM70XX_Evt_MessageFilter(void* p_Device, std::string* p_Message)
 	#endif
 
 	#ifdef CONFIG_SIM70XX_DRIVER_WITH_MQTT
+		// Handle MQTT(S) socket publish events.
 		if(p_Message->find("+CMQPUB") != std::string::npos)
 		{
 			SIM7020_Evt_on_MQTT_Pub(Device, p_Message);
@@ -93,7 +94,22 @@ void SIM70XX_Evt_MessageFilter(void* p_Device, std::string* p_Message)
 	#ifdef CONFIG_SIM70XX_DRIVER_WITH_HTTP
 		if(p_Message->find("+CHTTPERR") != std::string::npos)
 		{
-			SIM7020_Evt_on_HTTP_Event(Device, p_Message);
+			SIM7020_Evt_on_HTTP_Error(Device, p_Message);
+		}
+
+		// Handle the HTTP header response.
+		if(p_Message->find("+CHTTPNMIH") != std::string::npos)
+		{
+			SIM7020_Evt_on_HTTP_Header(Device, p_Message);
+			Processed = true;
+		}
+
+		// Handle the HTTP data response.
+		// TODO: How process continious data?
+		if(p_Message->find("+CHTTPNMIC") != std::string::npos)
+		{
+			SIM7020_Evt_on_HTTP_Data(Device, p_Message);
+			Processed = true;
 		}
 	#endif
 

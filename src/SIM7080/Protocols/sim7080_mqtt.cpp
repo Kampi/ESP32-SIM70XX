@@ -356,7 +356,7 @@ SIM70XX_Error_t SIM7080_MQTT_Subscribe(SIM7080_t& p_Device, SIM7080_MQTT_Socket_
 
     if(p_Socket->Internal.SubQueue == NULL)
     {
-        p_Socket->Internal.SubQueue = xQueueCreate(CONFIG_SIM70XX_QUEUE_LENGTH, sizeof(SIM7080_Sub_Evt*));
+        p_Socket->Internal.SubQueue = xQueueCreate(CONFIG_SIM70XX_QUEUE_LENGTH, sizeof(SIM7080_MQTT_Sub_Evt_t*));
     }
 
     p_Socket->Internal.SubTopics++;
@@ -364,9 +364,9 @@ SIM70XX_Error_t SIM7080_MQTT_Subscribe(SIM7080_t& p_Device, SIM7080_MQTT_Socket_
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7080_MQTT_GetMessage(SIM7080_MQTT_Socket_t* p_Socket, SIM7080_Sub_Evt* p_Message)
+SIM70XX_Error_t SIM7080_MQTT_GetMessage(SIM7080_MQTT_Socket_t* p_Socket, SIM7080_MQTT_Sub_Evt_t* p_Message)
 {
-    SIM7080_Sub_Evt* Packet;
+    SIM7080_MQTT_Sub_Evt_t* Packet;
 
     if((p_Message == NULL) || (p_Socket->Internal.SubQueue == NULL))
     {
@@ -379,7 +379,7 @@ SIM70XX_Error_t SIM7080_MQTT_GetMessage(SIM7080_MQTT_Socket_t* p_Socket, SIM7080
 
     if(xQueueReceive(p_Socket->Internal.SubQueue, &Packet, 0) != pdTRUE)
     {
-        return SIM70XX_ERR_FAIL;
+        return SIM70XX_ERR_QUEUE_ERR;
     }
 
     *p_Message = *Packet;

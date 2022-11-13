@@ -34,6 +34,19 @@ typedef enum
     SIM7020_COAP_RST,                               /**< Indicates error in received messages. */
 } SIM7020_CoAP_Type_t;
 
+/** @brief SIM7020 CoAP message object.
+ */
+typedef struct
+{
+    std::string Endpoint;                           /**< Message endpoint. */
+    SIM7020_CoAP_Type_t Type;                       /**< Transmission type. */
+    uint8_t FunctionCode_H:3;                       /**< Upper three bits of the fuction code. */
+    uint8_t FunctionCode_L:5;                       /**< Lower five bits of the fuction code. */
+    uint64_t Token;                                 /**< Message token. */
+    uint16_t Length;                                /**< Payload length. */
+    uint8_t* p_Payload;                             /**< Pointer to payload. */
+} SIM7020_CoAP_Msg_t;
+
 /** @brief SIM7020 CoAP Socket object.
  */
 typedef struct
@@ -46,9 +59,8 @@ typedef struct
                                                          NOTE: Handled by the device driver. */
         uint8_t ID;                                 /**< Socket ID from the module.
                                                          NOTE: Handled by the device driver. */
-        bool isConnected;                           /**< Socket connected.
-                                                         NOTE: Handled by the device driver.
-                                                         NOTE: Only used for client sockets! */
+        bool isCreated;                             /**< Socket created.
+                                                         NOTE: Handled by the device driver. */
         bool isDataReceived;                        /**< Set to #true when data are received.
                                                          NOTE: Managed by the device driver. */
     } Internal;

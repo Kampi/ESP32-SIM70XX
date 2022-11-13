@@ -27,24 +27,29 @@
 #include "sim7020_evt.h"
 #include "../../Core/Queue/sim70xx_queue.h"
 
+#include "../../Core/Arch/ESP32/UART/sim70xx_uart.h"
+
 static const char* TAG = "SIM7020_Evt_HTTP";
 
-void SIM7020_Evt_on_HTTP_Event(SIM7020_t* const p_Device, std::string* p_Message)
+void SIM7020_Evt_on_HTTP_Error(SIM7020_t* const p_Device, std::string* p_Message)
 {
-    int Index;
     uint8_t ID;
+    size_t Index;
     SIM7020_HTTP_Error_t HTTP_Error;
+    std::string Message;
 
-    ESP_LOGI(TAG, "HTTP disconnect event!");
+    ESP_LOGD(TAG, "HTTP error event!");
 
-    // Get the socket ID and the error code.
-    SIMXX_TOOLS_REMOVE_LINEEND((*p_Message));
-
-    Index = p_Message->find(",");
+    // Remove the command and make a copy of the command response.
+    Index = p_Message->find("+CHTTPERR: ");
     if(Index == std::string::npos)
     {
         return;
     }
+    Message = p_Message->substr(Index + std::string("+CHTTPERR: ").size());
+    SIMXX_TOOLS_REMOVE_LINEEND((Message));
+
+    Index = p_Message->find(",");
 
     ID = (uint8_t)SIM70XX_Tools_StringToUnsigned(p_Message->substr(Index - 1, 1));
     HTTP_Error = (SIM7020_HTTP_Error_t)SIM70XX_Tools_StringToUnsigned(p_Message->substr(Index + 1));
@@ -52,14 +57,85 @@ void SIM7020_Evt_on_HTTP_Event(SIM7020_t* const p_Device, std::string* p_Message
     // Iterate through the list of active sockets and close the socket with the given ID.
     for(std::vector<SIM7020_HTTP_Socket_t*>::iterator it = p_Device->HTTP.Sockets.begin(); it != p_Device->HTTP.Sockets.end(); ++it)
     {
-        if((*it)->ID == ID)
+        if((*it)->Internal.ID == ID)
         {
-            (*it)->isConnected = false;
+            (*it)->Internal.isConnected = false;
 
-            ESP_LOGI(TAG, "Disconnect socket %u", ID);
-            ESP_LOGI(TAG, "Error: %i", HTTP_Error);
+            ESP_LOGD(TAG, "Disconnect socket %u", ID);
+            ESP_LOGD(TAG, "Error: %i", HTTP_Error);
         }
     }
+}
+
+void SIM7020_Evt_on_HTTP_Header(SIM7020_t* const p_Device, std::string* p_Message)
+{
+    bool Flag;
+    size_t Index;
+    std::string Message;
+    SIM7020_HTTP_Response_t* Response;
+
+    Response = new SIM7020_HTTP_Response_t();
+
+    ESP_LOGI(TAG, "HTTP header event!");
+
+    // Remove the command and make a copy of the command response.
+    Index = p_Message->find("+CHTTPNMIH: ");
+    if(Index == std::string::npos)
+    {
+        return;
+    }
+    Message = p_Message->substr(Index + std::string("+CHTTPNMIH: ").size());
+
+    // Get the socket ID from the response.
+    Response->ID = (uint8_t)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Message));
+
+    // Get the response code from the response.
+    Response->ResponseCode = (uint16_t)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Message));
+
+    // Remove the header length from the response.
+    SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Message));
+
+    // Split the header from the response.
+    Index = Message.find("+CHTTPNMIC: ");
+    Response->Header = SIM70XX_Tools_SubstringSplitErase(&Message, "+CHTTPNMIC: ");
+
+    // Process the content.
+    // Remove the command.
+    SIM70XX_Tools_SubstringSplitErase(&Message);
+
+    // Get the flag.
+    Flag = (bool)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Message));
+
+    // Remove the total length.
+    SIM70XX_Tools_SubstringSplitErase(&Message);
+
+    // Remove the package length.
+    SIM70XX_Tools_SubstringSplitErase(&Message);
+
+    Response->Content = Message;
+
+    ESP_LOGD(TAG, "ID: %u", Response->ID);
+    ESP_LOGD(TAG, "Header: %s", Response->Header.c_str());
+    ESP_LOGD(TAG, "Response code: %u", Response->ResponseCode);
+    ESP_LOGD(TAG, "Content: %s", Response->Content.c_str());
+
+    for(std::vector<SIM7020_HTTP_Socket_t*>::iterator it = p_Device->HTTP.Sockets.begin(); it != p_Device->HTTP.Sockets.end(); ++it)
+    {
+        if((*it)->Internal.ID == Response->ID)
+        {
+            if(((*it)->Internal.ResponseQueue == NULL) ||
+               (xQueueSend((*it)->Internal.ResponseQueue, &Response, 0) != pdPASS)
+              )
+            {
+                delete Response;
+            }
+        }
+    }
+}
+
+void SIM7020_Evt_on_HTTP_Data(SIM7020_t* const p_Device, std::string* p_Message)
+{
+
 }
 
 #endif

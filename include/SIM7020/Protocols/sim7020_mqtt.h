@@ -24,6 +24,20 @@
 #include "sim70xx_errors.h"
 #include "sim7020_mqtt_defs.h"
 
+/** @brief          Get the number subscription messages from the subscription queue.
+ *  @param p_Socket Pointer to MQTT socket object
+ *  @return         Number of items in the subscription queue.
+ */
+inline __attribute__((always_inline)) uint32_t SIM7020_MQTT_GetSubcriptionItems(SIM7020_MQTT_Socket_t* p_Socket)
+{
+    if((p_Socket == NULL) || (p_Socket->Internal.SubQueue == NULL))
+    {
+        return 0;
+    }
+
+    return uxQueueMessagesWaiting(p_Socket->Internal.SubQueue);
+}
+
 /** @brief          Create a MQTT socket by using default settings.
  *  @param p_Device SIM7020 device object
  *  @param Broker   MQTT broker address
@@ -83,16 +97,16 @@ SIM70XX_Error_t SIM7020_MQTT_Publish(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t*
  */
 SIM70XX_Error_t SIM7020_MQTT_Subscribe(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* p_Socket, std::string Topic, SIM7020_MQTT_QoS_t QoS = SIM7020_MQTT_QOS_0);
 
-/** @brief              Pop a message from the MQTT subscription queue.
- *                      NOTE: Please call SIM7020_MQTT_Publish first.
+/** @brief              Get the next subscription message from the MQTT subscription queue.
  *  @param p_Device     SIM7020 device object
  *  @param p_Socket     Pointer to MQTT socket object
  *  @param p_Message    Pointer to MQTT publish message object
  *  @return             SIM70XX_ERR_OK when successful
+ *                      SIM70XX_ERR_QUEUE_EMPTY when no item is available
  */
-SIM70XX_Error_t SIM7020_MQTT_GetMessage(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* p_Socket, SIM7020_Pub_t* p_Message);
+SIM70XX_Error_t SIM7020_MQTT_GetSubscription(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* p_Socket, SIM7020_MQTT_Sub_Evt_t* p_Message);
 
-/** @brief          Unsubscribe a MQTT topic.
+/** @brief          Unsubscribe from a MQTT topic.
  *  @param p_Device SIM7020 device object
  *  @param p_Socket Pointer to MQTT socket object
  *  @param Topic    Message topic
@@ -100,7 +114,7 @@ SIM70XX_Error_t SIM7020_MQTT_GetMessage(SIM7020_t& p_Device, SIM7020_MQTT_Socket
  */
 SIM70XX_Error_t SIM7020_MQTT_Unsubscribe(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* p_Socket, std::string Topic);
 
-/** @brief          Close a connection to a MQTT socket.
+/** @brief          Close a MQTT socket.
  *  @param p_Device SIM7020 device object
  *  @param p_Socket Pointer to MQTT socket object
  *  @return         SIM70XX_ERR_OK when successful

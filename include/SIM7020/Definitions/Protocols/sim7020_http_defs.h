@@ -24,10 +24,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-/** @brief 
- */
-#define SIM7020_HTTP_MAX_PAYLOAD                    20000UL
-
 /** @brief SIM7020 HTTP error code definitions.
  */
 typedef enum
@@ -50,20 +46,35 @@ typedef enum
     SIM7020_HTTP_REQ_DELETE,                         /**< HTTP DELETE method. */
 } SIM7020_HTTP_Method_t;
 
+/** @brief SIM7020 HTTP GET response object.
+ */
+typedef struct
+{
+    uint8_t ID;                                     /**< Client ID. */
+    uint16_t ResponseCode;                          /**< Response code. */
+    std::string Header;                             /**< Response header. */
+    std::string Content;                            /**< Response content. */
+} SIM7020_HTTP_Response_t;
+
 /** @brief SIM7020 HTTP Socket object.
  */
 typedef struct
 {
     std::string Host;                               /**< HTTP(S) Host URL. */
     uint16_t Timeout;                               /**< Socket timeout in seconds. */
-    uint8_t ID;                                     /**< Socket ID from the module.
+    SIM7020_HTTP_Error_t Error;                     /**< Response error from the last request.
                                                          NOTE: Handled by the device driver. */
-    bool isConnected;                               /**< #true when the socket is connected.
+    struct
+    {
+        uint8_t ID;                                 /**< Socket ID from the module.
                                                          NOTE: Handled by the device driver. */
-    bool isCreated;                                 /**< #true when the socket is created.
+        bool isConnected;                           /**< #true when the socket is connected.
                                                          NOTE: Handled by the device driver. */
-    SIM7020_HTTP_Error_t Error;                     /**< Socket error.
+        bool isCreated;                             /**< #true when the socket is created.
                                                          NOTE: Handled by the device driver. */
+        QueueHandle_t ResponseQueue;                /**< Response event queue.
+                                                         NOTE: Managed by the device driver. */
+    } Internal;
 } SIM7020_HTTP_Socket_t;
 
 #endif /* SIM7020_HTTP_DEFS_H_ */

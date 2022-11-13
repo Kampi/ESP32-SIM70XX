@@ -38,6 +38,11 @@ void SIM7020_Evt_on_TCP_Disconnect(SIM7020_t* const p_Device, std::string* p_Mes
     ESP_LOGI(TAG, "TCP disconnect event!");
 
     Index = p_Message->find("+CSOERR");
+    if(Index == std::string::npos)
+    {
+        return;
+    }
+
     Index = p_Message->find(",", Index);
     ID = (uint8_t)SIM70XX_Tools_StringToUnsigned(p_Message->substr(Index - 1, 1));
     TCP_Error = (SIM7020_TCP_Error_t)std::stoi(p_Message->substr(Index + 1));
@@ -63,6 +68,11 @@ void SIM7020_Evt_on_TCP_Data(SIM7020_t* const p_Device, std::string* p_Message)
     ESP_LOGD(TAG, "TCP message data event!");
 
     Index = p_Message->find("+CSONMI");
+    if(Index == std::string::npos)
+    {
+        return;
+    }
+
     Index = p_Message->find(",", Index);
     ID = (uint8_t)SIM70XX_Tools_StringToUnsigned(p_Message->substr(Index - 1, 1));
 

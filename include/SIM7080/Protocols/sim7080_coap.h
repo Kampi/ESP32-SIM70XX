@@ -24,4 +24,50 @@
 #include "sim70xx_errors.h"
 #include "sim7080_coap_defs.h"
 
+/** @brief          Check if data are received for a specific CoAP socket.
+ *  @param p_Socket Pointer to CoAP socket object
+ *  @return         #true when data were received
+ */
+inline __attribute__((always_inline)) bool SIM7080_CoAP_isDataAvailable(SIM7080_CoAP_Socket_t* p_Socket)
+{
+    if(p_Socket == NULL)
+    {
+        return false;
+    }
+
+    return p_Socket->Internal.isDataReceived;
+}
+
+/** @brief          Create a CoAP socket.
+ *  @param p_Device SIM7080 device object
+ *  @param Server   CoAP server address
+ *  @param Port     CoAP broker port
+ *  @param p_Socket Pointer to CoAP socket object
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_CoAP_Create(SIM7080_t& p_Device, std::string Server, uint16_t Port, SIM7080_CoAP_Socket_t* p_Socket);
+
+/** @brief          Create a CoAP socket.
+ *  @param p_Device SIM7080 device object
+ *  @param p_Socket Pointer to CoAP socket object
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_CoAP_Create(SIM7080_t& p_Device, SIM7080_CoAP_Socket_t* p_Socket);
+
+/** @brief          Transmit a CoAP message.
+ *  @param p_Device SIM7080 device object
+ *  @param p_Socket Pointer to CoAP socket object
+ *  @param p_Buffer Pointer to data buffer
+ *  @param Length   Data length (maximum 512 bytes)
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_CoAP_Transmit(SIM7080_t& p_Device, SIM7080_CoAP_Socket_t* p_Socket, const void* p_Buffer, uint16_t Length);
+
+/** @brief          Close a CoAP connection and release the socket.
+ *  @param p_Device SIM7080 device object
+ *  @param p_Socket Pointer to CoAP socket object
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_CoAP_Destroy(SIM7080_t& p_Device, SIM7080_CoAP_Socket_t* p_Socket);
+
 #endif /* SIM7080_COAP_H_ */

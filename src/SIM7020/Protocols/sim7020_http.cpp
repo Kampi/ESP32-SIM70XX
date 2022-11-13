@@ -27,6 +27,7 @@
 #include "sim7020_http.h"
 #include "../../Core/Queue/sim70xx_queue.h"
 #include "../../Core/Commands/sim70xx_commands.h"
+
 #include "../../Core/Arch/ESP32/Timer/sim70xx_timer.h"
 
 static const char* TAG = "SIM7020_HTTP";
@@ -57,6 +58,14 @@ SIM70XX_Error_t SIM7020_HTTP_Create(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* 
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
+    else if(p_Socket->Internal.isCreated == true)
+    {
+        return SIM70XX_ERR_OK;
+    }
+    else if(p_Socket->Internal.isConnected == true)
+    {
+        return SIM70XX_ERR_OK;
+    }
 
     // Check if the URL is valid.
     std::for_each(p_Socket->Host.begin(), p_Socket->Host.end(), [](char& c)
@@ -77,11 +86,11 @@ SIM70XX_Error_t SIM7020_HTTP_Create(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* 
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    p_Socket->isConnected = false;
-    p_Socket->isCreated = true;
-    p_Socket->ID = (uint8_t)SIM70XX_Tools_StringToUnsigned(Response);
+    p_Socket->Internal.isConnected = false;
+    p_Socket->Internal.isCreated = true;
+    p_Socket->Internal.ID = (uint8_t)SIM70XX_Tools_StringToUnsigned(Response);
 
-    ESP_LOGI(TAG, "Socket %u created...", p_Socket->ID);
+    ESP_LOGI(TAG, "Socket %u created...", p_Socket->Internal.ID);
 
     return SIM70XX_ERR_OK;
 }
@@ -100,16 +109,20 @@ SIM70XX_Error_t SIM7020_HTTP_Connect(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t*
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
-    else if(p_Socket->isCreated == false)
+    else if(p_Socket->Internal.isCreated == false)
     {
         return SIM70XX_ERR_SOCKET_NOT_CREATED;
     }
+    else if(p_Socket->Internal.isConnected == true)
+    {
+        return SIM70XX_ERR_OK;
+    }
 
-    p_Socket->isConnected = false;
+    p_Socket->Internal.isConnected = false;
     p_Socket->Timeout = Timeout;
 
     SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7020_AT_CHTTCON(p_Socket->ID);
+    *Command = SIM7020_AT_CHTTCON(p_Socket->Internal.ID);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
     if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, p_Socket->Timeout) == false)
     {
@@ -117,11 +130,16 @@ SIM70XX_Error_t SIM7020_HTTP_Connect(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t*
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response, &Status));
 
+    if(p_Socket->Internal.ResponseQueue == NULL)
+    {
+        p_Socket->Internal.ResponseQueue = xQueueCreate(CONFIG_SIM70XX_QUEUE_LENGTH, sizeof(SIM7020_HTTP_Response_t*));
+    }
+
     // Everything okay. The socket is active now.
-    ESP_LOGI(TAG, "Socket %u opened...", p_Socket->ID);
+    ESP_LOGI(TAG, "Socket %u opened...", p_Socket->Internal.ID);
 
     p_Device.HTTP.Sockets.push_back(p_Socket);
-    p_Socket->isConnected = true;
+    p_Socket->Internal.isConnected = true;
 
     return SIM70XX_ERR_OK;
 }
@@ -153,14 +171,18 @@ SIM70XX_Error_t SIM7020_HTTP_POST(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
-    else if(p_Socket->isConnected == false)
+    else if(p_Socket->Internal.isCreated == false)
+    {
+        return SIM70XX_ERR_SOCKET_NOT_CREATED;
+    }
+    else if(p_Socket->Internal.isConnected == false)
     {
         return SIM70XX_ERR_NOT_CONNECTED;
     }
 
     // Prepare the header packet.
     SIM70XX_Tools_Buf2Hex(Header.c_str(), Header.size(), &Buffer_Hex);
-    Packet = std::to_string(p_Socket->ID) + "," +
+    Packet = std::to_string(p_Socket->Internal.ID) + "," +
              std::to_string(SIM7020_HTTP_REQ_POST) + "," +
              std::to_string(Path.size()) + "," +
              "\"" + Path + "\"" + "," +
@@ -242,7 +264,7 @@ SIM70XX_Error_t SIM7020_HTTP_POST(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_
 
     // Get the response from the server.
     Now = SIM70XX_Timer_GetMilliseconds();
-    while(SIM70XX_Queue_isEvent(p_Device.Internal.EventQueue, "+CHTTPNMIH" + std::to_string(p_Socket->ID), &Packet) == false)
+    while(SIM70XX_Queue_isEvent(p_Device.Internal.EventQueue, "+CHTTPNMIH" + std::to_string(p_Socket->Internal.ID), &Packet) == false)
     {
         if((SIM70XX_Timer_GetMilliseconds() - Now) > (p_Socket->Timeout * 1000UL))
         {
@@ -253,7 +275,7 @@ SIM70XX_Error_t SIM7020_HTTP_POST(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_
     }
 
     // Remove the command from the response.
-    Packet.replace(Packet.find("+CHTTPNMIH: " + std::to_string(p_Socket->ID) + ","), std::string("+CHTTPNMIH: " + std::to_string(p_Socket->ID) + ",").size(), "");
+    Packet.replace(Packet.find("+CHTTPNMIH: " + std::to_string(p_Socket->Internal.ID) + ","), std::string("+CHTTPNMIH: " + std::to_string(p_Socket->Internal.ID) + ",").size(), "");
 
     // Get the response code.
     ResponseCode = SIM70XX_Tools_StringToUnsigned(Packet.substr(0, Packet.find(",")));
@@ -273,17 +295,13 @@ SIM70XX_Error_t SIM7020_HTTP_POST(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_HTTP_GET(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_Socket, std::string Path, uint8_t** p_Buffer, uint32_t* p_Length, uint16_t* p_ResponseCode)
+SIM70XX_Error_t SIM7020_HTTP_GET(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_Socket, std::string Path, std::string* p_Payload, uint16_t* p_ResponseCode)
 {
-    size_t Index;
-    uint32_t Now;
-    uint16_t ResponseCode;
     std::string Response;
     std::string CommandStr;
     SIM70XX_TxCmd_t* Command;
-    bool isAdditionalData;
 
-    if((p_Socket == NULL) || (p_Buffer == NULL) || (p_Length == NULL))
+    if((p_Socket == NULL) || (p_Payload == NULL))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
@@ -291,12 +309,16 @@ SIM70XX_Error_t SIM7020_HTTP_GET(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_S
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
-    else if(p_Socket->isConnected == false)
+    else if(p_Socket->Internal.isCreated == false)
     {
-        return SIM70XX_ERR_OK;
+        return SIM70XX_ERR_SOCKET_NOT_CREATED;
+    }
+    else if(p_Socket->Internal.isConnected == false)
+    {
+        return SIM70XX_ERR_NOT_CONNECTED;
     }
 
-    CommandStr = "AT+CHTTPSEND=" + std::to_string(p_Socket->ID) + "," +
+    CommandStr = "AT+CHTTPSEND=" + std::to_string(p_Socket->Internal.ID) + "," +
                                    std::to_string(SIM7020_HTTP_REQ_GET) + "," +
                                    "\"" + Path + "\"";
     SIM70XX_CREATE_CMD(Command);
@@ -306,55 +328,36 @@ SIM70XX_Error_t SIM7020_HTTP_GET(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_S
     {
         return SIM70XX_ERR_FAIL;
     }
-    SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
 
-    // Get the response from the server.
-    Now = SIM70XX_Timer_GetMilliseconds();
-    while(SIM70XX_Queue_isEvent(p_Device.Internal.EventQueue, "+CHTTPNMIH" + std::to_string(p_Socket->ID), &Response) == false)
+    return SIM70XX_ERR_OK;
+}
+
+SIM70XX_Error_t SIM7020_HTTP_GetResponse(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_Socket, SIM7020_HTTP_Response_t* p_Message)
+{
+    SIM7020_HTTP_Response_t* Packet;
+
+    if((p_Message == NULL) || (p_Socket->Internal.ResponseQueue == NULL))
     {
-        if((SIM70XX_Timer_GetMilliseconds() - Now) > (p_Socket->Timeout * 1000UL))
-        {
-            return SIM70XX_ERR_TIMEOUT;
-        }
-
-        vTaskDelay(100 / portTICK_PERIOD_MS);
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+    else if(p_Device.Internal.isInitialized == false)
+    {
+        return SIM70XX_ERR_NOT_INITIALIZED;
+    }
+    else if(uxQueueMessagesWaiting(p_Socket->Internal.ResponseQueue) == 0)
+    {
+        return SIM70XX_ERR_QUEUE_EMPTY;
     }
 
-    // Remove the command from the response.
-    Index = Response.find("+CHTTPNMIH: " + std::to_string(p_Socket->ID) + ",");
-    Response.replace(Index, std::string("+CHTTPNMIH: " + std::to_string(p_Socket->ID) + ",").size(), "");
-
-    // Get the response code.
-    ResponseCode = SIM70XX_Tools_StringToUnsigned(Response.substr(0, Response.find(",")));
-
-    // Remove the header and the command from the response.
-    Index = Response.find("+CHTTPNMIC: " + std::to_string(p_Socket->ID) + ",");
-    Response = Response.substr(Index + std::string("+CHTTPNMIC: " + std::to_string(p_Socket->ID) + ",").size());
-
-    // Get the additional data flag.
-    // TODO: Must be implemented
-    isAdditionalData = (bool)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response));
-
-    // Remove the total length.
-    SIM70XX_Tools_SubstringSplitErase(&Response);
-
-    // Get the payload length.
-    *p_Length = (uint32_t)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response));
-
-    *p_Buffer = (uint8_t*)malloc(*p_Length);
-
-    // Get the hexadecimal payload string.
-    SIM70XX_Tools_Hex2ASCII(Response, *p_Buffer);
-
-    if(p_ResponseCode != NULL)
+    if(xQueueReceive(p_Socket->Internal.ResponseQueue, &Packet, 0) != pdTRUE)
     {
-        *p_ResponseCode = ResponseCode;
+        return SIM70XX_ERR_QUEUE_ERR;
     }
 
-    ESP_LOGI(TAG, "Response code: %u", ResponseCode);
-    ESP_LOGI(TAG, "Additional data: %u", isAdditionalData);
-    ESP_LOGI(TAG, "Length: %u", *p_Length);
-    ESP_LOGI(TAG, "Response: %s", (char*)p_Buffer);
+    *p_Message = *Packet;
+
+    delete Packet;
 
     return SIM70XX_ERR_OK;
 }
@@ -371,13 +374,17 @@ SIM70XX_Error_t SIM7020_HTTP_Disconnect(SIM7020_t& p_Device, SIM7020_HTTP_Socket
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
-    else if(p_Socket->isConnected == false)
+    else if(p_Socket->Internal.isCreated == false)
+    {
+        return SIM70XX_ERR_SOCKET_NOT_CREATED;
+    }
+    else if(p_Socket->Internal.isConnected == false)
     {
         return SIM70XX_ERR_OK;
     }
 
     SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7020_AT_CHTTPDISCON(p_Socket->ID);
+    *Command = SIM7020_AT_CHTTPDISCON(p_Socket->Internal.ID);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
     if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, p_Socket->Timeout) == false)
     {
@@ -385,10 +392,15 @@ SIM70XX_Error_t SIM7020_HTTP_Disconnect(SIM7020_t& p_Device, SIM7020_HTTP_Socket
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
 
+    if(p_Socket->Internal.ResponseQueue != NULL)
+    {
+        vQueueDelete(p_Socket->Internal.ResponseQueue);
+    }
+
     // Remove the socket from the list with active sockets.
     for(std::vector<SIM7020_HTTP_Socket_t*>::iterator it = p_Device.HTTP.Sockets.begin(); it != p_Device.HTTP.Sockets.end(); ++it)
     {
-        if((*it)->ID == p_Socket->ID)
+        if((*it)->Internal.ID == p_Socket->Internal.ID)
         {
             p_Device.HTTP.Sockets.erase(it);
 
@@ -396,33 +408,9 @@ SIM70XX_Error_t SIM7020_HTTP_Disconnect(SIM7020_t& p_Device, SIM7020_HTTP_Socket
         }
     }
 
-    p_Socket->isConnected = false;
+    p_Socket->Internal.isConnected = false;
 
-    ESP_LOGI(TAG, "Socket %u closed...", p_Socket->ID);
-
-    return SIM70XX_ERR_OK;
-}
-
-SIM70XX_Error_t SIM7020_HTTP_DestroyAllSockets(SIM7020_t& p_Device )
-{
-    SIM70XX_TxCmd_t* Command;
-
-    if(p_Device.Internal.isInitialized == false)
-    {
-        return SIM70XX_ERR_NOT_INITIALIZED;
-    }
-
-    for(uint8_t i = 0; i < 5; i++)
-    {
-        SIM70XX_CREATE_CMD(Command);
-        *Command = SIM7020_AT_CHTTPDISCON(i);
-        SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-        if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
-        {
-            return SIM70XX_ERR_FAIL;
-        }
-        SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
-    }
+    ESP_LOGI(TAG, "Socket %u closed...", p_Socket->Internal.ID);
 
     return SIM70XX_ERR_OK;
 }
@@ -440,9 +428,13 @@ SIM70XX_Error_t SIM7020_HTTP_Destroy(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t*
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
+    else if(p_Socket->Internal.isCreated == false)
+    {
+        return SIM70XX_ERR_OK;
+    }
 
     SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7020_AT_CHTTPDESTROY(p_Socket->ID);
+    *Command = SIM7020_AT_CHTTPDESTROY(p_Socket->Internal.ID);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
     if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, p_Socket->Timeout) == false)
     {
@@ -450,22 +442,9 @@ SIM70XX_Error_t SIM7020_HTTP_Destroy(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t*
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response, NULL));
 
-    ESP_LOGI(TAG, "Socket %u destroyed...", p_Socket->ID);
+    ESP_LOGI(TAG, "Socket %u destroyed...", p_Socket->Internal.ID);
 
     return SIM70XX_ERR_OK;
-}
-
-void SIM7020_HTTP_AddToHeader(std::string Key, std::string Value, std::string* p_Header)
-{
-    if(p_Header == NULL)
-    {
-        return;
-    }
-
-    p_Header->append(Key);
-    p_Header->append(": ");
-    p_Header->append(Value);
-    p_Header->append("\n");
 }
 
 #endif

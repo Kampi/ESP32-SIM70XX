@@ -174,4 +174,13 @@
 #define SIM7080_AT_SGNSCFG(Type, Value)                         SIM70XX_CMD("AT+SGNSCFG=\"" + std::string(Type) + "\"," + std::to_string(Value), false, 1, 1)
 #define SIM7080_AT_SGNSCMD(Command)                             SIM70XX_CMD(Command, false, 1, 1)
 
+/**
+ *
+ * Used in SIM7080 CoAP driver.
+ *
+ */
+#define SIM7080_AT_CCOAPINIT                                    SIM70XX_CMD("AT+CCOAPINIT", false, 1, 1)
+#define SIM7080_AT_CCOAPURL(Server, Port)                       SIM70XX_CMD("AT+CCOAPURL=\"coap://" + Server + ":" + std::to_string(Port) + "\"", false, 1, 1)
+#define SIM7080_AT_CCOAPTERM                                    SIM70XX_CMD("AT+CCCOAPTERM", false, 1, 1)
+
 #endif /* SIM7080_COMMANDS_H_ */

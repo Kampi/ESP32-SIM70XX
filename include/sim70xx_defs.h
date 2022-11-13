@@ -74,18 +74,20 @@ typedef enum
     SIM_MODE_BOTH       = 4,                        /**< Manual / Automatic. If manual fails, automatic mode is entered. */
 } SIM70XX_OpMode_t;
 
-/** @brief SIM70XX Ping configuration object.
- */
-typedef struct
-{
-    std::string IP;                                 /**< IP address of the remote host. */
-    int Retries;                                    /**< The number of Ping Echo Request to send.
-                                                         NOTE: -1 will use the default value (4). Minimum 1, Maximum 100. */
-    int16_t DataLength;                             /**< The length of Ping Echo Request data.
-                                                         NOTE: -1 will use the default value (32). Minimum 0, Maximum 5120. */
-    int16_t Timeout;                                /**< The timeout, in units of 100ms, waiting for a single Echo Reply.
-                                                         NOTE: -1 will use the default value (100). Minimum 0, Maximum 600. */
-} SIM70XX_Ping_t;
+#ifdef CONFIG_SIM70XX_DRIVER_WITH_TCPIP
+    /** @brief SIM70XX Ping configuration object.
+     */
+    typedef struct
+    {
+        std::string IP;                                 /**< IP address of the remote host. */
+        int Retries;                                    /**< The number of Ping Echo Request to send.
+                                                            NOTE: -1 will use the default value (4). Minimum 1, Maximum 100. */
+        int16_t DataLength;                             /**< The length of Ping Echo Request data.
+                                                            NOTE: -1 will use the default value (32). Minimum 0, Maximum 5120. */
+        int16_t Timeout;                                /**< The timeout, in units of 100ms, waiting for a single Echo Reply.
+                                                            NOTE: -1 will use the default value (100). Minimum 0, Maximum 600. */
+    } SIM70XX_Ping_t;
+#endif
 
 /** @brief SIM70XX APN configuration object definition.
  */

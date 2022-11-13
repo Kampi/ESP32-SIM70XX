@@ -55,14 +55,22 @@ SIM70XX_Error_t SIM7020_CoAP_Create(SIM7020_t& p_Device, std::string Server, uin
  */
 SIM70XX_Error_t SIM7020_CoAP_Create(SIM7020_t& p_Device, SIM7020_CoAP_Socket_t* p_Socket);
 
-/** @brief          Transmit a CoAP message.
+/** @brief          Transmit a raw CoAP message.
  *  @param p_Device SIM7020 device object
  *  @param p_Socket Pointer to CoAP socket object
  *  @param p_Buffer Pointer to data buffer
- *  @param Length   Data length (maximum 512 bytes)
+ *  @param Length   Data length (minimum 4 bytes, maximum 512 bytes)
  *  @return         SIM70XX_ERR_OK when successful
  */
 SIM70XX_Error_t SIM7020_CoAP_Transmit(SIM7020_t& p_Device, SIM7020_CoAP_Socket_t* p_Socket, const void* p_Buffer, uint16_t Length);
+
+/** @brief              Transmit a CoAP message.
+ *  @param p_Device     SIM7020 device object
+ *  @param p_Socket     Pointer to CoAP socket object
+ *  @param p_Message    Pointer to CoAP message object
+ *  @return             SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7020_CoAP_Transmit(SIM7020_t& p_Device, SIM7020_CoAP_Socket_t* p_Socket, SIM7020_CoAP_Msg_t* p_Message);
 
 /** @brief          Receive a CoAP message.
  *  @param p_Device SIM7080 device object

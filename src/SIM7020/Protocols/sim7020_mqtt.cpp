@@ -208,7 +208,7 @@ SIM70XX_Error_t SIM7020_MQTT_Subscribe(SIM7020_t& p_Device, SIM7020_MQTT_Socket_
 
     if(p_Socket->Internal.SubQueue == NULL)
     {
-        p_Socket->Internal.SubQueue = xQueueCreate(CONFIG_SIM70XX_QUEUE_LENGTH, sizeof(SIM7020_Pub_t*));
+        p_Socket->Internal.SubQueue = xQueueCreate(CONFIG_SIM70XX_QUEUE_LENGTH, sizeof(SIM7020_MQTT_Sub_Evt_t*));
     }
 
     p_Socket->Internal.SubTopics++;
@@ -216,9 +216,9 @@ SIM70XX_Error_t SIM7020_MQTT_Subscribe(SIM7020_t& p_Device, SIM7020_MQTT_Socket_
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_MQTT_GetMessage(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* p_Socket, SIM7020_Pub_t* p_Message)
+SIM70XX_Error_t SIM7020_MQTT_GetSubscription(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* p_Socket, SIM7020_MQTT_Sub_Evt_t* p_Message)
 {
-    SIM7020_Pub_t* Packet;
+    SIM7020_MQTT_Sub_Evt_t* Packet;
 
     if((p_Message == NULL) || (p_Socket->Internal.SubQueue == NULL))
     {
@@ -235,7 +235,7 @@ SIM70XX_Error_t SIM7020_MQTT_GetMessage(SIM7020_t& p_Device, SIM7020_MQTT_Socket
 
     if(xQueueReceive(p_Socket->Internal.SubQueue, &Packet, 0) != pdTRUE)
     {
-        return SIM70XX_ERR_FAIL;
+        return SIM70XX_ERR_QUEUE_ERR;
     }
 
     *p_Message = *Packet;
@@ -319,6 +319,17 @@ SIM70XX_Error_t SIM7020_MQTT_Disconnect(SIM7020_t& p_Device, SIM7020_MQTT_Socket
     if(p_Socket->Internal.SubQueue != NULL)
     {
         vQueueDelete(p_Socket->Internal.SubQueue);
+    }
+
+    // Remove the socket from the list with active sockets.
+    for(std::vector<SIM7020_MQTT_Socket_t*>::iterator it = p_Device.MQTT.Sockets.begin(); it != p_Device.MQTT.Sockets.end(); ++it)
+    {
+        if((*it)->Internal.ID == p_Socket->Internal.ID)
+        {
+            p_Device.MQTT.Sockets.erase(it);
+
+            break;
+        }
     }
 
     return SIM70XX_ERR_OK;

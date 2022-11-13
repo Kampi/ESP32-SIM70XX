@@ -24,4 +24,19 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+/** @brief SIM7080 CoAP Socket object.
+ */
+typedef struct
+{
+    std::string Server;                             /**< CoAP server IP address. */
+    uint16_t Port;                                  /**< CoAP port. */
+    struct
+    {
+        bool isCreated;                             /**< Socket created.
+                                                         NOTE: Handled by the device driver. */
+        bool isDataReceived;                        /**< Set to #true when data are received.
+                                                         NOTE: Managed by the device driver. */
+    } Internal;
+} SIM7080_CoAP_Socket_t;
+
 #endif /* SIM7080_COAP_DEFS_H_ */

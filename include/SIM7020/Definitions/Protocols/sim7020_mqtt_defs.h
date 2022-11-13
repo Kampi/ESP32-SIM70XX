@@ -20,6 +20,8 @@
 #ifndef SIM7020_MQTT_DEFS_H_
 #define SIM7020_MQTT_DEFS_H_
 
+#include <freertos/queue.h>
+
 #include <string>
 #include <stdint.h>
 #include <stdbool.h>
@@ -51,7 +53,7 @@ typedef struct
     bool Retained;                                  /**< Retained flag. */
 } SIM7020_MQTT_Will_t;
 
-/** @brief SIM7020 MQTT publish object definition.
+/** @brief SIM7020 MQTT subscription event object definition.
  */
 typedef struct
 {
@@ -61,7 +63,7 @@ typedef struct
     bool Retained;                                  /**< Retained flag. */
     bool Dup;                                       /**< Duplicate flag. */
     std::string Payload;                            /**< Message payload. */
-} SIM7020_Pub_t;
+} SIM7020_MQTT_Sub_Evt_t;
 
 /** @brief SIM7020 MQTT Socket object.
  */
@@ -92,9 +94,9 @@ typedef struct
                                                          NOTE: Handled by the device driver. */
         bool isCreated;                             /**< #true when the socket is created.
                                                          NOTE: Handled by the device driver. */
-        QueueHandle_t SubQueue;                     /**< Subscribe event queue.
-                                                         NOTE: Managed by the device driver. */
         uint32_t SubTopics;                         /**< Topic subscription counter.
+                                                         NOTE: Managed by the device driver. */
+        QueueHandle_t SubQueue;                     /**< Subscribe event queue.
                                                          NOTE: Managed by the device driver. */
     } Internal;
 } SIM7020_MQTT_Socket_t;

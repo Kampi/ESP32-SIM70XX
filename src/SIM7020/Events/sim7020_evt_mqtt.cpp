@@ -32,30 +32,30 @@ static const char* TAG = "SIM7020_Evt_MQTT";
 void SIM7020_Evt_on_MQTT_Pub(SIM7020_t* const p_Device, std::string* p_Message)
 {
     size_t Index;
-    SIM7020_Pub_t* Packet;
+    SIM7020_MQTT_Sub_Evt_t* SubMessage;
 
     ESP_LOGI(TAG, "MQTT subscribe event!");
 
-    Packet = new SIM7020_Pub_t();
+    SubMessage = new SIM7020_MQTT_Sub_Evt_t();
 
     SIMXX_TOOLS_REMOVE_LINEEND((*p_Message));
 
     p_Message->replace(p_Message->find("+CMQPUB: "), std::string("+CMQPUB: ").size(), "");
 
     // Get the socket ID.
-    Packet->ID = SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(p_Message));
+    SubMessage->ID = SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(p_Message));
 
     // Get the message topic.
-    Packet->Topic = SIM70XX_Tools_SubstringSplitErase(p_Message);
+    SubMessage->Topic = SIM70XX_Tools_SubstringSplitErase(p_Message);
 
     // Get the quality of service.
-    Packet->QoS = (SIM7020_MQTT_QoS_t)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(p_Message));
+    SubMessage->QoS = (SIM7020_MQTT_QoS_t)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(p_Message));
 
     // Get the retained flag.
-    Packet->Retained = (bool)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(p_Message));
+    SubMessage->Retained = (bool)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(p_Message));
 
     // Get the duplicate flag.
-    Packet->Dup = (bool)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(p_Message));
+    SubMessage->Dup = (bool)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(p_Message));
 
     SIM70XX_Tools_StringRemove(p_Message);
 
@@ -65,29 +65,50 @@ void SIM7020_Evt_on_MQTT_Pub(SIM7020_t* const p_Device, std::string* p_Message)
     p_Message->erase(0, Index + 1);
 
     // Get the message payload.
-    Packet->Payload = p_Message->substr(0);
+    SubMessage->Payload = p_Message->substr(0);
 
-    if((p_Device->MQTT.Sockets.at(Packet->ID)->Internal.SubQueue == NULL) || (xQueueSend(p_Device->MQTT.Sockets.at(Packet->ID)->Internal.SubQueue, &Packet, 0) != pdPASS))
+    // Add the message to the subscription queue.
+    for(std::vector<SIM7020_MQTT_Socket_t*>::iterator it = p_Device->MQTT.Sockets.begin(); it != p_Device->MQTT.Sockets.end(); ++it)
     {
-        delete Packet;
+        if((*it)->Internal.ID == SubMessage->ID)
+        {
+            if(((*it)->Internal.SubQueue == NULL) ||
+               (xQueueSend((*it)->Internal.SubQueue, &SubMessage, 0) != pdPASS)
+              )
+            {
+                delete SubMessage;
+            }
+        }
     }
 }
 
 void SIM7020_Evt_on_MQTT_Disconnect(SIM7020_t* const p_Device, std::string* p_Message)
 {
-    int Index;
+    uint8_t ID;
+    size_t Index;
 
     ESP_LOGI(TAG, "MQTT socket disconnect event!");
 
-    SIMXX_TOOLS_REMOVE_LINEEND((*p_Message));
-
-    Index = p_Message->find(":");
+    Index = p_Message->find("+CMQDISCON");
     if(Index == std::string::npos)
     {
         return;
     }
 
-    // TODO: Event
+    Index = p_Message->find("=", Index);
+    SIMXX_TOOLS_REMOVE_LINEEND((*p_Message));
+
+    ID = (uint8_t)SIM70XX_Tools_StringToUnsigned(p_Message->substr(Index - 1, 1));
+
+    for(std::vector<SIM7020_MQTT_Socket_t*>::iterator it = p_Device->MQTT.Sockets.begin(); it != p_Device->MQTT.Sockets.end(); ++it)
+    {
+        if((*it)->Internal.ID == ID)
+        {
+            (*it)->Internal.isConnected = false;
+
+            ESP_LOGI(TAG, "Disconnect socket %u", ID);
+        }
+    }
 }
 
 #endif

@@ -30,4 +30,116 @@
 
 static const char* TAG = "SIM7080_CoAP";
 
+SIM70XX_Error_t SIM7080_CoAP_Create(SIM7080_t& p_Device, std::string Server, uint16_t Port, SIM7080_CoAP_Socket_t* p_Socket)
+{
+    if(p_Socket == NULL)
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+
+    p_Socket->Server = Server;
+    p_Socket->Port = Port;
+    p_Socket->Internal.isCreated = false;
+
+    return SIM7080_CoAP_Create(p_Device, p_Socket);
+}
+
+SIM70XX_Error_t SIM7080_CoAP_Create(SIM7080_t& p_Device, SIM7080_CoAP_Socket_t* p_Socket)
+{
+    std::string Response;
+    SIM70XX_TxCmd_t* Command;
+
+    if(p_Socket == NULL)
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+    else if(p_Device.Internal.isInitialized == false)
+    {
+        return SIM70XX_ERR_NOT_INITIALIZED;
+    }
+    else if(p_Socket->Internal.isCreated == true)
+    {
+        return SIM70XX_ERR_NOT_CONNECTED;
+    }
+
+    SIM70XX_CREATE_CMD(Command);
+    *Command = SIM7080_AT_CCOAPINIT;
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    {
+        return SIM70XX_ERR_FAIL;
+    }
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
+
+    SIM70XX_CREATE_CMD(Command);
+    *Command = SIM7080_AT_CCOAPURL(p_Socket->Server, p_Socket->Port);
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    {
+        return SIM70XX_ERR_FAIL;
+    }
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
+
+    // Everything okay. The socket is active now.
+    ESP_LOGI(TAG, "Socket opened...");
+
+    p_Device.CoAP.Socket = p_Socket;
+    p_Socket->Internal.isCreated = true;
+
+    return SIM70XX_ERR_OK;    
+}
+
+SIM70XX_Error_t SIM7080_CoAP_Transmit(SIM7080_t& p_Device, SIM7080_CoAP_Socket_t* p_Socket, const void* p_Buffer, uint16_t Length)
+{
+    std::string Buffer_Hex;
+    std::string CommandStr;
+    SIM70XX_TxCmd_t* Command;
+
+    if((p_Socket == NULL) || (p_Buffer == NULL) || (Length < 4) || (Length > 512))
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+    else if(p_Device.Internal.isInitialized == false)
+    {
+        return SIM70XX_ERR_NOT_INITIALIZED;
+    }
+    else if(p_Socket->Internal.isCreated == false)
+    {
+        return SIM70XX_ERR_SOCKET_NOT_CREATED;
+    }
+
+    return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);   
+}
+
+SIM70XX_Error_t SIM7080_CoAP_Destroy(SIM7080_t& p_Device, SIM7080_CoAP_Socket_t* p_Socket)
+{
+    SIM70XX_TxCmd_t* Command;
+
+    if(p_Socket == NULL)
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+    else if(p_Device.Internal.isInitialized == false)
+    {
+        return SIM70XX_ERR_NOT_INITIALIZED;
+    }
+    else if(p_Socket->Internal.isCreated == false)
+    {
+        return SIM70XX_ERR_OK;
+    }
+
+    SIM70XX_CREATE_CMD(Command);
+    *Command = SIM7080_AT_CCOAPTERM;
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    {
+        return SIM70XX_ERR_FAIL;
+    }
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
+
+    p_Socket->Internal.isCreated = false;
+
+    return SIM70XX_ERR_OK;
+}
+
 #endif

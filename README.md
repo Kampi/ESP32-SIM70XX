@@ -50,7 +50,7 @@ Multidevice driver for SIMCom cellular modules with UART interface.
 | UDP (Client)  | Complete      | Complete      |
 | TCP (Server)  | Open          | Not started   |
 | HTTP          | Open          | Not started   |
-| CoAP          | Open          | Not started   |
+| CoAP          | Basic         | Not started   |
 | MQTT          | Complete      | Complete      |
 | PSM           | Open          | Open          |
 

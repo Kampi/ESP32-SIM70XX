@@ -24,6 +24,20 @@
 #include "sim70xx_errors.h"
 #include "sim7020_http_defs.h"
 
+/** @brief          Get the number response messages from the response queue.
+ *  @param p_Socket Pointer to HTTP socket object
+ *  @return         Number of items in the response queue.
+ */
+inline __attribute__((always_inline)) uint32_t SIM7020_HTTP_GetResponseItems(SIM7020_HTTP_Socket_t* p_Socket)
+{
+    if((p_Socket == NULL) || (p_Socket->Internal.ResponseQueue == NULL))
+    {
+        return 0;
+    }
+
+    return uxQueueMessagesWaiting(p_Socket->Internal.ResponseQueue);
+}
+
 /** @brief          Create a HTTP(S) socket.
  *  @param p_Device SIM7020 device object
  *  @param Host     Host address
@@ -75,13 +89,20 @@ SIM70XX_Error_t SIM7020_HTTP_POST(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_
 /** @brief                  
  *  @param p_Device         SIM7020 device object
  *  @param p_Socket         Pointer to HTTP(S) socket object
- *  @param p_Buffer         Pointer to data buffer
- *                          NOTE: The memory for the buffer is dynamic memory and must be freed after usage!
- *  @param p_Length         Payload length
+ *  @param p_Payload        Pointer to data buffer
  *  @param p_ResponseCode   (Optional) Pointer to response code
  *  @return                 SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_HTTP_GET(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_Socket, std::string Path, uint8_t** p_Buffer, uint32_t* p_Length, uint16_t* p_ResponseCode = NULL);
+SIM70XX_Error_t SIM7020_HTTP_GET(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_Socket, std::string Path, std::string* p_Payload, uint16_t* p_ResponseCode = NULL);
+
+/** @brief              Get the next HTTP response from the response queue.
+ *  @param p_Device     SIM7020 device object
+ *  @param p_Socket     Pointer to HTTP(S) socket object
+ *  @param p_Message    Pointer to HTTP response object
+ *  @return             SIM70XX_ERR_OK when successful
+ *                      SIM70XX_ERR_QUEUE_EMPTY when no item is available
+ */
+SIM70XX_Error_t SIM7020_HTTP_GetResponse(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_Socket, SIM7020_HTTP_Response_t* p_Message);
 
 /** @brief          Disconnect a HTTP(S) socket.
  *  @param p_Device SIM7020 device object
@@ -96,18 +117,5 @@ SIM70XX_Error_t SIM7020_HTTP_Disconnect(SIM7020_t& p_Device, SIM7020_HTTP_Socket
  *  @return         SIM70XX_ERR_OK when successful
  */
 SIM70XX_Error_t SIM7020_HTTP_Destroy(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_Socket);
-
-/** @brief          Destroy all active HTTP(S) sockets.
- *  @param p_Device SIM7020 device object
- *  @return         SIM70XX_ERR_OK when successful
- */
-SIM70XX_Error_t SIM7020_HTTP_DestroyAllSockets(SIM7020_t& p_Device);
-
-/** @brief          Add a key / value pair to the message header.
- *  @param Key      Header key
- *  @param Value    Header value
- *  @param p_Header Pointer to header string
- */
-void SIM7020_HTTP_AddToHeader(std::string Key, std::string Value, std::string* p_Header);
 
 #endif /* SIM7020_HTTP_H_ */

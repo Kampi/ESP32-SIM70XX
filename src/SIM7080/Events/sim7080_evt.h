@@ -35,21 +35,21 @@
 
 #ifdef CONFIG_SIM70XX_DRIVER_WITH_TCPIP
     /** @brief              TCP/IP disconnect event handler.
-     *                      This function will filter out the disconnect message from the event message.
+     *                      NOTE: This function will clear the \ref isConnected flag of the receiving socket.
      *  @param p_Device     Pointer to device
      *  @param p_Message    Pointer to message string
      */
     void SIM7080_Evt_on_TCP_Disconnect(SIM7080_t* const p_Device, std::string* p_Message);
 
     /** @brief              TCP/IP data ready event handler.
-     *                      This function will filter out the receive message from the event message.
+     *                      NOTE: This function will filter out the receive message from the event message and set the \ref isDataReceived flag of the receiving socket.
      *  @param p_Device     Pointer to device
      *  @param p_Message    Pointer to message string
      */
     void SIM7080_Evt_on_TCP_DataReady(SIM7080_t* const p_Device, std::string* p_Message);
 
     /** @brief              TCP/IP data event handler.
-     *                      This function will filter out the receive message from the event message.
+     *                      NOTE:
      *  @param p_Device     Pointer to device
      *  @param p_Message    Pointer to message string
      */
@@ -58,7 +58,6 @@
 
 #ifdef CONFIG_SIM70XX_DRIVER_WITH_MQTT
     /** @brief              MQTT on subscription event handler.
-     *                      This function will filter out the receive message from the event message.
      *  @param p_Device     Pointer to device
      *  @param p_Message    Pointer to message string
      */
@@ -67,15 +66,17 @@
 
 #ifdef CONFIG_SIM70XX_DRIVER_WITH_GNSS
     /** @brief              GNSS on event handler.
-     *                      This function will filter out the receive message from the event message.
      *  @param p_Device     Pointer to device
      *  @param p_Message    Pointer to message string
      */
     void SIM7080_Evt_on_GNSS(SIM7080_t* const p_Device, std::string* p_Message);
 #endif
 
+#ifdef CONFIG_SIM70XX_DRIVER_WITH_COAP
+
+#endif
+
 /** @brief              PSM event handler.
- *                      This function will filter out the receive message from the event message.
  *  @param p_Device     Pointer to device
  *  @param p_Message    Pointer to message string
  */

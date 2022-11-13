@@ -20,6 +20,8 @@
 #ifndef SIM7080_MQTT_DEFS_H_
 #define SIM7080_MQTT_DEFS_H_
 
+#include <freertos/queue.h>
+
 #include <string>
 #include <stdint.h>
 #include <stdbool.h>
@@ -49,7 +51,7 @@ typedef struct
 {
     std::string Topic;                              /**< Message topic. */
     std::string Payload;                            /**< Message payload. */
-} SIM7080_Sub_Evt;
+} SIM7080_MQTT_Sub_Evt_t;
 
 /** @brief SIM7080 MQTT Socket object.
  */

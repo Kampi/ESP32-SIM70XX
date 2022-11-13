@@ -77,7 +77,7 @@ void MQTT_Run(DEVICE_TYPE& p_Device, std::string SubTopic, std::string PubTopic)
 
             while(true)
             {
-                SIM7080_Sub_Evt Message;
+                SIM7080_MQTT_Sub_Evt_t Message;
 
                 if(SIM7080_MQTT_GetMessage(&_MQTT_Socket, &Message) == SIM70XX_ERR_OK)
                 {

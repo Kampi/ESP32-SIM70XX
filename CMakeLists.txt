@@ -27,6 +27,7 @@ set(COMPONENT_SRCS
     "src/SIM7080/Events/sim7080_evt_mqtt.cpp"
     "src/SIM7080/Events/sim7080_evt_gnss.cpp"
     "src/SIM7080/Events/sim7080_evt_tcp.cpp"
+    "src/SIM7080/Events/sim7080_evt_coap.cpp"
     "src/SIM7080/Events/sim7080_evt_pwrmgnt.cpp"
 
     # SIM7020

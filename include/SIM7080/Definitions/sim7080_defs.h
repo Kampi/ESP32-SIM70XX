@@ -44,6 +44,10 @@
     #include "sim7080_mqtt_defs.h"
 #endif
 
+#ifdef CONFIG_SIM70XX_DRIVER_WITH_COAP
+    #include "sim7080_coap_defs.h"
+#endif
+
 /** @brief SIM7080 SIM card status codes definitions.
  */
 typedef enum
@@ -186,6 +190,13 @@ typedef struct
             QueueHandle_t EventQueue;                       /**< GNSS event queue.
                                                                  NOTE: Managed by the device driver. */
         } GNSS;
+    #endif
+    #ifdef CONFIG_SIM70XX_DRIVER_WITH_COAP
+        struct
+        {
+            SIM7080_CoAP_Socket_t* Socket;                  /**< Pointer to connected CoAP socket.
+                                                                 NOTE: Managed by the device driver. */
+        } CoAP;
     #endif
     struct
     {

@@ -1,5 +1,5 @@
  /*
- * sim7080_evt_mqtt.cpp
+ * sim7080_evt_coap.cpp
  *
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -19,7 +19,7 @@
 
 #include <sdkconfig.h>
 
-#if((CONFIG_SIMXX_DEV == 7080) && (defined CONFIG_SIM70XX_DRIVER_WITH_MQTT))
+#if((CONFIG_SIMXX_DEV == 7080) && (defined CONFIG_SIM70XX_DRIVER_WITH_COAP))
 
 #include <esp_log.h>
 
@@ -27,33 +27,6 @@
 #include "sim7080_evt.h"
 #include "../../Core/Queue/sim70xx_queue.h"
 
-static const char* TAG = "SIM7080_Evt_MQTT";
-
-void SIM7080_Evt_on_MQTT_Subscribe(SIM7080_t* const p_Device, std::string* p_Message)
-{
-    SIM7080_MQTT_Sub_Evt_t* Message;
-
-    Message = new SIM7080_MQTT_Sub_Evt_t;
-
-    p_Message->erase(0, p_Message->find("\""));
-    SIM70XX_Tools_StringRemove(&Response);
-
-    Message->Topic = SIM70XX_Tools_SubstringSplitErase(p_Message, ",");
-    Message->Payload = *p_Message;
-    SIMXX_TOOLS_REMOVE_LINEEND(Message->Payload);
-
-    ESP_LOGD(TAG, "Topic: %s", Message->Topic.c_str());
-    ESP_LOGD(TAG, "Payload: %s", Message->Payload.c_str());
-
-    if(p_Device->MQTT.Socket == NULL)
-    {
-        return;
-    }
-
-	if(xQueueSend(p_Device->MQTT.Socket->Internal.SubQueue, &Message, 0) != pdPASS)
-    {
-        delete Message;
-    }
-}
+static const char* TAG = "SIM7080_Evt_CoAP";
 
 #endif
