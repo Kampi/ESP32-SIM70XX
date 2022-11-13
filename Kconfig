@@ -149,9 +149,23 @@ menu "SIM70XX"
             help
                 UART communication buffer size.
 
-        config SIM70XX_UART_USE_FLOWCONTROL
-            bool "Enable UART flow control support reset"
+        config SIM70XX_UART_USE_RTS
+            bool "Enable UART flow control RTS signal"
             default n
+
+        config SIM70XX_UART_RTS_PIN
+            depends on SIM70XX_UART_USE_RTS
+            int "UART RTS pin"
+            default 10
+
+        config SIM70XX_UART_USE_CTS
+            bool "Enable UART flow control CTS signal"
+            default n
+
+        config SIM70XX_UART_CTS_PIN
+            depends on SIM70XX_UART_USE_CTS
+            int "UART CTS pin"
+            default 11
     endmenu
 
     menu "GPIO" 

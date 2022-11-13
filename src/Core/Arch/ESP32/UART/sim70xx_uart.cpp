@@ -98,6 +98,9 @@ static int SIM7020_UART_TimedRead(SIM70XX_UART_Conf_t& p_Config, uint32_t Timeou
 
 SIM70XX_Error_t SIM70XX_UART_Init(SIM70XX_UART_Conf_t& p_Config)
 {
+    int RTS;
+    int CTS;
+
     if(p_Config.isInitialized)
     {
         SIM70XX_ERROR_CHECK(SIM70XX_UART_Deinit(p_Config));
@@ -113,16 +116,46 @@ SIM70XX_Error_t SIM70XX_UART_Init(SIM70XX_UART_Conf_t& p_Config)
         return SIM70XX_ERR_NO_MEM;
     }
 
-    // TODO: Flow control
+    #ifdef CONFIG_SIM70XX_UART_USE_RTS
+        if(GPIO_IS_VALID_GPIO(CONFIG_SIM70XX_UART_RTS_PIN))
+        {
+            RTS = CONFIG_SIM70XX_UART_RTS_PIN;
+        }
+        else
+        {
+            ESP_LOGE(TAG, "Invalid GPIO for RTS!");
+
+            return SIM70XX_ERR_INVALID_ARG;
+        }
+    #else
+        RTS = UART_PIN_NO_CHANGE;
+    #endif
+
+    #ifdef CONFIG_SIM70XX_UART_USE_CTS
+        if(GPIO_IS_VALID_GPIO(CONFIG_SIM70XX_UART_CTS_PIN))
+        {
+            RTS = CONFIG_SIM70XX_UART_CTS_PIN;
+        }
+        else
+        {
+            ESP_LOGE(TAG, "Invalid GPIO for CTS!");
+
+            return SIM70XX_ERR_INVALID_ARG;
+        }
+    #else
+        CTS = UART_PIN_NO_CHANGE;
+    #endif
 
     if(xSemaphoreTake(p_Config.Lock, 10 / portTICK_PERIOD_MS) == pdTRUE)
     {
         if((uart_driver_install(p_Config.Interface, CONFIG_SIM70XX_UART_BUFFER_SIZE * 2, 0, 0, NULL, 0) ||
             uart_param_config(p_Config.Interface, &_SIM70XX_UART_Config) ||
-            uart_set_pin(p_Config.Interface, p_Config.Tx, p_Config.Rx, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE) ||
-            uart_flush(p_Config.Interface)) != ESP_OK)
+            uart_set_pin(p_Config.Interface, p_Config.Tx, p_Config.Rx, RTS, CTS) ||
+            uart_flush(p_Config.Interface)
+           ) != ESP_OK)
         {
             xSemaphoreGive(p_Config.Lock);
+
             return SIM70XX_ERR_NOT_INITIALIZED;
         }
         xSemaphoreGive(p_Config.Lock);

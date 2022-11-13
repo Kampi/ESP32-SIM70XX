@@ -537,7 +537,7 @@ SIM70XX_Error_t SIM7020_GetFunctionality(SIM7020_t& p_Device)
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    p_Device.Connection.Functionality = (SIM7020_Func_t)SIM70XX_Tools_StringToUnsigned(Response);
+     p_Device.Connection.Functionality = (SIM7020_Func_t)SIM70XX_Tools_StringToUnsigned(Response);
 
     ESP_LOGI(TAG, "Functionality: %u", p_Device.Connection.Functionality);
 

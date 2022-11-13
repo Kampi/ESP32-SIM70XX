@@ -96,23 +96,36 @@ void SIM7020_Evt_on_HTTP_Header(SIM7020_t* const p_Device, std::string* p_Messag
     SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Message));
 
     // Split the header from the response.
-    Index = Message.find("+CHTTPNMIC: ");
-    Response->Header = SIM70XX_Tools_SubstringSplitErase(&Message, "+CHTTPNMIC: ");
+    Response->Header = SIM70XX_Tools_SubstringSplitErase(&Message, "\r\n\r\n");
 
     // Process the content.
-    // Remove the command.
-    SIM70XX_Tools_SubstringSplitErase(&Message);
+    do
+    {
+        // Remove the command.
+        SIM70XX_Tools_SubstringSplitErase(&Message);
 
-    // Get the flag.
-    Flag = (bool)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Message));
+        // Get the flag.
+        Flag = (bool)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Message));
 
-    // Remove the total length.
-    SIM70XX_Tools_SubstringSplitErase(&Message);
+        // Remove the total length.
+        SIM70XX_Tools_SubstringSplitErase(&Message);
 
-    // Remove the package length.
-    SIM70XX_Tools_SubstringSplitErase(&Message);
+        // Remove the package length.
+        SIM70XX_Tools_SubstringSplitErase(&Message);
 
-    Response->Content = Message;
+        // Continue when the flag is set (additional packets are available).
+        if(Flag == true)
+        {
+            Response->Content += SIM70XX_Tools_SubstringSplitErase(&Message, "\r\n\r\n");
+        }
+        // Otherwise receive the remaining data and exit.
+        else
+        {
+            Response->Content += SIM70XX_Tools_SubstringSplitErase(&Message, "\r\n");
+
+            break;
+        }
+    } while(true);
 
     ESP_LOGD(TAG, "ID: %u", Response->ID);
     ESP_LOGD(TAG, "Header: %s", Response->Header.c_str());
