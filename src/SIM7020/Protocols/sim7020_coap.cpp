@@ -114,7 +114,7 @@ SIM70XX_Error_t SIM7020_CoAP_Transmit(SIM7020_t& p_Device, SIM7020_CoAP_Socket_t
 
     return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
 }
-
+/*
 SIM70XX_Error_t SIM7020_CoAP_Transmit(SIM7020_t& p_Device, SIM7020_CoAP_Socket_t* p_Socket, SIM7020_CoAP_Msg_t* p_Message)
 {
     std::string CommandStr;
@@ -143,12 +143,14 @@ SIM70XX_Error_t SIM7020_CoAP_Transmit(SIM7020_t& p_Device, SIM7020_CoAP_Socket_t
         p_Message->Token = __builtin_bswap64(p_Message->Token);
     #endif
 
+    // TBD
+
     SIM70XX_Tools_Buf2Hex(p_Message->Endpoint.c_str(), p_Message->Endpoint.length(), &Buffer_Hex);
     SIM70XX_Tools_Buf2Hex((const void*)&p_Message->Token, sizeof(p_Message->Token), &Token_Str);
 
     std::string Data = "AABB";
 
-    CommandStr = "AT+CCOAPCSEND=" + std::to_string(p_Socket->Internal.ID) + ",1,0,0,2,0a,\"b7" + Buffer_Hex + "\"," + std::to_string(Data.size()) + ",\"" + Data + "\"";
+    CommandStr = "AT+CCOAPCSEND=" + std::to_string(p_Socket->Internal.ID) + ",1,0,0,2,\"0a\",\"b7" + Buffer_Hex + "\"," + std::to_string(Data.size()) + ",\"" + Data + "\"";
     //CommandStr = "AT+CCOAPCSEND=" + std::to_string(p_Socket->Internal.ID) + ",1," + std::to_string(p_Message->Type) + "," + std::to_string(p_Message->FunctionCode_H) + "," + std::to_string(p_Message->FunctionCode_L) + "," + Token_Str + ",\"ff" + Buffer_Hex + "\",,";
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CCOAPCSEND(CommandStr);
@@ -160,7 +162,7 @@ SIM70XX_Error_t SIM7020_CoAP_Transmit(SIM7020_t& p_Device, SIM7020_CoAP_Socket_t
 
     return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
 }
-
+*/
 SIM70XX_Error_t SIM7020_CoAP_Receive(SIM7020_t& p_Device, SIM7020_CoAP_Socket_t* p_Socket, std::string* p_Buffer)
 {
     size_t Index;

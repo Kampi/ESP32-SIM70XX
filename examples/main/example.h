@@ -20,6 +20,10 @@
 #ifndef EXAMPLE_H_
 #define EXAMPLE_H_
 
+#include <string>
+#include <stdint.h>
+#include <stdbool.h>
+
 #include "sim70xx.h"
 
 #include <sdkconfig.h>
@@ -36,6 +40,13 @@
  */
 void StartExamples(void);
 
+#ifdef CONFIG_DEMO_USE_SSL
+    /** @brief          Configure the device for SSL.
+     *  @param p_Device Pointer to device object
+     */
+    void SSL_Configure(DEVICE_TYPE& p_Device);
+#endif
+
 #ifdef CONFIG_DEMO_USE_NVRAM
     /** @brief          Run the NVRAM example.
      *  @param p_Device Pointer to device object
@@ -49,29 +60,6 @@ void StartExamples(void);
      *  @param p_Device Pointer to device object
      */
     void FileSystem_Run(DEVICE_TYPE& p_Device);
-#endif
-
-#ifdef CONFIG_DEMO_USE_EMAIL
-    /** @brief          Run the E-Mail example.
-     *  @param p_Device Pointer to device object
-     */
-    void EMail_Run(DEVICE_TYPE& p_Device);
-#endif
-
-#ifdef CONFIG_DEMO_USE_MQTT
-    /** @brief          Run the MQTT example.
-     *  @param p_Device Pointer to device object
-     *  @param SubTopic (Optional) Subscription topic
-     *  @param PubTopic (Optional) Publish topic
-     */
-    void MQTT_Run(DEVICE_TYPE& p_Device, std::string SubTopic = "foo/bar", std::string PubTopic = "foo/bar");
-#endif
-
-#ifdef CONFIG_DEMO_USE_SNTP
-    /** @brief          Run the NTP example.
-     *  @param p_Device Pointer to device object
-     */
-    void NTP_Run(DEVICE_TYPE& p_Device);
 #endif
 
 #ifdef CONFIG_DEMO_USE_TCPIP_CLIENT
@@ -94,11 +82,56 @@ void StartExamples(void);
     void UDP_Client_Run(DEVICE_TYPE& p_Device);
 #endif
 
+#ifdef CONFIG_DEMO_USE_TCPIP_SERVER
+    /** @brief          Run the TCP server.
+     *  @param p_Device Pointer to device object
+     */
+    void TCP_Server_Run(DEVICE_TYPE& p_Device);
+#endif
+
+#ifdef CONFIG_DEMO_USE_EMAIL
+    /** @brief          Run the E-Mail example.
+     *  @param p_Device Pointer to device object
+     */
+    void EMail_Run(DEVICE_TYPE& p_Device);
+#endif
+
+#ifdef CONFIG_DEMO_USE_SNTP
+    /** @brief          Run the NTP example.
+     *  @param p_Device Pointer to device object
+     */
+    void NTP_Run(DEVICE_TYPE& p_Device);
+#endif
+
+#ifdef CONFIG_DEMO_USE_MQTT
+    /** @brief          Run the MQTT example.
+     *  @param p_Device Pointer to device object
+     *  @param SubTopic (Optional) Subscription topic
+     *  @param PubTopic (Optional) Publish topic
+     */
+    void MQTT_Run(DEVICE_TYPE& p_Device, std::string SubTopic = "foo/bar", std::string PubTopic = "foo/bar");
+#endif
+
 #ifdef CONFIG_DEMO_USE_COAP
     /** @brief          Run the CoAP example.
      *  @param p_Device Pointer to device object
      */
     void CoAP_Run(DEVICE_TYPE& p_Device);
+#endif
+
+#ifdef CONFIG_DEMO_USE_GNSS
+    /** @brief          Run the GNSS example.
+     *  @param p_Device Pointer to device object
+     */
+    void GNSS_Run(DEVICE_TYPE& p_Device);
+#endif
+
+#ifdef CONFIG_DEMO_USE_HTTP
+    /** @brief          Run the HTTP(S) example.
+     *  @param p_Device Pointer to device object
+     *  @param Path     Server endpoint
+     */
+    void HTTP_Run(DEVICE_TYPE& p_Device, std::string Path = "/");
 #endif
 
 #endif /* EXAMPLE_H_ */

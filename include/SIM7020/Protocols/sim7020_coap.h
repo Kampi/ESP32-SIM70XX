@@ -70,7 +70,7 @@ SIM70XX_Error_t SIM7020_CoAP_Transmit(SIM7020_t& p_Device, SIM7020_CoAP_Socket_t
  *  @param p_Message    Pointer to CoAP message object
  *  @return             SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_CoAP_Transmit(SIM7020_t& p_Device, SIM7020_CoAP_Socket_t* p_Socket, SIM7020_CoAP_Msg_t* p_Message);
+//SIM70XX_Error_t SIM7020_CoAP_Transmit(SIM7020_t& p_Device, SIM7020_CoAP_Socket_t* p_Socket, SIM7020_CoAP_Msg_t* p_Message);
 
 /** @brief          Receive a CoAP message.
  *  @param p_Device SIM7080 device object

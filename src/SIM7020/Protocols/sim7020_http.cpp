@@ -144,22 +144,22 @@ SIM70XX_Error_t SIM7020_HTTP_Connect(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t*
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_HTTP_POST(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_Socket, std::string Path, std::string ContentType, std::string Header, std::string Payload, uint16_t* p_ResponseCode)
+SIM70XX_Error_t SIM7020_HTTP_POST(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_Socket, std::string Path, std::string ContentType, std::string Header, std::string Payload, SIM7020_HTTP_Response_t* p_Response)
 {
-    return SIM7020_HTTP_POST(p_Device, p_Socket, Path, ContentType, Header, Payload.c_str(), Payload.size(), p_ResponseCode);
+    return SIM7020_HTTP_POST(p_Device, p_Socket, Path, ContentType, Header, Payload.c_str(), Payload.size(), p_Response);
 }
 
-SIM70XX_Error_t SIM7020_HTTP_POST(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_Socket, std::string Path, std::string ContentType, std::string Header, const void* p_Buffer, uint32_t Length, uint16_t* p_ResponseCode)
+SIM70XX_Error_t SIM7020_HTTP_POST(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_Socket, std::string Path, std::string ContentType, std::string Header, const void* p_Buffer, uint32_t Length, SIM7020_HTTP_Response_t* p_Response)
 {
     std::string CommandStr;
     std::string Buffer_Hex;
     std::string Packet;
-    uint16_t ResponseCode;
     uint32_t Now;
     uint32_t PayloadLength_Length;
     uint32_t TotalLength;
     uint32_t Length_Temp = Length;
     SIM70XX_TxCmd_t* Command;
+    SIM7020_HTTP_Response_t Response;
     bool isFirstPacket;
     char* Buffer_Temp = (char*)p_Buffer;
 
@@ -262,9 +262,8 @@ SIM70XX_Error_t SIM7020_HTTP_POST(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_
         vTaskDelay(10 / portTICK_PERIOD_MS);
     } while(Length_Temp != 0);
 
-    // Get the response from the server.
     Now = SIM70XX_Timer_GetMilliseconds();
-    while(SIM70XX_Queue_isEvent(p_Device.Internal.EventQueue, "+CHTTPNMIH" + std::to_string(p_Socket->Internal.ID), &Packet) == false)
+    while(SIM7020_HTTP_GetResponseItems(p_Socket) == 0)
     {
         if((SIM70XX_Timer_GetMilliseconds() - Now) > (p_Socket->Timeout * 1000UL))
         {
@@ -274,34 +273,26 @@ SIM70XX_Error_t SIM7020_HTTP_POST(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_
         vTaskDelay(100 / portTICK_PERIOD_MS);
     }
 
-    // Remove the command from the response.
-    Packet.replace(Packet.find("+CHTTPNMIH: " + std::to_string(p_Socket->Internal.ID) + ","), std::string("+CHTTPNMIH: " + std::to_string(p_Socket->Internal.ID) + ",").size(), "");
+    SIM70XX_ERROR_CHECK(SIM7020_HTTP_GetResponse(p_Device, p_Socket, &Response));
 
-    // Get the response code.
-    ResponseCode = SIM70XX_Tools_StringToUnsigned(Packet.substr(0, Packet.find(",")));
+    ESP_LOGI(TAG, "Got Response from server...");
+    ESP_LOGI(TAG, "     Response code: %u", Response.ResponseCode);
 
-    if(p_ResponseCode != NULL)
+    if(p_Response != NULL)
     {
-        *p_ResponseCode = ResponseCode;
+        *p_Response = Response;
     }
-
-    // TODO: Items in Queue müssen korrekt ausgewertet werden
-    SIM70XX_Queue_Reset(p_Device.Internal.RxQueue);
-    ESP_LOGI(TAG, "Items: %u", SIM70XX_Queue_GetItems(p_Device.Internal.RxQueue));
-
-    ESP_LOGI(TAG, "Response from server: %s", Packet.c_str());
-    ESP_LOGI(TAG, "     Code: %u", ResponseCode);
 
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_HTTP_GET(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_Socket, std::string Path, std::string* p_Payload, uint16_t* p_ResponseCode)
+SIM70XX_Error_t SIM7020_HTTP_GET(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_Socket, std::string Path)
 {
     std::string Response;
     std::string CommandStr;
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Socket == NULL) || (p_Payload == NULL))
+    if(p_Socket == NULL)
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
@@ -333,11 +324,11 @@ SIM70XX_Error_t SIM7020_HTTP_GET(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_S
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_HTTP_GetResponse(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_Socket, SIM7020_HTTP_Response_t* p_Message)
+SIM70XX_Error_t SIM7020_HTTP_GetResponse(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_Socket, SIM7020_HTTP_Response_t* p_Response)
 {
     SIM7020_HTTP_Response_t* Packet;
 
-    if((p_Message == NULL) || (p_Socket->Internal.ResponseQueue == NULL))
+    if((p_Response == NULL) || (p_Socket->Internal.ResponseQueue == NULL))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
@@ -355,7 +346,7 @@ SIM70XX_Error_t SIM7020_HTTP_GetResponse(SIM7020_t& p_Device, SIM7020_HTTP_Socke
         return SIM70XX_ERR_QUEUE_ERR;
     }
 
-    *p_Message = *Packet;
+    *p_Response = *Packet;
 
     delete Packet;
 

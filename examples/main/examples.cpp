@@ -112,8 +112,34 @@ void StartExamples(void)
             SIM7080_PDP_IP_CheckNetworks(_Device, &Networks);
             SIM7080_Info_GetEquipmentInfo(_Device, &UEInfo);
         #endif
+/*
+        SIM7080_PSM_Init(_Device);
+        SIM7080_PSM_Enable(_Device, SIM7080_TAU_BASE_10_HOUR, 7, SIM7080_TIME_BASE_2_SECONDS, 1);
 
+        while(1)
+        {
+            bool isActive;
+
+            isActive = SIM7080_PSM_isActive(_Device);
+            ESP_LOGI(TAG, "PSM active: %u", isActive);
+
+            if(isActive)
+            {
+                SIM7080_PwrMgnt_WakeUp(_Device);
+            }
+
+            vTaskDelay(10000 / portTICK_PERIOD_MS);
+        }
+*/
         ESP_LOGI(TAG, "Run the examples...");
+
+        #ifdef CONFIG_DEMO_USE_GNSS
+            GNSS_Run(_Device);
+        #endif
+
+        #ifdef CONFIG_DEMO_USE_SSL
+            SSL_Configure(_Device);
+        #endif
 
         #ifdef CONFIG_DEMO_USE_NVRAM
             NVRAM_Run(_Device);
@@ -121,14 +147,6 @@ void StartExamples(void)
 
         #ifdef CONFIG_DEMO_USE_FS
             FileSystem_Run(_Device);
-        #endif
-
-        #ifdef CONFIG_DEMO_USE_EMAIL
-            EMail_Run(_Device);
-        #endif
-
-        #ifdef CONFIG_DEMO_USE_MQTT
-            MQTT_Run(_Device);
         #endif
 
         #ifdef CONFIG_DEMO_USE_SNTP
@@ -144,8 +162,24 @@ void StartExamples(void)
             UDP_Client_Run(_Device);
         #endif
 
+        #ifdef CONFIG_DEMO_USE_TCPIP_SERVER
+            TCP_Server_Run(_Device);
+        #endif
+
+        #ifdef CONFIG_DEMO_USE_EMAIL
+            EMail_Run(_Device);
+        #endif
+
+        #ifdef CONFIG_DEMO_USE_MQTT
+            MQTT_Run(_Device);
+        #endif
+
         #ifdef CONFIG_DEMO_USE_COAP
             CoAP_Run(_Device);
+        #endif
+
+        #ifdef CONFIG_DEMO_USE_HTTP
+            HTTP_Run(_Device);
         #endif
 
         ESP_LOGI(TAG, "Done...");

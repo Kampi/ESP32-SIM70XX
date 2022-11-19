@@ -38,7 +38,7 @@ void SIM7020_Evt_on_HTTP_Error(SIM7020_t* const p_Device, std::string* p_Message
     SIM7020_HTTP_Error_t HTTP_Error;
     std::string Message;
 
-    ESP_LOGD(TAG, "HTTP error event!");
+    ESP_LOGI(TAG, "HTTP error event!");
 
     // Remove the command and make a copy of the command response.
     Index = p_Message->find("+CHTTPERR: ");

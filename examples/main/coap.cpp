@@ -31,6 +31,7 @@ static const char* TAG                                              = "CoAP";
 
 #if(CONFIG_SIMXX_DEV == 7020)
     static SIM7020_CoAP_Socket_t _CoAP_Socket;
+    static SIM7020_CoAP_Msg_t _CoAP_Message;
 
     #define SIMXX_ParseDNS(Device, Host, IP)                        SIM7020_DNS_FetchAddress(Device, Host, IP)
     #define SIMXX_ClientCreate(Device, IP, Port, Socket)            SIM7020_CoAP_Create(Device, IP, Port, Socket)
@@ -42,18 +43,18 @@ static const char* TAG                                              = "CoAP";
     static SIM7080_CoAP_Socket_t _CoAP_Socket;
 
     #define SIMXX_ParseDNS(Device, Host, IP)                        SIM7080_DNS_FetchAddress(Device, Host, IP)
-    #define SIMXX_ClientCreate(Device, IP, Port, Socket)            (SIM70XX_ERR_FAIL)
-    #define SIMXX_ClientTransmit(Device, Socket, Data, Length)      (SIM70XX_ERR_FAIL)
+    #define SIMXX_ClientCreate(Device, IP, Port, Socket)            SIM7080_CoAP_Create(Device, IP, Port, Socket)
+    #define SIMXX_ClientTransmit(Device, Socket, Data, Length)      SIM7080_CoAP_Transmit(Device, Socket, Data, Length)
     #define SIMXX_ClientIsDataAvailable(Socket)                     (false)
     #define SIMXX_ClientReceive(Device, Socket, Response)           (SIM70XX_ERR_FAIL)
-    #define SIMXX_ClientDestroy(Device, Socket)                     (SIM70XX_ERR_FAIL)
+    #define SIMXX_ClientDestroy(Device, Socket)                     SIM7080_CoAP_Destroy(Device, Socket)
 #endif
 
 void CoAP_Run(DEVICE_TYPE& p_Device)
 {
     SIM70XX_Error_t Error;
     std::string Response;
-    uint8_t Payload[] = {0x40, 0x01, 0x41, 0xC7, 0xB7, 0x63, 0x6F, 0x75, 0x6E, 0x74, 0x65, 0x72};
+    uint8_t Payload[] = {/*0x40, 0x01, 0x41, 0xC7, */0xB7, 0x63, 0x6F, 0x75, 0x6E, 0x74, 0x65, 0x72};
 
 	ESP_LOGI(TAG, "Run CoAP example...");
 
@@ -70,7 +71,18 @@ void CoAP_Run(DEVICE_TYPE& p_Device)
         ESP_LOGI(TAG, "Connected with CoAP server: %s", _CoAP_DNS_IP.c_str());
 
         ESP_LOGI(TAG, "Transmit data...");
-        Error = SIMXX_ClientTransmit(p_Device, &_CoAP_Socket, Payload, sizeof(Payload));
+        //Error = SIMXX_ClientTransmit(p_Device, &_CoAP_Socket, Payload, sizeof(Payload));
+        //SIM7020_CoAP_Transmit(p_Device, &_CoAP_Socket, "counter", SIM7020_COAP_CON, 1, Payload, sizeof(Payload));
+
+        _CoAP_Message.Endpoint = "counter";
+        _CoAP_Message.Type = SIM7020_COAP_CON;
+        _CoAP_Message.FunctionCode_H = 0;
+        _CoAP_Message.FunctionCode_L = 2;
+        _CoAP_Message.Token = 10;
+        _CoAP_Message.Length = sizeof(Payload);
+        _CoAP_Message.p_Payload = Payload;
+
+        SIM7020_CoAP_Transmit(p_Device, &_CoAP_Socket, &_CoAP_Message);
         if(Error == SIM70XX_ERR_OK)
         {
             while(SIMXX_ClientIsDataAvailable(&_CoAP_Socket) == false)
