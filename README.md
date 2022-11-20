@@ -44,7 +44,7 @@ Multidevice driver for SIMCom modules with UART interface.
 | DNS           | Complete      | Complete      |
 | Ping          | Complete      | Complete      |
 | GNSS          |               | Basic         |
-| E-Mail        |               | Basic         |
+| E-Mail        |               | Complete      |
 | File system   |               | Complete      |
 | SSL / TLS     | Open          | Open          |
 | NVRAM         | Complete      |               |
@@ -54,7 +54,7 @@ Multidevice driver for SIMCom modules with UART interface.
 | HTTP          | Complete      | Not started   |
 | CoAP          | Complete      | Not started   |
 | MQTT          | Complete      | Complete      |
-| PSM           | Open          | Open          |
+| PSM           | Basic         | Basic         |
 
 ### Description
 
