@@ -21,8 +21,6 @@
 
 #if((CONFIG_SIMXX_DEV == 7080) && (defined CONFIG_SIM70XX_DRIVER_WITH_TCPIP))
 
-#include <esp_log.h>
-
 #include "sim7080.h"
 #include "sim7080_tcpip.h"
 #include "Private/Client/sim7080_client.h"

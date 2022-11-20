@@ -1,5 +1,5 @@
  /*
- * sim7080_http.cpp
+ * sim70xx_logging.h
  *
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -17,18 +17,14 @@
  * Errors and commissions should be reported to DanielKampert@kampis-elektroecke.de.
  */
 
-#include <sdkconfig.h>
+#ifndef SIM70XX_LOGGING_H_
+#define SIM70XX_LOGGING_H_
 
-#if((CONFIG_SIMXX_DEV == 7080) && (defined CONFIG_SIM70XX_DRIVER_WITH_HTTP))
+#include <esp_log.h>
 
-#include "sim7080.h"
-#include "sim7080_http.h"
+#define SIM70XX_LOGI(tag, format, ...)                          ESP_LOGI(tag, format, ##__VA_ARGS__)
+#define SIM70XX_LOGD(tag, format, ...)                          ESP_LOGD(tag, format, ##__VA_ARGS__)
+#define SIM70XX_LOGW(tag, format, ...)                          ESP_LOGW(tag, format, ##__VA_ARGS__)
+#define SIM70XX_LOGE(tag, format, ...)                          ESP_LOGE(tag, format, ##__VA_ARGS__)
 
-#include "../../Core/Queue/sim70xx_queue.h"
-#include "../../Core/Commands/sim70xx_commands.h"
-
-#include "../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
-
-static const char* TAG = "SIM7080_HTTP";
-
-#endif
+#endif /* SIM70XX_LOGGING_H_ */

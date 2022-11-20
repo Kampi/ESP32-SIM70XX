@@ -20,7 +20,7 @@ menu "SIM70XX"
     menu "FreeRTOS"
         config SIM70XX_TASK_CORE_AFFINITY
             bool "Communication task core affinity"
-            default y
+            default n
             help
                 Enable this option if you want to use a specific core for the driver.
 
@@ -28,18 +28,18 @@ menu "SIM70XX"
             int "Communication task core"
             range 0 1
             default 1
-            depends on SIM7020_TASK_CORE_AFFINITY
+            depends on SIM70XX_TASK_CORE_AFFINITY
             help
                 Use a specific core for the communication task.
 
-        config SIM70XX_TASK_evt_PRIO
+        config SIM70XX_TASK_COM_PRIO
             int "Communication task priority"
             range 12 25
             default 12
             help
                 Task priority for the communication task.
 
-        config SIM70XX_TASK_evt_STACK
+        config SIM70XX_TASK_COM_STACK
             int "Communication task stack size"
             range 4096 16384
             default 4096
@@ -166,6 +166,11 @@ menu "SIM70XX"
             depends on SIM70XX_UART_USE_CTS
             int "UART CTS pin"
             default 11
+
+		config SIM70XX_UART_IRAM
+            depends on IDF_TARGET_ESP32
+			bool "Place UART ISR in IRAM"
+			default n
     endmenu
 
     menu "GPIO" 

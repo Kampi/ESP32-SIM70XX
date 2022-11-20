@@ -21,14 +21,14 @@
 
 #if((CONFIG_SIMXX_DEV == 7080) && (defined CONFIG_SIM70XX_DRIVER_WITH_EMAIL))
 
-#include <esp_log.h>
-#include <esp_task_wdt.h>
-
 #include "sim7080.h"
 #include "sim7080_email.h"
-#include "../../../Core/Arch/ESP32/UART/sim70xx_uart.h"
+
 #include "../../../Core/Queue/sim70xx_queue.h"
 #include "../../../Core/Commands/sim70xx_commands.h"
+
+#include "../../../Core/Arch/ESP32/UART/sim70xx_uart.h"
+#include "../../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
 
 static const char* TAG = "SIM7080_EMail";
 
@@ -91,7 +91,7 @@ SIM70XX_Error_t SIM7080_EMail_POP3_Login(SIM7080_t& p_Device, SIM7080_EMail_Conf
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_EMAILTO(Timeout);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -100,7 +100,7 @@ SIM70XX_Error_t SIM7080_EMail_POP3_Login(SIM7080_t& p_Device, SIM7080_EMail_Conf
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_POP3SRV(p_Config->SMTP_Address, p_Config->SMTP_Auth_User, p_Config->SMTP_Auth_Pass, p_Config->SMTP_Port);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -109,7 +109,7 @@ SIM70XX_Error_t SIM7080_EMail_POP3_Login(SIM7080_t& p_Device, SIM7080_EMail_Conf
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_POP3IN;
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -136,7 +136,7 @@ SIM70XX_Error_t SIM7080_EMail_POP3_ReadInbox(SIM7080_t& p_Device, uint32_t* p_Nu
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_POP3NUM
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -169,7 +169,7 @@ SIM70XX_Error_t SIM7080_EMail_POP3_ReadEMailMeta(SIM7080_t& p_Device, uint32_t M
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_POP3LIST(Mail);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -191,7 +191,7 @@ SIM70XX_Error_t SIM7080_EMail_POP3_ReadEMailMeta(SIM7080_t& p_Device, uint32_t M
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_POP3UIDL(Mail);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -232,7 +232,7 @@ SIM70XX_Error_t SIM7080_EMail_POP3_ReadEMail(SIM7080_t& p_Device, uint32_t ID, s
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_POP3CMD(SIM7080_EMAIL_POP3_RETRIEVE, ID);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -246,15 +246,13 @@ SIM70XX_Error_t SIM7080_EMail_POP3_ReadEMail(SIM7080_t& p_Device, uint32_t ID, s
     Response.erase(Response.find("+POP3CMD: "), std::string("+POP3CMD: ").size());
     SIM70XX_ERROR_CHECK(SIM7080_EMail_POP3_ErrorCheck(Response, p_Error));
 
-    vTaskSuspend(p_Device.Internal.TaskHandle);
+    vTaskSuspend(p_Device.UART.TaskHandle);
     do
     {
         uint8_t StatusCode;
         uint16_t BytesReceived;
         std::string Response;
         SIM70XX_TxCmd_t ReadCommand;
-
-        esp_task_wdt_reset();
 
         ReadCommand = SIM7080_AT_POP3READ(PacketSize);
         SIM70XX_UART_SendLine(p_Device.UART, ReadCommand.Command);
@@ -275,13 +273,13 @@ SIM70XX_Error_t SIM7080_EMail_POP3_ReadEMail(SIM7080_t& p_Device, uint32_t ID, s
             break;
         }
 
-        ESP_LOGI(TAG, "Response: %s", Response.c_str());
+        SIM70XX_LOGI(TAG, "Response: %s", Response.c_str());
         Response.erase(Response.find("+POP3READ: "), std::string("+POP3READ: ").size());
         StatusCode = (uint8_t)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response));
         BytesReceived = (uint16_t)SIM70XX_Tools_StringToUnsigned(Response);
 
-        ESP_LOGD(TAG, "Status code: %u", StatusCode);
-        ESP_LOGD(TAG, "Bytes received: %u", BytesReceived);
+        SIM70XX_LOGD(TAG, "Status code: %u", StatusCode);
+        SIM70XX_LOGD(TAG, "Bytes received: %u", BytesReceived);
 
         // An error has occured.
         if(BytesReceived == 0)
@@ -311,7 +309,7 @@ SIM70XX_Error_t SIM7080_EMail_POP3_ReadEMail(SIM7080_t& p_Device, uint32_t ID, s
         } while(Response.find('\r') == std::string::npos);
         SIM70XX_UART_ReadStringUntil(p_Device.UART);
         Response = SIM70XX_UART_ReadStringUntil(p_Device.UART);
-        ESP_LOGD(TAG, "Response: %s", Response.c_str());
+        SIM70XX_LOGD(TAG, "Response: %s", Response.c_str());
 
         // Addditional data are available.
         if(StatusCode == 1)
@@ -326,7 +324,7 @@ SIM70XX_Error_t SIM7080_EMail_POP3_ReadEMail(SIM7080_t& p_Device, uint32_t ID, s
         {
         }
     } while(true);
-    vTaskResume(p_Device.Internal.TaskHandle);
+    vTaskResume(p_Device.UART.TaskHandle);
 
     return Error;
 }
@@ -344,7 +342,7 @@ SIM70XX_Error_t SIM7080_EMail_POP3_DeleteEMail(SIM7080_t& p_Device, uint32_t ID,
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_POP3DEL(ID);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -371,7 +369,7 @@ SIM70XX_Error_t SIM7080_EMail_POP3_Logout(SIM7080_t& p_Device, SIM7080_EMail_Err
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_POP3OUT(Command->Timeout);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }

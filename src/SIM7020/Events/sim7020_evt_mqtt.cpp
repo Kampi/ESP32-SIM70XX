@@ -21,11 +21,12 @@
 
 #if((CONFIG_SIMXX_DEV == 7020) && (defined CONFIG_SIM70XX_DRIVER_WITH_MQTT))
 
-#include <esp_log.h>
-
 #include "sim7020.h"
 #include "sim7020_evt.h"
+
 #include "../../Core/Queue/sim70xx_queue.h"
+
+#include "../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
 
 static const char* TAG = "SIM7020_Evt_MQTT";
 
@@ -34,7 +35,7 @@ void SIM7020_Evt_on_MQTT_Pub(SIM7020_t* const p_Device, std::string* p_Message)
     size_t Index;
     SIM7020_MQTT_Sub_Evt_t* SubMessage;
 
-    ESP_LOGI(TAG, "MQTT subscribe event!");
+    SIM70XX_LOGI(TAG, "MQTT subscribe event!");
 
     SubMessage = new SIM7020_MQTT_Sub_Evt_t();
 
@@ -87,7 +88,7 @@ void SIM7020_Evt_on_MQTT_Disconnect(SIM7020_t* const p_Device, std::string* p_Me
     uint8_t ID;
     size_t Index;
 
-    ESP_LOGI(TAG, "MQTT socket disconnect event!");
+    SIM70XX_LOGI(TAG, "MQTT socket disconnect event!");
 
     Index = p_Message->find("+CMQDISCON");
     if(Index == std::string::npos)
@@ -106,7 +107,7 @@ void SIM7020_Evt_on_MQTT_Disconnect(SIM7020_t* const p_Device, std::string* p_Me
         {
             (*it)->Internal.isConnected = false;
 
-            ESP_LOGI(TAG, "Disconnect socket %u", ID);
+            SIM70XX_LOGI(TAG, "Disconnect socket %u", ID);
         }
     }
 }

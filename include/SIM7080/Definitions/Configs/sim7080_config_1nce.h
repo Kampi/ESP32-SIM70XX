@@ -33,6 +33,7 @@
                                                                             .Interface = Serial,                            \
                                                                             .Lock = NULL,                                   \
                                                                             .Baudrate = Baud,                               \
+                                                                            .TaskHandle = NULL,                             \
                                                                             .isInitialized = false,                         \
                                                                         },                                                  \
                                                                         .Band = SIM7080_BAND_ALL,                           \

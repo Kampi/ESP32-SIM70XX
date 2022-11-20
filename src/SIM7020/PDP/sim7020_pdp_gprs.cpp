@@ -21,12 +21,13 @@
 
 #if(CONFIG_SIMXX_DEV == 7020)
 
-#include <esp_log.h>
-
 #include "sim7020.h"
 #include "sim7020_pdp_defs.h"
+
 #include "../../Core/Queue/sim70xx_queue.h"
 #include "../../Core/Commands/sim70xx_commands.h"
+
+#include "../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
 
 static const char* TAG = "SIM7020_PDP";
 
@@ -45,7 +46,7 @@ bool SIM7020_PGP_GPRS_isAttached(SIM7020_t& p_Device)
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM70XX_AT_CGATT_R;
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return false;
     }

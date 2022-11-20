@@ -21,13 +21,14 @@
 
 #if((CONFIG_SIMXX_DEV == 7080) && (defined CONFIG_SIM70XX_DRIVER_WITH_FS))
 
-#include <esp_log.h>
-
 #include "sim7080.h"
 #include "sim7080_fs.h"
-#include "../../Core/Arch/ESP32/UART/sim70xx_uart.h"
+
 #include "../../Core/Queue/sim70xx_queue.h"
 #include "../../Core/Commands/sim70xx_commands.h"
+
+#include "../../Core/Arch/ESP32/UART/sim70xx_uart.h"
+#include "../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
 
 static const char* TAG = "SIM7080_FS";
 
@@ -38,7 +39,7 @@ SIM70XX_Error_t SIM7080_FS_Init(SIM7080_t& p_Device)
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CFSINIT;
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -58,7 +59,7 @@ SIM70XX_Error_t SIM7080_FS_Deinit(SIM7080_t& p_Device)
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CFSTERM;
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -85,7 +86,7 @@ SIM70XX_Error_t SIM7080_FS_GetFileSize(SIM7080_t& p_Device, SIM7080_FS_Path_t Pa
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CFSGFIS(Path, Name);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -120,7 +121,7 @@ SIM70XX_Error_t SIM7080_FS_Write(SIM7080_t& p_Device, SIM7080_FS_Path_t Path, st
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CFSWFILE(Path, Name, Append, Length, Timeout);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -131,18 +132,18 @@ SIM70XX_Error_t SIM7080_FS_Write(SIM7080_t& p_Device, SIM7080_FS_Path_t Path, st
         goto SIM7080_FS_Write_Exit;
     }
 
-    vTaskSuspend(p_Device.Internal.TaskHandle);
+    vTaskSuspend(p_Device.UART.TaskHandle);
     SIM70XX_UART_Send(p_Device.UART, p_Buffer, Length);
     SIM70XX_UART_ReadStringUntil(p_Device.UART);
     Response = SIM70XX_UART_ReadStringUntil(p_Device.UART);
-    vTaskResume(p_Device.Internal.TaskHandle);
+    vTaskResume(p_Device.UART.TaskHandle);
     if(Response.find("OK") == std::string::npos)
     {
         Error = SIM70XX_ERR_FAIL;
         goto SIM7080_FS_Write_Exit;
     }
 
-    ESP_LOGD(TAG, "Response: %s", Response.c_str());
+    SIM70XX_LOGD(TAG, "Response: %s", Response.c_str());
 
     p_Device.FS.Free -= Length;
 
@@ -181,7 +182,7 @@ SIM70XX_Error_t SIM7080_FS_Read(SIM7080_t& p_Device, SIM7080_FS_Path_t Path, std
     }
 
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -193,7 +194,7 @@ SIM70XX_Error_t SIM7080_FS_Read(SIM7080_t& p_Device, SIM7080_FS_Path_t Path, std
         return SIM70XX_ERR_FAIL;
     }
 
-    vTaskSuspend(p_Device.Internal.TaskHandle);
+    vTaskSuspend(p_Device.UART.TaskHandle);
     BytesRead = 0;
     do
     {
@@ -212,9 +213,9 @@ SIM70XX_Error_t SIM7080_FS_Read(SIM7080_t& p_Device, SIM7080_FS_Path_t Path, std
     SIM70XX_UART_ReadStringUntil(p_Device.UART);
     Response = SIM70XX_UART_ReadStringUntil(p_Device.UART);
 
-    vTaskResume(p_Device.Internal.TaskHandle);
+    vTaskResume(p_Device.UART.TaskHandle);
 
-    ESP_LOGI(TAG, "Response: %s", Response.c_str());
+    SIM70XX_LOGI(TAG, "Response: %s", Response.c_str());
 
     if(Response.find("OK") == std::string::npos)
     {
@@ -240,7 +241,7 @@ SIM70XX_Error_t SIM7080_FS_Delete(SIM7080_t& p_Device, SIM7080_FS_Path_t Path, s
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CFSDFILE(Path, Name);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -265,7 +266,7 @@ SIM70XX_Error_t SIM7080_FS_Rename(SIM7080_t& p_Device, SIM7080_FS_Path_t Path, s
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CFSREN(Path, Old, New);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -293,7 +294,7 @@ SIM70XX_Error_t SIM7080_FS_GetFree(SIM7080_t& p_Device, uint32_t* const p_Free)
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CFSGFRS;
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }

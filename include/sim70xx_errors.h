@@ -110,8 +110,8 @@ typedef int SIM70XX_Error_t;
                                                                     SIM70XX_Error_t Error = Func;                                                       \
                                                                     if(Error != SIM70XX_ERR_OK)                                                         \
                                                                     {                                                                                   \
-																		ESP_LOGE("SIM70XX_Error", "Error: 0x%X", Error);                                \
-                                                                        ESP_LOGE("SIM70XX_Error", "  %s:%d (%s)", __FILE__, __LINE__, __FUNCTION__);    \
+																		SIM70XX_LOGE("SIM70XX_Error", "Error: 0x%X", Error);                                \
+                                                                        SIM70XX_LOGE("SIM70XX_Error", "  %s:%d (%s)", __FILE__, __LINE__, __FUNCTION__);    \
                                                                         return Error;                                                                   \
                                                                     }                                                                                   \
                                                                 } while(0);

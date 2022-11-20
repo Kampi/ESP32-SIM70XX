@@ -21,13 +21,14 @@
 
 #if((CONFIG_SIMXX_DEV == 7080) && (defined CONFIG_SIM70XX_DRIVER_WITH_SSL))
 
-#include <esp_log.h>
-
 #include "sim7080.h"
 #include "sim7080_fs.h"
 #include "sim7080_ssl.h"
+
 #include "../../Core/Queue/sim70xx_queue.h"
 #include "../../Core/Commands/sim70xx_commands.h"
+
+#include "../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
 
 /** @brief              Execute a SSL convert command.
  *  @param p_Device     SIM7080 device object
@@ -41,7 +42,7 @@ static SIM70XX_Error_t SIM7080_SSL_Convert(SIM7080_t& p_Device, std::string Comm
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CFSINIT;
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -50,7 +51,7 @@ static SIM70XX_Error_t SIM7080_SSL_Convert(SIM7080_t& p_Device, std::string Comm
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CSSLCFG(CommandStr);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -59,7 +60,7 @@ static SIM70XX_Error_t SIM7080_SSL_Convert(SIM7080_t& p_Device, std::string Comm
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CFSTERM;
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -85,7 +86,7 @@ SIM70XX_Error_t SIM7080_SSL_Configure(SIM7080_t& p_Device, SIM7080_SSL_Config_t*
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CSSLCFG(CommandStr);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -96,7 +97,7 @@ SIM70XX_Error_t SIM7080_SSL_Configure(SIM7080_t& p_Device, SIM7080_SSL_Config_t*
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CSSLCFG(CommandStr);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -106,7 +107,7 @@ SIM70XX_Error_t SIM7080_SSL_Configure(SIM7080_t& p_Device, SIM7080_SSL_Config_t*
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CSSLCFG(CommandStr);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -176,7 +177,7 @@ SIM70XX_Error_t SIM7080_SSL_Enable(SIM7080_t& p_Device, uint8_t CID, uint8_t Con
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CASSLCFG("AT+CASSLCFG=" + std::to_string(CID) + ",\"SSL\",1");
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -185,7 +186,7 @@ SIM70XX_Error_t SIM7080_SSL_Enable(SIM7080_t& p_Device, uint8_t CID, uint8_t Con
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CSSLCFG("AT+CASSLCFG=" + std::to_string(CID) + ",\"CRINDEX\"," + std::to_string(Configuration));
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -208,7 +209,7 @@ SIM70XX_Error_t SIM7080_SSL_Disable(SIM7080_t& p_Device, uint8_t CID)
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CASSLCFG("AT+CASSLCFG=" + std::to_string(CID) + ",\"SSL\",1");
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }

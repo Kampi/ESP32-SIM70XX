@@ -21,11 +21,11 @@
 
 #if((CONFIG_SIMXX_DEV == 7020) && (defined CONFIG_SIM70XX_DRIVER_WITH_TCPIP))
 
-#include <esp_log.h>
-
 #include "sim7020_server.h"
 #include "../../../../../Core/Queue/sim70xx_queue.h"
 #include "../../../../../Core/Commands/sim70xx_commands.h"
+
+#include "../../../../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
 
 static const char* TAG = "SIM7020_TCPIP_Server";
 
@@ -53,7 +53,7 @@ SIM70XX_Error_t SIM7020_Server_CreateSocket(SIM7020_t& p_Device, SIM7020_TCP_Typ
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CSOC(p_Socket->Domain, Type, p_Socket->Protocol, p_Socket->Internal.CID);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, p_Socket->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, p_Socket->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -65,7 +65,7 @@ SIM70XX_Error_t SIM7020_Server_CreateSocket(SIM7020_t& p_Device, SIM7020_TCP_Typ
     p_Socket->Internal.isCreated = true;
     p_Socket->Internal.isServer = true;
 
-    ESP_LOGD(TAG, "Socket %u created...", p_Socket->Internal.ID);
+    SIM70XX_LOGD(TAG, "Socket %u created...", p_Socket->Internal.ID);
 
     return SIM70XX_ERR_OK;  
 }
@@ -98,7 +98,7 @@ SIM70XX_Error_t SIM7020_Server_BindSocket(SIM7020_t& p_Device, SIM7020_TCPIP_Soc
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CSOB(p_Socket->Internal.ID, p_Socket->Port, p_Socket->IP);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, p_Socket->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, p_Socket->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -135,7 +135,7 @@ SIM70XX_Error_t SIM7020_Server_Listen(SIM7020_t& p_Device, SIM7020_TCPIP_Socket_
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CSOLIS(p_Socket->Internal.ID);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, p_Socket->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, p_Socket->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -167,7 +167,7 @@ SIM70XX_Error_t SIM7020_Server_DestroySocket(SIM7020_t& p_Device, SIM7020_TCPIP_
     {
         if((*it)->Internal.ID == p_Socket->Internal.ID)
         {
-            ESP_LOGI(TAG, "Delete socket: %u", p_Socket->Internal.ID);
+            SIM70XX_LOGI(TAG, "Delete socket: %u", p_Socket->Internal.ID);
 
             p_Device.TCP.Sockets.erase(it);
             break;

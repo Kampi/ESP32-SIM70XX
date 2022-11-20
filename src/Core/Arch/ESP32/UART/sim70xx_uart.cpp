@@ -18,7 +18,7 @@
  */
 
 #include <esp_err.h>
-#include <esp_log.h>
+#include <esp_task_wdt.h>
 
 #include <driver/uart.h>
 
@@ -30,6 +30,8 @@
 #include "sim70xx_tools.h"
 
 #include "../Timer/sim70xx_timer.h"
+#include "../Logging/sim70xx_logging.h"
+#include "../Watchdog/sim70xx_watchdog.h"
 
 #include <sdkconfig.h>
 
@@ -86,6 +88,7 @@ static int SIM7020_UART_TimedRead(SIM70XX_UART_Conf_t& p_Config, uint32_t Timeou
     Now = SIM70XX_Timer_GetMilliseconds();
     do
     {
+        SIM70XX_WDT_Reset();
         c = SIM70XX_UART_Read(p_Config);
         if(c >= 0)
         {
@@ -100,12 +103,14 @@ SIM70XX_Error_t SIM70XX_UART_Init(SIM70XX_UART_Conf_t& p_Config)
 {
     int RTS;
     int CTS;
+    uint8_t Flags;
 
     if(p_Config.isInitialized)
     {
         SIM70XX_ERROR_CHECK(SIM70XX_UART_Deinit(p_Config));
     }
 
+    Flags = 0;
     p_Config.isInitialized = false;
 
     _SIM70XX_UART_Config.baud_rate = p_Config.Baudrate;
@@ -123,7 +128,7 @@ SIM70XX_Error_t SIM70XX_UART_Init(SIM70XX_UART_Conf_t& p_Config)
         }
         else
         {
-            ESP_LOGE(TAG, "Invalid GPIO for RTS!");
+            SIM70XX_LOGE(TAG, "Invalid GPIO for RTS!");
 
             return SIM70XX_ERR_INVALID_ARG;
         }
@@ -138,7 +143,7 @@ SIM70XX_Error_t SIM70XX_UART_Init(SIM70XX_UART_Conf_t& p_Config)
         }
         else
         {
-            ESP_LOGE(TAG, "Invalid GPIO for CTS!");
+            SIM70XX_LOGE(TAG, "Invalid GPIO for CTS!");
 
             return SIM70XX_ERR_INVALID_ARG;
         }
@@ -146,9 +151,13 @@ SIM70XX_Error_t SIM70XX_UART_Init(SIM70XX_UART_Conf_t& p_Config)
         CTS = UART_PIN_NO_CHANGE;
     #endif
 
+    #ifdef CONFIG_SIM70XX_UART_IRAM
+        Flags = ESP_INTR_FLAG_IRAM;
+    #endif
+
     if(xSemaphoreTake(p_Config.Lock, 10 / portTICK_PERIOD_MS) == pdTRUE)
     {
-        if((uart_driver_install(p_Config.Interface, CONFIG_SIM70XX_UART_BUFFER_SIZE * 2, 0, 0, NULL, 0) ||
+        if((uart_driver_install(p_Config.Interface, CONFIG_SIM70XX_UART_BUFFER_SIZE * 2, 0, 0, NULL, Flags) ||
             uart_param_config(p_Config.Interface, &_SIM70XX_UART_Config) ||
             uart_set_pin(p_Config.Interface, p_Config.Tx, p_Config.Rx, RTS, CTS) ||
             uart_flush(p_Config.Interface)
@@ -160,7 +169,14 @@ SIM70XX_Error_t SIM70XX_UART_Init(SIM70XX_UART_Conf_t& p_Config)
         }
         xSemaphoreGive(p_Config.Lock);
 
-        ESP_LOGD(TAG, "UART initialized...");
+        SIM70XX_UART_Flush(p_Config);
+
+        SIM70XX_LOGD(TAG, "UART initialized...");
+
+        if(p_Config.TaskHandle != NULL)
+        {
+            SIM70XX_WDT_AddHandle(p_Config.TaskHandle);
+        }
 
         p_Config.isInitialized = true;
 
@@ -190,9 +206,14 @@ SIM70XX_Error_t SIM70XX_UART_Deinit(SIM70XX_UART_Conf_t& p_Config)
 
         vSemaphoreDelete(p_Config.Lock);
 
-        ESP_LOGD(TAG, "UART deinitialized...");
+        SIM70XX_LOGD(TAG, "UART deinitialized...");
 
         p_Config.isInitialized = false;
+
+        if(p_Config.TaskHandle != NULL)
+        {
+            SIM70XX_WDT_RemoveHanndle(p_Config.TaskHandle);
+        }
 
         return SIM70XX_ERR_OK;
     }

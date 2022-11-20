@@ -1,8 +1,8 @@
-# ESP32 driver for [SIM70XX](https://www.simcom.com) cellular modules
+# ESP32 driver for [SIM70XX](https://www.simcom.com) modules
 
 ## Table of Contents
 
-- [ESP32 driver for SIM70XX cellular modules](#esp32-driver-for-sim70xx-cellular-modules)
+- [ESP32 driver for SIM70XX modules](#esp32-driver-for-sim70xx-modules)
   - [Table of Contents](#table-of-contents)
   - [About](#about)
   - [Driver status](#driver-status)
@@ -28,11 +28,13 @@
     - [CoAP](#coap)
       - [Prepare the CoAP server](#prepare-the-coap-server)
       - [Configure the CoAP project](#configure-the-coap-project)
+    - [HTTP](#http)
+      - [Configure the HTTP project](#configure-the-http-project)
   - [Maintainer](#maintainer)
 
 ## About
 
-Multidevice driver for SIMCom cellular modules with UART interface.
+Multidevice driver for SIMCom modules with UART interface.
 
 ## Driver status
 
@@ -49,8 +51,8 @@ Multidevice driver for SIMCom cellular modules with UART interface.
 | TCP (Client)  | Complete      | Complete      |
 | UDP (Client)  | Complete      | Complete      |
 | TCP (Server)  | Open          | Not started   |
-| HTTP          | Open          | Not started   |
-| CoAP          | Basic         | Not started   |
+| HTTP          | Complete      | Not started   |
+| CoAP          | Complete      | Not started   |
 | MQTT          | Complete      | Complete      |
 | PSM           | Open          | Open          |
 
@@ -202,7 +204,7 @@ This demo demo is sending and receiving data to and from an UDP server. The demo
 
 ### CoAP
 
-This demo demo is sending and receiving data to and from a CoAP server. The demo ends after data from the UDP server were received.
+This demo demo is sending and receiving data to and from a CoAP server. The demo ends after data from the CoAP server were received.
 
 #### Prepare the CoAP server
 
@@ -216,6 +218,19 @@ This demo demo is sending and receiving data to and from a CoAP server. The demo
 - Run `make menuconfig`
 - Open the menu `Demo` -> `CoAP`
 - Select `Enable the CoAP client demo`
+- Fill in the required informations
+- Run `make`
+- Execute the demo application
+
+### HTTP
+
+This demo demo is sending and receiving data to and from a HTTP server. The demo ends after data from the HTTP server were received.
+
+#### Configure the HTTP project
+
+- Run `make menuconfig`
+- Open the menu `Demo` -> `HTTP`
+- Select `Enable the HTTP client demo`
 - Fill in the required informations
 - Run `make`
 - Execute the demo application

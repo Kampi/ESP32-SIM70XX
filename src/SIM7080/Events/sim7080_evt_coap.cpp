@@ -21,11 +21,11 @@
 
 #if((CONFIG_SIMXX_DEV == 7080) && (defined CONFIG_SIM70XX_DRIVER_WITH_COAP))
 
-#include <esp_log.h>
-
 #include "sim7080.h"
 #include "sim7080_evt.h"
+
 #include "../../Core/Queue/sim70xx_queue.h"
+#include "../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
 
 static const char* TAG = "SIM7080_Evt_CoAP";
 

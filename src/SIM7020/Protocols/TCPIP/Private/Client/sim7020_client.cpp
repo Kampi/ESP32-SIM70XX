@@ -21,12 +21,11 @@
 
 #if((CONFIG_SIMXX_DEV == 7020) && (defined CONFIG_SIM70XX_DRIVER_WITH_TCPIP))
 
-#include <esp_log.h>
-#include <esp_task_wdt.h>
-
 #include "sim7020_client.h"
 #include "../../../../../Core/Queue/sim70xx_queue.h"
 #include "../../../../../Core/Commands/sim70xx_commands.h"
+
+#include "../../../../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
 
 static const char* TAG = "SIM7020_TCPIP_Client";
 
@@ -55,7 +54,7 @@ SIM70XX_Error_t SIM7020_Client_CreateSocket(SIM7020_t& p_Device, SIM7020_TCP_Typ
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CSOC(p_Socket->Domain, Type, p_Socket->Protocol, p_Socket->Internal.CID);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, p_Socket->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, p_Socket->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -67,7 +66,7 @@ SIM70XX_Error_t SIM7020_Client_CreateSocket(SIM7020_t& p_Device, SIM7020_TCP_Typ
     p_Socket->Internal.isCreated = true;
     p_Socket->Internal.isServer = false;
 
-    ESP_LOGD(TAG, "Socket %u created...", p_Socket->Internal.ID);
+    SIM70XX_LOGD(TAG, "Socket %u created...", p_Socket->Internal.ID);
 
     return SIM70XX_ERR_OK;    
 }
@@ -101,7 +100,7 @@ SIM70XX_Error_t SIM7020_Client_ConnectSocket(SIM7020_t& p_Device, SIM7020_TCPIP_
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CSOCON(p_Socket->Internal.ID, p_Socket->Port, p_Socket->IP);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, p_Socket->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, p_Socket->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -146,8 +145,6 @@ SIM70XX_Error_t SIM7020_Client_Transmit(SIM7020_t& p_Device, SIM7020_TCPIP_Socke
         uint16_t TransmissionSize;
         std::string Buffer_Hex;
 
-        esp_task_wdt_reset();
-
         if(BytesToTransmit > PacketSize)
         {
             TransmissionSize = PacketSize;
@@ -162,7 +159,7 @@ SIM70XX_Error_t SIM7020_Client_Transmit(SIM7020_t& p_Device, SIM7020_TCPIP_Socke
         SIM70XX_CREATE_CMD(Command);
         *Command = SIM7020_AT_CCSOSEND(p_Socket->Internal.ID, Buffer_Hex.size(), Buffer_Hex);
         SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-        if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+        if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
         {
             return SIM70XX_ERR_FAIL;
         }
@@ -211,7 +208,7 @@ SIM70XX_Error_t SIM7020_Client_Receive(SIM7020_t& p_Device, SIM7020_TCPIP_Socket
 
     while(SIM70XX_Queue_isEvent(p_Device.Internal.EventQueue, "+CSONMI: " + std::to_string(p_Socket->Internal.ID), &Response) == false);
 
-    ESP_LOGD(TAG, "Response: %s", Response.c_str());
+    SIM70XX_LOGD(TAG, "Response: %s", Response.c_str());
 
     // Get the index of the first delimiter.
     Index = Response.find(",");
@@ -257,7 +254,7 @@ SIM70XX_Error_t SIM7020_Client_DisconnectSocket(SIM7020_t& p_Device, SIM7020_TCP
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CSOCL(p_Socket->Internal.ID);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -291,7 +288,7 @@ SIM70XX_Error_t SIM7020_Client_DestroySocket(SIM7020_t& p_Device, SIM7020_TCPIP_
     {
         if((*it)->Internal.ID == p_Socket->Internal.ID)
         {
-            ESP_LOGI(TAG, "Delete socket: %u", p_Socket->Internal.ID);
+            SIM70XX_LOGI(TAG, "Delete socket: %u", p_Socket->Internal.ID);
 
             p_Device.TCP.Sockets.erase(it);
             break;

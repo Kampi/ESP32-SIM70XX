@@ -21,11 +21,11 @@
 
 #if((CONFIG_SIMXX_DEV == 7020) && (defined CONFIG_SIM70XX_DRIVER_WITH_TCPIP))
 
-#include <esp_log.h>
-
 #include "sim7020.h"
 #include "sim7020_tcpip.h"
 #include "Private/Server/sim7020_server.h"
+
+#include "../../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
 
 SIM70XX_Error_t SIM7020_TCP_Server_Create(SIM7020_t& p_Device, std::string IP, uint16_t Port, SIM7020_TCPIP_Socket_t* p_Socket)
 {

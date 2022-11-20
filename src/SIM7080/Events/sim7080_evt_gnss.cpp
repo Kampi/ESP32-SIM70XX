@@ -21,11 +21,11 @@
 
 #if((CONFIG_SIMXX_DEV == 7080) && (defined CONFIG_SIM70XX_DRIVER_WITH_GNSS))
 
-#include <esp_log.h>
-
 #include "sim7080.h"
 #include "sim7080_evt.h"
+
 #include "../../Core/Queue/sim70xx_queue.h"
+#include "../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
 
 static const char* TAG = "SIM7080_Evt_GNSS";
 
@@ -42,7 +42,7 @@ void SIM7080_Evt_on_GNSS(SIM7080_t* const p_Device, std::string* p_Message)
     // The device is in listening mode.
     else
     {
-        ESP_LOGI(TAG, "Add item to GNSS queue");
+        SIM70XX_LOGI(TAG, "Add item to GNSS queue");
 
         if(xQueueSend(p_Device->GNSS.EventQueue, &p_Message, 0) != pdPASS)
         {

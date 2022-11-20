@@ -42,34 +42,34 @@ void NTP_Run(DEVICE_TYPE& p_Device)
     struct tm NTP_Time;
     struct tm Local_Time;
 
-	ESP_LOGI(TAG, "Run NTP example...");
+	SIM70XX_LOGI(TAG, "Run NTP example...");
 
     memset(&NTP_Time, 0, sizeof(NTP_Time));
     memset(&Local_Time, 0, sizeof(Local_Time));
 
-    ESP_LOGI(TAG, "Sync time...");
+    SIM70XX_LOGI(TAG, "Sync time...");
     SIM70XX_NTP_Sync(p_Device, &NTP_Time);
-    ESP_LOGI(TAG, "     Seconds after the minute: %u", NTP_Time.tm_sec);
-    ESP_LOGI(TAG, "     Minutes after the hour: %u", NTP_Time.tm_min);
-    ESP_LOGI(TAG, "     Hours since midnight: %u", NTP_Time.tm_hour);
-    ESP_LOGI(TAG, "     Day of the month. %u", NTP_Time.tm_mday);
-    ESP_LOGI(TAG, "     Months since January: %u", NTP_Time.tm_mon);
-    ESP_LOGI(TAG, "     Years since 1900: %u", NTP_Time.tm_year);
-    ESP_LOGI(TAG, "     Days since Sunday: %u", NTP_Time.tm_wday);
-    ESP_LOGI(TAG, "     Days since January 1: %u", NTP_Time.tm_yday);
-    ESP_LOGI(TAG, "     Daylight Saving Time flag: %i", NTP_Time.tm_isdst);
+    SIM70XX_LOGI(TAG, "     Seconds after the minute: %u", NTP_Time.tm_sec);
+    SIM70XX_LOGI(TAG, "     Minutes after the hour: %u", NTP_Time.tm_min);
+    SIM70XX_LOGI(TAG, "     Hours since midnight: %u", NTP_Time.tm_hour);
+    SIM70XX_LOGI(TAG, "     Day of the month. %u", NTP_Time.tm_mday);
+    SIM70XX_LOGI(TAG, "     Months since January: %u", NTP_Time.tm_mon);
+    SIM70XX_LOGI(TAG, "     Years since 1900: %u", NTP_Time.tm_year);
+    SIM70XX_LOGI(TAG, "     Days since Sunday: %u", NTP_Time.tm_wday);
+    SIM70XX_LOGI(TAG, "     Days since January 1: %u", NTP_Time.tm_yday);
+    SIM70XX_LOGI(TAG, "     Daylight Saving Time flag: %i", NTP_Time.tm_isdst);
 
-    ESP_LOGI(TAG, "Read local time...");
+    SIM70XX_LOGI(TAG, "Read local time...");
     SIM70XX_NTP_Get(p_Device, &Local_Time);
-    ESP_LOGI(TAG, "     Seconds after the minute: %u", Local_Time.tm_sec);
-    ESP_LOGI(TAG, "     Minutes after the hour: %u", Local_Time.tm_min);
-    ESP_LOGI(TAG, "     Hours since midnight: %u", Local_Time.tm_hour);
-    ESP_LOGI(TAG, "     Day of the month. %u", Local_Time.tm_mday);
-    ESP_LOGI(TAG, "     Months since January: %u", Local_Time.tm_mon);
-    ESP_LOGI(TAG, "     Years since 1900: %u", Local_Time.tm_year);
-    ESP_LOGI(TAG, "     Days since Sunday: %u", Local_Time.tm_wday);
-    ESP_LOGI(TAG, "     Days since January 1: %u", Local_Time.tm_yday);
-    ESP_LOGI(TAG, "     Daylight Saving Time flag: %i", Local_Time.tm_isdst);
+    SIM70XX_LOGI(TAG, "     Seconds after the minute: %u", Local_Time.tm_sec);
+    SIM70XX_LOGI(TAG, "     Minutes after the hour: %u", Local_Time.tm_min);
+    SIM70XX_LOGI(TAG, "     Hours since midnight: %u", Local_Time.tm_hour);
+    SIM70XX_LOGI(TAG, "     Day of the month. %u", Local_Time.tm_mday);
+    SIM70XX_LOGI(TAG, "     Months since January: %u", Local_Time.tm_mon);
+    SIM70XX_LOGI(TAG, "     Years since 1900: %u", Local_Time.tm_year);
+    SIM70XX_LOGI(TAG, "     Days since Sunday: %u", Local_Time.tm_wday);
+    SIM70XX_LOGI(TAG, "     Days since January 1: %u", Local_Time.tm_yday);
+    SIM70XX_LOGI(TAG, "     Daylight Saving Time flag: %i", Local_Time.tm_isdst);
 }
 
 #endif

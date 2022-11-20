@@ -36,42 +36,42 @@
  */
 typedef enum
 {
-    SIM_BAUD_AUTO       = 0,                        /**< Automatic baudrate selection. */
-    SIM_BAUD_4800       = 4800,                     /**< Baud rate 4800. */
-    SIM_BAUD_9600       = 9600,                     /**< Baud rate 9600. */
-    SIM_BAUD_115200     = 115200,                   /**< Baud rate 115200. */
-    SIM_BAUD_230400     = 230400,                   /**< Baud rate 230400. */
-    SIM_BAUD_460800     = 460800,                   /**< Baud rate 460800. */
-    SIM_BAUD_921600     = 921600,                   /**< Baud rate 921600. */
+    SIM_BAUD_AUTO       = 0,                            /**< Automatic baudrate selection. */
+    SIM_BAUD_4800       = 4800,                         /**< Baud rate 4800. */
+    SIM_BAUD_9600       = 9600,                         /**< Baud rate 9600. */
+    SIM_BAUD_115200     = 115200,                       /**< Baud rate 115200. */
+    SIM_BAUD_230400     = 230400,                       /**< Baud rate 230400. */
+    SIM_BAUD_460800     = 460800,                       /**< Baud rate 460800. */
+    SIM_BAUD_921600     = 921600,                       /**< Baud rate 921600. */
 } SIM70XX_Baud_t;
 
 /** @brief SIM70XX operator statuses definition.
  */
 typedef enum
 {
-    SIM_OP_UNKNOWN      = 0,                        /**< Unknown operator. */
-    SIM_OP_AVAIL,                                   /**< Operator available. */
-    SIM_OP_CUR,                                     /**< Operator current. */
-    SIM_OP_FORBIDDEN,                               /**< Operator forbidden. */
+    SIM_OP_UNKNOWN      = 0,                            /**< Unknown operator. */
+    SIM_OP_AVAIL,                                       /**< Operator available. */
+    SIM_OP_CUR,                                         /**< Operator current. */
+    SIM_OP_FORBIDDEN,                                   /**< Operator forbidden. */
 } SIM70XX_OpStat_t;
 
 /** @brief SIM70XX operator formats definition.
  */
 typedef enum
 {
-    SIM_FORM_LONG       = 0,                        /**< Long format alphanumeric. */
-    SIM_FORM_SHORT,                                 /**< Short format alphanumeric. */
-    SIM_FORM_NUMERIC,                               /**< Numeric GSM Location Area Identification number. */
+    SIM_FORM_LONG       = 0,                            /**< Long format alphanumeric. */
+    SIM_FORM_SHORT,                                     /**< Short format alphanumeric. */
+    SIM_FORM_NUMERIC,                                   /**< Numeric GSM Location Area Identification number. */
 } SIM70XX_OpForm_t;
 
 /** @brief SIM70XX operator modes definition.
  */
 typedef enum
 {
-    SIM_MODE_AUTO       = 0,                        /**< Automatic mode. */
-    SIM_MODE_MANUAL,                                /**< Manual mode. */
-    SIM_MODE_DEREGISTER,                            /**< Deregister from network. */
-    SIM_MODE_BOTH       = 4,                        /**< Manual / Automatic. If manual fails, automatic mode is entered. */
+    SIM_MODE_AUTO       = 0,                            /**< Automatic mode. */
+    SIM_MODE_MANUAL,                                    /**< Manual mode. */
+    SIM_MODE_DEREGISTER,                                /**< Deregister from network. */
+    SIM_MODE_BOTH       = 4,                            /**< Manual / Automatic. If manual fails, automatic mode is entered. */
 } SIM70XX_OpMode_t;
 
 #ifdef CONFIG_SIM70XX_DRIVER_WITH_TCPIP
@@ -81,11 +81,11 @@ typedef enum
     {
         std::string IP;                                 /**< IP address of the remote host. */
         int Retries;                                    /**< The number of Ping Echo Request to send.
-                                                            NOTE: -1 will use the default value (4). Minimum 1, Maximum 100. */
+                                                             NOTE: -1 will use the default value (4). Minimum 1, Maximum 100. */
         int16_t DataLength;                             /**< The length of Ping Echo Request data.
-                                                            NOTE: -1 will use the default value (32). Minimum 0, Maximum 5120. */
+                                                             NOTE: -1 will use the default value (32). Minimum 0, Maximum 5120. */
         int16_t Timeout;                                /**< The timeout, in units of 100ms, waiting for a single Echo Reply.
-                                                            NOTE: -1 will use the default value (100). Minimum 0, Maximum 600. */
+                                                             NOTE: -1 will use the default value (100). Minimum 0, Maximum 600. */
     } SIM70XX_Ping_t;
 #endif
 
@@ -93,48 +93,50 @@ typedef enum
  */
 typedef struct
 {
-    std::string Name;                               /**< Name of the access point. */
-    std::string Username;                           /**< Access Point username. */
-    std::string Password;                           /**< Access Point password. */
+    std::string Name;                                   /**< Name of the access point. */
+    std::string Username;                               /**< Access Point username. */
+    std::string Password;                               /**< Access Point password. */
 } SIM70XX_APN_t;
 
 /** @brief SIM70XX signal quality report object definition.
  */
 typedef struct
 {
-    int8_t RSSI;                                    /**< Network RSSI value in dBm. */
-    uint8_t RXQual;                                 /**< RxQUAL values in the table in GSM 05.08 [20] subclause 7.2.4. */
+    int8_t RSSI;                                        /**< Network RSSI value in dBm. */
+    uint8_t RXQual;                                     /**< RxQUAL values in the table in GSM 05.08 [20] subclause 7.2.4. */
 } SIM70XX_Qual_t;
 
 /** @brief SIM70XX operator object definition.
  */
 typedef struct
 {
-    SIM70XX_OpStat_t Stat;                          /**< Operator status. */
-    SIM70XX_OpForm_t Format;                        /**< Used operator format. */
-    std::string Long;                               /**< Long alphanumeric name. */
-    std::string Short;                              /**< Short alphanumeric name. */
-    std::string Numeric;                            /**< Numeric name. */
-    uint8_t Act;                                    /**< 0 = User-specific GSM (SIM7080)
-                                                         1 = GSM compact (SIM7080)
-                                                         3 = GSM EGPRS (SIM7080)
-                                                         7 = User-specific LTE M1 A GB (SIM7080)
-                                                         9 = User-specific LTE NB S1 (SIM7080)
-                                                         9 = NB-IoT (SIM7020) */
+    SIM70XX_OpStat_t Stat;                              /**< Operator status. */
+    SIM70XX_OpForm_t Format;                            /**< Used operator format. */
+    std::string Long;                                   /**< Long alphanumeric name. */
+    std::string Short;                                  /**< Short alphanumeric name. */
+    std::string Numeric;                                /**< Numeric name. */
+    uint8_t Act;                                        /**< 0 = User-specific GSM (SIM7080)
+                                                             1 = GSM compact (SIM7080)
+                                                             3 = GSM EGPRS (SIM7080)
+                                                             7 = User-specific LTE M1 A GB (SIM7080)
+                                                             9 = User-specific LTE NB S1 (SIM7080)
+                                                             9 = NB-IoT (SIM7020) */
 } SIM70XX_Operator_t;
 
 /** @brief SIM70XX UART configuration object definition.
  */
 typedef struct
 {
-    gpio_num_t Rx;                                  /**< Rx pin number. */
-    gpio_num_t Tx;                                  /**< Tx pin number. */
-    uart_port_t Interface;                          /**< Serial interface used by the device SIM70XX driver. */
-    SemaphoreHandle_t Lock;                         /**< */
-    SIM70XX_Baud_t Baudrate;                        /**< Baud rate for the serial communication interface.
-                                                         NOTE: Managed by the device driver. */
-    bool isInitialized;                             /**< #true when the interface is initialized.
-                                                         NOTE: Managed by the device driver. */
+    gpio_num_t Rx;                                      /**< Rx pin number. */
+    gpio_num_t Tx;                                      /**< Tx pin number. */
+    uart_port_t Interface;                              /**< Serial interface used by the device SIM70XX driver. */
+    SemaphoreHandle_t Lock;                             /**< */
+    SIM70XX_Baud_t Baudrate;                            /**< Baud rate for the serial communication interface.
+                                                             NOTE: Managed by the device driver. */
+    TaskHandle_t TaskHandle;                            /**< Handle of the receive task.
+                                                             NOTE: Managed by the device driver. */
+    bool isInitialized;                                 /**< #true when the interface is initialized.
+                                                             NOTE: Managed by the device driver. */
 } SIM70XX_UART_Conf_t;
 
 #endif /* SIM70XX_DEFS_H_ */

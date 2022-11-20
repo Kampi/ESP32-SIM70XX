@@ -59,17 +59,17 @@ void UDP_Client_Run(DEVICE_TYPE& p_Device)
 {
     SIM70XX_Error_t Error;
 
-	ESP_LOGI(TAG, "Run UDP-Client example...");
+	SIM70XX_LOGI(TAG, "Run UDP-Client example...");
 
     SIMXX_RunPing(p_Device, &_UDP_Ping, &_UDP_PingResult);
     for(uint8_t i = 0; i < _UDP_PingResult.size(); i++)
     {
-        ESP_LOGI(TAG, "Result %u...", i + 1);
-        ESP_LOGI(TAG, "     IP: %s", _UDP_PingResult.at(i).IP.c_str());
-        ESP_LOGI(TAG, "     ReplyTime: %u", _UDP_PingResult.at(i).ReplyTime);
+        SIM70XX_LOGI(TAG, "Result %u...", i + 1);
+        SIM70XX_LOGI(TAG, "     IP: %s", _UDP_PingResult.at(i).IP.c_str());
+        SIM70XX_LOGI(TAG, "     ReplyTime: %u", _UDP_PingResult.at(i).ReplyTime);
     }
 
-    ESP_LOGI(TAG, "Connecting with UDP server: %s", std::string(CONFIG_DEMO_UDP_CLIENT_HOST).c_str());
+    SIM70XX_LOGI(TAG, "Connecting with UDP server: %s", std::string(CONFIG_DEMO_UDP_CLIENT_HOST).c_str());
 
     SIMXX_ClientCreate(p_Device, CONFIG_DEMO_UDP_CLIENT_HOST, CONFIG_DEMO_UDP_CLIENT_PORT, &_UDP_Socket);
     Error = SIMXX_ClientConnect(p_Device, &_UDP_Socket);
@@ -80,25 +80,25 @@ void UDP_Client_Run(DEVICE_TYPE& p_Device)
         Error = SIMXX_ClientTransmit(p_Device, &_UDP_Socket, Payload.c_str(), Payload.size());
         if(Error != SIM70XX_ERR_OK)
         {
-            ESP_LOGE(TAG, "Can not transmit payload! Error: 0x%X", Error);
+            SIM70XX_LOGE(TAG, "Can not transmit payload! Error: 0x%X", Error);
         }
 
         while(SIMXX_ClientIsDataAvailable(&_UDP_Socket) == false)
         {
-            ESP_LOGI(TAG, "Waiting for data...");
+            SIM70XX_LOGI(TAG, "Waiting for data...");
 
             vTaskDelay(1000 / portTICK_PERIOD_MS);
         }
 
         SIMXX_ClientReceive(p_Device, &_UDP_Socket, &Payload);
-        ESP_LOGI(TAG, "Response from server: %s", Payload.c_str());
+        SIM70XX_LOGI(TAG, "Response from server: %s", Payload.c_str());
 
         SIMXX_ClientDisconnect(p_Device, &_UDP_Socket);
         SIMXX_ClientDestroy(p_Device, &_UDP_Socket);
     }
     else
     {
-        ESP_LOGE(TAG, "Can not connect with server! Error: 0x%X", Error);
+        SIM70XX_LOGE(TAG, "Can not connect with server! Error: 0x%X", Error);
     }
 }
 

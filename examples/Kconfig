@@ -121,13 +121,6 @@ menu "Demo"
             bool "Enable the NVRAM demo"
 	endmenu
 
-	menu "SSL"
-	    depends on SIM70XX_DRIVER_WITH_SSL
-
-        config DEMO_USE_SSL
-            bool "Enable the SSL support for the demos"
-	endmenu
-
 	menu "MQTT"
 	    depends on SIM70XX_DRIVER_WITH_MQTT
 
@@ -201,6 +194,5 @@ menu "Demo"
         config DEMO_HTTP_ENDPOINT
 	        depends on DEMO_USE_HTTP
             string "Server endpoint"
-            default "/b9751a25-0f1b-4cd1-9161-b27b8958e2d6"
 	endmenu
 endmenu

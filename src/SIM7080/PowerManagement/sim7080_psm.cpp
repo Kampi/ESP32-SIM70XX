@@ -21,8 +21,6 @@
 
 #if(CONFIG_SIMXX_DEV == 7080)
 
-#include <esp_log.h>
-
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <freertos/event_groups.h>
@@ -31,13 +29,15 @@
 
 #include "sim7080.h"
 #include "sim7080_pwrmgnt.h"
+
 #include "../../Core/Queue/sim70xx_queue.h"
 #include "../../Core/Commands/sim70xx_commands.h"
+
 #include "../../Core/Arch/ESP32/GPIO/sim70xx_gpio.h"
+#include "../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
 
 SIM70XX_Error_t SIM7080_PSM_Init(SIM7080_t& p_Device)
 {
-    std::string Response;
     SIM70XX_TxCmd_t* Command;
 
     if(p_Device.Internal.isInitialized == false)
@@ -48,7 +48,7 @@ SIM70XX_Error_t SIM7080_PSM_Init(SIM7080_t& p_Device)
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CEREG_W(SIM7080_NETREG_PSM);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -57,21 +57,19 @@ SIM70XX_Error_t SIM7080_PSM_Init(SIM7080_t& p_Device)
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CEREG_R;
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    return SIM70XX_ERR_OK;
+    return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
 }
 
 SIM70XX_Error_t SIM7080_PSM_Enable(SIM7080_t& p_Device, SIM7080_PSM_TAU_t TAU_Base, uint8_t TAU_Value, SIM7080_PSM_Time_t Time_Base, uint8_t Time_Value)
 {
-    std::string Response;
     SIM70XX_TxCmd_t* Command;
 
-    if((TAU_Base > SIM7080_TAU_BASE_320_H) || (TAU_Value > 31) || (Time_Base > SIM7080_TIME_BASE_6_MINUTES) || (Time_Value > 31))
+    if((TAU_Base > SIM7080_TAU_BASE_320_H) || (TAU_Value > 31) || (Time_Base > SIM7080_TIME_BASE_6_M) || (Time_Value > 31))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
@@ -83,11 +81,11 @@ SIM70XX_Error_t SIM7080_PSM_Enable(SIM7080_t& p_Device, SIM7080_PSM_TAU_t TAU_Ba
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CPSMS(true, std::bitset<8>((TAU_Base << 5) | (TAU_Value & 0x1F)).to_string(), std::bitset<8>((Time_Base << 5) | (Time_Value & 0x1F)).to_string());
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
 
     p_Device.PwrMgnt.PSM.isEnabled = true;
 
@@ -96,17 +94,16 @@ SIM70XX_Error_t SIM7080_PSM_Enable(SIM7080_t& p_Device, SIM7080_PSM_TAU_t TAU_Ba
 
 SIM70XX_Error_t SIM7080_PSM_Disable(SIM7080_t& p_Device)
 {
-    std::string Response;
     SIM70XX_TxCmd_t* Command;
 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CPSMS(false, "00000000", "00000000");
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
 
     p_Device.PwrMgnt.PSM.isEnabled = false;
 
@@ -143,16 +140,6 @@ SIM70XX_Error_t SIM7080_PSM_GetOptimizations(SIM7080_t& p_Device, SIM7080_PSM_Mo
     // TODO
 
     return SIM70XX_ERR_OK;
-}
-
-bool SIM7080_PSM_isActive(SIM7080_t& p_Device)
-{
-    if(p_Device.PwrMgnt.PSM.isEnabled == false)
-    {
-        return false;
-    }
-
-    return p_Device.PwrMgnt.PSM.isActive;
 }
 
 #endif

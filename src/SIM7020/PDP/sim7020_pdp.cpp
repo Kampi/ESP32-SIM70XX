@@ -21,12 +21,13 @@
 
 #if(CONFIG_SIMXX_DEV == 7020)
 
-#include <esp_log.h>
-
 #include "sim7020.h"
 #include "sim7020_pdp_defs.h"
+
 #include "../../Core/Queue/sim70xx_queue.h"
 #include "../../Core/Commands/sim70xx_commands.h"
+
+#include "../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
 
 static const char* TAG = "SIM7020_PDP";
 
@@ -48,7 +49,7 @@ SIM70XX_Error_t SIM7020_PDP_GetContext(SIM7020_t& p_Device, SIM7020_PDP_Context_
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CGDCONT_R;
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -76,7 +77,7 @@ SIM70XX_Error_t SIM7020_PDP_Switch(SIM7020_t& p_Device, bool Enable, uint8_t Con
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CGACT_W(Context, Enable);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -101,7 +102,7 @@ SIM70XX_Error_t SIM7020_PDP_GetStatus(SIM7020_t& p_Device, std::vector<SIM7020_P
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CGACT_R;
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -148,7 +149,7 @@ SIM70XX_Error_t SIM7020_PDP_ReadDynamicParameters(SIM7020_t& p_Device, SIM7020_P
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_MCGDEFCONT_R;
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -175,7 +176,7 @@ SIM70XX_Error_t SIM7020_PDP_ReadDynamicParameters(SIM7020_t& p_Device, SIM7020_P
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CGCONTRDP;
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -209,12 +210,12 @@ SIM70XX_Error_t SIM7020_PDP_ReadDynamicParameters(SIM7020_t& p_Device, SIM7020_P
         p_Params->Subnet = Response;
     }
 
-    ESP_LOGD(TAG, "Type: %u", p_Params->Type);
-    ESP_LOGD(TAG, "IP: %s", p_Params->IP.c_str());
-    ESP_LOGD(TAG, "Subnet: %s", p_Params->Subnet.c_str());
-    ESP_LOGD(TAG, "Operator: %s", p_Params->APN.c_str());
-    ESP_LOGD(TAG, "CID: %u", p_Params->CID);
-    ESP_LOGD(TAG, "Baerer: %u", p_Params->Baerer);
+    SIM70XX_LOGD(TAG, "Type: %u", p_Params->Type);
+    SIM70XX_LOGD(TAG, "IP: %s", p_Params->IP.c_str());
+    SIM70XX_LOGD(TAG, "Subnet: %s", p_Params->Subnet.c_str());
+    SIM70XX_LOGD(TAG, "Operator: %s", p_Params->APN.c_str());
+    SIM70XX_LOGD(TAG, "CID: %u", p_Params->CID);
+    SIM70XX_LOGD(TAG, "Baerer: %u", p_Params->Baerer);
 
     return SIM70XX_ERR_OK;
 }

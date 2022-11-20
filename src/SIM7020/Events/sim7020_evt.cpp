@@ -21,10 +21,10 @@
 
 #if(CONFIG_SIMXX_DEV == 7020)
 
-#include <esp_log.h>
-
 #include "sim7020.h"
 #include "sim7020_evt.h"
+
+#include "../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
 
 static const char* TAG = "SIM7020_Evt";
 
@@ -40,10 +40,10 @@ void SIM70XX_Evt_MessageFilter(void* p_Device, std::string* p_Message)
 	// Shutdown message was received.
 	if(p_Message->find("NORMAL POWER DOWN") != std::string::npos)
 	{
-		Device->Internal.isActive = false;
-		Processed = true;
+		SIM70XX_LOGI(TAG, "Power down event!");
 
-		ESP_LOGI(TAG, "Power down event!");
+		Device->Internal.isInitialized = false;
+		Processed = true;
 	}
 
 	if(p_Message->find("EXIT PSM") != std::string::npos)
@@ -105,7 +105,6 @@ void SIM70XX_Evt_MessageFilter(void* p_Device, std::string* p_Message)
 		}
 
 		// Handle the HTTP data response.
-		// TODO: How process continious data?
 		if(p_Message->find("+CHTTPNMIC") != std::string::npos)
 		{
 			SIM7020_Evt_on_HTTP_Data(Device, p_Message);

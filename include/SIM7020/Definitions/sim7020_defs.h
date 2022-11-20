@@ -109,7 +109,21 @@ typedef enum
     SIM7020_NET_ROAMING,                                    /**< Registered, roaming. */
     SIM7020_NET_SMS_HOME,                                   /**< Registered for "SMS only", home network (applicable only when <Act> indicates E-UTRAN). */
     SIM7020_NET_SMS_ROAMING,                                /**< Registered for "SMS only", roaming network (applicable only when <Act> indicates E-UTRAN). */
-} SIM7020_NetRegistration_t;
+} SIM7020_NetReg_Status_t;
+
+/** @brief SIM7020 preferred network registration definitions.
+ */
+typedef enum
+{
+    SIM7020_NETREG_DISABLE  = 0,                            /**< Disable network registration unsolicited result code. */
+    SIM7020_NETREG_ENABLE   = 1,                            /**< Enable network registration unsolicited result code. */
+    SIM7020_NETREG_LOCATION = 2,                            /**< Enable network registration and location information unsolicited result code. */
+    SIM7020_NETREG_PSM      = 4,                            /**< For a UE that wants to apply PSM, enable network registration and
+                                                                 location information unsolicited result code. */
+    SIM7020_NETREG_PSM_EMM  = 5,                            /**< For a UE that wants to apply PSM, enable network registration,
+                                                                 location information and EMM cause value information unsolicited
+                                                                 result code. */
+} SIM7020_NetReg_t;
 
 /** @brief SIM7020 network status object definition.
  */
@@ -135,12 +149,9 @@ typedef struct
 typedef struct
 {
     SIM70XX_UART_Conf_t UART;                               /**< UART configuration object. */
-    std::vector<SIM70XX_Operator_t> Operators;              /**< */
-    std::string Modes;                                      /**< */
-    std::string Formats;                                    /**< */
     struct
     {
-        SIM7020_NetRegistration_t Status;                   /**< Network status. */
+        SIM7020_NetReg_t Status;                            /**< Network status. */
         SIM7020_Func_t Functionality;                       /**< Current device functionality. */
     } Connection;
     #ifdef CONFIG_SIM70XX_DRIVER_WITH_TCPIP
@@ -181,15 +192,19 @@ typedef struct
                                                                  NOTE: Managed by the device driver. */
         bool isInitialized;                                 /**< #true when the module is initialized and ready to use.
                                                                  NOTE: Managed by the device driver. */
-        bool isPSM;                                         /**< #true when the module has entered PSM.
-                                                                 NOTE: Managed by the device driver. */
-        bool isPSMEvent;                                    /**< #true when PSM event notifications are enabled.
-                                                                 NOTE: Managed by the device driver. */
-        bool isActive;                                      /**< #true when the device is active and ready to use.
-                                                                 NOTE: Managed by the device driver. */
-        TaskHandle_t TaskHandle;                            /**< Handle of the receive task.
-                                                                 NOTE: Managed by the device driver. */
     } Internal;
+    struct
+    {
+        struct
+        {
+            bool isEnabled;                                 /**< #true when PSM is enabled.
+                                                                 NOTE: Managed by the device driver. */
+            bool isActive;                                  /**< #true when PSM is is active.
+                                                                 NOTE: Managed by the device driver. */
+            bool isEventEnabled;                            /**< #true when PSM event notifications are enabled.
+                                                                 NOTE: Managed by the device driver. */
+        } PSM;
+    } PwrMgnt;
 } SIM7020_t;
 
 /** @brief SIM7020 device configuration object.

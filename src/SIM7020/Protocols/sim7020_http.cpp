@@ -21,14 +21,14 @@
 
 #if((CONFIG_SIMXX_DEV == 7020) && (defined CONFIG_SIM70XX_DRIVER_WITH_HTTP))
 
-#include <esp_log.h>
-
 #include "sim7020.h"
 #include "sim7020_http.h"
+
 #include "../../Core/Queue/sim70xx_queue.h"
 #include "../../Core/Commands/sim70xx_commands.h"
 
 #include "../../Core/Arch/ESP32/Timer/sim70xx_timer.h"
+#include "../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
 
 static const char* TAG = "SIM7020_HTTP";
 
@@ -80,7 +80,7 @@ SIM70XX_Error_t SIM7020_HTTP_Create(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CHTTPCREATE(p_Socket->Host);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, p_Socket->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, p_Socket->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -90,7 +90,7 @@ SIM70XX_Error_t SIM7020_HTTP_Create(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* 
     p_Socket->Internal.isCreated = true;
     p_Socket->Internal.ID = (uint8_t)SIM70XX_Tools_StringToUnsigned(Response);
 
-    ESP_LOGI(TAG, "Socket %u created...", p_Socket->Internal.ID);
+    SIM70XX_LOGI(TAG, "Socket %u created...", p_Socket->Internal.ID);
 
     return SIM70XX_ERR_OK;
 }
@@ -124,7 +124,7 @@ SIM70XX_Error_t SIM7020_HTTP_Connect(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t*
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CHTTCON(p_Socket->Internal.ID);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, p_Socket->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, p_Socket->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -136,7 +136,7 @@ SIM70XX_Error_t SIM7020_HTTP_Connect(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t*
     }
 
     // Everything okay. The socket is active now.
-    ESP_LOGI(TAG, "Socket %u opened...", p_Socket->Internal.ID);
+    SIM70XX_LOGI(TAG, "Socket %u opened...", p_Socket->Internal.ID);
 
     p_Device.HTTP.Sockets.push_back(p_Socket);
     p_Socket->Internal.isConnected = true;
@@ -209,6 +209,11 @@ SIM70XX_Error_t SIM7020_HTTP_POST(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CHTTPSENDEXT(CommandStr);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, p_Socket->Timeout) == false)
+    {
+        return SIM70XX_ERR_FAIL;
+    }
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
 
     // Transmit the data packets.
     isFirstPacket = true;
@@ -255,12 +260,17 @@ SIM70XX_Error_t SIM7020_HTTP_POST(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_
         SIM70XX_CREATE_CMD(Command);
         *Command = SIM7020_AT_CHTTPSENDEXT(CommandStr);
         SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+        if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, p_Socket->Timeout) == false)
+        {
+            return SIM70XX_ERR_FAIL;
+        }
+        SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
 
         Length_Temp -= BytesToTransmit;
         Buffer_Temp += BytesToTransmit;
 
         vTaskDelay(10 / portTICK_PERIOD_MS);
-    } while(Length_Temp != 0);
+    } while((Length_Temp != 0) && (p_Socket->Internal.isConnected == true));
 
     Now = SIM70XX_Timer_GetMilliseconds();
     while(SIM7020_HTTP_GetResponseItems(p_Socket) == 0)
@@ -275,8 +285,8 @@ SIM70XX_Error_t SIM7020_HTTP_POST(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_
 
     SIM70XX_ERROR_CHECK(SIM7020_HTTP_GetResponse(p_Device, p_Socket, &Response));
 
-    ESP_LOGI(TAG, "Got Response from server...");
-    ESP_LOGI(TAG, "     Response code: %u", Response.ResponseCode);
+    SIM70XX_LOGI(TAG, "Got Response from server...");
+    SIM70XX_LOGI(TAG, "     Response code: %u", Response.ResponseCode);
 
     if(p_Response != NULL)
     {
@@ -315,7 +325,7 @@ SIM70XX_Error_t SIM7020_HTTP_GET(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_S
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CHTTPSEND(CommandStr);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, p_Socket->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, p_Socket->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -377,7 +387,7 @@ SIM70XX_Error_t SIM7020_HTTP_Disconnect(SIM7020_t& p_Device, SIM7020_HTTP_Socket
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CHTTPDISCON(p_Socket->Internal.ID);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, p_Socket->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, p_Socket->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -401,7 +411,7 @@ SIM70XX_Error_t SIM7020_HTTP_Disconnect(SIM7020_t& p_Device, SIM7020_HTTP_Socket
 
     p_Socket->Internal.isConnected = false;
 
-    ESP_LOGI(TAG, "Socket %u closed...", p_Socket->Internal.ID);
+    SIM70XX_LOGI(TAG, "Socket %u closed...", p_Socket->Internal.ID);
 
     return SIM70XX_ERR_OK;
 }
@@ -427,13 +437,13 @@ SIM70XX_Error_t SIM7020_HTTP_Destroy(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t*
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CHTTPDESTROY(p_Socket->Internal.ID);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, p_Socket->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, p_Socket->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response, NULL));
 
-    ESP_LOGI(TAG, "Socket %u destroyed...", p_Socket->Internal.ID);
+    SIM70XX_LOGI(TAG, "Socket %u destroyed...", p_Socket->Internal.ID);
 
     return SIM70XX_ERR_OK;
 }

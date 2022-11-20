@@ -21,14 +21,14 @@
 
 #if((CONFIG_SIMXX_DEV == 7020) && (defined CONFIG_SIM70XX_DRIVER_WITH_TCPIP))
 
-#include <esp_log.h>
-
 #include <algorithm>
 
 #include "sim7020.h"
 #include "sim7020_tcpip.h"
 #include "../../../Core/Queue/sim70xx_queue.h"
 #include "../../../Core/Commands/sim70xx_commands.h"
+
+#include "../../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
 
 static const char* TAG = "SIM7020_TCPIP";
 
@@ -86,7 +86,7 @@ SIM70XX_Error_t SIM7020_TCPIP_Ping(SIM7020_t& p_Device, const SIM7020_Ping_t* co
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CIPPING(CommandStr);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -121,7 +121,7 @@ SIM70XX_Error_t SIM7020_TCPIP_Ping(SIM7020_t& p_Device, const SIM7020_Ping_t* co
 
                 Pings++;
 
-                ESP_LOGD(TAG, "Ping %u / %u", Pings, p_Config->Retries);
+                SIM70XX_LOGD(TAG, "Ping %u / %u", Pings, p_Config->Retries);
             } while(Response.find("+CIPPING") != std::string::npos);
         }
 

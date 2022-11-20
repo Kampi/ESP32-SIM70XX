@@ -21,12 +21,13 @@
 
 #if(CONFIG_SIMXX_DEV == 7080)
 
-#include <esp_log.h>
-
 #include "sim7080.h"
 #include "PDP/sim7080_pdp_defs.h"
+
 #include "../../Core/Queue/sim70xx_queue.h"
 #include "../../Core/Commands/sim70xx_commands.h"
+
+#include "../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
 
 SIM70XX_Error_t SIM7080_PDP_GPRS_Define(SIM7080_t& p_Device, SIM7080_PDP_GPRS_Type_t Type, SIM70XX_APN_t APN, uint8_t PDP)
 {
@@ -68,7 +69,7 @@ SIM70XX_Error_t SIM7080_PDP_GPRS_Define(SIM7080_t& p_Device, SIM7080_PDP_GPRS_Ty
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CGDCONT_W(CommandStr);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -96,7 +97,7 @@ bool SIM7080_PGP_GRPS_isAttached(SIM7080_t& p_Device)
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM70XX_AT_CGATT_R;
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if((SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false) || (SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response) != SIM70XX_ERR_OK))
+    if((SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false) || (SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response) != SIM70XX_ERR_OK))
     {
         return false;
     }

@@ -21,14 +21,15 @@
 
 #if((CONFIG_SIMXX_DEV == 7080) && (defined CONFIG_SIM70XX_DRIVER_WITH_TCPIP))
 
-#include <esp_log.h>
-
 #include <algorithm>
 
 #include "sim7080.h"
 #include "sim7080_tcpip.h"
+
 #include "../../../Core/Queue/sim70xx_queue.h"
 #include "../../../Core/Commands/sim70xx_commands.h"
+
+#include "../../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
 
 SIM70XX_Error_t SIM7080_TCPIP_Ping(SIM7080_t& p_Device, const SIM7080_Ping_t* const p_Config, std::vector<SIM7080_PingRes_t>* p_Result, bool IPv6)
 {
@@ -90,7 +91,7 @@ SIM70XX_Error_t SIM7080_TCPIP_Ping(SIM7080_t& p_Device, const SIM7080_Ping_t* co
     }
 
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }

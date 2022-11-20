@@ -51,7 +51,8 @@ void StartExamples(void)
 {
     if(SIM70XX_Tools_EnableModule(_Config.UART) == false)
     {
-        ESP_LOGE(TAG, "Can not enable module!");
+        SIM70XX_LOGE(TAG, "Can not enable module!");
+
 		return;
     }
 
@@ -77,22 +78,22 @@ void StartExamples(void)
                 {
                     for(uint8_t i = 0; i < Operators.size(); i++)
                     {
-                        ESP_LOGI(TAG, "Operator %u:", i + 1);
-                        ESP_LOGI(TAG, "     Status: %u", Operators.at(i).Stat);
-                        ESP_LOGI(TAG, "     Act: %u", Operators.at(i).Act);
-                        ESP_LOGI(TAG, "     Long: %s", Operators.at(i).Long.c_str());
-                        ESP_LOGI(TAG, "     Short: %s", Operators.at(i).Short.c_str());
-                        ESP_LOGI(TAG, "     Numeric: %s", Operators.at(i).Numeric.c_str());
+                        SIM70XX_LOGI(TAG, "Operator %u:", i + 1);
+                        SIM70XX_LOGI(TAG, "     Status: %u", Operators.at(i).Stat);
+                        SIM70XX_LOGI(TAG, "     Act: %u", Operators.at(i).Act);
+                        SIM70XX_LOGI(TAG, "     Long: %s", Operators.at(i).Long.c_str());
+                        SIM70XX_LOGI(TAG, "     Short: %s", Operators.at(i).Short.c_str());
+                        SIM70XX_LOGI(TAG, "     Numeric: %s", Operators.at(i).Numeric.c_str());
                     }
                 }
                 else
                 {
-                    ESP_LOGI(TAG, "No operators found!");
+                    SIM70XX_LOGI(TAG, "No operators found!");
                 }
             }
             else
             {
-                ESP_LOGE(TAG, "Can not read operators. Error: 0x%X", Error);
+                SIM70XX_LOGE(TAG, "Can not read operators. Error: 0x%X", Error);
             }
         #endif
 
@@ -121,7 +122,7 @@ void StartExamples(void)
             bool isActive;
 
             isActive = SIM7080_PSM_isActive(_Device);
-            ESP_LOGI(TAG, "PSM active: %u", isActive);
+            SIM70XX_LOGI(TAG, "PSM active: %u", isActive);
 
             if(isActive)
             {
@@ -131,7 +132,7 @@ void StartExamples(void)
             vTaskDelay(10000 / portTICK_PERIOD_MS);
         }
 */
-        ESP_LOGI(TAG, "Run the examples...");
+        SIM70XX_LOGI(TAG, "Run the examples...");
 
         #ifdef CONFIG_DEMO_USE_GNSS
             GNSS_Run(_Device);
@@ -182,6 +183,11 @@ void StartExamples(void)
             HTTP_Run(_Device);
         #endif
 
-        ESP_LOGI(TAG, "Done...");
+        SIM70XX_LOGI(TAG, "Done...");
+
+        while(true)
+        {
+            vTaskDelay(1000 / portTICK_PERIOD_MS);
+        }
     }
 }

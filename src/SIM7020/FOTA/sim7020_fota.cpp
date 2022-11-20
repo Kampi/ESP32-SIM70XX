@@ -21,13 +21,14 @@
 
 #if(CONFIG_SIMXX_DEV == 7020)
 
-#include <esp_log.h>
-
 #include "sim7020.h"
 #include "sim7020_fota.h"
+
 #include "../../Core/Queue/sim70xx_queue.h"
 #include "../../Core/Commands/sim70xx_commands.h"
+
 #include "../../Core/Arch/ESP32/Timer/sim70xx_timer.h"
+#include "../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
 
 static const char* TAG = "SIM7020_FOTA";
 
@@ -45,7 +46,7 @@ SIM70XX_Error_t SIM7020_FOTA_Start(SIM7020_t& p_Device, uint32_t Timeout)
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CFOTA(SIM7020_FOTA_DOWNLOAD_UPDATE);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -64,7 +65,7 @@ SIM70XX_Error_t SIM7020_FOTA_Start(SIM7020_t& p_Device, uint32_t Timeout)
 
     SIMXX_TOOLS_REMOVE_LINEEND(Response);
 
-    ESP_LOGI(TAG, "Response: %s", Response.c_str());
+    SIM70XX_LOGI(TAG, "Response: %s", Response.c_str());
 
     if(Response.find("No update package") != std::string::npos)
     {

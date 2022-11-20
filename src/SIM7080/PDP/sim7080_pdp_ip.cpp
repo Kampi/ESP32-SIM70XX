@@ -21,12 +21,13 @@
 
 #if(CONFIG_SIMXX_DEV == 7080)
 
-#include <esp_log.h>
-
 #include "sim7080.h"
 #include "sim7080_pdp_defs.h"
+
 #include "../../Core/Queue/sim70xx_queue.h"
 #include "../../Core/Commands/sim70xx_commands.h"
+
+#include "../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
 
 static const char* TAG = "SIM7080_PDP";
 
@@ -54,7 +55,7 @@ SIM70XX_Error_t SIM7080_PDP_IP_Configure(SIM7080_t& p_Device, SIM7080_PDP_IP_Typ
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CNCFG_W(CommandStr);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -78,7 +79,7 @@ SIM70XX_Error_t SIM7080_PDP_IP_Action(SIM7080_t& p_Device, uint8_t PDP, SIM7080_
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CNACT_W(PDP, Action);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -104,7 +105,7 @@ SIM70XX_Error_t SIM7080_PDP_IP_CheckNetworks(SIM7080_t& p_Device, std::vector<SI
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CNACT_R;
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }

@@ -21,13 +21,14 @@
 
 #if((CONFIG_SIMXX_DEV == 7020) && (defined CONFIG_SIM70XX_DRIVER_WITH_DNS))
 
-#include <esp_log.h>
-
 #include "sim7020.h"
 #include "sim7020_dns.h"
+
 #include "../../Core/Queue/sim70xx_queue.h"
 #include "../../Core/Commands/sim70xx_commands.h"
+
 #include "../../Core/Arch/ESP32/Timer/sim70xx_timer.h"
+#include "../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
 
 static const char* TAG = "SIM7020_DNS";
 
@@ -51,7 +52,7 @@ SIM70XX_Error_t SIM7020_DNS_FetchAddress(SIM7020_t& p_Device, std::string Host, 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CDNSGIP(Host);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -70,7 +71,7 @@ SIM70XX_Error_t SIM7020_DNS_FetchAddress(SIM7020_t& p_Device, std::string Host, 
 
     SIMXX_TOOLS_REMOVE_LINEEND(Response);
 
-    ESP_LOGD(TAG, "Response: %s", Response.c_str());
+    SIM70XX_LOGD(TAG, "Response: %s", Response.c_str());
 
     // Filter out the error code.
     Index = Response.find(",");
@@ -87,7 +88,7 @@ SIM70XX_Error_t SIM7020_DNS_FetchAddress(SIM7020_t& p_Device, std::string Host, 
         SIM70XX_Tools_StringRemove(&Response);
         *p_IP = Response;
 
-        ESP_LOGD(TAG, "IP: %s", p_IP->c_str());
+        SIM70XX_LOGD(TAG, "IP: %s", p_IP->c_str());
 
         return SIM70XX_ERR_OK;
     }
@@ -96,7 +97,7 @@ SIM70XX_Error_t SIM7020_DNS_FetchAddress(SIM7020_t& p_Device, std::string Host, 
     {
         DNS_Error = (SIM7020_DNS_Error_t)SIM70XX_Tools_StringToUnsigned(Response.substr(Index + 1));
 
-        ESP_LOGE(TAG, "DNS_Error: %u", DNS_Error);
+        SIM70XX_LOGE(TAG, "DNS_Error: %u", DNS_Error);
     }
 
     if (p_Error != NULL)
@@ -123,7 +124,7 @@ SIM70XX_Error_t SIM7020_DNS_SetIndex(SIM7020_t& p_Device, uint8_t Index)
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CDNSPDPID_W(Index);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -149,7 +150,7 @@ SIM70XX_Error_t SIM7020_DNS_GetIndex(SIM7020_t& p_Device, uint8_t* p_Index)
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CDNSPDPID_R;
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -172,7 +173,7 @@ SIM70XX_Error_t SIM7020_DNS_SetServer(SIM7020_t& p_Device, SIM7020_DNS_Server_t 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CDNSCFG_W(Server.Prim, Server.Sec);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -198,7 +199,7 @@ SIM70XX_Error_t SIM7020_DNS_GetServer(SIM7020_t& p_Device, SIM7020_DNS_Server_t*
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CDNSCFG_R;
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }

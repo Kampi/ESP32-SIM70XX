@@ -23,13 +23,35 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+/** @brief SIM7020 PSM Periodic-TAU definitions.
+ */
+typedef enum
+{
+    SIM7020_TAU_BASE_10_M = 0,                              /**< Base 10 minutes. */
+    SIM7020_TAU_BASE_1_H,                                   /**< Base 1 hour. */
+    SIM7020_TAU_BASE_10_H,                                  /**< Base 10 hours. */
+    SIM7020_TAU_BASE_2_S,                                   /**< Base 2 seconds. */
+    SIM7020_TAU_BASE_30_S,                                  /**< Base 30 seconds. */
+    SIM7020_TAU_BASE_1_M,                                   /**< Base 1 minute. */
+    SIM7020_TAU_BASE_320_H,                                 /**< Base 320 hours. */
+} SIM7020_PSM_TAU_t;
+
+/** @brief SIM7020 PSM Active-Time definitions.
+ */
+typedef enum
+{
+    SIM7020_TIME_BASE_2_S,                                  /**< Base 2 seconds. */
+    SIM7020_TIME_BASE_1_M,                                  /**< Base 1 minute. */
+    SIM7020_TIME_BASE_6_M,                                  /**< Base 320 hours. */
+} SIM7020_PSM_Time_t;
+
 /** @brief PSM enable mode definitions.
  */
 typedef enum
 {
-    SIM7020_PSM_DIS         = 0,                    /**< Disable the use of PSM. */
-    SIM7020_PSM_EN,                                 /**< Enable the use of PSM. */
-    SIM7020_PSM_DISC,                               /**< Disable the use of PSM and discard all parameters for PSM or, if available reset to the manufacturer specific default values. */
+    SIM7020_PSM_DISABLE     = 0,                            /**< Disable the use of PSM. */
+    SIM7020_PSM_ENABLE,                                     /**< Enable the use of PSM. */
+    SIM7020_PSM_DISCARD,                                    /**< Disable the use of PSM and discard all parameters for PSM or, if available reset to the manufacturer specific default values. */
 } SIM7020_PSM_Enable_t;
 
 #endif /* SIM7020_PWRMGNT_DEFS_H_ */

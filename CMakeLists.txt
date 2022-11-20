@@ -46,6 +46,7 @@ set(COMPONENT_SRCS
     "src/SIM7020/Protocols/TCPIP/sim7020_tcp_client.cpp"
     "src/SIM7020/Protocols/TCPIP/sim7020_tcp_server.cpp"
     "src/SIM7020/Protocols/TCPIP/sim7020_udp_client.cpp"
+    "src/SIM7020/PowerManagement/sim7020_psm.cpp"
     "src/SIM7020/PowerManagement/sim7020_pwrmgnt.cpp"
     "src/SIM7020/Misc/sim7020_info.cpp"
     "src/SIM7020/NVRAM/sim7020_nvram.cpp"

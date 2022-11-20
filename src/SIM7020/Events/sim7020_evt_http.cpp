@@ -21,11 +21,12 @@
 
 #if((CONFIG_SIMXX_DEV == 7020) && (defined CONFIG_SIM70XX_DRIVER_WITH_HTTP))
 
-#include <esp_log.h>
-
 #include "sim7020.h"
 #include "sim7020_evt.h"
+
 #include "../../Core/Queue/sim70xx_queue.h"
+
+#include "../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
 
 #include "../../Core/Arch/ESP32/UART/sim70xx_uart.h"
 
@@ -38,7 +39,7 @@ void SIM7020_Evt_on_HTTP_Error(SIM7020_t* const p_Device, std::string* p_Message
     SIM7020_HTTP_Error_t HTTP_Error;
     std::string Message;
 
-    ESP_LOGI(TAG, "HTTP error event!");
+    SIM70XX_LOGI(TAG, "HTTP error event!");
 
     // Remove the command and make a copy of the command response.
     Index = p_Message->find("+CHTTPERR: ");
@@ -61,8 +62,8 @@ void SIM7020_Evt_on_HTTP_Error(SIM7020_t* const p_Device, std::string* p_Message
         {
             (*it)->Internal.isConnected = false;
 
-            ESP_LOGD(TAG, "Disconnect socket %u", ID);
-            ESP_LOGD(TAG, "Error: %i", HTTP_Error);
+            SIM70XX_LOGD(TAG, "Disconnect socket %u", ID);
+            SIM70XX_LOGD(TAG, "Error: %i", HTTP_Error);
         }
     }
 }
@@ -76,7 +77,7 @@ void SIM7020_Evt_on_HTTP_Header(SIM7020_t* const p_Device, std::string* p_Messag
 
     Response = new SIM7020_HTTP_Response_t();
 
-    ESP_LOGI(TAG, "HTTP header event!");
+    SIM70XX_LOGI(TAG, "HTTP header event!");
 
     // Remove the command and make a copy of the command response.
     Index = p_Message->find("+CHTTPNMIH: ");
@@ -127,10 +128,10 @@ void SIM7020_Evt_on_HTTP_Header(SIM7020_t* const p_Device, std::string* p_Messag
         }
     } while(true);
 
-    ESP_LOGD(TAG, "ID: %u", Response->ID);
-    ESP_LOGD(TAG, "Header: %s", Response->Header.c_str());
-    ESP_LOGD(TAG, "Response code: %u", Response->ResponseCode);
-    ESP_LOGD(TAG, "Content: %s", Response->Content.c_str());
+    SIM70XX_LOGD(TAG, "ID: %u", Response->ID);
+    SIM70XX_LOGD(TAG, "Header: %s", Response->Header.c_str());
+    SIM70XX_LOGD(TAG, "Response code: %u", Response->ResponseCode);
+    SIM70XX_LOGD(TAG, "Content: %s", Response->Content.c_str());
 
     for(std::vector<SIM7020_HTTP_Socket_t*>::iterator it = p_Device->HTTP.Sockets.begin(); it != p_Device->HTTP.Sockets.end(); ++it)
     {

@@ -129,9 +129,8 @@ void StartExamples(void);
 #ifdef CONFIG_DEMO_USE_HTTP
     /** @brief          Run the HTTP(S) example.
      *  @param p_Device Pointer to device object
-     *  @param Path     Server endpoint
      */
-    void HTTP_Run(DEVICE_TYPE& p_Device, std::string Path = "/");
+    void HTTP_Run(DEVICE_TYPE& p_Device);
 #endif
 
 #endif /* EXAMPLE_H_ */

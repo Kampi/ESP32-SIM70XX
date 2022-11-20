@@ -21,13 +21,14 @@
 
 #if((CONFIG_SIMXX_DEV == 7020) && (defined CONFIG_SIM70XX_DRIVER_WITH_NTP))
 
-#include <esp_log.h>
-
 #include "sim7020.h"
 #include "sim7020_ntp.h"
+
 #include "../../Core/Queue/sim70xx_queue.h"
 #include "../../Core/Commands/sim70xx_commands.h"
+
 #include "../../Core/Arch/ESP32/Timer/sim70xx_timer.h"
+#include "../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
 
 static const char* TAG = "SIM7020_NTP";
 
@@ -52,7 +53,7 @@ SIM70XX_Error_t SIM7020_NTP_Sync(SIM7020_t& p_Device, std::string Server, int8_t
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CSNTPSTOP;
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout);
+    SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout);
     SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
 
     // Start a new request.
@@ -72,7 +73,7 @@ SIM70XX_Error_t SIM7020_NTP_Sync(SIM7020_t& p_Device, std::string Server, int8_t
     }
 
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -87,7 +88,7 @@ SIM70XX_Error_t SIM7020_NTP_Sync(SIM7020_t& p_Device, std::string Server, int8_t
             SIM70XX_CREATE_CMD(Command);
             *Command = SIM7020_AT_CSNTPSTOP;
             SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-            SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout);
+            SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout);
             SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
 
             return SIM70XX_ERR_TIMEOUT;
@@ -101,13 +102,13 @@ SIM70XX_Error_t SIM7020_NTP_Sync(SIM7020_t& p_Device, std::string Server, int8_t
     // Remove the command from the response.
     Response.replace(Response.find("+CSNTP:"), std::string("+CSNTP:").size(), "");
 
-    ESP_LOGD(TAG, "Response: %s", Response.c_str());
+    SIM70XX_LOGD(TAG, "Response: %s", Response.c_str());
 
     // Stop the NTP request.
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CSNTPSTOP;
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -137,7 +138,7 @@ SIM70XX_Error_t SIM7020_NTP_GetTime(SIM7020_t& p_Device, struct tm* p_Time, int8
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CCLK_R;
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -153,7 +154,7 @@ SIM70XX_Error_t SIM7020_NTP_GetTime(SIM7020_t& p_Device, struct tm* p_Time, int8
 
     // We have to add the year to the response to use the convert function from time.h properly.
     Response = "20" + Response;
-    ESP_LOGD(TAG, "Response: %s", Response.c_str());
+    SIM70XX_LOGD(TAG, "Response: %s", Response.c_str());
 
     strptime((char*)Response.c_str(), "%Y/%m/%d,%H:%M:%S", p_Time);
 

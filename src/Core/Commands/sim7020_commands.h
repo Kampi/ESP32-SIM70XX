@@ -32,6 +32,8 @@
 #define SIM7020_AT_COPS_W(Command)                              SIM70XX_CMD(Command, false, 300, 1)
 #define SIM7020_AT_COPS                                         SIM70XX_CMD("AT+COPS?", true, 10, 1)
 #define SIM7020_AT_COPS_R                                       SIM70XX_CMD("AT+COPS=?", true, 300, 1)
+#define SIM7020_AT_CEREG_W(ID)                                  SIM70XX_CMD("AT+CEREG=" + std::to_string(ID), false, 1, 1)
+#define SIM7020_AT_CEREG_R                                      SIM70XX_CMD("AT+CEREG?", true, 300, 1)
 #define SIM7020_AT_CPOWD(Urgently)                              SIM70XX_CMD("AT+CPOWD=" + std::to_string(Urgently), true, 1, 1)
 
 /**
@@ -80,8 +82,9 @@
  *
  */
 #define SIM7020_AT_RETENTION(Enable)                            SIM70XX_CMD("AT+RETENTION=" + std::to_string(Enable), false, 10, 1)
+#define SIM7020_AT_CPSMS(Enable, TAU, Active)                   SIM70XX_CMD("AT+CPSMS=" + std::to_string(Enable) + ",,,\"" + TAU + "\",\"" + Active + "\"", false, 1, 1)
 #define SIM7020_AT_CPSMS_DIS(Mode)                              SIM70XX_CMD("AT+CPSMS=" + std::to_string(Mode), false, 1, 1)
-#define SIM7020_AT_CPSMS_EN(TAU, Active)                        SIM70XX_CMD("AT+CPSMS=1,,,\"" + std::to_string(TAU) + "\",\"" + std::to_string(Active) + "\"", false, 1, 1)
+#define SIM7020_AT_CPSMS_R                                      SIM70XX_CMD("AT+CPSMS?", true, 1, 1)
 #define SIM7020_AT_CPSMSTATUS_W(Enable)                         SIM70XX_CMD("AT+CPSMSTATUS=" + std::to_string(Enable), false, 1, 1)
 #define SIM7020_AT_CPSMSTATUS_R                                 SIM70XX_CMD("AT+CPSMSTATUS?", true, 1, 1)
 

@@ -21,22 +21,23 @@
 
 #if(CONFIG_SIMXX_DEV == 7080)
 
-#include <esp_log.h>
-
 #include "sim7080.h"
+
 #include "../../Core/Queue/sim70xx_queue.h"
 #include "../../Core/Commands/sim70xx_commands.h"
+
+#include "../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
 
 static const char* TAG = "SIM7080_Info";
 
 void SIM7080_Info_Print(SIM7080_Info_t* const p_Info)
 {
-    ESP_LOGI(TAG, "Device information:");
-    ESP_LOGI(TAG, "     Manufacturer: %s", p_Info->Manufacturer.c_str());
-    ESP_LOGI(TAG, "     Firmware: %s", p_Info->Firmware.c_str());
-    ESP_LOGI(TAG, "     Model: %s", p_Info->Model.c_str());
-    ESP_LOGI(TAG, "     IMEI: %s",p_Info->IMEI.c_str());
-    ESP_LOGI(TAG, "     ICCID: %s", p_Info->ICCID.c_str());
+    SIM70XX_LOGI(TAG, "Device information:");
+    SIM70XX_LOGI(TAG, "     Manufacturer: %s", p_Info->Manufacturer.c_str());
+    SIM70XX_LOGI(TAG, "     Firmware: %s", p_Info->Firmware.c_str());
+    SIM70XX_LOGI(TAG, "     Model: %s", p_Info->Model.c_str());
+    SIM70XX_LOGI(TAG, "     IMEI: %s",p_Info->IMEI.c_str());
+    SIM70XX_LOGI(TAG, "     ICCID: %s", p_Info->ICCID.c_str());
 }
 
 SIM70XX_Error_t SIM7080_Info_GetDeviceInformation(SIM7080_t& p_Device, SIM7080_Info_t* const p_Info)
@@ -75,7 +76,7 @@ SIM70XX_Error_t SIM7080_Info_GetManufacturer(SIM7080_t& p_Device, std::string* c
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CGMI;
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout))
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout))
     {
         return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, p_Manufacturer);
     }
@@ -99,7 +100,7 @@ SIM70XX_Error_t SIM7080_Info_GetModel(SIM7080_t& p_Device, std::string* const p_
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CGMM;
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout))
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout))
     {
         return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, p_Model);
     }
@@ -123,7 +124,7 @@ SIM70XX_Error_t SIM7080_Info_GetFW(SIM7080_t& p_Device, std::string* const p_Fir
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CGMR;
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout))
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout))
     {
         return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, p_Firmware);
     }
@@ -147,7 +148,7 @@ SIM70XX_Error_t SIM7080_Info_GetIMEI(SIM7080_t& p_Device, std::string* const p_I
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CGSN;
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout))
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout))
     {
         return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, p_IMEI);
     }
@@ -171,7 +172,7 @@ SIM70XX_Error_t SIM7080_Info_GetICCID(SIM7080_t& p_Device, std::string* const p_
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CCID;
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout))
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout))
     {
         return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, p_ICCID);
     }
@@ -192,7 +193,7 @@ SIM70XX_Error_t SIM7080_Info_GetNetworkRegistrationStatus(SIM7080_t& p_Device)
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CGREG;
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -221,7 +222,7 @@ SIM70XX_Error_t SIM7080_Info_GetQuality(SIM7080_t& p_Device, SIM70XX_Qual_t* p_R
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CSQ;
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -261,8 +262,8 @@ SIM70XX_Error_t SIM7080_Info_GetQuality(SIM7080_t& p_Device, SIM70XX_Qual_t* p_R
         p_Report->RXQual = 0;
     }
 
-    ESP_LOGD(TAG, "RSSI: %u", p_Report->RSSI);
-    ESP_LOGD(TAG, "RXQual: %u", p_Report->RXQual);
+    SIM70XX_LOGD(TAG, "RSSI: %u", p_Report->RSSI);
+    SIM70XX_LOGD(TAG, "RXQual: %u", p_Report->RXQual);
 
     return SIM70XX_ERR_OK;
 }
@@ -284,13 +285,13 @@ SIM70XX_Error_t SIM7080_Info_GetEquipmentInfo(SIM7080_t& p_Device, SIM7080_UEInf
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CPSI;
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    ESP_LOGD(TAG, "Response: %s", Response.c_str());
+    SIM70XX_LOGD(TAG, "Response: %s", Response.c_str());
 
     if(Response.find("NO SERVICE") != std::string::npos)
     {

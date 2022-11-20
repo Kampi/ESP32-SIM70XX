@@ -21,14 +21,14 @@
 
 #if((CONFIG_SIMXX_DEV == 7080) && (defined CONFIG_SIM70XX_DRIVER_WITH_MQTT))
 
-#include <esp_log.h>
-#include <esp_task_wdt.h>
-
 #include "sim7080.h"
 #include "sim7080_mqtt.h"
-#include "../../Core/Arch/ESP32/UART/sim70xx_uart.h"
+
 #include "../../Core/Queue/sim70xx_queue.h"
 #include "../../Core/Commands/sim70xx_commands.h"
+
+#include "../../Core/Arch/ESP32/UART/sim70xx_uart.h"
+#include "../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
 
 static const char* TAG = "SIM7080_MQTT";
 
@@ -66,7 +66,7 @@ SIM70XX_Error_t SIM7080_MQTT_Create(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_SMCONF(CommandStr);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -76,7 +76,7 @@ SIM70XX_Error_t SIM7080_MQTT_Create(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_SMCONF(CommandStr);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -86,7 +86,7 @@ SIM70XX_Error_t SIM7080_MQTT_Create(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_SMCONF(CommandStr);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -96,7 +96,7 @@ SIM70XX_Error_t SIM7080_MQTT_Create(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_SMCONF(CommandStr);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -108,7 +108,7 @@ SIM70XX_Error_t SIM7080_MQTT_Create(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* 
         SIM70XX_CREATE_CMD(Command);
         *Command = SIM7080_AT_SMCONF(CommandStr);
         SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-        if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+        if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
         {
             return SIM70XX_ERR_FAIL;
         }
@@ -118,7 +118,7 @@ SIM70XX_Error_t SIM7080_MQTT_Create(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* 
         SIM70XX_CREATE_CMD(Command);
         *Command = SIM7080_AT_SMCONF(CommandStr);
         SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-        if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+        if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
         {
             return SIM70XX_ERR_FAIL;
         }
@@ -128,7 +128,7 @@ SIM70XX_Error_t SIM7080_MQTT_Create(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* 
         SIM70XX_CREATE_CMD(Command);
         *Command = SIM7080_AT_SMCONF(CommandStr);
         SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-        if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+        if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
         {
             return SIM70XX_ERR_FAIL;
         }
@@ -138,7 +138,7 @@ SIM70XX_Error_t SIM7080_MQTT_Create(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* 
         SIM70XX_CREATE_CMD(Command);
         *Command = SIM7080_AT_SMCONF(CommandStr);
         SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-        if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+        if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
         {
             return SIM70XX_ERR_FAIL;
         }
@@ -151,7 +151,7 @@ SIM70XX_Error_t SIM7080_MQTT_Create(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* 
         SIM70XX_CREATE_CMD(Command);
         *Command = SIM7080_AT_SMCONF(CommandStr);
         SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-        if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+        if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
         {
             return SIM70XX_ERR_FAIL;
         }
@@ -164,7 +164,7 @@ SIM70XX_Error_t SIM7080_MQTT_Create(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* 
         SIM70XX_CREATE_CMD(Command);
         *Command = SIM7080_AT_SMCONF(CommandStr);
         SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-        if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+        if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
         {
             return SIM70XX_ERR_FAIL;
         }
@@ -178,7 +178,7 @@ SIM70XX_Error_t SIM7080_MQTT_Create(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_SMCONF(CommandStr);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -213,7 +213,7 @@ SIM70XX_Error_t SIM7080_MQTT_Connect(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t*
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_SMCONN;
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -253,15 +253,13 @@ SIM70XX_Error_t SIM7080_MQTT_Publish(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t*
         return SIM70XX_ERR_NOT_CONNECTED;
     }
 
-    vTaskSuspend(p_Device.Internal.TaskHandle);
-    ESP_LOGI(TAG, "Total %u bytes to transmit...", Remaining);
+    vTaskSuspend(p_Device.UART.TaskHandle);
+    SIM70XX_LOGI(TAG, "Total %u bytes to transmit...", Remaining);
     RetryCounter = 0;
     do
     {
         uint32_t BytesToSend;
         std::string Response;
-
-        esp_task_wdt_reset();
 
         if(Remaining > PacketSize)
         {
@@ -272,7 +270,7 @@ SIM70XX_Error_t SIM7080_MQTT_Publish(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t*
             BytesToSend = Remaining;
         }
 
-        ESP_LOGI(TAG, "     Transmit %u bytes...", BytesToSend);
+        SIM70XX_LOGI(TAG, "     Transmit %u bytes...", BytesToSend);
 
         Command = SIM7080_AT_SMPUB(Topic, Length, QoS, Retained);
 
@@ -283,7 +281,7 @@ SIM70XX_Error_t SIM7080_MQTT_Publish(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t*
         Response = SIM70XX_UART_ReadStringUntil(p_Device.UART, ' ', Command.Timeout * 1000UL);
         if(Response.find(">") == std::string::npos)
         {
-            ESP_LOGE(TAG, "Invalid response. Expect '>', got: %s", Response.c_str());
+            SIM70XX_LOGE(TAG, "Invalid response. Expect '>', got: %s", Response.c_str());
 
             return SIM70XX_ERR_FAIL;
         }
@@ -322,7 +320,7 @@ SIM70XX_Error_t SIM7080_MQTT_Publish(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t*
             Remaining -= BytesToSend;
         }
     } while(Remaining > 0);
-    vTaskResume(p_Device.Internal.TaskHandle);
+    vTaskResume(p_Device.UART.TaskHandle);
 
     return Error;
 }
@@ -348,7 +346,7 @@ SIM70XX_Error_t SIM7080_MQTT_Subscribe(SIM7080_t& p_Device, SIM7080_MQTT_Socket_
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_SMSUB(Topic, QoS);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command); 
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -409,7 +407,7 @@ SIM70XX_Error_t SIM7080_MQTT_Unsubscribe(SIM7080_t& p_Device, SIM7080_MQTT_Socke
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_SMUNSUB(Topic);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -456,7 +454,7 @@ SIM70XX_Error_t SIM7080_MQTT_Disconnect(SIM7080_t& p_Device, SIM7080_MQTT_Socket
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_SMDISC;
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }

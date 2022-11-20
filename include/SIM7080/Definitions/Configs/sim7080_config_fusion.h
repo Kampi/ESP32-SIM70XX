@@ -26,25 +26,26 @@
  *  @param Pin_Rx   Rx pin for the serial interface
  *  @param Pin_Tx   Tx pin for the serial interface
  */
-#define SIM70XX_DEFAULT_CONF_FUSION(Serial, Baud, Pin_Rx, Pin_Tx)   {                                                                           \
-                                                                        .UART = {                                                               \
-                                                                            .Rx = Pin_Rx,                                                       \
-                                                                            .Tx = Pin_Tx,                                                       \
-                                                                            .Interface = Serial,                                                \
-                                                                            .Lock = NULL,                                                       \
-                                                                            .Baudrate = Baud,                                                   \
-                                                                            .isInitialized = false,                                             \
-                                                                        },                                                                      \
-                                                                        .Band = SIM7080_BAND_ALL,                                               \
-                                                                        .APN = {                                                                \
-                                                                            .Name = "m2m.fusion-iot.de",                                        \
-                                                                            .Username = "",                                                     \
-                                                                            .Password = "",                                                     \
-                                                                        },                                                                      \
-                                                                        .OperatorFormat = SIM_FORM_NUMERIC,                                     \
-                                                                        .Operator = "23201",                                                    \
-                                                                        .NetMode = SIM7080_NETMODE_LTE,                                         \
-                                                                        .Mode = SIM7080_MODE_BOTH,                                              \
-                                                                        .Bandlist = std::vector<uint8_t>(),                                     \
+#define SIM70XX_DEFAULT_CONF_FUSION(Serial, Baud, Pin_Rx, Pin_Tx)   {                                                       \
+                                                                        .UART = {                                           \
+                                                                            .Rx = Pin_Rx,                                   \
+                                                                            .Tx = Pin_Tx,                                   \
+                                                                            .Interface = Serial,                            \
+                                                                            .Lock = NULL,                                   \
+                                                                            .Baudrate = Baud,                               \
+                                                                            .TaskHandle = NULL,                             \
+                                                                            .isInitialized = false,                         \
+                                                                        },                                                  \
+                                                                        .Band = SIM7080_BAND_ALL,                           \
+                                                                        .APN = {                                            \
+                                                                            .Name = "m2m.fusion-iot.de",                    \
+                                                                            .Username = "",                                 \
+                                                                            .Password = "",                                 \
+                                                                        },                                                  \
+                                                                        .OperatorFormat = SIM_FORM_NUMERIC,                 \
+                                                                        .Operator = "23201",                                \
+                                                                        .NetMode = SIM7080_NETMODE_LTE,                     \
+                                                                        .Mode = SIM7080_MODE_BOTH,                          \
+                                                                        .Bandlist = std::vector<uint8_t>(),                 \
                                                                     };
 #endif /* SIM7080_CONFIG_FUSION_H_ */

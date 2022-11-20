@@ -1,5 +1,5 @@
  /*
- * sim70xx_gpio.cpp
+ * sim70xx_timer.cpp
  *
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -17,8 +17,6 @@
  * Errors and commissions should be reported to DanielKampert@kampis-elektroecke.de.
  */
 
-#include <esp_err.h>
-#include <esp_log.h>
 #include <esp_timer.h>
 
 #include "sim70xx_timer.h"

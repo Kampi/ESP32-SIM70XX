@@ -21,18 +21,19 @@
 
 #if(CONFIG_SIMXX_DEV == 7080)
 
-#include <esp_log.h>
-
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <freertos/event_groups.h>
 
 #include "sim7080.h"
 #include "sim7080_pwrmgnt.h"
+
 #include "../../Core/Queue/sim70xx_queue.h"
 #include "../../Core/Commands/sim70xx_commands.h"
+
 #include "../../Core/Arch/ESP32/GPIO/sim70xx_gpio.h"
 #include "../../Core/Arch/ESP32/Timer/sim70xx_timer.h"
+#include "../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
 
 SIM70XX_Error_t SIM7080_PwrMgnt_WakeUp(SIM7080_t& p_Device, uint8_t Timeout)
 {

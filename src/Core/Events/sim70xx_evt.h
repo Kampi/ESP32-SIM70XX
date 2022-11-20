@@ -20,10 +20,6 @@
 #ifndef SIM70XX_EVT_H_
 #define SIM70XX_EVT_H_
 
-#include <string>
-#include <stdint.h>
-#include <stdbool.h>
-
 #include <sdkconfig.h>
 
 #if(CONFIG_SIMXX_DEV == 7020)
@@ -39,10 +35,16 @@
 extern void SIM70XX_Evt_MessageFilter(void* p_Device, std::string* p_Message);
 
 /** @brief          Start the SIM70XX event task.
- *  @param p_Handle Pointer to task handle
+ *  @param p_Config Pointer to UART configuration
  *  @param p_Arg    Pointer to task arguments
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM70XX_Evt_StartTask(TaskHandle_t* p_Handle, void* p_Arg);
+SIM70XX_Error_t SIM70XX_Evt_StartTask(SIM70XX_UART_Conf_t& p_Config, void* p_Arg);
+
+/** @brief          Stop the SIM70XX event task.
+ *  @param p_Handle Pointer to task handle
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM70XX_Evt_StopTask(TaskHandle_t Handle);
 
 #endif /* SIM70XX_EVT_H_ */

@@ -59,7 +59,7 @@ void MQTT_Run(DEVICE_TYPE& p_Device, std::string SubTopic, std::string PubTopic)
 {
     SIM70XX_Error_t Error;
 
-	ESP_LOGI(TAG, "Run MQTT example...");
+	SIM70XX_LOGI(TAG, "Run MQTT example...");
 
     _MQTT_Socket.KeepAlive = 60;
     _MQTT_Socket.Broker = CONFIG_DEMO_MQTT_BROKER;
@@ -88,12 +88,12 @@ void MQTT_Run(DEVICE_TYPE& p_Device, std::string SubTopic, std::string PubTopic)
                     vTaskDelay(1000 / portTICK_PERIODE_MS);
                 }
 
-                ESP_LOGI(TAG, "Receive subscription...");
+                SIM70XX_LOGI(TAG, "Receive subscription...");
 
                 if(SIMXX_GetSubscription(&_MQTT_Socket, &_MQTT_Message) == SIM70XX_ERR_OK)
                 {
-                    ESP_LOGI(TAG, "Topic: %s", _MQTT_Message.Topic.c_str());
-                    ESP_LOGI(TAG, "Payload: %s", _MQTT_Message.Payload.c_str());
+                    SIM70XX_LOGI(TAG, "Topic: %s", _MQTT_Message.Topic.c_str());
+                    SIM70XX_LOGI(TAG, "Payload: %s", _MQTT_Message.Payload.c_str());
 
                     break;
                 }
@@ -106,14 +106,14 @@ void MQTT_Run(DEVICE_TYPE& p_Device, std::string SubTopic, std::string PubTopic)
         }
         else
         {
-            ESP_LOGE(TAG, "Can not connect socket! Error: 0x%X", Error);
+            SIM70XX_LOGE(TAG, "Can not connect socket! Error: 0x%X", Error);
         }
 
         SIMXX_Destroy(p_Device, &_MQTT_Socket);
     }
     else
     {
-        ESP_LOGE(TAG, "Can not create socket! Error: 0x%X", Error);
+        SIM70XX_LOGE(TAG, "Can not create socket! Error: 0x%X", Error);
     }
 }
 

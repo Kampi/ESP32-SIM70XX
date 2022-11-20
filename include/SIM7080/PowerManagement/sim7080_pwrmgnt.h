@@ -24,6 +24,15 @@
 #include "sim70xx_errors.h"
 #include "sim7080_pwrmgnt_defs.h"
 
+/** @brief          Check if the module has entered PSM.
+ *  @param p_Device SIM7080 device object
+ *  @return         #true when the device has entered PSM
+ */
+inline __attribute__((always_inline)) bool SIM7080_PSM_isActive(SIM7080_t& p_Device)
+{
+    return p_Device.PwrMgnt.PSM.isActive;
+}
+
 /** @brief          Initialize the PSM. Must be called before enabling PSM.
  *  @param p_Device SIM7080 device object
  *  @return         SIM70XX_ERR_OK when successful
@@ -59,12 +68,6 @@ SIM70XX_Error_t SIM7080_PSM_SetOptimizations(SIM7080_t& p_Device, SIM7080_PSM_Mo
  *  @return         SIM70XX_ERR_OK when successful
  */
 SIM70XX_Error_t SIM7080_PSM_GetOptimizations(SIM7080_t& p_Device, SIM7080_PSM_ModemOpts_t* p_Opts);
-
-/** @brief          Get the status of the PSM mode.
- *  @param p_Device SIM7080 device object
- *  @return         #true when PSM mode is active.
- */
-bool SIM7080_PSM_isActive(SIM7080_t& p_Device);
 
 /** @brief          Wake up the module.
  *  @param p_Device SIM7080 device object

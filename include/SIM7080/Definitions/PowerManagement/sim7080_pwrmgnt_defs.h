@@ -30,12 +30,12 @@
  */
 typedef enum
 {
-    SIM7080_TAU_BASE_10_MIN = 0,                            /**< Base 10 minutes. */
-    SIM7080_TAU_BASE_1_HOUR,                                /**< Base 1 hour. */
-    SIM7080_TAU_BASE_10_HOUR,                               /**< Base 10 hours. */
-    SIM7080_TAU_BASE_2_SEC,                                 /**< Base 2 seconds. */
-    SIM7080_TAU_BASE_30_SECONDS,                            /**< Base 30 seconds. */
-    SIM7080_TAU_BASE_1_MINUTE,                              /**< Base 1 minute. */
+    SIM7080_TAU_BASE_10_M = 0,                              /**< Base 10 minutes. */
+    SIM7080_TAU_BASE_1_H,                                   /**< Base 1 hour. */
+    SIM7080_TAU_BASE_10_H,                                  /**< Base 10 hours. */
+    SIM7080_TAU_BASE_2_S,                                   /**< Base 2 seconds. */
+    SIM7080_TAU_BASE_30_S,                                  /**< Base 30 seconds. */
+    SIM7080_TAU_BASE_1_M,                                   /**< Base 1 minute. */
     SIM7080_TAU_BASE_320_H,                                 /**< Base 320 hours. */
 } SIM7080_PSM_TAU_t;
 
@@ -43,9 +43,9 @@ typedef enum
  */
 typedef enum
 {
-    SIM7080_TIME_BASE_2_SECONDS,                            /**< Base 2 seconds. */
-    SIM7080_TIME_BASE_1_MINUTE,                             /**< Base 1 minute. */
-    SIM7080_TIME_BASE_6_MINUTES,                            /**< Base 320 hours. */
+    SIM7080_TIME_BASE_2_S,                                  /**< Base 2 seconds. */
+    SIM7080_TIME_BASE_1_M,                                  /**< Base 1 minute. */
+    SIM7080_TIME_BASE_6_M,                                  /**< Base 320 hours. */
 } SIM7080_PSM_Time_t;
 
 /** @brief SIM7080 PSM modem optimization object definition.

@@ -21,13 +21,14 @@
 
 #if((CONFIG_SIMXX_DEV == 7080) && (defined CONFIG_SIM70XX_DRIVER_WITH_GNSS))
 
-#include <esp_log.h>
-
 #include "sim7080.h"
 #include "sim7080_gnss.h"
+
 #include "../../Core/Queue/sim70xx_queue.h"
 #include "../../Core/Commands/sim70xx_commands.h"
+
 #include "../../Core/Arch/ESP32/Timer/sim70xx_timer.h"
+#include "../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
 
 static const char* TAG = "SIM7080_GNSS";
 
@@ -66,7 +67,7 @@ SIM70XX_Error_t SIM7080_GNSS_Config(SIM7080_t& p_Device, const SIM7080_GNSS_Conf
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_SGNSCFG("NMEATYPE", p_Config->NMEA);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_NOT_READY;
     }
@@ -75,7 +76,7 @@ SIM70XX_Error_t SIM7080_GNSS_Config(SIM7080_t& p_Device, const SIM7080_GNSS_Conf
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_SGNSCFG("OUTURC", p_Config->EnableURC);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_NOT_READY;
     }
@@ -84,7 +85,7 @@ SIM70XX_Error_t SIM7080_GNSS_Config(SIM7080_t& p_Device, const SIM7080_GNSS_Conf
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_SGNSCFG("ADSS", p_Config->ADSS);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_NOT_READY;
     }
@@ -93,7 +94,7 @@ SIM70XX_Error_t SIM7080_GNSS_Config(SIM7080_t& p_Device, const SIM7080_GNSS_Conf
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_SGNSCFG("MODE", p_Config->Network);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_NOT_READY;
     }
@@ -102,7 +103,7 @@ SIM70XX_Error_t SIM7080_GNSS_Config(SIM7080_t& p_Device, const SIM7080_GNSS_Conf
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_SGNSCFG("THRESHOLD", Threshold);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_NOT_READY;
     }
@@ -111,7 +112,7 @@ SIM70XX_Error_t SIM7080_GNSS_Config(SIM7080_t& p_Device, const SIM7080_GNSS_Conf
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_SGNSCFG("TIMEOUT", Timeout);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_NOT_READY;
     }
@@ -120,7 +121,7 @@ SIM70XX_Error_t SIM7080_GNSS_Config(SIM7080_t& p_Device, const SIM7080_GNSS_Conf
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_SGNSCFG("EXTRAINFO", p_Config->Flag);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_NOT_READY;
     }
@@ -140,7 +141,7 @@ SIM70XX_Error_t SIM7080_GNSS_ColdStart(SIM7080_t& p_Device)
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CGNSCOLD;
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_NOT_READY;
     }
@@ -159,7 +160,7 @@ SIM70XX_Error_t SIM7080_GNSS_WarmStart(SIM7080_t& p_Device)
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CGNSWARM;
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_NOT_READY;
     }
@@ -178,7 +179,7 @@ SIM70XX_Error_t SIM7080_GNSS_HotStart(SIM7080_t& p_Device)
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CGNSHOT;
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_NOT_READY;
     }
@@ -197,7 +198,7 @@ SIM70XX_Error_t SIM7080_GNSS_Enable(SIM7080_t& p_Device, bool Enable)
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CGNSPWR_W(Enable);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_NOT_READY;
     }
@@ -221,7 +222,7 @@ SIM70XX_Error_t SIM7080_GNSS_isEnabled(SIM7080_t& p_Device, bool* p_Enable)
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CGNSPWR_R;
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_NOT_READY;
     }
@@ -257,7 +258,7 @@ SIM70XX_Error_t SIM7080_GNSS_GetSingleLocation(SIM7080_t& p_Device, SIM7080_GNSS
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_SGNSCMD(std::string("AT+SGNSCMD=" + std::to_string(SIM7080_GNSS_MODE_ON_SINGLE) + "," + std::to_string(Power)));
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_NOT_READY;
     }
@@ -270,7 +271,7 @@ SIM70XX_Error_t SIM7080_GNSS_GetSingleLocation(SIM7080_t& p_Device, SIM7080_GNSS
 
         if(SIM70XX_Queue_isEvent(p_Device.Internal.EventQueue, "SGNSERR", &Event))
         {
-            ESP_LOGE(TAG, "GPS error");
+            SIM70XX_LOGE(TAG, "GPS error");
 
             break;
         }
@@ -322,7 +323,7 @@ SIM70XX_Error_t SIM7080_GNSS_GetNavInfo(SIM7080_t& p_Device, SIM7080_GNSS_Info_t
     SIM70XX_ERROR_CHECK(SIM7080_GNSS_isEnabled(p_Device, &Enabled));
     if(Enabled == false)
     {
-        ESP_LOGE(TAG, "GPS not enabled!");
+        SIM70XX_LOGE(TAG, "GPS not enabled!");
 
         return SIM70XX_ERR_INVALID_STATE;
     }
@@ -334,7 +335,7 @@ SIM70XX_Error_t SIM7080_GNSS_GetNavInfo(SIM7080_t& p_Device, SIM7080_GNSS_Info_t
         SIM70XX_CREATE_CMD(Command);
         *Command = SIM7080_AT_CGNSINF;
         SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-        if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+        if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
         {
             return SIM70XX_ERR_NOT_READY;
         }
@@ -345,7 +346,7 @@ SIM70XX_Error_t SIM7080_GNSS_GetNavInfo(SIM7080_t& p_Device, SIM7080_GNSS_Info_t
         {
             std::string Substring;
 
-            ESP_LOGI(TAG, "GPS enabled...");
+            SIM70XX_LOGI(TAG, "GPS enabled...");
 
             Substring = SIM70XX_Tools_SubstringSplitErase(&Response);
             if(Substring.size() > 0)
@@ -360,7 +361,7 @@ SIM70XX_Error_t SIM7080_GNSS_GetNavInfo(SIM7080_t& p_Device, SIM7080_GNSS_Info_t
             // Check if GPS is locked.
             if(Enabled)
             {
-                ESP_LOGI(TAG, "GPS locked...");
+                SIM70XX_LOGI(TAG, "GPS locked...");
 
                 p_Info->DateTime = SIM70XX_Tools_SubstringSplitErase(&Response);
                 p_Info->Latitude = SIM70XX_Tools_StringToFloat(SIM70XX_Tools_SubstringSplitErase(&Response));
@@ -394,12 +395,12 @@ SIM70XX_Error_t SIM7080_GNSS_GetNavInfo(SIM7080_t& p_Device, SIM7080_GNSS_Info_t
             }
             else
             {
-                ESP_LOGI(TAG, "GPS not locked...");
+                SIM70XX_LOGI(TAG, "GPS not locked...");
             }
         }
         else
         {
-            ESP_LOGI(TAG, "GPS not enabled...");
+            SIM70XX_LOGI(TAG, "GPS not enabled...");
         }
 
         if((SIM70XX_Timer_GetMilliseconds() - Now) > (Timeout * 1000UL))
@@ -425,7 +426,7 @@ SIM70XX_Error_t SIM7080_GNSS_Start(SIM7080_t& p_Device, SIM7080_GNSS_Accuracy_t 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_SGNSCMD(std::string("AT+SGNSCMD=" + std::to_string(SIM7080_GNSS_MODE_ON_CONT) + "," + std::to_string(minInterval) + "," + std::to_string(minDistance) + "," + std::to_string(Accuracy)));
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_NOT_READY;
     }
@@ -452,7 +453,7 @@ SIM70XX_Error_t SIM7080_GNSS_Stop(SIM7080_t& p_Device)
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_SGNSCMD(std::string("AT+SGNSCMD=" + std::to_string(SIM7080_GNSS_MODE_OFF)));
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_NOT_READY;
     }

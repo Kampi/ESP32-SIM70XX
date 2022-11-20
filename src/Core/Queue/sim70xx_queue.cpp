@@ -17,11 +17,11 @@
  * Errors and commissions should be reported to DanielKampert@kampis-elektroecke.de.
  */
 
-#include <esp_log.h>
-
 #include "sim70xx_queue.h"
 #include "sim70xx_tools.h"
+
 #include "../Arch/ESP32/Timer/sim70xx_timer.h"
+#include "../Arch/ESP32/Logging/sim70xx_logging.h"
 
 static const char* TAG = "SIM70XX_Queue";
 
@@ -43,32 +43,32 @@ SIM70XX_Error_t SIM70XX_Queue_PopItem(QueueHandle_t Queue, std::string* p_Respon
         return SIM70XX_ERR_QUEUE_EMPTY;
     }
 
-    ESP_LOGD(TAG, "Items in queue before: %u", MessagesInQueue);
+    SIM70XX_LOGD(TAG, "Items in queue before: %u", MessagesInQueue);
 
     Rx = new SIM70XX_CmdResp_t();
 
     // Get the next item from the queue.
     if(xQueueReceive(Queue, &Rx, portMAX_DELAY) != pdPASS)
     {
-        ESP_LOGE(TAG, "     Can not fetch item!");
+        SIM70XX_LOGE(TAG, "     Can not fetch item!");
 
         Error = SIM70XX_ERR_QUEUE_ERR;
         goto SIM7020_Wait_Exit;
     }
 
     MessagesInQueue = uxQueueMessagesWaiting(Queue);
-    ESP_LOGD(TAG, "Items in queue after: %u", MessagesInQueue);
+    SIM70XX_LOGD(TAG, "Items in queue after: %u", MessagesInQueue);
 
     if(Rx->isError)
     {
-        ESP_LOGE(TAG, "     Message error!");
+        SIM70XX_LOGE(TAG, "     Message error!");
 
         Error = SIM70XX_ERR_FAIL;
         goto SIM7020_Wait_Exit;
     }
     else if(Rx->isTimeout)
     {
-        ESP_LOGE(TAG, "     Message timeout!");
+        SIM70XX_LOGE(TAG, "     Message timeout!");
 
         Error = SIM70XX_ERR_TIMEOUT;
         goto SIM7020_Wait_Exit;
@@ -101,13 +101,13 @@ uint32_t SIM70XX_Queue_GetItems(QueueHandle_t Queue)
     return uxQueueMessagesWaiting(Queue);
 }
 
-bool SIM70XX_Queue_Wait(QueueHandle_t Queue, bool* p_Active, uint32_t Timeout)
+bool SIM70XX_Queue_Wait(QueueHandle_t Queue, uint32_t Timeout)
 {
     uint32_t Now;
     uint32_t ItemsInQueue;
     uint32_t Timeout_Temp;
 
-    if((Queue == NULL) || (p_Active == NULL))
+    if(Queue == NULL)
     {
         return false;
     }
@@ -118,11 +118,11 @@ bool SIM70XX_Queue_Wait(QueueHandle_t Queue, bool* p_Active, uint32_t Timeout)
     do
     {
         ItemsInQueue = uxQueueMessagesWaiting(Queue);
-        ESP_LOGD(TAG, "Items in queue: %u", ItemsInQueue);
+        SIM70XX_LOGD(TAG, "Items in queue: %u", ItemsInQueue);
 
-        if(((Timeout != 0) && ((SIM70XX_Timer_GetMilliseconds() - Now) > Timeout_Temp)) || (*p_Active == false))
+        if((Timeout != 0) && ((SIM70XX_Timer_GetMilliseconds() - Now) > Timeout_Temp))
         {
-            ESP_LOGE(TAG, "Qeueue timeout");
+            SIM70XX_LOGE(TAG, "Qeueue timeout");
 
             // Something has gone wrong. Clear the queue.
             xQueueReset(Queue);

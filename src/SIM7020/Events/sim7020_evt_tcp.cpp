@@ -21,11 +21,12 @@
 
 #if((CONFIG_SIMXX_DEV == 7020) && (defined CONFIG_SIM70XX_DRIVER_WITH_TCPIP))
 
-#include <esp_log.h>
-
 #include "sim7020.h"
 #include "sim7020_evt.h"
+
 #include "../../Core/Queue/sim70xx_queue.h"
+
+#include "../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
 
 static const char* TAG = "SIM7020_Evt_TCP";
 
@@ -35,7 +36,7 @@ void SIM7020_Evt_on_TCP_Disconnect(SIM7020_t* const p_Device, std::string* p_Mes
     size_t Index;
     SIM7020_TCP_Error_t TCP_Error;
 
-    ESP_LOGI(TAG, "TCP disconnect event!");
+    SIM70XX_LOGI(TAG, "TCP disconnect event!");
 
     Index = p_Message->find("+CSOERR");
     if(Index == std::string::npos)
@@ -54,8 +55,8 @@ void SIM7020_Evt_on_TCP_Disconnect(SIM7020_t* const p_Device, std::string* p_Mes
         {
             (*it)->Internal.isConnected = false;
 
-            ESP_LOGI(TAG, "Disconnect socket %u", ID);
-            ESP_LOGI(TAG, "Error: %i", TCP_Error);
+            SIM70XX_LOGI(TAG, "Disconnect socket %u", ID);
+            SIM70XX_LOGI(TAG, "Error: %i", TCP_Error);
         }
     }
 }
@@ -65,7 +66,7 @@ void SIM7020_Evt_on_TCP_Data(SIM7020_t* const p_Device, std::string* p_Message)
     uint8_t ID;
     size_t Index;
 
-    ESP_LOGD(TAG, "TCP message data event!");
+    SIM70XX_LOGD(TAG, "TCP message data event!");
 
     Index = p_Message->find("+CSONMI");
     if(Index == std::string::npos)
@@ -80,7 +81,7 @@ void SIM7020_Evt_on_TCP_Data(SIM7020_t* const p_Device, std::string* p_Message)
     {
         if((*it)->Internal.ID == ID)
         {
-            ESP_LOGI(TAG, "Data received for socket: %u", ID);
+            SIM70XX_LOGI(TAG, "Data received for socket: %u", ID);
 
             (*it)->Internal.isDataReceived = true;
         }

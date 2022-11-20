@@ -22,32 +22,46 @@
 
 #include "sim7020_defs.h"
 #include "sim70xx_errors.h"
-#include "PowerManagement/sim7020_pwrmgnt_defs.h"
+#include "sim7020_pwrmgnt_defs.h"
 
-/** @brief              Enable the power saving mode (PSM).
+/** @brief          Check if the module has entered PSM.
+ *  @param p_Device SIM7020 device object
+ *  @return         #true when the device has entered PSM
+ */
+inline __attribute__((always_inline)) bool SIM7020_PSM_isActive(SIM7020_t& p_Device)
+{
+    return p_Device.PwrMgnt.PSM.isActive;
+}
+
+/** @brief          Initialize the PSM. Must be called before enabling PSM.
+ *  @param p_Device SIM7020 device object
+ *  @param NetReg   (Optional) Network registration options for the PSM.
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7020_PSM_Init(SIM7020_t& p_Device, SIM7020_NetReg_t NetReg = SIM7020_NETREG_PSM);
+
+/** @brief              Enable PSM.
  *  @param p_Device     SIM7020 device object
- *  @param Base_T       TAU base (T3412)
- *  @param Value_T      TAU value (T3412)
- *  @param Base_A       Active Time base (T3324)
- *  @param Value_A      Active Time value (T3324)
- *  @param UseRetention (Optional) Use socket scene retention
+ *  @param TAU_Base     Periodic-TAU base value
+ *  @param TAU_Value    Periodic-TAU value
+ *  @param Active_Base  Active-Time base value
+ *  @param Active_Value Active-Time value
  *  @return             SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_PSM_Enable(SIM7020_t& p_Device, uint8_t Base_T, uint8_t Value_T, uint8_t Base_A, uint8_t Value_A, bool UseRetention = false);
+SIM70XX_Error_t SIM7020_PSM_Enable(SIM7020_t& p_Device, SIM7020_PSM_TAU_t TAU_Base, uint8_t TAU_Value, SIM7020_PSM_Time_t Time_Base, uint8_t Time_Value);
 
-/** @brief          Disable the power saving mode (PSM).
+/** @brief          Disable PSM.
  *  @param p_Device SIM7020 device object
- *  @param Mode     PSM mode
+ *  @param Mode     (Optional) PSM disable mode
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_PSM_Disable(SIM7020_t& p_Device, SIM7020_PSM_Enable_t Mode);
+SIM70XX_Error_t SIM7020_PSM_Disable(SIM7020_t& p_Device, SIM7020_PSM_Enable_t Mode = SIM7020_PSM_DISABLE);
 
-/** @brief          Get the current power saving mode (PSM).
+/** @brief          Get the current PSM status from the modem.
  *  @param p_Device SIM7020 device object
- *  @param p_Mode   Pointer to PSM mode
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_PSM_GetMode(SIM7020_t& p_Device, SIM7020_PSM_Enable_t* p_Mode);
+SIM70XX_Error_t SIM7020_PSM_GetStatus(SIM7020_t& p_Device, bool* p_Status);
 
 /** @brief          Get the status of the PSM event notifications.
  *  @param p_Device SIM7020 device object
@@ -62,5 +76,12 @@ SIM70XX_Error_t SIM7020_PSM_GetEventStatus(SIM7020_t& p_Device, bool* p_Enable);
  *  @return         SIM70XX_ERR_OK when successful
  */
 SIM70XX_Error_t SIM7020_PSM_SetEventStatus(SIM7020_t& p_Device, bool Enable);
+
+/** @brief          Wake up the module.
+ *  @param p_Device SIM7020 device object
+ *  @param Timeout  (Optional) Timeout in seconds
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7020_PwrMgnt_WakeUp(SIM7020_t& p_Device, uint8_t Timeout = 10);
 
 #endif /* SIM7020_PWRMGNT_H_ */

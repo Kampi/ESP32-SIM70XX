@@ -101,6 +101,7 @@
  */
 #define SIM7080_AT_CPSMSTATUS(Enable)                           SIM70XX_CMD("AT+CPSMSTATUS=" + std::to_string(Enable), false, 1, 1)
 #define SIM7080_AT_CPSMS(Enable, TAU, Active)                   SIM70XX_CMD("AT+CPSMS=" + std::to_string(Enable) + ",,,\"" + TAU + "\",\"" + Active + "\"", false, 1, 1)
+
 /**
  *
  * Used in SIM7080 SSL driver.

@@ -21,10 +21,10 @@
 
 #if(CONFIG_SIMXX_DEV == 7080)
 
-#include <esp_log.h>
-
 #include "sim7080.h"
 #include "sim7080_evt.h"
+
+#include "../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
 
 static const char* TAG = "SIM7080_Event";
 
@@ -40,16 +40,16 @@ void SIM70XX_Evt_MessageFilter(void* p_Device, std::string* p_Message)
 	// Shutdown message was received.
 	if(p_Message->find("NORMAL POWER DOWN") != std::string::npos)
 	{
-		ESP_LOGI(TAG, "Power down event!");
+		SIM70XX_LOGI(TAG, "Power down event!");
 
-		Device->Internal.isActive = false;
+		Device->Internal.isInitialized = false;
 		Processed = true;
 	}
 
 	// PSM related events.
 	if(p_Message->find("+CPSMSTATUS") != std::string::npos)
 	{
-		ESP_LOGI(TAG, "PSM event!");
+		SIM70XX_LOGI(TAG, "PSM event!");
 
 		SIM7080_Evt_on_PSM(Device, p_Message);
 		Processed = true;
@@ -58,7 +58,7 @@ void SIM70XX_Evt_MessageFilter(void* p_Device, std::string* p_Message)
 	#ifdef CONFIG_SIM70XX_DRIVER_WITH_GNSS
 		if(p_Message->find("+SGNSCMD") != std::string::npos)
 		{
-			ESP_LOGI(TAG, "GNSS event!");
+			SIM70XX_LOGI(TAG, "GNSS event!");
 
 			SIM7080_Evt_on_GNSS(Device, p_Message);
 		}

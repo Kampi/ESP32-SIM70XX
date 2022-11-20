@@ -21,12 +21,12 @@
 
 #if((CONFIG_SIMXX_DEV == 7020) && (defined CONFIG_SIM70XX_DRIVER_WITH_COAP))
 
-#include <esp_log.h>
-
 #include "sim7020.h"
 #include "sim7020_coap.h"
+
 #include "../../Core/Queue/sim70xx_queue.h"
 #include "../../Core/Commands/sim70xx_commands.h"
+#include "../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
 
 static const char* TAG = "SIM7020_CoAP";
 
@@ -64,17 +64,17 @@ SIM70XX_Error_t SIM7020_CoAP_Create(SIM7020_t& p_Device, SIM7020_CoAP_Socket_t* 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CCOAPNEW(CommandStr);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    ESP_LOGI(TAG, "Response: %s", Response.c_str());
+    SIM70XX_LOGI(TAG, "Response: %s", Response.c_str());
     p_Socket->Internal.ID = (uint8_t)SIM70XX_Tools_StringToUnsigned(Response);
 
     // Everything okay. The socket is active now.
-    ESP_LOGI(TAG, "Socket %u opened...", p_Socket->Internal.ID);
+    SIM70XX_LOGI(TAG, "Socket %u opened...", p_Socket->Internal.ID);
 
     p_Device.CoAP.Sockets.push_back(p_Socket);
     p_Socket->Internal.isCreated = true;
@@ -107,7 +107,7 @@ SIM70XX_Error_t SIM7020_CoAP_Transmit(SIM7020_t& p_Device, SIM7020_CoAP_Socket_t
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CCOAPCSEND(CommandStr);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -155,7 +155,7 @@ SIM70XX_Error_t SIM7020_CoAP_Transmit(SIM7020_t& p_Device, SIM7020_CoAP_Socket_t
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CCOAPCSEND(CommandStr);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -190,7 +190,7 @@ SIM70XX_Error_t SIM7020_CoAP_Receive(SIM7020_t& p_Device, SIM7020_CoAP_Socket_t*
 
     while(SIM70XX_Queue_isEvent(p_Device.Internal.EventQueue, "+CCOAPNMI: " + std::to_string(p_Socket->Internal.ID), &Response) == false);
 
-    ESP_LOGI(TAG, "Response: %s", Response.c_str());
+    SIM70XX_LOGI(TAG, "Response: %s", Response.c_str());
 
     // Get the index of the first delimiter.
     Index = Response.find(",");
@@ -230,7 +230,7 @@ SIM70XX_Error_t SIM7020_CoAP_Destroy(SIM7020_t& p_Device, SIM7020_CoAP_Socket_t*
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CCOAPDEL(p_Socket->Internal.ID);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }

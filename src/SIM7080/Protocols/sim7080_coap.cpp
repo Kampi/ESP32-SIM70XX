@@ -21,12 +21,13 @@
 
 #if((CONFIG_SIMXX_DEV == 7080) && (defined CONFIG_SIM70XX_DRIVER_WITH_COAP))
 
-#include <esp_log.h>
-
 #include "sim7080.h"
 #include "sim7080_coap.h"
+
 #include "../../Core/Queue/sim70xx_queue.h"
 #include "../../Core/Commands/sim70xx_commands.h"
+
+#include "../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
 
 static const char* TAG = "SIM7080_CoAP";
 
@@ -65,7 +66,7 @@ SIM70XX_Error_t SIM7080_CoAP_Create(SIM7080_t& p_Device, SIM7080_CoAP_Socket_t* 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CCOAPINIT;
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -74,14 +75,14 @@ SIM70XX_Error_t SIM7080_CoAP_Create(SIM7080_t& p_Device, SIM7080_CoAP_Socket_t* 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CCOAPURL(p_Socket->Server, p_Socket->Port);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
 
     // Everything okay. The socket is active now.
-    ESP_LOGI(TAG, "Socket opened...");
+    SIM70XX_LOGI(TAG, "Socket opened...");
 
     p_Device.CoAP.Socket = p_Socket;
     p_Socket->Internal.isCreated = true;
@@ -131,7 +132,7 @@ SIM70XX_Error_t SIM7080_CoAP_Destroy(SIM7080_t& p_Device, SIM7080_CoAP_Socket_t*
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_CCOAPTERM;
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }

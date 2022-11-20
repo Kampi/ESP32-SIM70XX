@@ -20,8 +20,8 @@
 #ifndef SIM70XX_UART_H_
 #define SIM70XX_UART_H_
 
-#include <stdint.h>
 #include <string>
+#include <stdint.h>
 
 #include "sim70xx_defs.h"
 #include "sim70xx_errors.h"

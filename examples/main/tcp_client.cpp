@@ -97,30 +97,30 @@ void TCP_Client_Run_FormData(DEVICE_TYPE& p_Device, bool IncludeImage)
     std::string Response;
     SIM70XX_Error_t Error;
 
-	ESP_LOGI(TAG, "Run TCP-Client example...");
+	SIM70XX_LOGI(TAG, "Run TCP-Client example...");
 
     Error = SIMXX_RunPing(p_Device, &_TCP_Ping, &_TCP_PingResult);
     if(Error != SIM70XX_ERR_OK)
     {
-        ESP_LOGE(TAG, "Can not ping server! Error: 0x%X", Error);
+        SIM70XX_LOGE(TAG, "Can not ping server! Error: 0x%X", Error);
         return;
     }
 
     Error = SIMXX_ParseDNS(p_Device, _TCP_Ping.Host, &_TCP_DNS_IP);
     if(Error != SIM70XX_ERR_OK)
     {
-        ESP_LOGE(TAG, "Can not fetch IP address! Error: 0x%X", Error);
+        SIM70XX_LOGE(TAG, "Can not fetch IP address! Error: 0x%X", Error);
         return;
     }
 
     for(uint8_t i = 0; i < _TCP_PingResult.size(); i++)
     {
-        ESP_LOGI(TAG, "Result %u...", i + 1);
-        ESP_LOGI(TAG, "     IP: %s", _TCP_PingResult.at(i).IP.c_str());
-        ESP_LOGI(TAG, "     ReplyTime: %u", _TCP_PingResult.at(i).ReplyTime);
+        SIM70XX_LOGI(TAG, "Result %u...", i + 1);
+        SIM70XX_LOGI(TAG, "     IP: %s", _TCP_PingResult.at(i).IP.c_str());
+        SIM70XX_LOGI(TAG, "     ReplyTime: %u", _TCP_PingResult.at(i).ReplyTime);
     }
 
-    ESP_LOGI(TAG, "Connecting with TCP server: %s", _TCP_DNS_IP.c_str());
+    SIM70XX_LOGI(TAG, "Connecting with TCP server: %s", _TCP_DNS_IP.c_str());
 
     Footer = "--" + std::string(Boundary) + "--\r\n";
 
@@ -172,19 +172,19 @@ void TCP_Client_Run_FormData(DEVICE_TYPE& p_Device, bool IncludeImage)
             }
 
             SIMXX_ClientReceive(p_Device, &_TCP_Socket, &Response);
-            ESP_LOGI(TAG, "Response from server: %s", Response.c_str());
+            SIM70XX_LOGI(TAG, "Response from server: %s", Response.c_str());
 
             SIMXX_ClientDisconnect(p_Device, &_TCP_Socket);
             SIMXX_ClientDestroy(p_Device, &_TCP_Socket);
         }
         else
         {
-            ESP_LOGE(TAG, "Can not connect with server! Error: 0x%X", Error);
+            SIM70XX_LOGE(TAG, "Can not connect with server! Error: 0x%X", Error);
         }
     }
     else
     {
-        ESP_LOGE(TAG, "Can not create socket! Error: 0x%X", Error);
+        SIM70XX_LOGE(TAG, "Can not create socket! Error: 0x%X", Error);
     }
 }
 
@@ -196,17 +196,17 @@ void TCP_Client_Run_JSON(DEVICE_TYPE& p_Device)
 
     cJSON* root;
 
-	ESP_LOGI(TAG, "Run TCP-Client example...");
+	SIM70XX_LOGI(TAG, "Run TCP-Client example...");
 
     SIMXX_RunPing(p_Device, &_TCP_Ping, &_TCP_PingResult);
     SIMXX_ParseDNS(p_Device, _TCP_Ping.Host, &_TCP_DNS_IP);
 
-    ESP_LOGI(TAG, "IP: %s", _TCP_DNS_IP.c_str());
+    SIM70XX_LOGI(TAG, "IP: %s", _TCP_DNS_IP.c_str());
 
     root = cJSON_CreateObject();
     cJSON_AddStringToObject(root, "version", "1.0.0");
 
-    ESP_LOGI(TAG, "Transmit JSON: %s", cJSON_Print(root));
+    SIM70XX_LOGI(TAG, "Transmit JSON: %s", cJSON_Print(root));
 
     Header += "POST /" + std::string(CONFIG_DEMO_TCP_CLIENT_ENDPOINT) + " HTTP/1.1\r\n";
     Header += "Host: " + std::string(CONFIG_DEMO_TCP_CLIENT_HOST) + "\r\n";
@@ -233,21 +233,21 @@ void TCP_Client_Run_JSON(DEVICE_TYPE& p_Device)
                 vTaskDelay(100 / portTICK_PERIOD_MS);
             }
 
-            ESP_LOGI(TAG, "Data received...");
+            SIM70XX_LOGI(TAG, "Data received...");
             SIMXX_ClientReceive(p_Device, &_TCP_Socket, &Response);
-            ESP_LOGI(TAG, "Response from server: %s", Response.c_str());
+            SIM70XX_LOGI(TAG, "Response from server: %s", Response.c_str());
 
             SIMXX_ClientDisconnect(p_Device, &_TCP_Socket);
             SIMXX_ClientDestroy(p_Device, &_TCP_Socket);
         }
         else
         {
-            ESP_LOGE(TAG, "Can not connect with server! Error: 0x%X", Error);
+            SIM70XX_LOGE(TAG, "Can not connect with server! Error: 0x%X", Error);
         }
     }
     else
     {
-        ESP_LOGE(TAG, "Can not create socket! Error: 0x%X", Error);
+        SIM70XX_LOGE(TAG, "Can not create socket! Error: 0x%X", Error);
     }
 }
 

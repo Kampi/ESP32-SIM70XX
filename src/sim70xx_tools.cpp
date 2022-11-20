@@ -17,17 +17,16 @@
  * Errors and commissions should be reported to DanielKampert@kampis-elektroecke.de.
  */
 
-#include <esp_log.h>
-#include <esp_timer.h>
-
 #include <mbedtls/base64.h>
 
 #include <cmath>
 #include <stdio.h>
 
 #include "sim70xx_tools.h"
+
 #include "Core/Arch/ESP32/UART/sim70xx_uart.h"
 #include "Core/Arch/ESP32/GPIO/sim70xx_gpio.h"
+#include "Core/Arch/ESP32/Logging/sim70xx_logging.h"
 
 static const char* TAG = "SIM70XX_Tools";
 
@@ -141,20 +140,18 @@ bool SIM70XX_Tools_ToBase64(const void* const p_Buffer, uint32_t Length, std::st
 
     p_Base64->clear();
 
-    // Get the size for memory allocation first.
     mbedtls_base64_encode(OutputBuffer, 0, &EncodeLength, (const unsigned char*)p_Buffer, Length);
 
-    ESP_LOGI(TAG, "Payload length: %u", Length);
-    ESP_LOGI(TAG, "Allocate %u bytes...", EncodeLength);
+    SIM70XX_LOGI(TAG, "Payload length: %u", Length);
+    SIM70XX_LOGI(TAG, "Allocate %u bytes...", EncodeLength);
     OutputBuffer = (unsigned char*)malloc(sizeof(unsigned char) * EncodeLength);
     if(OutputBuffer == NULL)
     {
-        ESP_LOGE(TAG, "Can not allocate memory!");
+        SIM70XX_LOGE(TAG, "Can not allocate memory!");
 
         return false;
     }
 
-    // Encode the data.
     mbedtls_base64_encode(OutputBuffer, EncodeLength, &EncodeLength, (const unsigned char*)p_Buffer, Length);
     p_Base64->append(std::string((char*)OutputBuffer));
 
@@ -177,7 +174,7 @@ bool SIM70XX_Tools_EnableModule(SIM70XX_UART_Conf_t& p_Config, uint8_t Cycles)
     {
         if(SIM70XX_Tools_isActive(p_Config))
         {
-            ESP_LOGI(TAG, "Module active!");
+            SIM70XX_LOGI(TAG, "Module active!");
 
             Result = true;
 
@@ -185,8 +182,8 @@ bool SIM70XX_Tools_EnableModule(SIM70XX_UART_Conf_t& p_Config, uint8_t Cycles)
         }
         else
         {
-            ESP_LOGI(TAG, "Module inactive. Try to enable module: %u / %u...", Attempts + 1, Cycles);
-            ESP_LOGI(TAG, "Power on module...");
+            SIM70XX_LOGI(TAG, "Module inactive. Try to enable module: %u / %u...", Attempts + 1, Cycles);
+            SIM70XX_LOGI(TAG, "Power on module...");
 
             Attempts++;
         }
@@ -227,14 +224,15 @@ bool SIM70XX_Tools_isActive(SIM70XX_UART_Conf_t& p_Config)
 
     if((SIM70XX_UART_Init(p_Config) != SIM70XX_ERR_OK) || (SIM70XX_UART_SendLine(p_Config, "AT") != SIM70XX_ERR_OK))
     {
-        return false;
+        Result = false;
+        goto SIM70XX_Tools_isActive_Exit;
     }
 
     Result = false;
     SIM70XX_UART_ReadStringUntil(p_Config);
     Response = SIM70XX_UART_ReadStringUntil(p_Config);
-    ESP_LOGD(TAG, "Response: %s", Response.c_str());
-    ESP_LOGD(TAG, "Length: %u", Response.size());
+    SIM70XX_LOGD(TAG, "Response: %s", Response.c_str());
+    SIM70XX_LOGD(TAG, "Length: %u", Response.size());
     if(Response.find("OK") != std::string::npos)
     {
         Result = true;
@@ -242,8 +240,10 @@ bool SIM70XX_Tools_isActive(SIM70XX_UART_Conf_t& p_Config)
 
     if(SIM70XX_UART_Deinit(p_Config) != SIM70XX_ERR_OK)
     {
-        return false;
+        Result = false;
     }
+
+SIM70XX_Tools_isActive_Exit:
 
     return Result;
 }
@@ -252,14 +252,14 @@ bool SIM70XX_Tools_ResetModule(SIM70XX_UART_Conf_t& p_Config)
 {
     if(SIM70XX_Tools_DisableModule(p_Config) == false)
     {
-        ESP_LOGI(TAG, "Can not disable the module!");
+        SIM70XX_LOGI(TAG, "Can not disable the module!");
 
 		return false;
     }
 
     if(SIM70XX_Tools_EnableModule(p_Config) == false)
     {
-        ESP_LOGE(TAG, "Can not enable module!");
+        SIM70XX_LOGE(TAG, "Can not enable module!");
 
 		return false;
     }
@@ -276,6 +276,8 @@ SIM70XX_Error_t SIM70XX_Tools_DisableEcho(SIM70XX_UART_Conf_t& p_Config)
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
+    vTaskSuspend(p_Config.TaskHandle);
+
     // Check if echo mode is enabled. With echo mode enable the answer will have the following format:
     //  AT<CR><LF>
     //  OK<CR><LF><CR><LF>
@@ -284,7 +286,7 @@ SIM70XX_Error_t SIM70XX_Tools_DisableEcho(SIM70XX_UART_Conf_t& p_Config)
     SIM70XX_UART_ReadStringUntil(p_Config);
     if(Response.find("AT") != std::string::npos)
     {
-        ESP_LOGI(TAG, "Echo mode enabled. Disable echo mode...");
+        SIM70XX_LOGI(TAG, "Echo mode enabled. Disable echo mode...");
 
         // Disable echo mode.
         SIM70XX_UART_SendLine(p_Config, "ATE0");
@@ -293,8 +295,10 @@ SIM70XX_Error_t SIM70XX_Tools_DisableEcho(SIM70XX_UART_Conf_t& p_Config)
     }
     else
     {
-        ESP_LOGI(TAG, "Echo mode disabled...");
+        SIM70XX_LOGI(TAG, "Echo mode disabled...");
     }
+
+    vTaskResume(p_Config.TaskHandle);
 
     return SIM70XX_ERR_OK;
 }
@@ -307,17 +311,17 @@ SIM70XX_Error_t SIM70XX_Tools_SetBaudrate(SIM70XX_UART_Conf_t& p_Config, SIM70XX
 
 /*
     // Initialize the serial interface with the old baudrate.
-    vTaskSuspend(p_Device.Internal.TaskHandle);
+    vTaskSuspend(p_Device.UART.TaskHandle);
     p_Device.UART.Baudrate = Old;
     SIM70XX_ERROR_CHECK(SIM70XX_UART_Deinit(p_Device.UART));
     SIM70XX_ERROR_CHECK(SIM70XX_UART_Init(p_Device.UART));
-    vTaskResume(p_Device.Internal.TaskHandle);
+    vTaskResume(p_Device.UART.TaskHandle);
 
     // Set the new baudrate.
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM70XX_AT_IPR_W(New);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_NOT_READY;
     }
@@ -325,26 +329,26 @@ SIM70XX_Error_t SIM70XX_Tools_SetBaudrate(SIM70XX_UART_Conf_t& p_Config, SIM70XX
 
     if(Status.find("OK") == std::string::npos)
     {
-        ESP_LOGE(TAG, "Can not enable new baudrate!");
+        SIM70XX_LOGE(TAG, "Can not enable new baudrate!");
 
         // Switch back to the old baudrate.
-        vTaskSuspend(p_Device.Internal.TaskHandle);
+        vTaskSuspend(p_Device.UART.TaskHandle);
         p_Device.UART.Baudrate = Old;
         SIM70XX_ERROR_CHECK(SIM70XX_UART_Deinit(p_Device.UART));
         SIM70XX_ERROR_CHECK(SIM70XX_UART_Init(p_Device.UART));
-        vTaskResume(p_Device.Internal.TaskHandle);
+        vTaskResume(p_Device.UART.TaskHandle);
 
         return SIM70XX_ERR_FAIL;
     }
 
-    ESP_LOGI(TAG, "New baudrate enabled. Reinitialize the interface!");
+    SIM70XX_LOGI(TAG, "New baudrate enabled. Reinitialize the interface!");
 
     // Reinitialize the interface with the new baudrate.
-    vTaskSuspend(p_Device.Internal.TaskHandle);
+    vTaskSuspend(p_Device.UART.TaskHandle);
     p_Device.UART.Baudrate = New;
     SIM70XX_ERROR_CHECK(SIM70XX_UART_Deinit(p_Device.UART));
     SIM70XX_ERROR_CHECK(SIM70XX_UART_Init(p_Device.UART));
-    vTaskResume(p_Device.Internal.TaskHandle);
+    vTaskResume(p_Device.UART.TaskHandle);
 */
     return SIM70XX_ERR_OK;
 }

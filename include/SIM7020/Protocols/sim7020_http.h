@@ -61,28 +61,28 @@ SIM70XX_Error_t SIM7020_HTTP_Create(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* 
  */
 SIM70XX_Error_t SIM7020_HTTP_Connect(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_Socket, uint16_t Timeout = 60);
 
-/** @brief                  Start a new HTTP POST request.
- *  @param p_Device         SIM7020 device object
- *  @param p_Socket         Pointer to HTTP socket object
- *  @param Path             Request path
- *  @param ContentType      Content type
- *  @param Header           Request header
- *  @param Payload          Payload string
- *  @param p_Response       (Optional) Pointer to HTTP response object
- *  @return                 SIM70XX_ERR_OK when successful
+/** @brief              Start a new HTTP POST request.
+ *  @param p_Device     SIM7020 device object
+ *  @param p_Socket     Pointer to HTTP socket object
+ *  @param Path         Request path
+ *  @param ContentType  Content type
+ *  @param Header       Request header
+ *  @param Payload      Payload string
+ *  @param p_Response   (Optional) Pointer to HTTP response object
+ *  @return             SIM70XX_ERR_OK when successful
  */
 SIM70XX_Error_t SIM7020_HTTP_POST(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_Socket, std::string Path, std::string ContentType, std::string Header, std::string Payload, SIM7020_HTTP_Response_t* p_Response = NULL);
 
-/** @brief                  Start a new HTTP POST request.
- *  @param p_Device         SIM7020 device object
- *  @param p_Socket         Pointer to HTTP socket object
- *  @param Path             Request path
- *  @param ContentType      Content type
- *  @param Header           Request header
- *  @param p_Buffer         Pointer to data buffer
- *  @param Length           Buffer length
- *  @param p_Response       (Optional) Pointer to HTTP response object
- *  @return                 SIM70XX_ERR_OK when successful
+/** @brief              Start a new HTTP POST request.
+ *  @param p_Device     SIM7020 device object
+ *  @param p_Socket     Pointer to HTTP socket object
+ *  @param Path         Request path
+ *  @param ContentType  Content type
+ *  @param Header       Request header
+ *  @param p_Buffer     Pointer to data buffer
+ *  @param Length       Buffer length
+ *  @param p_Response   (Optional) Pointer to HTTP response object
+ *  @return             SIM70XX_ERR_OK when successful
  */
 SIM70XX_Error_t SIM7020_HTTP_POST(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* p_Socket, std::string Path, std::string ContentType, std::string Header, const void* p_Buffer, uint32_t Length, SIM7020_HTTP_Response_t* p_Response = NULL);
 

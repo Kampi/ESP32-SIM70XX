@@ -21,11 +21,12 @@
 
 #if((CONFIG_SIMXX_DEV == 7020) && (defined CONFIG_SIM70XX_DRIVER_WITH_COAP))
 
-#include <esp_log.h>
-
 #include "sim7020.h"
 #include "sim7020_evt.h"
+
 #include "../../Core/Queue/sim70xx_queue.h"
+
+#include "../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
 
 static const char* TAG = "SIM7020_Evt_CoAP";
 
@@ -35,7 +36,7 @@ void SIM7020_Evt_on_CoAP(SIM7020_t* const p_Device, std::string* p_Message)
     size_t Index;
     std::string Message;
 
-    ESP_LOGI(TAG, "CoAP event!");
+    SIM70XX_LOGI(TAG, "CoAP event!");
 
     Index = p_Message->find("+CCOAPNMI");
     Index = p_Message->find(",", Index);
@@ -45,7 +46,7 @@ void SIM7020_Evt_on_CoAP(SIM7020_t* const p_Device, std::string* p_Message)
     {
         if((*it)->Internal.ID == ID)
         {
-            ESP_LOGI(TAG, "Data received for socket: %u", ID);
+            SIM70XX_LOGI(TAG, "Data received for socket: %u", ID);
 
             (*it)->Internal.isDataReceived = true;
         }

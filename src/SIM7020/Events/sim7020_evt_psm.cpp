@@ -21,16 +21,23 @@
 
 #if(CONFIG_SIMXX_DEV == 7020)
 
-#include <esp_log.h>
-
 #include "sim7020.h"
 #include "sim7020_evt.h"
+
 #include "../../Core/Queue/sim70xx_queue.h"
+
+#include "../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
 
 static const char* TAG = "SIM7020_Evt_PSM";
 
 void SIM7020_Evt_on_PSM_Event(SIM7020_t* const p_Device, std::string* p_Message, bool isPSM)
 {
+    if(p_Message->find("ENTER PSM") != std::string::npos)
+    {
+        SIM70XX_LOGI(TAG, "Power down event!");
+    }
+
+    p_Device->PwrMgnt.PSM.isActive = isPSM;
 }
 
 #endif

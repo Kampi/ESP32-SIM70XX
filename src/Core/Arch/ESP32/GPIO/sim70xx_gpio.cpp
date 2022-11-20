@@ -17,13 +17,13 @@
  * Errors and commissions should be reported to DanielKampert@kampis-elektroecke.de.
  */
 
-#include <esp_log.h>
-
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <freertos/event_groups.h>
 
 #include "sim70xx_gpio.h"
+
+#include "../Logging/sim70xx_logging.h"
 
 static gpio_config_t _SIM70XX_PwrKey_Config = {
     .pin_bit_mask = BIT(CONFIG_SIM70XX_GPIO_PWRKEY_PIN),
@@ -87,7 +87,7 @@ static const char* TAG = "SIM70XX_GPIO";
 
 void SIM70XX_GPIO_Init(void)
 {
-    ESP_LOGI(TAG, "Initialize GPIO...");
+    SIM70XX_LOGI(TAG, "Initialize GPIO...");
 
     esp_log_level_set("gpio", ESP_LOG_NONE);
 
@@ -108,24 +108,24 @@ void SIM70XX_GPIO_Init(void)
     gpio_config(&_SIM70XX_PwrKey_Config);
 
     #ifdef CONFIG_SIM70XX_GPIO_USE_RESET
-        ESP_LOGI(TAG, "     Reset signal: [x]");
+        SIM70XX_LOGI(TAG, "     Reset signal: [x]");
         gpio_config(&_SIM70XX_Reset_Config);
     #else
-        ESP_LOGI(TAG, "     Reset signal: [ ]");
+        SIM70XX_LOGI(TAG, "     Reset signal: [ ]");
     #endif
 
     #ifdef CONFIG_SIM70XX_GPIO_USE_STATUS
-        ESP_LOGI(TAG, "     Status signal: [x]");
+        SIM70XX_LOGI(TAG, "     Status signal: [x]");
         gpio_config(&_SIM70XX_Status_Config);
     #else
-        ESP_LOGI(TAG, "     Status signal: [ ]");
+        SIM70XX_LOGI(TAG, "     Status signal: [ ]");
     #endif
 
     #ifdef CONFIG_SIM70XX_GPIO_USE_NETLIGHT
-        ESP_LOGI(TAG, "     Netlight signal: [x]");
+        SIM70XX_LOGI(TAG, "     Netlight signal: [x]");
         gpio_config(&_SIM70XX_Netlight_Config);
     #else
-        ESP_LOGI(TAG, "     Netlight signal: [ ]");
+        SIM70XX_LOGI(TAG, "     Netlight signal: [ ]");
     #endif
 
     #ifdef CONFIG_SIM70XX_GPIO_PWRKEY_INVERT

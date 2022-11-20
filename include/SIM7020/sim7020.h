@@ -27,9 +27,9 @@
 #include "sim7020_info.h"
 #include "sim7020_defs.h"
 #include "sim7020_fota.h"
-#include "sim7020_pwrmgnt.h"
 #include "sim70xx_tools.h"
 #include "sim70xx_errors.h"
+#include "sim7020_pwrmgnt.h"
 
 #include "sim7020_config_1nce.h"
 #include "sim7020_config_fusion.h"
@@ -81,15 +81,6 @@
 inline __attribute__((always_inline)) bool SIM7020_isInitialized(SIM7020_t& p_Device)
 {
     return p_Device.Internal.isInitialized;
-}
-
-/** @brief          Check if the module has entered PSM.
- *  @param p_Device SIM7020 device object
- *  @return         #true when the device has entered PSM
- */
-inline __attribute__((always_inline)) bool SIM7020_isPSM(SIM7020_t& p_Device)
-{
-    return p_Device.Internal.isPSM;
 }
 
 /** @brief          Initialize the communication interface and the SIM7020 module.
@@ -213,13 +204,5 @@ bool SIM7020_isSIMReady(SIM7020_t& p_Device);
  *  @return         SIM70XX_ERR_OK when successful
  */
 SIM70XX_Error_t SIM7020_Ping(SIM7020_t& p_Device);
-
-/** @brief          Change the baudrate settings of the module.
- *  @param p_Device SIM7020 device object
- *  @param Old      Old baudrate
- *  @param New      New baudrate
- *  @return         SIM70XX_ERR_OK when successful
- */
-SIM70XX_Error_t SIM7020_SetBaudrate(SIM7020_t& p_Device, SIM70XX_Baud_t Old, SIM70XX_Baud_t New);
 
 #endif /* SIM7020_H_ */

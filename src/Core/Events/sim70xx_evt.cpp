@@ -17,8 +17,6 @@
  * Errors and commissions should be reported to DanielKampert@kampis-elektroecke.de.
  */
 
-#include <esp_log.h>
-
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <freertos/event_groups.h>
@@ -27,10 +25,13 @@
 #include <list>
 
 #include "sim70xx_evt.h"
-#include "../Arch/ESP32/UART/sim70xx_uart.h"
-#include "../Arch/ESP32/Timer/sim70xx_timer.h"
 #include "../Queue/sim70xx_queue.h"
 #include "../Commands/sim7020_commands.h"
+
+#include "../Arch/ESP32/UART/sim70xx_uart.h"
+#include "../Arch/ESP32/Timer/sim70xx_timer.h"
+#include "../Arch/ESP32/Logging/sim70xx_logging.h"
+#include "../Arch/ESP32/Watchdog/sim70xx_watchdog.h"
 
 #include <sdkconfig.h>
 
@@ -57,8 +58,6 @@ static const char* TAG = "SIM70XX_Evt";
  */
 static void SIM70XX_Evt_Task(void* p_Arg)
 {
-    uint32_t StatusUpdate = 0;
-
     #if(CONFIG_SIMXX_DEV == 7020)
         SIM7020_t* Device = (SIM7020_t*)p_Arg;
     #elif(CONFIG_SIMXX_DEV == 7080)
@@ -73,15 +72,10 @@ static void SIM70XX_Evt_Task(void* p_Arg)
     {
         uint32_t Messages;
 
+        SIM70XX_WDT_Reset();
+
         // Get all pending messages from the queue.
         Messages = uxQueueMessagesWaiting(Device->Internal.TxQueue);
-
-        if((SIM70XX_Timer_GetMilliseconds() - StatusUpdate) > 1000)
-        {
-            ESP_LOGD(TAG, "%u messages queued for transmission...", Messages);
-
-            StatusUpdate = SIM70XX_Timer_GetMilliseconds();
-        }
 
         if(Device->UART.isInitialized == false)
         {
@@ -91,6 +85,8 @@ static void SIM70XX_Evt_Task(void* p_Arg)
         // Get the commands from the queue and send them.
         for(uint32_t i = 0; i < Messages; i++)
         {
+            SIM70XX_WDT_Reset();
+
             // NOTE: We need pointers, because the object contains a String objects and these objects may be 
             // problematic in FreeRTOS:
             //      https://stackoverflow.com/questions/67346516/using-queue-of-string-in-freertos
@@ -110,7 +106,7 @@ static void SIM70XX_Evt_Task(void* p_Arg)
                 Command->Length = CmdObj->Command.size();
                 ActiveCommands.push_back(Command);
 
-                ESP_LOGI(TAG, "Transmit command: %s", CmdObj->Command.c_str());
+                SIM70XX_LOGI(TAG, "Transmit command: %s", CmdObj->Command.c_str());
 
                 // Transmit the command. The command has the layout
                 //  Command<CR><LF>
@@ -142,7 +138,7 @@ static void SIM70XX_Evt_Task(void* p_Arg)
                     Message->append(SIM70XX_UART_ReadString(Device->UART));
                 } while(SIM70XX_UART_Available(Device->UART));
 
-                ESP_LOGI(TAG, "Event: %s", Message->c_str());
+                SIM70XX_LOGI(TAG, "Event: %s", Message->c_str());
 
                 SIM70XX_Evt_MessageFilter(Device, Message);
             }
@@ -155,7 +151,9 @@ static void SIM70XX_Evt_Task(void* p_Arg)
         {
             uint32_t Now;
 
-            ESP_LOGD(TAG, "Active commands: %u", ActiveCommands.size());
+            SIM70XX_WDT_Reset();
+
+            SIM70XX_LOGD(TAG, "Active commands: %u", ActiveCommands.size());
 
             SIM70XX_UART_ReadStringUntil(Device->UART);
 
@@ -178,13 +176,13 @@ static void SIM70XX_Evt_Task(void* p_Arg)
 
                     if(Line.size() > 0)
                     {
-                        ESP_LOGI(TAG, "     Device response: %s", Line.c_str());
+                        SIM70XX_LOGI(TAG, "     Device response: %s", Line.c_str());
                     }
 
                     // The device has reported an error.
                     if(Line.find("ERROR") != std::string::npos)
                     {
-                        ESP_LOGE(TAG, "     Device response error!");
+                        SIM70XX_LOGE(TAG, "     Device response error!");
 
                         (*it)->isError = true;
 
@@ -208,7 +206,7 @@ static void SIM70XX_Evt_Task(void* p_Arg)
                         // Add the received line to the response when the number of lines is greater than 1.
                         if((*it)->Lines > 1)
                         {
-                            (*it)->Response += Line + '\n';
+                            (*it)->Response += Line + "\n";
                             (*it)->Lines--;
                         }
                         // Abort when all lines are received.
@@ -228,14 +226,14 @@ static void SIM70XX_Evt_Task(void* p_Arg)
                     // NOTE: Value 0 will disable the timeout function. This can be used by commands which will report a result anyway.
                     else if(((*it)->Timeout != 0) && (SIM70XX_Timer_GetMilliseconds() - Now) > (*it)->Timeout)
                     {
-                        ESP_LOGE(TAG, "     Device response timout!");
+                        SIM70XX_LOGE(TAG, "     Device response timout!");
 
                         (*it)->isTimeout = true;
 
                         break;
                     }
 
-                    vTaskDelay(20 / portTICK_PERIOD_MS);
+                    vTaskDelay(10 / portTICK_PERIOD_MS);
                 } while(true);
             }
 
@@ -247,6 +245,8 @@ static void SIM70XX_Evt_Task(void* p_Arg)
                 Now = SIM70XX_Timer_GetMilliseconds();
                 do
                 {
+                    SIM70XX_WDT_Reset();
+
                     // Read a new line from the serial interface.
                     // NOTE: The trailing \n is removed from the response!
                     (*it)->Status.append(SIM70XX_UART_ReadStringUntil(Device->UART));
@@ -254,28 +254,31 @@ static void SIM70XX_Evt_Task(void* p_Arg)
                     // Abort when a timeout occurs.
                     if(((*it)->Timeout != 0) && (SIM70XX_Timer_GetMilliseconds() - Now) > (*it)->Timeout)
                     {
-                        ESP_LOGE(TAG, "     Device status timout!");
+                        SIM70XX_LOGE(TAG, "     Device status timout!");
 
                         (*it)->isTimeout = true;
 
                         break;
                     }
 
-                    vTaskDelay(20 / portTICK_PERIOD_MS);
+                    vTaskDelay(10 / portTICK_PERIOD_MS);
                 } while((*it)->Status.size() < 2);
 
                 // Remove the line endings.
                 SIMXX_TOOLS_REMOVE_LINEEND((*it)->Status);
 
+                // SIM7020 outputs "oK" sometimes. Catch this case by converting the status to upper case.
+                transform((*it)->Status.begin(), (*it)->Status.end(), (*it)->Status.begin(), ::toupper);
+
                 // Transmission is without error when 'OK' as status code is transmitted and when no event data are received.
                 if((*it)->Status.find("OK") == std::string::npos)
                 {
-                    ESP_LOGE(TAG, "     Device status error!");
+                    SIM70XX_LOGE(TAG, "     Device status error!");
 
                     (*it)->isError = true;
                 }
 
-                ESP_LOGI(TAG, "     Device Status: %s", (*it)->Status.c_str());
+                SIM70XX_LOGI(TAG, "     Device Status: %s", (*it)->Status.c_str());
             }
 
             // The command was processed completly. Push it to the response queue and remove it from the command list.
@@ -283,26 +286,36 @@ static void SIM70XX_Evt_Task(void* p_Arg)
             ActiveCommands.erase(it++);
         }
 
-        vTaskDelay(20 / portTICK_PERIOD_MS);
+        vTaskDelay(10 / portTICK_PERIOD_MS);
     }
 }
 
-SIM70XX_Error_t SIM70XX_Evt_StartTask(TaskHandle_t* p_Handle, void* p_Arg)
+SIM70XX_Error_t SIM70XX_Evt_StartTask(SIM70XX_UART_Conf_t& p_Config, void* p_Arg)
 {
-    if((p_Handle == NULL) || (p_Arg == NULL))
+    if(p_Arg == NULL)
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
 
-	#ifdef CONFIG_SIM7020_TASK_CORE_AFFINITY
-        xTaskCreatePinnedToCore(SIM70XX_Evt_Task, "SIM70XX_Evt", SIM70XX_TASK_COM_STACK, p_Arg, CONFIG_SIM70XX_TASK_COM_PRIO, p_Handle, CONFIG_SIM70XX_TASK_COM_CORE);
+	#ifdef CONFIG_SIM70XX_TASK_CORE_AFFINITY
+        xTaskCreatePinnedToCore(SIM70XX_Evt_Task, "SIM70XX_Evt", CONFIG_SIM70XX_TASK_COM_STACK, p_Arg, CONFIG_SIM70XX_TASK_COM_PRIO, &p_Config.TaskHandle, CONFIG_SIM70XX_TASK_COM_CORE);
 	#else
-        xTaskCreate(SIM70XX_Evt_Task, "SIM70XX_Evt", CONFIG_SIM70XX_TASK_COM_STACK, p_Arg, CONFIG_SIM70XX_TASK_COM_PRIO, p_Handle);
+        xTaskCreate(SIM70XX_Evt_Task, "SIM70XX_Evt", CONFIG_SIM70XX_TASK_COM_STACK, p_Arg, CONFIG_SIM70XX_TASK_COM_PRIO, &p_Config.TaskHandle);
 	#endif
-    if(p_Handle == NULL)
+    if(p_Config.TaskHandle == NULL)
     {
         return SIM70XX_ERR_NO_MEM;
     }
 
+    SIM70XX_ERROR_CHECK(SIM70XX_UART_Init(p_Config));
+
     return SIM70XX_ERR_OK;
+}
+
+SIM70XX_Error_t SIM70XX_Evt_StopTask(TaskHandle_t Handle)
+{
+    vTaskSuspend(Handle);
+    vTaskDelete(Handle);
+
+    return SIM70XX_WDT_RemoveHanndle(Handle);
 }

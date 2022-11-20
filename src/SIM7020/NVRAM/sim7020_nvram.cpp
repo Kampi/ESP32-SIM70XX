@@ -21,13 +21,14 @@
 
 #if((CONFIG_SIMXX_DEV == 7020) && (defined CONFIG_SIM70XX_DRIVER_WITH_NVRAM))
 
-#include <esp_log.h>
-
 #include "sim7020.h"
 #include "sim7020_nvram.h"
-#include "../../Core/Arch/ESP32/UART/sim70xx_uart.h"
+
 #include "../../Core/Queue/sim70xx_queue.h"
 #include "../../Core/Commands/sim70xx_commands.h"
+
+#include "../../Core/Arch/ESP32/UART/sim70xx_uart.h"
+#include "../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
 
 static const char* TAG = "SIM7020_NVRAM";
 
@@ -46,12 +47,12 @@ SIM70XX_Error_t SIM7020_NVRAM_Write(SIM7020_t& p_Device, std::string Key, const 
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
-    ESP_LOGD(TAG, "Writing to NVRAM...");
+    SIM70XX_LOGD(TAG, "Writing to NVRAM...");
 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CNVMW(Key, Data, Data.size());
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -101,12 +102,12 @@ SIM70XX_Error_t SIM7020_NVRAM_Read(SIM7020_t& p_Device, std::string Key, std::st
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
-    ESP_LOGD(TAG, "Reading from NVRAM...");
+    SIM70XX_LOGD(TAG, "Reading from NVRAM...");
 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CNVMR(Key);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -133,9 +134,9 @@ SIM70XX_Error_t SIM7020_NVRAM_Read(SIM7020_t& p_Device, std::string Key, std::st
     // Filter out the payload.
     *p_Payload = Response;
 
-    ESP_LOGD(TAG, "Error: %i", Error);
-    ESP_LOGD(TAG, "Length: %i", p_Payload->length());
-    ESP_LOGD(TAG, "Payload: %s", p_Payload->c_str());
+    SIM70XX_LOGD(TAG, "Error: %i", Error);
+    SIM70XX_LOGD(TAG, "Length: %i", p_Payload->length());
+    SIM70XX_LOGD(TAG, "Payload: %s", p_Payload->c_str());
 
     return SIM70XX_ERR_OK;
 }
@@ -158,7 +159,7 @@ SIM70XX_Error_t SIM7020_NVRAM_Erase(SIM7020_t& p_Device, std::string Key, SIM702
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CNVMIVD(Key);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, &p_Device.Internal.isActive, Command->Timeout) == false)
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
@@ -197,7 +198,7 @@ SIM70XX_Error_t SIM7020_NVRAM_GetKeys(SIM7020_t& p_Device, std::vector<std::stri
     p_Keys->clear();
 
     // We have to pause the UART thread here and receive the response line by line, because we don´t know the exakt number of keys.
-    vTaskSuspend(p_Device.Internal.TaskHandle);
+    vTaskSuspend(p_Device.UART.TaskHandle);
 
     // Transmit the command.
     Command = SIM7020_AT_CNVMGET;
@@ -213,7 +214,7 @@ SIM70XX_Error_t SIM7020_NVRAM_GetKeys(SIM7020_t& p_Device, std::vector<std::stri
         // We have received something.
         if(Response.size() > 2)
         {
-            ESP_LOGD(TAG, "Response: %s", Response.c_str());
+            SIM70XX_LOGD(TAG, "Response: %s", Response.c_str());
 
             // OK received. Abort here.
             if((Response.find("OK") != std::string::npos) && (Response.size() < 4))
@@ -232,7 +233,7 @@ SIM70XX_Error_t SIM7020_NVRAM_GetKeys(SIM7020_t& p_Device, std::vector<std::stri
                 // Replace the quotations.
                 Response.erase(std::remove(Response.begin(), Response.end(), '\"'), Response.end());
 
-                ESP_LOGD(TAG, "Key: %s", Response.c_str());
+                SIM70XX_LOGD(TAG, "Key: %s", Response.c_str());
 
                 p_Keys->push_back(Response);
             }
@@ -246,7 +247,7 @@ SIM70XX_Error_t SIM7020_NVRAM_GetKeys(SIM7020_t& p_Device, std::vector<std::stri
 
         vTaskDelay(100 / portTICK_PERIOD_MS);
     } while(true);
-    vTaskResume(p_Device.Internal.TaskHandle);
+    vTaskResume(p_Device.UART.TaskHandle);
 
     return Error;
 }

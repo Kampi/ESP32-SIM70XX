@@ -21,11 +21,11 @@
 
 #if((CONFIG_SIMXX_DEV == 7080) && (defined CONFIG_SIM70XX_DRIVER_WITH_TCPIP))
 
-#include <esp_log.h>
-
 #include "sim7080.h"
 #include "sim7080_evt.h"
+
 #include "../../Core/Queue/sim70xx_queue.h"
+#include "../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
 
 static const char* TAG = "SIM7080_Evt_TCP";
 
@@ -36,7 +36,7 @@ void SIM7080_Evt_on_TCP_Disconnect(SIM7080_t* const p_Device, std::string* p_Mes
     std::string Message;
     SIM7080_TCP_Error_t Error;
 
-    ESP_LOGD(TAG, "TCP disconnect event!");
+    SIM70XX_LOGD(TAG, "TCP disconnect event!");
 
     Index = p_Message->find("+CASTATE");
     if(Index == std::string::npos)
@@ -55,8 +55,8 @@ void SIM7080_Evt_on_TCP_Disconnect(SIM7080_t* const p_Device, std::string* p_Mes
         {
             (*it)->Internal.isConnected = false;
 
-            ESP_LOGI(TAG, "Disconnect socket: %u", CID);
-            ESP_LOGI(TAG, "Error: %i", Error);
+            SIM70XX_LOGI(TAG, "Disconnect socket: %u", CID);
+            SIM70XX_LOGI(TAG, "Error: %i", Error);
         }
     }
 }
@@ -67,7 +67,7 @@ void SIM7080_Evt_on_TCP_DataReady(SIM7080_t* const p_Device, std::string* p_Mess
     uint8_t CID;
     std::string Message;
 
-    ESP_LOGD(TAG, "TCP message data ready event!");
+    SIM70XX_LOGD(TAG, "TCP message data ready event!");
 
     Index = p_Message->find("+CADATAIND");
     if(Index == std::string::npos)
@@ -83,7 +83,7 @@ void SIM7080_Evt_on_TCP_DataReady(SIM7080_t* const p_Device, std::string* p_Mess
     {
         if((*it)->Internal.CID == CID)
         {
-            ESP_LOGI(TAG, "Data received for socket: %u", CID);
+            SIM70XX_LOGI(TAG, "Data received for socket: %u", CID);
 
             (*it)->Internal.isDataReceived = true;
         }
@@ -96,7 +96,7 @@ void SIM7080_Evt_on_TCP_Data(SIM7080_t* const p_Device, std::string* p_Message)
     std::string Message;
     std::string* Response;
 
-    ESP_LOGD(TAG, "TCP message data event!");
+    SIM70XX_LOGD(TAG, "TCP message data event!");
 
     Index = p_Message->find("+CARECV");
     if(Index == std::string::npos)
