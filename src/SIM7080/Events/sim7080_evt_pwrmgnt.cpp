@@ -27,7 +27,7 @@
 #include "../../Core/Queue/sim70xx_queue.h"
 #include "../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
 
-static const char* TAG = "SIM7080_Evt_TCP";
+static const char* TAG = "SIM7080_Evt_PSM";
 
 void SIM7080_Evt_on_PSM(SIM7080_t* const p_Device, std::string* p_Message)
 {

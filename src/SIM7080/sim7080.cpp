@@ -87,7 +87,7 @@ SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t& p_Conf
         SIM70XX_LOGI(TAG, "Changing baudrate...");
 
         p_Device.Internal.isInitialized = true;
-        Error = SIM7080_SetBaudrate(p_Device.UART, Old, p_Config.UART.Baudrate);
+        Error = SIM70XX_Tools_SetBaudrate(p_Device.UART, Old, p_Config.UART.Baudrate);
         p_Device.Internal.isInitialized = false;
         if(Error != SIM70XX_ERR_OK)
         {
