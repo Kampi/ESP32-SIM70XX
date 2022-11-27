@@ -1,5 +1,5 @@
  /*
- * sim7080_evt_mqtt.cpp
+ * sim7020_battery.cpp
  *
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -19,38 +19,61 @@
 
 #include <sdkconfig.h>
 
-#if((CONFIG_SIMXX_DEV == 7080) && (defined CONFIG_SIM70XX_DRIVER_WITH_MQTT))
+#if(CONFIG_SIMXX_DEV == 7020)
 
-#include "sim7080.h"
-#include "sim7080_evt.h"
+#include "sim7020.h"
 
 #include "../../Core/Queue/sim70xx_queue.h"
+#include "../../Core/Commands/sim70xx_commands.h"
+
 #include "../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
 
-static const char* TAG = "SIM7080_Evt_MQTT";
-
-void SIM7080_Evt_on_MQTT_Subscribe(SIM7080_t* const p_Device, std::string* p_Message)
+SIM70XX_Error_t SIM7020_Info_ReadBattery(SIM7020_t& p_Device, uint8_t* const p_Battery)
 {
-    SIM7080_MQTT_Sub_Evt_t* Message;
+    return SIM7020_Info_ReadBattery(p_Device, p_Battery, NULL);
+}
 
-    Message = new SIM7080_MQTT_Sub_Evt_t;
+SIM70XX_Error_t SIM7020_Info_ReadBattery(SIM7020_t& p_Device, uint16_t* const p_Voltage)
+{
+    return SIM7020_Info_ReadBattery(p_Device, NULL, p_Voltage);
+}
 
-    p_Message->erase(0, p_Message->find("\""));
-    SIM70XX_Tools_StringRemove(p_Message);
+SIM70XX_Error_t SIM7020_Info_ReadBattery(SIM7020_t& p_Device, uint8_t* const p_Battery, uint16_t* const p_Voltage)
+{
+    std::string Response;
+    SIM70XX_TxCmd_t* Command;
+    uint8_t Battery;
+    uint16_t Voltage;
 
-    Message->Topic = SIM70XX_Tools_SubstringSplitErase(p_Message, ",");
-    Message->Payload = *p_Message;
-    SIMXX_TOOLS_REMOVE_LINEEND(Message->Payload);
-
-    SIM70XX_LOGD(TAG, "Topic: %s", Message->Topic.c_str());
-    SIM70XX_LOGD(TAG, "Payload: %s", Message->Payload.c_str());
-
-    if(p_Device->MQTT.Socket == NULL)
+    if(p_Device.Internal.isInitialized == false)
     {
-        return;
+        return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
-	xQueueSend(p_Device->MQTT.Socket->Internal.SubQueue, &Message, 0);
+    SIM70XX_CREATE_CMD(Command);
+    *Command = SIM7020_AT_CBC
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
+    {
+        return SIM70XX_ERR_FAIL;
+    }
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
+
+    Battery = (uint8_t)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response));
+    Voltage = (uint16_t)SIM70XX_Tools_StringToUnsigned(Response);
+
+
+    if(p_Battery != NULL)
+    {
+        *p_Battery = Battery;
+    }
+
+    if(p_Voltage != NULL)
+    {
+        *p_Voltage = Voltage;
+    }
+
+    return SIM70XX_ERR_OK;
 }
 
 #endif

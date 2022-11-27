@@ -1,5 +1,5 @@
  /*
- * sim7020_pdp.cpp
+ * sim7020_baerer.cpp
  *
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -22,22 +22,22 @@
 #if(CONFIG_SIMXX_DEV == 7020)
 
 #include "sim7020.h"
-#include "sim7020_pdp_defs.h"
+#include "sim7020_baerer_defs.h"
 
 #include "../../Core/Queue/sim70xx_queue.h"
 #include "../../Core/Commands/sim70xx_commands.h"
 
+#include "../../Core/Arch/ESP32/Timer/sim70xx_timer.h"
 #include "../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
 
-static const char* TAG = "SIM7020_PDP";
+static const char* TAG = "SIM7020_Baerer";
 
-// TODO: Check for GPRS and IP (see SIM7080)
-
-SIM70XX_Error_t SIM7020_PDP_GetContext(SIM7020_t& p_Device, SIM7020_PDP_Context_t* const p_Context)
+SIM70XX_Error_t SIM7020_Baerer_SetAPN(SIM7020_t& p_Device, SIM70XX_APN_t APN, SIM7020_PDP_Context_t* const p_PDP, uint32_t Timeout)
 {
-    SIM70XX_TxCmd_t* Command;
+    unsigned long Now;
+    bool isAttached;
 
-    if(p_Context == NULL)
+    if((p_PDP == NULL) || (p_PDP->ID == 0) || (p_PDP->ID > 15))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
@@ -46,97 +46,58 @@ SIM70XX_Error_t SIM7020_PDP_GetContext(SIM7020_t& p_Device, SIM7020_PDP_Context_
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
-    SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7020_AT_CGDCONT_R;
-    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
+// TODO: This doesn´t work!
+/*
+    if(p_Device.Connection.Functionality != SIM7020_FUNC_MIN)
     {
-        return SIM70XX_ERR_FAIL;
+        SIM70XX_ERROR_CHECK(SIM7020_SetFunctionality(p_Device, SIM7020_FUNC_MIN));
     }
 
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
+    SIM70XX_ERROR_CHECK(SIM7020_SetFunctionality(p_Device, SIM7020_FUNC_FULL));
+    SIM70XX_ERROR_CHECK(SIM7020_Baerer_PDP_Configure(p_Device, APN, p_PDP));
+    SIM70XX_ERROR_CHECK(SIM7020_PDP_GetStatus(p_Device, p_PDP));
 
-    // TODO: Get the informations from the input
-
-    return SIM70XX_ERR_OK;
-}
-
-SIM70XX_Error_t SIM7020_PDP_Switch(SIM7020_t& p_Device, bool Enable, uint8_t Context)
-{
-    SIM70XX_TxCmd_t* Command;
-
-    if(Context > 10)
+    if(p_PDP->Internal.isActive == false)
     {
-        return SIM70XX_ERR_INVALID_ARG;
+        SIM70XX_ERROR_CHECK(SIM7020_Baerer_PDP_Enable(p_Device, p_PDP));
     }
-    else if(p_Device.Internal.isInitialized == false)
-    {
-        return SIM70XX_ERR_NOT_INITIALIZED;
-    }
-
-    SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7020_AT_CGACT_W(Context, Enable);
-    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
-    {
-        return SIM70XX_ERR_FAIL;
-    }
-
-    return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
-}
-
-SIM70XX_Error_t SIM7020_PDP_GetStatus(SIM7020_t& p_Device, std::vector<SIM7020_PDP_Status_t>* p_Status)
-{
-    std::string Response;
-    SIM70XX_TxCmd_t* Command;
-
-    if(p_Status == NULL)
-    {
-        return SIM70XX_ERR_INVALID_ARG;
-    }
-    else if(p_Device.Internal.isInitialized == false)
-    {
-        return SIM70XX_ERR_NOT_INITIALIZED;
-    }
-
-    SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7020_AT_CGACT_R;
-    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
-    {
-        return SIM70XX_ERR_FAIL;
-    }
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
-
+*/
+    isAttached = false;
+    Now = SIM70XX_Timer_GetMilliseconds();
     do
     {
-        uint32_t Index;
-        std::string Dummy;
-        SIM7020_PDP_Status_t Status;
+        bool Deactivated;
+        SIM70XX_Qual_t Report;
 
-        Dummy = Response.substr(0, 3);
-        Response.erase(0, 3);
-
-        Index = Dummy.find(",");
-        if(Index != std::string::npos)
+        SIM70XX_ERROR_CHECK(SIM7020_Info_GetQuality(p_Device, &Report));
+        if(Report.RSSI != 99)
         {
-            Status.CID = (uint8_t)SIM70XX_Tools_StringToUnsigned(Dummy.substr(Index - 1, 1));
-            Status.Status = (bool)SIM70XX_Tools_StringToUnsigned(Dummy.substr(Index + 1, 1));
-            Dummy.erase(0, Index + 1);
+            isAttached = SIM7020_Baerer_GRPS_isAttached(p_Device, &Deactivated);
+            if(Deactivated == true)
+            {
+                SIM70XX_LOGE(TAG, "Context not activated!");
+
+                return SIM70XX_ERR_PDP_NOT_ACTIVE;
+            }
         }
 
-        p_Status->push_back(Status);
-    } while(Response.size() > 0);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    } while((isAttached == false) && ((SIM70XX_Timer_GetMilliseconds() - Now) < (Timeout * 1000)));
+
+    if(isAttached == false)
+    {
+        return SIM70XX_ERR_TIMEOUT;
+    }
 
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_PDP_ReadDynamicParameters(SIM7020_t& p_Device, SIM7020_PDP_Params_t* p_Params)
+SIM70XX_Error_t SIM7020_PDP_ReadDynamicParameters(SIM7020_t& p_Device, SIM7020_PDP_Context_t* const p_Context, SIM7020_PDP_Params_t* const p_Params)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;
 
-    if(p_Params == NULL)
+    if((p_Context == NULL) || (p_Params == NULL))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
@@ -145,36 +106,8 @@ SIM70XX_Error_t SIM7020_PDP_ReadDynamicParameters(SIM7020_t& p_Device, SIM7020_P
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
-    // Get the PDP type.
     SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7020_AT_MCGDEFCONT_R;
-    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
-    {
-        return SIM70XX_ERR_FAIL;
-    }
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
-
-    Response = SIM70XX_Tools_SubstringSplitErase(&Response);
-    if(Response.find("IP") != std::string::npos)
-    {
-        p_Params->Type = SIM7020_PDP_IP;
-    }
-    else if(Response.find("IPV6") != std::string::npos)
-    {
-        p_Params->Type = SIM7020_PDP_IPV6;
-    }
-    else if(Response.find("IP4V6") != std::string::npos)
-    {
-        p_Params->Type = SIM7020_PDP_IPV4V6;
-    }
-    else if(Response.find("Non-IP") != std::string::npos)
-    {
-        p_Params->Type = SIM7020_PDP_NO_IP;
-    }
-
-    SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7020_AT_CGCONTRDP;
+    *Command = SIM7020_AT_CGCONTRDP_W(p_Context->ID);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
     if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
@@ -187,7 +120,6 @@ SIM70XX_Error_t SIM7020_PDP_ReadDynamicParameters(SIM7020_t& p_Device, SIM7020_P
     p_Params->APN = SIM70XX_Tools_SubstringSplitErase(&Response);
     SIM70XX_Tools_StringRemove(&p_Params->APN);
 
-    // Process the IP address and the subnet.
     SIM70XX_Tools_StringRemove(&Response);
     if(p_Params->Type == SIM7020_PDP_IP)
     {

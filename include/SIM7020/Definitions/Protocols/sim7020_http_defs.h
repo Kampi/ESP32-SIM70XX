@@ -20,6 +20,8 @@
 #ifndef SIM7020_HTTP_DEFS_H_
 #define SIM7020_HTTP_DEFS_H_
 
+#include <freertos/queue.h>
+
 #include <string>
 #include <stdint.h>
 #include <stdbool.h>

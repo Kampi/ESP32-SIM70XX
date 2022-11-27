@@ -65,14 +65,15 @@ void StartExamples(void);
 #ifdef CONFIG_DEMO_USE_TCPIP_CLIENT
     /** @brief              Run the TCP client example with a form-data HTTP request.
      *  @param p_Device     Pointer to device object
-     *  @param IncludeImage (Optional) Include an image to the transmission
+     *  @param p_Opts       (Optional) Pointer to additional options
      */
-    void TCP_Client_Run_FormData(DEVICE_TYPE& p_Device, bool IncludeImage = true);
+    void TCP_Client_Run_FormData(DEVICE_TYPE& p_Device, void* p_Opts = NULL);
 
     /** @brief          Run the TCP client example with a JSON HTTP request.
      *  @param p_Device Pointer to device object
+     *  @param p_Opts   (Optional) Pointer to additional options
      */
-    void TCP_Client_Run_JSON(DEVICE_TYPE& p_Device);
+    void TCP_Client_Run_JSON(DEVICE_TYPE& p_Device, void* p_Opts = NULL);
 #endif
 
 #ifdef CONFIG_DEMO_USE_UDP_CLIENT
@@ -92,8 +93,9 @@ void StartExamples(void);
 #ifdef CONFIG_DEMO_USE_EMAIL
     /** @brief          Run the E-Mail example.
      *  @param p_Device Pointer to device object
+     *  @param p_Opts   (Optional) Pointer to additional options
      */
-    void EMail_Run(DEVICE_TYPE& p_Device);
+    void EMail_Run(DEVICE_TYPE& p_Device, void* p_Opts = NULL);
 #endif
 
 #ifdef CONFIG_DEMO_USE_SNTP
@@ -106,10 +108,11 @@ void StartExamples(void);
 #ifdef CONFIG_DEMO_USE_MQTT
     /** @brief          Run the MQTT example.
      *  @param p_Device Pointer to device object
+     *  @param p_Opts   (Optional) Pointer to additional options
      *  @param SubTopic (Optional) Subscription topic
      *  @param PubTopic (Optional) Publish topic
      */
-    void MQTT_Run(DEVICE_TYPE& p_Device, std::string SubTopic = "foo/bar", std::string PubTopic = "foo/bar");
+    void MQTT_Run(DEVICE_TYPE& p_Device, void* p_Opts = NULL, std::string SubTopic = "foo/bar", std::string PubTopic = "foo/bar");
 #endif
 
 #ifdef CONFIG_DEMO_USE_COAP

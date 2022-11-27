@@ -41,7 +41,7 @@ static const char* TAG = "SIM7080_EMail";
  *  @param p_BCC    BCC recipient
  *  @return         SIM70XX_ERR_OK when successful
  */
-static SIM70XX_Error_t SIM7080_EMail_PrepareEMail(SIM7080_t& p_Device, SIM7080_EMail_Config_t* p_Config, SIM7080_EMail_User_t* p_Sender, SIM7080_EMail_User_t* p_To, std::string Subject, SIM7080_EMail_User_t* p_CC, SIM7080_EMail_User_t* p_BCC)
+static SIM70XX_Error_t SIM7080_EMail_PrepareEMail(SIM7080_t& p_Device, SIM7080_EMail_Config_t* const p_Config, SIM7080_EMail_User_t* const p_Sender, SIM7080_EMail_User_t* const p_To, std::string Subject, SIM7080_EMail_User_t* const p_CC, SIM7080_EMail_User_t* const p_BCC)
 {
     uint8_t Timeout;
     SIM70XX_TxCmd_t* Command;
@@ -148,12 +148,12 @@ static SIM70XX_Error_t SIM7080_EMail_PrepareEMail(SIM7080_t& p_Device, SIM7080_E
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7080_EMail_SendText(SIM7080_t& p_Device, SIM7080_EMail_Config_t* p_Config, SIM7080_EMail_User_t* p_Sender, SIM7080_EMail_User_t* p_To, std::string Subject, std::string Body, SIM7080_EMail_Error_t* p_Error, uint8_t CID)
+SIM70XX_Error_t SIM7080_EMail_SendText(SIM7080_t& p_Device, SIM7080_PDP_Context_t* const p_PDP, SIM7080_EMail_Config_t* const p_Config, SIM7080_EMail_User_t* p_Sender, SIM7080_EMail_User_t* const p_To, std::string Subject, std::string Body, SIM7080_EMail_Error_t* const p_Error)
 {
-    return SIM7080_EMail_SendText(p_Device, p_Config, p_Sender, p_To, Subject, Body, NULL, NULL, p_Error, CID);
+    return SIM7080_EMail_SendText(p_Device, p_PDP, p_Config, p_Sender, p_To, Subject, Body, NULL, NULL, p_Error);
 }
 
-SIM70XX_Error_t SIM7080_EMail_SendText(SIM7080_t& p_Device, SIM7080_EMail_Config_t* p_Config, SIM7080_EMail_User_t* p_Sender, SIM7080_EMail_User_t* p_To, std::string Subject, std::string Body, SIM7080_EMail_User_t* p_CC, SIM7080_EMail_User_t* p_BCC, SIM7080_EMail_Error_t* p_Error, uint8_t CID)
+SIM70XX_Error_t SIM7080_EMail_SendText(SIM7080_t& p_Device, SIM7080_PDP_Context_t* const p_PDP, SIM7080_EMail_Config_t* const p_Config, SIM7080_EMail_User_t* const p_Sender, SIM7080_EMail_User_t* const p_To, std::string Subject, std::string Body, SIM7080_EMail_User_t* const p_CC, SIM7080_EMail_User_t* p_BCC, SIM7080_EMail_Error_t* const p_Error)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;
@@ -167,11 +167,15 @@ SIM70XX_Error_t SIM7080_EMail_SendText(SIM7080_t& p_Device, SIM7080_EMail_Config
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
+    else if(p_PDP->Internal.isActive == false)
+    {
+        return SIM70XX_ERR_PDP_NOT_ACTIVE;
+    }
 
     // TODO: Add support for SNTP servers without authentication
 
     SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7080_AT_EMAILCID(CID);
+    *Command = SIM7080_AT_EMAILCID(p_PDP->ID);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
     if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {

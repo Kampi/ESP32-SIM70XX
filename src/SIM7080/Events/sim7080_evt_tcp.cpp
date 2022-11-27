@@ -108,10 +108,7 @@ void SIM7080_Evt_on_TCP_Data(SIM7080_t* const p_Device, std::string* p_Message)
     Response = new std::string();
     *Response = p_Message->substr(Index, p_Message->find("\r\n\r\n", Index) - Index);
 
-	if(xQueueSend(p_Device->Internal.EventQueue, &Response, 0) != pdPASS)
-    {
-        delete Response;
-    }
+	xQueueSend(p_Device->Internal.EventQueue, &Response, 0);
 }
 
 #endif

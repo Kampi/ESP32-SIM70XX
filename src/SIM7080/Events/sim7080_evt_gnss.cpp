@@ -31,23 +31,21 @@ static const char* TAG = "SIM7080_Evt_GNSS";
 
 void SIM7080_Evt_on_GNSS(SIM7080_t* const p_Device, std::string* p_Message)
 {
+    std::string* Message = new std::string();
+
+    Message = p_Message;
+
     // 
     if(p_Device->GNSS.isListening == false)
     {
-        if(xQueueSend(p_Device->Internal.EventQueue, &p_Message, 0) != pdPASS)
-        {
-            delete p_Message;
-        }
+        xQueueSend(p_Device->Internal.EventQueue, &Message, 0);
     }
     // The device is in listening mode.
     else
     {
         SIM70XX_LOGI(TAG, "Add item to GNSS queue");
 
-        if(xQueueSend(p_Device->GNSS.EventQueue, &p_Message, 0) != pdPASS)
-        {
-            delete p_Message;
-        } 
+        xQueueSend(p_Device->GNSS.EventQueue, &Message, 0);
     }
 }
 

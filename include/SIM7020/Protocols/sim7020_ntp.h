@@ -32,7 +32,7 @@
  *  @param Timeout      (Optional) Timeout in seconds
  *  @return             SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_NTP_Sync(SIM7020_t& p_Device, std::string Server, int8_t TimeZone, struct tm* p_Time, uint32_t Timeout = 60);
+SIM70XX_Error_t SIM7020_NTP_Sync(SIM7020_t& p_Device, std::string Server, int8_t TimeZone, struct tm* const p_Time, uint32_t Timeout = 60);
 
 /** @brief              Get the current time from the module.
  *                      NOTE: Use \ref SIM7020_NTP_Sync to sync the time first!
@@ -41,6 +41,6 @@ SIM70XX_Error_t SIM7020_NTP_Sync(SIM7020_t& p_Device, std::string Server, int8_t
  *  @param p_Timezone   (Optional) Pointer to timezone
  *  @return             SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_NTP_GetTime(SIM7020_t& p_Device, struct tm* p_Time, int8_t* p_Timezone = NULL);
+SIM70XX_Error_t SIM7020_NTP_GetTime(SIM7020_t& p_Device, struct tm* const p_Time, int8_t* const p_Timezone = NULL);
 
 #endif /* SIM7020_NTP_H_ */

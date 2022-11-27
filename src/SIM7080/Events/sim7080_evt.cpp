@@ -28,7 +28,7 @@
 
 static const char* TAG = "SIM7080_Event";
 
-void SIM70XX_Evt_MessageFilter(void* p_Device, std::string* p_Message)
+void SIM70XX_Evt_MessageFilter(void* p_Device, std::string* const p_Message)
 {
 	// This flag is set to #true when the data were processed completely in the event handler. Do not set this flag to #true when
 	// the data should be processed by using the event message queue.
@@ -36,6 +36,24 @@ void SIM70XX_Evt_MessageFilter(void* p_Device, std::string* p_Message)
 	SIM7080_t* Device = (SIM7080_t*)p_Device;
 
 	Processed = false;
+
+	if(p_Message->find("+CPIN: READY") != std::string::npos)
+	{
+		SIM70XX_LOGI(TAG, "CPIN event");
+
+		Device->Connection.Functionality = SIM7080_FUNC_FULL;
+
+		Processed = true;
+	}
+
+	if(p_Message->find("+CPIN: NOT READY") != std::string::npos)
+	{
+		SIM70XX_LOGI(TAG, "CPIN event");
+
+		Device->Connection.Functionality = SIM7080_FUNC_MIN;
+
+		Processed = true;
+	}
 
 	// Shutdown message was received.
 	if(p_Message->find("NORMAL POWER DOWN") != std::string::npos)
@@ -58,9 +76,8 @@ void SIM70XX_Evt_MessageFilter(void* p_Device, std::string* p_Message)
 	#ifdef CONFIG_SIM70XX_DRIVER_WITH_GNSS
 		if(p_Message->find("+SGNSCMD") != std::string::npos)
 		{
-			SIM70XX_LOGI(TAG, "GNSS event!");
-
 			SIM7080_Evt_on_GNSS(Device, p_Message);
+			Processed = true;
 		}
 	#endif
 
@@ -93,11 +110,12 @@ void SIM70XX_Evt_MessageFilter(void* p_Device, std::string* p_Message)
 		}
 	#endif
 
-	#ifdef CONFIG_SIM70XX_DRIVER_WITH_EMAIL
-	#endif
-
+	// Delete the message object when the message was completely processed by the event handler or
+	// when the message can´t be pushed to the event queue.
 	if((Processed == true) || (xQueueSend(Device->Internal.EventQueue, &p_Message, 0) != pdPASS))
 	{
+		SIM70XX_LOGI(TAG, "Items in event queue: %u", uxQueueMessagesWaiting(Device->Internal.EventQueue));
+
 		delete p_Message;
 	}
 }

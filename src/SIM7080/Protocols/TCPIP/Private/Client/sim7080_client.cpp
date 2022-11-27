@@ -61,14 +61,14 @@ SIM70XX_Error_t SIM7080_Client_CreateSocket(SIM7080_t& p_Device, SIM7080_TCP_Typ
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7080_Client_ConnectSocket(SIM7080_t& p_Device, SIM7080_TCPIP_Socket_t* p_Socket, uint8_t PDP, SIM7080_TCP_Error_t* p_Result)
+SIM70XX_Error_t SIM7080_Client_ConnectSocket(SIM7080_t& p_Device, SIM7080_TCPIP_Socket_t* p_Socket, SIM7080_PDP_Context_t* p_PDP, SIM7080_TCP_Error_t* p_Result)
 {
     std::string Type;
     std::string Response;
     SIM70XX_TxCmd_t* Command;
     SIM7080_TCP_Error_t Result;
 
-    if((p_Socket == NULL) || (PDP > 3))
+    if((p_Socket == NULL) || (p_PDP == NULL) || (p_PDP->ID > 3))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
@@ -99,7 +99,7 @@ SIM70XX_Error_t SIM7080_Client_ConnectSocket(SIM7080_t& p_Device, SIM7080_TCPIP_
     }
 
     SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7080_AT_CAOPEN(p_Socket->Internal.CID, PDP, Type, p_Socket->IP, p_Socket->Port);
+    *Command = SIM7080_AT_CAOPEN(p_Socket->Internal.CID, p_PDP->ID, Type, p_Socket->IP, p_Socket->Port);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
     if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {

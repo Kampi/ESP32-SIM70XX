@@ -23,14 +23,15 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "sim7020_pdp.h"
 #include "sim7020_info.h"
 #include "sim7020_defs.h"
 #include "sim7020_fota.h"
 #include "sim70xx_tools.h"
+#include "sim7020_baerer.h"
 #include "sim70xx_errors.h"
 #include "sim7020_pwrmgnt.h"
 
+#include "sim7020_pdp_context.h"
 #include "sim7020_config_1nce.h"
 #include "sim7020_config_fusion.h"
 
@@ -146,17 +147,18 @@ SIM70XX_Error_t SIM7020_SetOperator(SIM7020_t& p_Device, SIM70XX_OpMode_t Mode, 
  *  @param p_Device     SIM7020 device object
  *  @param p_Operator   Pointer to operator
  *  @param p_Modes      Pointer to Operator mode
- *  @param p_Format     Pointer to Operator format
  *  @return             SIM70XX_ERR_OK when successful
+ *                      SIM70XX_ERR_INVALID_STATE when the device is not in fully active mode
  */
-SIM70XX_Error_t SIM7020_GetOperator(SIM7020_t& p_Device, SIM70XX_Operator_t* p_Operator, SIM70XX_OpMode_t* p_Mode, SIM70XX_OpForm_t* p_Format);
+SIM70XX_Error_t SIM7020_GetOperator(SIM7020_t& p_Device, SIM70XX_Operator_t* const p_Operator, SIM70XX_OpMode_t* const p_Mode);
 
 /** @brief              Get the available operators.
  *  @param p_Device     SIM7020 device object
  *  @param p_Operators  Pointer for list of available operators
  *  @return             SIM70XX_ERR_OK when successful
+ *                      SIM70XX_ERR_INVALID_STATE when the device is not in fully active mode
  */
-SIM70XX_Error_t SIM7020_GetAvailOperators(SIM7020_t& p_Device, std::vector<SIM70XX_Operator_t>* p_Operators);
+SIM70XX_Error_t SIM7020_GetAvailOperators(SIM7020_t& p_Device, std::vector<SIM70XX_Operator_t>* const p_Operators);
 
 /** @brief          Set the frequency band of the module.
  *  @param p_Device SIM7020 device object
@@ -170,7 +172,7 @@ SIM70XX_Error_t SIM7020_SetBand(SIM7020_t& p_Device, SIM7020_Band_t Band);
  *  @param p_Band   Pointer to freuquency band
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_GetBand(SIM7020_t& p_Device, SIM7020_Band_t* p_Band);
+SIM70XX_Error_t SIM7020_GetBand(SIM7020_t& p_Device, SIM7020_Band_t* const p_Band);
 
 /** @brief          Set the device functionality.
  *  @param p_Device SIM7020 device object

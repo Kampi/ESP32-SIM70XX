@@ -28,7 +28,7 @@
 
 static const char* TAG = "SIM7020_Evt";
 
-void SIM70XX_Evt_MessageFilter(void* p_Device, std::string* p_Message)
+void SIM70XX_Evt_MessageFilter(void* p_Device, std::string* const p_Message)
 {
 	// This flag is set to #true when the data were processed completely in the event handler. Do not set this flag to #true when
 	// the data should be processed by using the event message queue.
@@ -36,6 +36,33 @@ void SIM70XX_Evt_MessageFilter(void* p_Device, std::string* p_Message)
 	SIM7020_t* Device = (SIM7020_t*)p_Device;
 
 	Processed = false;
+
+	// Not sure what this message mean. Just process it to keep it away from the event queue.
+	if(p_Message->find("*MRPM:") != std::string::npos)
+	{
+		SIM70XX_LOGI(TAG, "Drop...");
+
+		Processed = true;
+	}
+
+	// Catch asynchronous CPIN messages which are send during the power up stage.
+	if(p_Message->find("+CPIN: READY") != std::string::npos)
+	{
+		SIM70XX_LOGI(TAG, "Change functionality to full...");
+
+		Device->Connection.Functionality = SIM7020_FUNC_FULL;
+
+		Processed = true;
+	}
+
+	if(p_Message->find("+CPIN: NOT READY") != std::string::npos)
+	{
+		SIM70XX_LOGI(TAG, "Change functionality to minimum...");
+
+		Device->Connection.Functionality = SIM7020_FUNC_MIN;
+
+		Processed = true;
+	}
 
 	// Shutdown message was received.
 	if(p_Message->find("NORMAL POWER DOWN") != std::string::npos)
@@ -114,6 +141,8 @@ void SIM70XX_Evt_MessageFilter(void* p_Device, std::string* p_Message)
 
 	if((Processed == true) || (xQueueSend(Device->Internal.EventQueue, &p_Message, 0) != pdPASS))
 	{
+		SIM70XX_LOGI(TAG, "Items in event queue: %u", uxQueueMessagesWaiting(Device->Internal.EventQueue));
+
 		delete p_Message;
 	}
 }

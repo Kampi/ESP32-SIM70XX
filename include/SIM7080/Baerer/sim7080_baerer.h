@@ -1,5 +1,5 @@
  /*
- * sim7080_pdp.h
+ * sim7080_baerer.h
  *
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -17,51 +17,73 @@
  * Errors and commissions should be reported to DanielKampert@kampis-elektroecke.de.
  */
 
-#ifndef SIM7080_PDP_H_
-#define SIM7080_PDP_H_
+#ifndef SIM7080_BAERER_H_
+#define SIM7080_BAERER_H_
 
-#include "sim70xx_errors.h"
 #include "sim7080_defs.h"
-#include "sim7080_pdp_defs.h"
+#include "sim70xx_errors.h"
+#include "sim7080_baerer_defs.h"
 
-/** @brief          Define a GPRS PDP context.
+/** @brief          Deattach the module to GPRS service.
  *  @param p_Device SIM7080 device object
- *  @param Type     Packet Data Protocol (PDP) type
- *  @param APN      Access Point Name (APN) configuration
- *  @param PDP      (Optional) PDP context ID
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_PDP_GPRS_Define(SIM7080_t& p_Device, SIM7080_PDP_GPRS_Type_t Type, SIM70XX_APN_t APN, uint8_t PDP = 1);
+SIM70XX_Error_t SIM7080_Baerer_GRPS_Attach(SIM7080_t& p_Device);
+
+/** @brief          Deattach the module from GPRS service.
+ *  @param p_Device SIM7080 device object
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_Baerer_GRPS_Deattach(SIM7080_t& p_Device);
 
 /** @brief          Check if the module is connected with the GPRS service.
  *  @param p_Device SIM7080 device object
  *  @return         #true when the module is connected to the GPRS service
  */
-bool SIM7080_PGP_GRPS_isAttached(SIM7080_t& p_Device);
+bool SIM7080_Baerer_GRPS_isAttached(SIM7080_t& p_Device);
 
-/** @brief          Define a IP PDP context.
+/** @brief          Define a PDP context.
  *  @param p_Device SIM7080 device object
- *  @param Type     Packet Data Protocol (PDP) type
  *  @param APN      Access Point Name (APN) configuration
- *  @param PDP      (Optional) PDP context ID
- *  @param Auth     (Optional) Authentication method for APN
+ *  @param p_PDP    Pointer to PDP context
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_PDP_IP_Configure(SIM7080_t& p_Device, SIM7080_PDP_IP_Type_t Type, SIM70XX_APN_t APN, uint8_t PDP = 0, SIM7080_PDP_IP_Auth_t Auth = SIM7080_PDP_IP_AUTH_NONE);
+SIM70XX_Error_t SIM7080_Baerer_PDP_Configure(SIM7080_t& p_Device, SIM70XX_APN_t APN, SIM7080_PDP_Context_t* const p_PDP);
 
-/** @brief          Execute a IP PDP action for a specific PDP context.
+/** @brief          Enable the given PDP context.
  *  @param p_Device SIM7080 device object
- *  @param PDP      PDP context ID
- *  @param Action   PDP action
+ *  @param p_PDP    Pointer to PDP context
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_PDP_IP_Action(SIM7080_t& p_Device, uint8_t PDP, SIM7080_PDP_Action_t Action);
+SIM70XX_Error_t SIM7080_Baerer_PDP_Enable(SIM7080_t& p_Device, SIM7080_PDP_Context_t* const p_PDP);
+
+/** @brief          Disable the given PDP context.
+ *  @param p_Device SIM7080 device object
+ *  @param p_PDP    Pointer to PDP context
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_Baerer_PDP_Disable(SIM7080_t& p_Device, SIM7080_PDP_Context_t* const p_PDP);
+
+/** @brief          Disable all PDP contextes.
+ *  @param p_Device SIM7080 device object
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_Baerer_PDP_DisableAll(SIM7080_t& p_Device);
 
 /** @brief              Get the network status.
  *  @param p_Device     SIM7080 device object
  *  @param p_Networks   Pointer to network status list
  *  @return             SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_PDP_IP_CheckNetworks(SIM7080_t& p_Device, std::vector<SIM7080_PDP_Network_t>* p_Networks);
+SIM70XX_Error_t SIM7080_Baerer_IP_CheckNetworks(SIM7080_t& p_Device, std::vector<SIM7080_PDP_Network_t>* const p_Networks);
 
-#endif /* SIM7080_PDP_H_ */
+/** @brief          Set and enable the APN.
+ *  @param p_Device SIM7080 device object
+ *  @param APN      APN configuration object
+ *  @param p_PDP    Pointer to PDP context
+ *  @param Timeout  (Optional) Wait for connection timeout in seconds
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_Baerer_SetAPN(SIM7080_t& p_Device, SIM70XX_APN_t APN, SIM7080_PDP_Context_t* const p_PDP, uint32_t Timeout = 60);
+
+#endif /* SIM7080_BAERER_H_ */

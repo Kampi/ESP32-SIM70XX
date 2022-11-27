@@ -1,5 +1,5 @@
  /*
- * sim7020_pdp.cpp
+ * sim7020_pdp_context.h
  *
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -17,42 +17,20 @@
  * Errors and commissions should be reported to DanielKampert@kampis-elektroecke.de.
  */
 
-#include <sdkconfig.h>
+#ifndef SIM7020_PDP_CONTEXT_H_
+#define SIM7020_PDP_CONTEXT_H_
 
-#if(CONFIG_SIMXX_DEV == 7020)
+/** @brief          Default PDP context definition.
+ *  @param Context  Context ID
+ */
+#define SIM7020_PDP_DEFAULT_CONTEXT(Context)                        {                                   \
+                                                                        .ID = Context,                  \
+                                                                        .Type = SIM7020_PDP_IP,         \
+                                                                        .Address = "",                  \
+                                                                        .Internal = {                   \
+                                                                            .isConfigured = false,      \
+                                                                            .isActive = false           \
+                                                                        }                               \
+                                                                    }
 
-#include "sim7020.h"
-#include "sim7020_pdp_defs.h"
-
-#include "../../Core/Queue/sim70xx_queue.h"
-#include "../../Core/Commands/sim70xx_commands.h"
-
-#include "../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
-
-static const char* TAG = "SIM7020_PDP";
-
-// TODO: Check for GPRS and IP (see SIM7080)
-
-bool SIM7020_PGP_GPRS_isAttached(SIM7020_t& p_Device)
-{
-    std::string Response;
-    SIM70XX_TxCmd_t* Command;
-
-    if(p_Device.Internal.isInitialized == false)
-    {
-        return false;
-    }
-
-    SIM70XX_CREATE_CMD(Command);
-    *Command = SIM70XX_AT_CGATT_R;
-    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
-    {
-        return false;
-    }
-    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
-
-    return (bool)SIM70XX_Tools_StringToUnsigned(Response);
-}
-
-#endif
+#endif /* SIM7020_PDP_CONTEXT_H_ */

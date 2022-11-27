@@ -55,19 +55,25 @@ SIM70XX_Error_t SIM7080_PSM_Enable(SIM7080_t& p_Device, SIM7080_PSM_TAU_t TAU_Ba
  */
 SIM70XX_Error_t SIM7080_PSM_Disable(SIM7080_t& p_Device);
 
+/** @brief          Get the current PSM status from the modem.
+ *  @param p_Device SIM7080 device object
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_PSM_GetStatus(SIM7080_t& p_Device, bool* const p_Status);
+
 /** @brief          Set the PSM modem optimizations.
  *  @param p_Device SIM7080 device object
  *  @param p_Opts   Pointer to modem optimization object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_PSM_SetOptimizations(SIM7080_t& p_Device, SIM7080_PSM_ModemOpts_t* p_Opts);
+SIM70XX_Error_t SIM7080_PSM_SetOptimizations(SIM7080_t& p_Device, SIM7080_PSM_ModemOpts_t* const p_Opts);
 
 /** @brief          Get the PSM modem optimizations.
  *  @param p_Device SIM7080 device object
  *  @param p_Opts   Pointer to modem optimization object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_PSM_GetOptimizations(SIM7080_t& p_Device, SIM7080_PSM_ModemOpts_t* p_Opts);
+SIM70XX_Error_t SIM7080_PSM_GetOptimizations(SIM7080_t& p_Device, SIM7080_PSM_ModemOpts_t* const p_Opts);
 
 /** @brief          Wake up the module.
  *  @param p_Device SIM7080 device object
@@ -76,4 +82,4 @@ SIM70XX_Error_t SIM7080_PSM_GetOptimizations(SIM7080_t& p_Device, SIM7080_PSM_Mo
  */
 SIM70XX_Error_t SIM7080_PwrMgnt_WakeUp(SIM7080_t& p_Device, uint8_t Timeout = 10);
 
-#endif /* SIM7020_PWRMGNT_H_ */
+#endif /* SIM7080_PWRMGNT_H_ */

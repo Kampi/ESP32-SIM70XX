@@ -176,13 +176,13 @@ static void SIM70XX_Evt_Task(void* p_Arg)
 
                     if(Line.size() > 0)
                     {
-                        SIM70XX_LOGI(TAG, "     Device response: %s", Line.c_str());
+                        SIM70XX_LOGI(TAG, "     Device Response: %s", Line.c_str());
                     }
 
                     // The device has reported an error.
                     if(Line.find("ERROR") != std::string::npos)
                     {
-                        SIM70XX_LOGE(TAG, "     Device response error!");
+                        SIM70XX_LOGE(TAG, "     Device Response error!");
 
                         (*it)->isError = true;
 
@@ -226,7 +226,7 @@ static void SIM70XX_Evt_Task(void* p_Arg)
                     // NOTE: Value 0 will disable the timeout function. This can be used by commands which will report a result anyway.
                     else if(((*it)->Timeout != 0) && (SIM70XX_Timer_GetMilliseconds() - Now) > (*it)->Timeout)
                     {
-                        SIM70XX_LOGE(TAG, "     Device response timout!");
+                        SIM70XX_LOGE(TAG, "     Device Response timout!");
 
                         (*it)->isTimeout = true;
 
@@ -245,11 +245,15 @@ static void SIM70XX_Evt_Task(void* p_Arg)
                 Now = SIM70XX_Timer_GetMilliseconds();
                 do
                 {
+                    std::string Line;
+
                     SIM70XX_WDT_Reset();
+
+                    Line = SIM70XX_UART_ReadStringUntil(Device->UART);
 
                     // Read a new line from the serial interface.
                     // NOTE: The trailing \n is removed from the response!
-                    (*it)->Status.append(SIM70XX_UART_ReadStringUntil(Device->UART));
+                    (*it)->Status.append(Line);
 
                     // Abort when a timeout occurs.
                     if(((*it)->Timeout != 0) && (SIM70XX_Timer_GetMilliseconds() - Now) > (*it)->Timeout)
@@ -290,7 +294,7 @@ static void SIM70XX_Evt_Task(void* p_Arg)
     }
 }
 
-SIM70XX_Error_t SIM70XX_Evt_StartTask(SIM70XX_UART_Conf_t& p_Config, void* p_Arg)
+SIM70XX_Error_t SIM70XX_Evt_StartTask(SIM70XX_UART_Conf_t& p_Config, void* const p_Arg)
 {
     if(p_Arg == NULL)
     {

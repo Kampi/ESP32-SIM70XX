@@ -283,7 +283,8 @@ SIM70XX_Error_t SIM7080_MQTT_Publish(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t*
         {
             SIM70XX_LOGE(TAG, "Invalid response. Expect '>', got: %s", Response.c_str());
 
-            return SIM70XX_ERR_FAIL;
+            Error = SIM70XX_ERR_FAIL;
+            break;
         }
 
         // Send the data.
@@ -362,7 +363,7 @@ SIM70XX_Error_t SIM7080_MQTT_Subscribe(SIM7080_t& p_Device, SIM7080_MQTT_Socket_
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7080_MQTT_GetMessage(SIM7080_MQTT_Socket_t* p_Socket, SIM7080_MQTT_Sub_Evt_t* p_Message)
+SIM70XX_Error_t SIM7080_MQTT_GetSubscription(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* p_Socket, SIM7080_MQTT_Sub_Evt_t* p_Message)
 {
     SIM7080_MQTT_Sub_Evt_t* Packet;
 
@@ -370,7 +371,11 @@ SIM70XX_Error_t SIM7080_MQTT_GetMessage(SIM7080_MQTT_Socket_t* p_Socket, SIM7080
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
-    else if(SIM7080_MQTT_MessagesAvailable(p_Socket) == 0)
+    else if(p_Device.Internal.isInitialized == false)
+    {
+        return SIM70XX_ERR_NOT_INITIALIZED;
+    }
+    else if(uxQueueMessagesWaiting(p_Socket->Internal.SubQueue) == 0)
     {
         return SIM70XX_ERR_QUEUE_EMPTY;
     }

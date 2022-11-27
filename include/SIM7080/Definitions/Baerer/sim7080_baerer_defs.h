@@ -1,5 +1,5 @@
  /*
- * sim7080_pdp_defs.h
+ * sim7080_baerer_defs.h
  *
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -17,9 +17,10 @@
  * Errors and commissions should be reported to DanielKampert@kampis-elektroecke.de.
  */
 
-#ifndef SIM7080_PDP_DEFS_H_
-#define SIM7080_PDP_DEFS_H_
+#ifndef SIM7080_BAERER_DEFS_H_
+#define SIM7080_BAERER_DEFS_H_
 
+#include <string>
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -27,9 +28,9 @@
  */
 typedef enum
 {
-    SIM7080_PDP_DISABLE         = 0,                /**< Deactive. */
-    SIM7080_PDP_ENABLE,                             /**< Active. */
-    SIM7080_PDP_AUTO,                               /**< Deactive. */
+    SIM7080_PDP_DISABLE         = 0,                /**< Deactive PDP context. */
+    SIM7080_PDP_ENABLE,                             /**< Activate PDP context. */
+    SIM7080_PDP_AUTO,                               /**< . */
 } SIM7080_PDP_Action_t;
 
 /** @brief SIM7080 supported network states.
@@ -45,7 +46,7 @@ typedef enum
  */
 typedef enum
 {
-    SIM7080_PDP_GPRS_IP     = 0,                    /**< Internet Protocol (IETF STD 5). */
+    SIM7080_PDP_GPRS_IP         = 0,                /**< Internet Protocol (IETF STD 5). */
     SIM7080_PDP_GPRS_IPV6,                          /**< Internet Protocol, version 6 (IETF RFC 2460). */
     SIM7080_PDP_GPRS_IPV4V6,                        /**< Virtual <PDP_type) introduced to handle dual IP stack UE capability(see 3GPP TS 24.301). */
     SIM7080_PDP_GPRS_NO_IP,                         /**< Transfer of Non-IP data to external packet data Network (see 3GPP TS 24.301). */
@@ -55,7 +56,7 @@ typedef enum
  */
 typedef enum
 {
-    SIM7080_PDP_IP_IP       = 0,                    /**< Dual PDN Stack. */
+    SIM7080_PDP_IP_IP           = 0,                /**< Dual PDN Stack. */
     SIM7080_PDP_IP_IPV4,                            /**< Internet Protocol, version 4. */
     SIM7080_PDP_IP_IPV6,                            /**< Internet Protocol, version 6. */
     SIM7080_PDP_IP_NONIP,                           /**< Non IP. */
@@ -76,9 +77,25 @@ typedef enum
  */
 typedef struct
 {
-    uint8_t ID;                                     /**< PDP Context Identifier. */
+    uint8_t ID;                                     /**< PDP context Identifier. */
     SIM7080_PDP_Status_t Status;                    /**< Network status. */
     std::string IP;                                 /**< IP address. */
 } SIM7080_PDP_Network_t;
 
-#endif /* SIM7080_PDP_DEFS_H_ */
+/** @brief SIM7080 PDP context object definition.
+ */
+typedef struct
+{
+    uint8_t ID;                                     /**< PDP context identifier. */
+    SIM7080_PDP_IP_Type_t Type;                     /**< Packet data protocol type. */
+    SIM7080_PDP_IP_Auth_t Auth;                     /**< Authentication. */
+    struct
+    {
+        bool isConfigured;                          /**< PDP context configured.
+                                                         NOTE: Managed by the device driver. */
+        bool isActive;                              /**< PDP context active.
+                                                         NOTE: Managed by the device driver. */
+    } Internal;
+} SIM7080_PDP_Context_t;
+
+#endif /* SIM7080_BAERER_DEFS_H_ */

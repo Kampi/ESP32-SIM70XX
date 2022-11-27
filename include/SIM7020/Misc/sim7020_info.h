@@ -91,4 +91,26 @@ SIM70XX_Error_t SIM7020_Info_GetQuality(SIM7020_t& p_Device, SIM70XX_Qual_t* con
  */
 SIM70XX_Error_t SIM7020_Info_GetNetworkStatus(SIM7020_t& p_Device, SIM7020_NetState_t* p_Status);
 
+/** @brief              Read the battery status.
+ *  @param p_Device     SIM7020 device object
+ *  @param p_Battery    Pointer to battery level (0 - 100%)
+ *  @return             SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7020_Info_ReadBattery(SIM7020_t& p_Device, uint8_t* const p_Battery);
+
+/** @brief              Read the battery status.
+ *  @param p_Device     SIM7020 device object
+ *  @param p_Voltage    Pointer to battery voltage
+ *  @return             SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7020_Info_ReadBattery(SIM7020_t& p_Device, uint16_t* const p_Voltage);
+
+/** @brief              Read the battery status.
+ *  @param p_Device     SIM7020 device object
+ *  @param p_Battery    Pointer to battery level (0 - 100%)
+ *  @param p_Voltage    Pointer to battery voltage
+ *  @return             SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7020_Info_ReadBattery(SIM7020_t& p_Device, uint8_t* const p_Battery, uint16_t* const p_Voltage);
+
 #endif /* SIM7020_INFO_H_ */

@@ -36,6 +36,8 @@
 #include "../../Core/Arch/ESP32/GPIO/sim70xx_gpio.h"
 #include "../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
 
+static const char* TAG = "SIM7020_PSM";
+
 SIM70XX_Error_t SIM7080_PSM_Init(SIM7080_t& p_Device)
 {
     SIM70XX_TxCmd_t* Command;
@@ -110,7 +112,37 @@ SIM70XX_Error_t SIM7080_PSM_Disable(SIM7080_t& p_Device)
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7080_PSM_SetOptimizations(SIM7080_t& p_Device, SIM7080_PSM_ModemOpts_t* p_Opts)
+SIM70XX_Error_t SIM7080_PSM_GetStatus(SIM7080_t& p_Device, bool* const p_Status)
+{
+    std::string Response;
+    SIM70XX_TxCmd_t* Command;
+
+    if(p_Status == NULL)
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+    else if(p_Device.Internal.isInitialized == false)
+    {
+        return SIM70XX_ERR_NOT_INITIALIZED;
+    }
+
+    SIM70XX_CREATE_CMD(Command);
+    *Command = SIM7080_AT_CPSMS_R;
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
+    {
+        return SIM70XX_ERR_FAIL;
+    }
+    SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
+
+    *p_Status = (bool)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response));
+
+    ESP_LOGI(TAG, "PSM Status: %u", *p_Status);
+
+    return SIM70XX_ERR_OK;
+}
+
+SIM70XX_Error_t SIM7080_PSM_SetOptimizations(SIM7080_t& p_Device, SIM7080_PSM_ModemOpts_t* const p_Opts)
 {
     if(p_Opts == NULL)
     {
@@ -126,7 +158,7 @@ SIM70XX_Error_t SIM7080_PSM_SetOptimizations(SIM7080_t& p_Device, SIM7080_PSM_Mo
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7080_PSM_GetOptimizations(SIM7080_t& p_Device, SIM7080_PSM_ModemOpts_t* p_Opts)
+SIM70XX_Error_t SIM7080_PSM_GetOptimizations(SIM7080_t& p_Device, SIM7080_PSM_ModemOpts_t* const p_Opts)
 {
     if(p_Opts == NULL)
     {

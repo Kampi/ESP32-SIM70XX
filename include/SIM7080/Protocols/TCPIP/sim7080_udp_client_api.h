@@ -55,13 +55,13 @@ SIM70XX_Error_t SIM7080_UDP_Client_Create(SIM7080_t& p_Device, std::string IP, u
 /** @brief          Open a UDP connection to a remote server.
  *  @param p_Device SIM7080 device object
  *  @param p_Socket Pointer to UDP socket object
- *  @param PDP      (Optional) PDP context that should be used
+ *  @param p_PDP    Pointer to PDP context
  *  @param p_Result (Optional) Pointer to UDP error code
  *                  NOTE: Can be used for error tracking
  *  @param Timeout  (Optional) Transmission timeout in milliseconds
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_UDP_Client_Connect(SIM7080_t& p_Device, SIM7080_TCPIP_Socket_t* p_Socket, uint8_t PDP = 0, SIM7080_TCP_Error_t* p_Result = NULL);
+SIM70XX_Error_t SIM7080_UDP_Client_Connect(SIM7080_t& p_Device, SIM7080_TCPIP_Socket_t* p_Socket, SIM7080_PDP_Context_t* p_PDP, SIM7080_TCP_Error_t* p_Result = NULL);
 
 /** @brief              Transmit a UDP message.
  *  @param p_Device     SIM7080 device object

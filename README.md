@@ -5,6 +5,7 @@
 - [ESP32 driver for SIM70XX modules](#esp32-driver-for-sim70xx-modules)
   - [Table of Contents](#table-of-contents)
   - [About](#about)
+  - [TODO](#todo)
   - [Driver status](#driver-status)
     - [Description](#description)
       - [Not started](#not-started)
@@ -36,6 +37,12 @@
 
 Multidevice driver for SIMCom modules with UART interface.
 
+## TODO
+
+- Baerer driver from SIM7080 for SIM7020
+- PDP definition from SIM7080 for SIM7020
+- Check MQTT for SIM7020 (no connection?)
+
 ## Driver status
 
 | Driver        | SIM7020       | SIM7080       |
@@ -54,6 +61,7 @@ Multidevice driver for SIMCom modules with UART interface.
 | HTTP          | Complete      | Not started   |
 | CoAP          | Complete      | Not started   |
 | MQTT          | Complete      | Complete      |
+| FTP           |               |               |
 | PSM           | Basic         | Basic         |
 
 ### Description

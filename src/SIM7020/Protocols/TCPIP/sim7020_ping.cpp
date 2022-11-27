@@ -32,7 +32,7 @@
 
 static const char* TAG = "SIM7020_TCPIP";
 
-SIM70XX_Error_t SIM7020_TCPIP_Ping(SIM7020_t& p_Device, const SIM7020_Ping_t* const p_Config, std::vector<SIM7020_PingRes_t>* p_Result)
+SIM70XX_Error_t SIM7020_TCPIP_Ping(SIM7020_t& p_Device, const SIM7020_Ping_t* const p_Config, std::vector<SIM7020_PingRes_t>* const p_Result)
 {
     uint8_t Retries;
     uint8_t Pings;

@@ -32,13 +32,13 @@
 
 static const char* TAG = "SIM7020_DNS";
 
-SIM70XX_Error_t SIM7020_DNS_FetchAddress(SIM7020_t& p_Device, std::string Host, std::string* p_IP, SIM7020_DNS_Error_t* p_Error, uint32_t Timeout)
+SIM70XX_Error_t SIM7020_DNS_FetchAddress(SIM7020_t& p_Device, std::string Host, std::string* const p_IP, SIM7020_DNS_Error_t* const p_Error, uint32_t Timeout)
 {
     size_t Index;
     uint32_t Now;
-    SIM7020_DNS_Error_t DNS_Error;
     std::string Response;
     SIM70XX_TxCmd_t* Command;
+    SIM7020_DNS_Error_t DNS_Error;
 
     if(p_IP == NULL)
     {
@@ -133,7 +133,7 @@ SIM70XX_Error_t SIM7020_DNS_SetIndex(SIM7020_t& p_Device, uint8_t Index)
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_DNS_GetIndex(SIM7020_t& p_Device, uint8_t* p_Index)
+SIM70XX_Error_t SIM7020_DNS_GetIndex(SIM7020_t& p_Device, uint8_t* const p_Index)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;
@@ -181,7 +181,7 @@ SIM70XX_Error_t SIM7020_DNS_SetServer(SIM7020_t& p_Device, SIM7020_DNS_Server_t 
     return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
 }
 
-SIM70XX_Error_t SIM7020_DNS_GetServer(SIM7020_t& p_Device, SIM7020_DNS_Server_t* p_IPv4, SIM7020_DNS_Server_t* p_IPv6)
+SIM70XX_Error_t SIM7020_DNS_GetServer(SIM7020_t& p_Device, SIM7020_DNS_Server_t* const p_IPv4, SIM7020_DNS_Server_t* const p_IPv6)
 {
     size_t Index;
     std::string Response;

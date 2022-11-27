@@ -24,6 +24,15 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+/** @brief SIM7080 charge state definitions.
+ */
+typedef enum
+{
+    SIM7080_CHARGE_NOT = 0,                         /**< The device is not charging. */
+    SIM7080_CHARGING,                               /**< The device is charging. */
+    SIM7080_CHARGE_DONE,                            /**< The charging is done. */
+} SIM7080_ChargeState_t;
+
 /** @brief SIM7080 device information object definition.
  */
 typedef struct
@@ -79,6 +88,6 @@ typedef struct
     std::string OperationMode;                      /**< UE operation mode. */
     std::string MCC;                                /**< Mobile Country Code (first part of the PLMN code). */
     std::string MNC;                                /**< Mobile Network Code (second part of the PLMN code). */
-} SIM7080_UEInfo_t;
+} SIM7080_UE_Info_t;
 
 #endif /* SIM7080_INFO_DEFS_H_ */

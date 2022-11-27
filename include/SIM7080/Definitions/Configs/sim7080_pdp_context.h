@@ -1,5 +1,5 @@
  /*
- * sim7080_evt_mqtt.cpp
+ * sim7080_pdp_context.h
  *
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -17,40 +17,20 @@
  * Errors and commissions should be reported to DanielKampert@kampis-elektroecke.de.
  */
 
-#include <sdkconfig.h>
+#ifndef SIM7080_PDP_CONTEXT_H_
+#define SIM7080_PDP_CONTEXT_H_
 
-#if((CONFIG_SIMXX_DEV == 7080) && (defined CONFIG_SIM70XX_DRIVER_WITH_MQTT))
+/** @brief          Default PDP context definition.
+ *  @param Context  Context ID
+ */
+#define SIM7080_PDP_DEFAULT_CONTEXT(Context)                        {                                       \
+                                                                        .ID = Context,                      \
+                                                                        .Type = SIM7080_PDP_IP_IP,          \
+                                                                        .Auth = SIM7080_PDP_IP_AUTH_NONE,   \
+                                                                        .Internal = {                       \
+                                                                            .isConfigured = false,          \
+                                                                            .isActive = false               \
+                                                                        }                                   \
+                                                                    }
 
-#include "sim7080.h"
-#include "sim7080_evt.h"
-
-#include "../../Core/Queue/sim70xx_queue.h"
-#include "../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
-
-static const char* TAG = "SIM7080_Evt_MQTT";
-
-void SIM7080_Evt_on_MQTT_Subscribe(SIM7080_t* const p_Device, std::string* p_Message)
-{
-    SIM7080_MQTT_Sub_Evt_t* Message;
-
-    Message = new SIM7080_MQTT_Sub_Evt_t;
-
-    p_Message->erase(0, p_Message->find("\""));
-    SIM70XX_Tools_StringRemove(p_Message);
-
-    Message->Topic = SIM70XX_Tools_SubstringSplitErase(p_Message, ",");
-    Message->Payload = *p_Message;
-    SIMXX_TOOLS_REMOVE_LINEEND(Message->Payload);
-
-    SIM70XX_LOGD(TAG, "Topic: %s", Message->Topic.c_str());
-    SIM70XX_LOGD(TAG, "Payload: %s", Message->Payload.c_str());
-
-    if(p_Device->MQTT.Socket == NULL)
-    {
-        return;
-    }
-
-	xQueueSend(p_Device->MQTT.Socket->Internal.SubQueue, &Message, 0);
-}
-
-#endif
+#endif /* SIM7080_PDP_CONTEXT_H_ */

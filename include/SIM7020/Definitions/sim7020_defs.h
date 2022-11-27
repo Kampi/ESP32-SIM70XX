@@ -48,7 +48,7 @@
 #endif
 
 #include "sim70xx_defs.h"
-#include "sim7020_pdp_defs.h"
+#include "sim7020_baerer_defs.h"
 
 #include <sdkconfig.h>
 

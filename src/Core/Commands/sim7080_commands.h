@@ -44,7 +44,8 @@
 #define SIM7080_AT_CNACT_R                                      SIM70XX_CMD("AT+CNACT?", true, 10, 4)
 #define SIM7080_AT_CEREG_W(ID)                                  SIM70XX_CMD("AT+CEREG=" + std::to_string(ID), false, 1, 1)
 #define SIM7080_AT_CEREG_R                                      SIM70XX_CMD("AT+CEREG?", true, 300, 1)
-#define SIM7080_AT_CPOWD(Urgently)                              SIM70XX_CMD("AT+CPOWD=" + std::to_string(Urgently), true, 1, 1)
+#define SIM7080_AT_CPOWD(Urgently)                              SIM70XX_CMD("AT+CPOWD=" + std::to_string(Urgently), false, 1, 1)
+#define SIM7080_AT_CBC                                          SIM70XX_CMD("AT+CBC", true, 1, 1)
 
 /**
  *
@@ -101,6 +102,7 @@
  */
 #define SIM7080_AT_CPSMSTATUS(Enable)                           SIM70XX_CMD("AT+CPSMSTATUS=" + std::to_string(Enable), false, 1, 1)
 #define SIM7080_AT_CPSMS(Enable, TAU, Active)                   SIM70XX_CMD("AT+CPSMS=" + std::to_string(Enable) + ",,,\"" + TAU + "\",\"" + Active + "\"", false, 1, 1)
+#define SIM7080_AT_CPSMS_R                                      SIM70XX_CMD("AT+CPSMS?", true, 1, 1)
 
 /**
  *

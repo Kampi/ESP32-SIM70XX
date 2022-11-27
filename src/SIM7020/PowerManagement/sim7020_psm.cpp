@@ -138,7 +138,7 @@ SIM70XX_Error_t SIM7020_PSM_Disable(SIM7020_t& p_Device, SIM7020_PSM_Enable_t Mo
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_PSM_GetStatus(SIM7020_t& p_Device, bool* p_Status)
+SIM70XX_Error_t SIM7020_PSM_GetStatus(SIM7020_t& p_Device, bool* const p_Status)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;
@@ -168,7 +168,7 @@ SIM70XX_Error_t SIM7020_PSM_GetStatus(SIM7020_t& p_Device, bool* p_Status)
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_PSM_GetEventStatus(SIM7020_t& p_Device, bool* p_Enable)
+SIM70XX_Error_t SIM7020_PSM_GetEventStatus(SIM7020_t& p_Device, bool* const p_Enable)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;

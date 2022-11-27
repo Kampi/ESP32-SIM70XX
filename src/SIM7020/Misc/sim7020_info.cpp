@@ -209,7 +209,6 @@ SIM70XX_Error_t SIM7020_Info_GetQuality(SIM7020_t& p_Device, SIM70XX_Qual_t* p_R
 {
     int8_t RSSI;
     uint8_t RXQual;
-    size_t Index;
     std::string Response;
     SIM70XX_TxCmd_t* Command;
 
@@ -231,9 +230,8 @@ SIM70XX_Error_t SIM7020_Info_GetQuality(SIM7020_t& p_Device, SIM70XX_Qual_t* p_R
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    Index = Response.find(",");
-    RSSI = (int8_t)SIM70XX_Tools_StringToUnsigned(Response.substr(0, Index));
-    RXQual = (uint8_t)SIM70XX_Tools_StringToUnsigned(Response.substr(Response.find_last_of(",") + 1));
+    RSSI = (int8_t)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response));
+    RXQual = (uint8_t)SIM70XX_Tools_StringToUnsigned(Response);
 
     if(RSSI == 0)
     {

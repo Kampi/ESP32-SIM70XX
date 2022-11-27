@@ -31,7 +31,7 @@
 
 static const char* TAG = "SIM7080_NTP";
 
-SIM70XX_Error_t SIM7080_NTP_Sync(SIM7080_t& p_Device, std::string Server, int8_t TimeZone, struct tm* p_Time, SIM7080_NTP_Error_t* p_Error, uint8_t CID)
+SIM70XX_Error_t SIM7080_NTP_Sync(SIM7080_t& p_Device, SIM7080_PDP_Context_t* p_PDP, std::string Server, int8_t TimeZone, struct tm* const p_Time, SIM7080_NTP_Error_t* const p_Error)
 {
     size_t Index;
     std::string Status;
@@ -48,9 +48,13 @@ SIM70XX_Error_t SIM7080_NTP_Sync(SIM7080_t& p_Device, std::string Server, int8_t
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
+    else if(p_PDP->Internal.isActive == false)
+    {
+        return SIM70XX_ERR_PDP_NOT_ACTIVE;
+    }
 
     SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7080_AT_CNTP_W(Server, TimeZone, CID, SIM7080_NTP_MODE_BOTH);
+    *Command = SIM7080_AT_CNTP_W(Server, TimeZone, p_PDP->ID, SIM7080_NTP_MODE_BOTH);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
     if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
@@ -115,7 +119,7 @@ SIM70XX_Error_t SIM7080_NTP_Sync(SIM7080_t& p_Device, std::string Server, int8_t
     return Error;
 }
 
-SIM70XX_Error_t SIM7080_NTP_GetTime(SIM7080_t& p_Device, struct tm* p_Time, int8_t* p_Timezone)
+SIM70XX_Error_t SIM7080_NTP_GetTime(SIM7080_t& p_Device, struct tm* const p_Time, int8_t* const p_Timezone)
 {
     size_t Index;
     std::string Status;

@@ -177,7 +177,7 @@ SIM70XX_Error_t SIM7020_Client_Transmit(SIM7020_t& p_Device, SIM7020_TCPIP_Socke
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_Client_Receive(SIM7020_t& p_Device, SIM7020_TCPIP_Socket_t* p_Socket, std::string* p_Buffer)
+SIM70XX_Error_t SIM7020_Client_Receive(SIM7020_t& p_Device, SIM7020_TCPIP_Socket_t* p_Socket, std::string* p_Buffer, uint8_t Timeout)
 {
     size_t Index;
     std::string Response;
@@ -206,7 +206,10 @@ SIM70XX_Error_t SIM7020_Client_Receive(SIM7020_t& p_Device, SIM7020_TCPIP_Socket
 
     p_Buffer->clear();
 
-    while(SIM70XX_Queue_isEvent(p_Device.Internal.EventQueue, "+CSONMI: " + std::to_string(p_Socket->Internal.ID), &Response) == false);
+    while(SIM70XX_Queue_isEvent(p_Device.Internal.EventQueue, "+CSONMI: " + std::to_string(p_Socket->Internal.ID), &Response) == false)
+    {
+        vTaskDelay(100 / portTICK_PERIOD_MS);
+    }
 
     SIM70XX_LOGD(TAG, "Response: %s", Response.c_str());
 

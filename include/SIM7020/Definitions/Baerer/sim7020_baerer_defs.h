@@ -1,5 +1,5 @@
  /*
- * sim7020_pdp_defs.h
+ * sim7020_baerer_defs.h
  *
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -17,9 +17,10 @@
  * Errors and commissions should be reported to DanielKampert@kampis-elektroecke.de.
  */
 
-#ifndef SIM7020_PDP_DEFS_H_
-#define SIM7020_PDP_DEFS_H_
+#ifndef SIM7020_BAERER_DEFS_H_
+#define SIM7020_BAERER_DEFS_H_
 
+#include <string>
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -53,25 +54,6 @@ typedef enum
     SIM7020_PDP_HCOMP_3095,                         /**< RFC 3095 (ROHC) (applicable for PDCP only). */
 } SIM7020_PDP_HComp_t;
 
-/** @brief SIM7020 PDP Context object definition.
- */
-typedef struct
-{
-    uint8_t CID;                                    /**< Context Identifier. */
-    SIM7020_PDP_Type_t Type;                        /**< PDP Context type. */
-    std::string APN;                                /**< Access Point Name. */
-    std::string PDP_Address;                        /**< */
-    SIM7020_PDP_DComp_t D_Comp;                     /**< PDP data compression. */
-    SIM7020_PDP_HComp_t H_Comp;                     /**< PDP header compression. */
-    uint8_t IPv4_MTU;                               /**< Influences how the MT/TA requests to get the IPv4 MTU size, see 3GPP TS 24.008 sub-clause 10.5.6.3.
-                                                            0 Preference of IPv4 MTU size discovery not influenced by +CGDCONT
-                                                            1 Preference of IPv4 MTU size discovery through NAS signaling. */
-    uint8_t Non_MTU;                                /**< Influences how the MT/TA requests to get the Non-IP MTU size, see 3GPP TS 24.008 sub-clause 10.5.6.3.
-                                                            0 Preference of Non-IP MTU size discovery not influenced by +CGDCONT
-                                                            1 Preference of Non-IP MTU size discovery through NAS signaling. */
-} SIM7020_PDP_Context_t;
-
-
 /** @brief SIM7020 PDP context dynamic parameters object definition.
  */
 typedef struct
@@ -80,18 +62,34 @@ typedef struct
     std::string IP;                                 /**< Device IP address. */
     std::string Subnet;                             /**< */
     std::string APN;                                /**< A string parameter which is a logical name that was used to select the GGSN or the external packet data network. */
-    uint8_t CID;                                    /**< A numeric parameter which specifies a particular primary PDP
-                                                         context definition. The parameter is local to the TE-UE interface and is
-                                                         used in other PDP context-related commands. */
+    uint8_t CID;                                    /**< A numeric parameter which specifies a particular primary PDP context definition. 
+                                                         The parameter is local to the TE-UE interface and is used in other PDP context-related commands. */
     uint8_t Baerer;                                 /**< A numeric parameter which identifies the bearer, EPS Bearer in EPS and NSAPI in UMTS/GPRS. */
 } SIM7020_PDP_Params_t;
 
-/** @brief SIM7020 PDP Context status object definition.
+/** @brief SIM7020 PDP context object definition.
  */
 typedef struct
 {
-    uint8_t CID;                                    /**< Context Identifier. */
-    bool Status;                                    /**< PDP Context enable status. */
-} SIM7020_PDP_Status_t;
+    uint8_t ID;                                     /**< Context Identifier. */
+    uint8_t IPv4_MTU;                               /**< Influences how the MT/TA requests to get the IPv4 MTU size, see 3GPP TS 24.008 sub-clause 10.5.6.3.
+                                                            0 Preference of IPv4 MTU size discovery not influenced by +CGDCONT
+                                                            1 Preference of IPv4 MTU size discovery through NAS signaling. */
+    uint8_t Non_MTU;                                /**< Influences how the MT/TA requests to get the Non-IP MTU size, see 3GPP TS 24.008 sub-clause 10.5.6.3.
+                                                            0 Preference of Non-IP MTU size discovery not influenced by +CGDCONT
+                                                            1 Preference of Non-IP MTU size discovery through NAS signaling. */
+    SIM7020_PDP_Type_t Type;                        /**< PDP Context type. */
+    std::string APN;                                /**< Access Point Name. */
+    std::string Address;                            /**< */
+    SIM7020_PDP_DComp_t D_Comp;                     /**< PDP data compression. */
+    SIM7020_PDP_HComp_t H_Comp;                     /**< PDP header compression. */
+    struct
+    {
+        bool isConfigured;                          /**< PDP context configured.
+                                                         NOTE: Managed by the device driver. */
+        bool isActive;                              /**< PDP context active.
+                                                         NOTE: Managed by the device driver. */
+    } Internal;
+} SIM7020_PDP_Context_t;
 
-#endif /* SIM7020_PDP_DEFS_H_ */
+#endif /* SIM7020_BAERER_DEFS_H_ */

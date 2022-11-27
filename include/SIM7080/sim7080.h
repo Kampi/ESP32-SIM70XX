@@ -20,13 +20,14 @@
 #ifndef SIM7080_H_
 #define SIM7080_H_
 
-#include "sim7080_pdp.h"
 #include "sim7080_info.h"
 #include "sim7080_defs.h"
 #include "sim70xx_tools.h"
 #include "sim70xx_errors.h"
+#include "sim7080_baerer.h"
 #include "sim7080_pwrmgnt.h"
 
+#include "sim7080_pdp_context.h"
 #include "sim7080_config_1nce.h"
 #include "sim7080_config_fusion.h"
 
@@ -68,6 +69,14 @@
 #ifdef CONFIG_SIM70XX_DRIVER_WITH_GNSS
     #include "sim7080_gnss.h"
     #include "sim7080_config_gnss.h"
+#endif
+
+#ifdef CONFIG_SIM70XX_DRIVER_WITH_HTTP
+    #include "sim7080_http.h"
+#endif
+
+#ifdef CONFIG_SIM70XX_DRIVER_WITH_FTP
+    #include "sim7080_ftp.h"
 #endif
 
 /** @brief          Check if the module is initialized.
@@ -121,24 +130,6 @@ SIM70XX_Error_t SIM7080_Deinit(SIM7080_t& p_Device, bool Skip = false);
  */
 SIM70XX_Error_t SIM7080_SoftReset(SIM7080_t& p_Device, uint32_t Timeout = 60);
 
-/** @brief          Automatically set an enable an IP APN.
- *  @param p_Device SIM7080 device object
- *  @param APN      APN configuration object
- *  @param PDP      (Optional) PDP context ID
- *  @param Timeout  (Optional) Wait for connection timeout in seconds
- *  @return         SIM70XX_ERR_OK when successful
- */
-SIM70XX_Error_t SIM7080_IP_AutoAPN(SIM7080_t& p_Device, SIM70XX_APN_t APN, uint8_t PDP = 0, uint32_t Timeout = 60);
-
-/** @brief          Manually set an enable an IP APN.
- *  @param p_Device SIM7080 device object
- *  @param APN      APN configuration object
- *  @param PDP      (Optional) PDP context ID
- *  @param Timeout  (Optional) Wait for connection timeout in seconds
- *  @return         SIM70XX_ERR_OK when successful
- */
-SIM70XX_Error_t SIM7080_IP_ManualAPN(SIM7080_t& p_Device, SIM70XX_APN_t APN, uint8_t PDP = 0, uint32_t Timeout = 10);
-
 /** @brief          Set the operator for the communication.
  *  @param p_Device SIM7080 device object
  *  @param Mode     Operator selection mode
@@ -156,14 +147,14 @@ SIM70XX_Error_t SIM7080_SetOperator(SIM7080_t& p_Device, SIM70XX_OpMode_t Mode, 
  *  @param p_Format     Pointer to operation format
  *  @return             SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_GetOperator(SIM7080_t& p_Device, SIM70XX_Operator_t* p_Operator, SIM70XX_OpMode_t* p_Mode, SIM70XX_OpForm_t* p_Format);
+SIM70XX_Error_t SIM7080_GetOperator(SIM7080_t& p_Device, SIM70XX_Operator_t* const p_Operator, SIM70XX_OpMode_t* const p_Mode, SIM70XX_OpForm_t* const p_Format);
 
 /** @brief              Get the available operators.
  *  @param p_Device     SIM7080 device object
  *  @param p_Operators  Pointer for list of available operators
  *  @return             SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_GetAvailOperators(SIM7080_t& p_Device, std::vector<SIM70XX_Operator_t>* p_Operators);
+SIM70XX_Error_t SIM7080_GetAvailOperators(SIM7080_t& p_Device, std::vector<SIM70XX_Operator_t>* const p_Operators);
 
 /** @brief          Configure the frequency bands for CAT-M or NB-IoT mode.
  *  @param p_Device SIM7080 device object
@@ -179,7 +170,7 @@ SIM70XX_Error_t SIM7080_SetBandConfig(SIM7080_t& p_Device, SIM7080_Mode_t Mode, 
  *  @param p_Band   Pointer to frequency band list
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_GetBandConfig(SIM7080_t& p_Device, SIM7080_Mode_t Mode, std::vector<uint8_t>* p_Bands);
+SIM70XX_Error_t SIM7080_GetBandConfig(SIM7080_t& p_Device, SIM7080_Mode_t Mode, std::vector<uint8_t>* const p_Bands);
 
 /** @brief          Set the frequency band of the module.
  *  @param p_Device SIM7080 device object
@@ -193,7 +184,7 @@ SIM70XX_Error_t SIM7080_SetBand(SIM7080_t& p_Device, SIM7080_Band_t Band);
  *  @param p_Band   Pointer to freuquency band
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_GetBand(SIM7080_t& p_Device, SIM7080_Band_t* p_Band);
+SIM70XX_Error_t SIM7080_GetBand(SIM7080_t& p_Device, SIM7080_Band_t* const p_Band);
 
 /** @brief          Set the preferred network mode.
  *  @param p_Device SIM7080 device object
@@ -207,7 +198,7 @@ SIM70XX_Error_t SIM7080_SetNetMode(SIM7080_t& p_Device, SIM7080_NetMode_t Mode);
  *  @param p_Mode   Pointer to preferred mode selection
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_GetNetMode(SIM7080_t& p_Device, SIM7080_NetMode_t* p_Mode);
+SIM70XX_Error_t SIM7080_GetNetMode(SIM7080_t& p_Device, SIM7080_NetMode_t* const p_Mode);
 
 /** @brief          Set the preffered selection between CAT-M and NB-IoT.
  *  @param p_Device SIM7080 device object
@@ -221,7 +212,7 @@ SIM70XX_Error_t SIM7080_SetSelectedMode(SIM7080_t& p_Device, SIM7080_Mode_t Mode
  *  @param p_Mode   Pointer to referred selection
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_GetSelection(SIM7080_t& p_Device, SIM7080_Mode_t* p_Mode);
+SIM70XX_Error_t SIM7080_GetSelection(SIM7080_t& p_Device, SIM7080_Mode_t* const p_Mode);
 
 /** @brief          Set the device functionality.
  *  @param p_Device SIM7080 device object

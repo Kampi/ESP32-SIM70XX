@@ -137,11 +137,9 @@ void SIM7020_Evt_on_HTTP_Header(SIM7020_t* const p_Device, std::string* p_Messag
     {
         if((*it)->Internal.ID == Response->ID)
         {
-            if(((*it)->Internal.ResponseQueue == NULL) ||
-               (xQueueSend((*it)->Internal.ResponseQueue, &Response, 0) != pdPASS)
-              )
+            if((*it)->Internal.ResponseQueue == NULL)
             {
-                delete Response;
+                xQueueSend((*it)->Internal.ResponseQueue, &Response, 0);
             }
         }
     }

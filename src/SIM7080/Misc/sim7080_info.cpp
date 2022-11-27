@@ -268,7 +268,7 @@ SIM70XX_Error_t SIM7080_Info_GetQuality(SIM7080_t& p_Device, SIM70XX_Qual_t* p_R
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7080_Info_GetEquipmentInfo(SIM7080_t& p_Device, SIM7080_UEInfo_t* p_Info)
+SIM70XX_Error_t SIM7080_Info_GetEquipmentInfo(SIM7080_t& p_Device, SIM7080_UE_Info_t* p_Info)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;

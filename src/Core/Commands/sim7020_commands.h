@@ -34,7 +34,8 @@
 #define SIM7020_AT_COPS_R                                       SIM70XX_CMD("AT+COPS=?", true, 300, 1)
 #define SIM7020_AT_CEREG_W(ID)                                  SIM70XX_CMD("AT+CEREG=" + std::to_string(ID), false, 1, 1)
 #define SIM7020_AT_CEREG_R                                      SIM70XX_CMD("AT+CEREG?", true, 300, 1)
-#define SIM7020_AT_CPOWD(Urgently)                              SIM70XX_CMD("AT+CPOWD=" + std::to_string(Urgently), true, 1, 1)
+#define SIM7020_AT_CPOWD(Urgently)                              SIM70XX_CMD("AT+CPOWD=" + std::to_string(Urgently), false, 1, 1)
+#define SIM7020_AT_CBC                                          SIM70XX_CMD("AT+CBC", true, 1, 1)
 
 /**
  *
@@ -45,6 +46,7 @@
 #define SIM7020_AT_CGACT_R                                      SIM70XX_CMD("AT+CGACT?", true, 10, 1)
 #define SIM7020_AT_CGDEL(ID)                                    SIM70XX_CMD("AT+CGDEL=" + std::to_string(ID), true, 10, 1)
 #define SIM7020_AT_CGDCONT_R                                    SIM70XX_CMD("AT+CGDCONT?", true, 10, 1)
+#define SIM7020_AT_CGDCONT_W(Command)                           SIM70XX_CMD("AT+CGDCONT=" + Command, false, 10, 1)
 
 /**
  *
@@ -60,7 +62,6 @@
 #define SIM7020_AT_CCID                                         SIM70XX_CMD("AT+CCID", true, 60, 1)
 #define SIM7020_AT_CGMR                                         SIM70XX_CMD("AT+CGMR", true, 60, 1)
 #define SIM7020_AT_CGCONTRDP_W(ID)                              SIM70XX_CMD("AT+CGCONTRDP=" + std::to_string(ID), true, 60, 1)
-#define SIM7020_AT_CGCONTRDP                                    SIM70XX_CMD("AT+CGCONTRDP", true, 300, 1)
 #define SIM7020_AT_CGREG                                        SIM70XX_CMD("AT+CGREG?", true, 10, 1)
 #define SIM7020_AT_CSQ                                          SIM70XX_CMD("AT+CSQ", true, 1, 1)
 #define SIM7020_AT_CENG_R                                       SIM70XX_CMD("AT+CENG?", true, 1, 1)
@@ -118,7 +119,7 @@
 
 /**
  *
- * Used in SIM7020 HTTP(S) driver.
+ * Used in SIM7020 HTTP driver.
  *
  */
 #define SIM7020_AT_CHTTPCREATE(Host)                            SIM70XX_CMD("AT+CHTTPCREATE=" + Host, true, 60, 1)

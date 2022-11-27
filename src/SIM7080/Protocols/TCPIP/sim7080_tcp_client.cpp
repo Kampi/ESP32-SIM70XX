@@ -30,14 +30,14 @@ SIM70XX_Error_t SIM7080_TCP_Client_Create(SIM7080_t& p_Device, std::string IP, u
     return SIM7080_Client_CreateSocket(p_Device, SIM7080_TCP_TYPE_TCP, IP, Port, p_Socket, CID, ReadManually);
 }
 
-SIM70XX_Error_t SIM7080_TCP_Client_Connect(SIM7080_t& p_Device, SIM7080_TCPIP_Socket_t* p_Socket, uint8_t PDP, SIM7080_TCP_Error_t* p_Result)
+SIM70XX_Error_t SIM7080_TCP_Client_Connect(SIM7080_t& p_Device, SIM7080_TCPIP_Socket_t* p_Socket, SIM7080_PDP_Context_t* p_PDP, SIM7080_TCP_Error_t* p_Result)
 {
     if(p_Socket->Internal.Type != SIM7080_TCP_TYPE_TCP)
     {
         return SIM70XX_ERR_INVALID_SOCKET;
     }
 
-    return SIM7080_Client_ConnectSocket(p_Device, p_Socket, PDP, p_Result);
+    return SIM7080_Client_ConnectSocket(p_Device, p_Socket, p_PDP, p_Result);
 }
 
 SIM70XX_Error_t SIM7080_TCP_Client_Transmit(SIM7080_t& p_Device, SIM7080_TCPIP_Socket_t* p_Socket, const void* p_Buffer, uint32_t Length, uint8_t Retries, uint16_t Timeout, uint16_t PacketSize)

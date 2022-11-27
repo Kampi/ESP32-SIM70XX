@@ -33,6 +33,6 @@
  *  @param Timeout  (Optional) Message timeout for each the request in seconds
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_DNS_FetchAddress(SIM7020_t& p_Device, std::string Host, std::string* p_IP, SIM7020_DNS_Error_t* p_Error = NULL, uint32_t Timeout = 60);
+SIM70XX_Error_t SIM7020_DNS_FetchAddress(SIM7020_t& p_Device, std::string Host, std::string* const p_IP, SIM7020_DNS_Error_t* const p_Error = NULL, uint32_t Timeout = 60);
 
 #endif /* SIM7020_DNS_H_ */

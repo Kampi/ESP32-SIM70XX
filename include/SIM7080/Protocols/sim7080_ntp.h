@@ -26,14 +26,14 @@
 
 /** @brief              Sync the local time with the time from an NTP server.
  *  @param p_Device     SIM7080 device object
+ *  @param p_PDP        Pointer to PDP context
  *  @param Server       NTP server
  *  @param Timezone     Timezone
  *  @param p_Time       Pointer to local time
  *  @param p_Error      (Optional) NTP synchronization error code
- *  @param CID          (Optional) NTP CID
  *  @return             SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_NTP_Sync(SIM7080_t& p_Device, std::string Server, int8_t TimeZone, struct tm* p_Time, SIM7080_NTP_Error_t* p_Error = NULL, uint8_t CID = 0);
+SIM70XX_Error_t SIM7080_NTP_Sync(SIM7080_t& p_Device, SIM7080_PDP_Context_t* p_PDP, std::string Server, int8_t TimeZone, struct tm* const p_Time, SIM7080_NTP_Error_t* const p_Error = NULL);
 
 /** @brief              Get the current time from the module.
  *                      NOTE: Use \ref SIM7080_NTP_Sync to sync the time first!
@@ -42,6 +42,6 @@ SIM70XX_Error_t SIM7080_NTP_Sync(SIM7080_t& p_Device, std::string Server, int8_t
  *  @param p_Timezone   (Optional) Pointer to timezone
  *  @return             SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_NTP_GetTime(SIM7080_t& p_Device, struct tm* p_Time, int8_t* p_Timezone = NULL);
+SIM70XX_Error_t SIM7080_NTP_GetTime(SIM7080_t& p_Device, struct tm* const p_Time, int8_t* const p_Timezone = NULL);
 
 #endif /* SIM7080_NTP_H_ */

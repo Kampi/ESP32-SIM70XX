@@ -29,17 +29,18 @@
 #endif
 
 /** @brief              Device specific event message filter.
+ *                      This event filter is responsible for filtering out the specific messages for i. e. MQTT or the PSM.
  *  @param p_Device     Pointer to device object
  *  @param p_Message    Pointer to event message
  */
-extern void SIM70XX_Evt_MessageFilter(void* p_Device, std::string* p_Message);
+extern void SIM70XX_Evt_MessageFilter(void* p_Device, std::string* const p_Message);
 
 /** @brief          Start the SIM70XX event task.
  *  @param p_Config Pointer to UART configuration
  *  @param p_Arg    Pointer to task arguments
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM70XX_Evt_StartTask(SIM70XX_UART_Conf_t& p_Config, void* p_Arg);
+SIM70XX_Error_t SIM70XX_Evt_StartTask(SIM70XX_UART_Conf_t& p_Config, void* const p_Arg);
 
 /** @brief          Stop the SIM70XX event task.
  *  @param p_Handle Pointer to task handle

@@ -42,7 +42,7 @@ typedef int SIM70XX_Error_t;
  */
 #define SIM70XX_ERR_INVALID_ARG                                 SIM70XX_ERR_BASE + 1
 
-/** @brief The module or the module interface is not initialized. Please call the module initialization function "SIM70xy_Init" first!
+/** @brief The module or the interface is not initialized. Please call the module initialization function "SIM70xy_Init" first!
  */
 #define SIM70XX_ERR_NOT_INITIALIZED                             SIM70XX_ERR_BASE + 2
 
@@ -101,6 +101,14 @@ typedef int SIM70XX_Error_t;
 /** @brief Invalid socket type.
  */
 #define SIM70XX_ERR_INVALID_SOCKET                              SIM70XX_ERR_BASE + 16
+
+/** @brief PDP context not inizalized.
+ */
+#define SIM70XX_ERR_PDP_NOT_INITIALIZED                         SIM70XX_ERR_BASE + 17
+
+/** @brief PDP context not active.
+ */
+#define SIM70XX_ERR_PDP_NOT_ACTIVE                              SIM70XX_ERR_BASE + 18
 
 /** @brief      Generic error check macro.
  *  @param Func Function call

@@ -104,20 +104,15 @@ SIM70XX_Error_t SIM7020_Init(SIM7020_t& p_Device, SIM7020_Config_t& p_Config, ui
     }
 
     SIM70XX_ERROR_CHECK(SIM7020_GetFunctionality(p_Device))
+
+    // TODO: Needs check with PDP context activation functions (SIM7020_Baerer_SetAPN)
     SIM70XX_ERROR_CHECK(SIM7020_SetFunctionality(p_Device, SIM7020_FUNC_MIN));
     SIM70XX_ERROR_CHECK(SIM7020_SetPSD(p_Device, SIM7020_PDP_IP, p_Config.APN));
     SIM70XX_ERROR_CHECK(SIM7020_SetFunctionality(p_Device, SIM7020_FUNC_FULL));
     SIM70XX_ERROR_CHECK(SIM7020_SetOperator(p_Device, SIM_MODE_MANUAL, p_Config.OperatorFormat, p_Config.Operator));
     SIM70XX_ERROR_CHECK(SIM7020_SetBand(p_Device, p_Config.Band));
-    SIM70XX_ERROR_CHECK(SIM7020_Info_GetNetworkRegistrationStatus(p_Device));
 
-/*
-    SIM7020_PSM_Enable(p_Device, 3, 15, 0, 15);
-    SIM70XX_ERROR_CHECK(SIM7020_PSM_SetEventStatus(p_Device, true));
-    Error = SIM7020_GetOperator(p_Device, &p_Device.Operators, &p_Device.Modes, &p_Device.Formats);
-*/
-
-    return SIM70XX_ERR_OK;
+    return SIM7020_Baerer_PDP_DisableAll(p_Device);
 }
 
 SIM70XX_Error_t SIM7020_Deinit(SIM7020_t& p_Device, bool Skip)
@@ -130,8 +125,8 @@ SIM70XX_Error_t SIM7020_Deinit(SIM7020_t& p_Device, bool Skip)
     // Shutdown the modem.
     if(Skip == false)
     {
+        std::string Status;
         SIM70XX_TxCmd_t* Command;
-        std::string Response;
 
         SIM70XX_CREATE_CMD(Command);
         *Command = SIM7020_AT_CPOWD(true);
@@ -141,8 +136,8 @@ SIM70XX_Error_t SIM7020_Deinit(SIM7020_t& p_Device, bool Skip)
             return SIM70XX_ERR_FAIL;
         }
 
-        SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response);
-        if(Response.find("NORMAL POWER DOWN") == std::string::npos)
+        SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, NULL, &Status);
+        if(Status.find("NORMAL POWER DOWN") == std::string::npos)
         {
             return SIM70XX_ERR_FAIL;
         }
@@ -188,7 +183,7 @@ SIM70XX_Error_t SIM7020_SoftReset(SIM7020_t& p_Device, uint32_t Timeout)
         SIM70XX_UART_SendLine(p_Device.UART, "ATZ");
         Response = SIM70XX_UART_ReadStringUntil(p_Device.UART);
         Response = SIM70XX_UART_ReadStringUntil(p_Device.UART);
-        SIM70XX_LOGI(TAG, "Response: %s", Response.c_str());
+        SIM70XX_LOGD(TAG, "Response: %s", Response.c_str());
 
         // Check if the reset was successful.
         if(Response.find("OK") != std::string::npos)
@@ -297,7 +292,7 @@ SIM70XX_Error_t SIM7020_SetOperator(SIM7020_t& p_Device, SIM70XX_OpMode_t Mode, 
     return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
 }
 
-SIM70XX_Error_t SIM7020_GetOperator(SIM7020_t& p_Device, SIM70XX_Operator_t* p_Operator, SIM70XX_OpMode_t* p_Mode)
+SIM70XX_Error_t SIM7020_GetOperator(SIM7020_t& p_Device, SIM70XX_Operator_t* const p_Operator, SIM70XX_OpMode_t* const p_Mode)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;
@@ -310,9 +305,10 @@ SIM70XX_Error_t SIM7020_GetOperator(SIM7020_t& p_Device, SIM70XX_Operator_t* p_O
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
-
-    // The device must be active to check the operators.
-    SIM70XX_ERROR_CHECK(SIM7020_SetFunctionality(p_Device, SIM7020_FUNC_FULL));
+    else if(p_Device.Connection.Functionality != SIM7020_FUNC_FULL)
+    {
+        return SIM70XX_ERR_INVALID_STATE;
+    }
 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_COPS;
@@ -323,12 +319,12 @@ SIM70XX_Error_t SIM7020_GetOperator(SIM7020_t& p_Device, SIM70XX_Operator_t* p_O
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    SIM70XX_LOGI(TAG, "Response: %s", Response.c_str());
+    SIM70XX_LOGD(TAG, "Response: %s", Response.c_str());
 
     if(Response.size())
     {
-        *p_Mode = (SIM70XX_OpMode_t)stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
-        p_Operator->Format = (SIM70XX_OpForm_t)stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
+        *p_Mode = (SIM70XX_OpMode_t)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response));
+        p_Operator->Format = (SIM70XX_OpForm_t)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response));
 
         if(p_Operator->Format == SIM_FORM_LONG)
         {
@@ -347,13 +343,13 @@ SIM70XX_Error_t SIM7020_GetOperator(SIM7020_t& p_Device, SIM70XX_Operator_t* p_O
         }
 
         p_Operator->Stat = SIM_OP_CUR;
-        p_Operator->Act = stoi(SIM70XX_Tools_SubstringSplitErase(&Response));
+        p_Operator->Act = (uint8_t)SIM70XX_Tools_StringToUnsigned(Response);
     }
 
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_GetAvailOperators(SIM7020_t& p_Device, std::vector<SIM70XX_Operator_t>* p_Operators)
+SIM70XX_Error_t SIM7020_GetAvailOperators(SIM7020_t& p_Device, std::vector<SIM70XX_Operator_t>* const p_Operators)
 {
     size_t Start;
     std::string List;
@@ -368,9 +364,10 @@ SIM70XX_Error_t SIM7020_GetAvailOperators(SIM7020_t& p_Device, std::vector<SIM70
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
-
-    // The device must be active to check the operators.
-    SIM70XX_ERROR_CHECK(SIM7020_SetFunctionality(p_Device, SIM7020_FUNC_FULL));
+    else if(p_Device.Connection.Functionality != SIM7020_FUNC_FULL)
+    {
+        return SIM70XX_ERR_INVALID_STATE;
+    }
 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_COPS_R;
@@ -438,7 +435,7 @@ SIM70XX_Error_t SIM7020_SetBand(SIM7020_t& p_Device, SIM7020_Band_t Band)
     return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
 }
 
-SIM70XX_Error_t SIM7020_GetBand(SIM7020_t& p_Device, SIM7020_Band_t* p_Band)
+SIM70XX_Error_t SIM7020_GetBand(SIM7020_t& p_Device, SIM7020_Band_t* const p_Band)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;
@@ -474,9 +471,10 @@ SIM70XX_Error_t SIM7020_GetBand(SIM7020_t& p_Device, SIM7020_Band_t* p_Band)
 
 SIM70XX_Error_t SIM7020_SetFunctionality(SIM7020_t& p_Device, SIM7020_Func_t Func, SIM7020_Reset_t Reset)
 {
-    std::string Status;
+    uint32_t Now;
+    std::string Line;
     std::string Response;
-    SIM70XX_TxCmd_t* Command;
+    SIM70XX_TxCmd_t Command;
 
     if(p_Device.Internal.isInitialized == false)
     {
@@ -487,16 +485,29 @@ SIM70XX_Error_t SIM7020_SetFunctionality(SIM7020_t& p_Device, SIM7020_Func_t Fun
         return SIM70XX_ERR_OK;
     }
 
-    SIM70XX_CREATE_CMD(Command);
-    *Command = SIM70XX_AT_CFUN_W(Func, Reset);
-    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
-    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
+    Command = SIM70XX_AT_CFUN_W(Func, Reset);
+    SIM70XX_LOGI(TAG, "Tranmit command: %s", Command.Command.c_str());
+    vTaskSuspend(p_Device.UART.TaskHandle);
+    SIM70XX_UART_SendLine(p_Device.UART, Command.Command);
+    Now = SIM70XX_Timer_GetMilliseconds();
+    do
+    {
+        Line = SIM70XX_UART_ReadStringUntil(p_Device.UART);
+        Response += Line + "\n";
+
+        if((SIM70XX_Timer_GetMilliseconds() - Now) > (Command.Timeout * 1000UL))
+        {
+            break;
+        }
+
+        vTaskDelay(100 / portTICK_PERIOD_MS);
+    } while(((Response.find("CPIN") == std::string::npos) || (Response.find("OK") == std::string::npos)) &&(Response.find("ERROR") == std::string::npos));
+    vTaskResume(p_Device.UART.TaskHandle);
+
+    if(Response.find("OK") == std::string::npos)
     {
         return SIM70XX_ERR_FAIL;
     }
-    SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response, &Status);
-
-    SIM70XX_LOGI(TAG, "Response: %s", Response.c_str());
 
     p_Device.Connection.Functionality = Func;
 
@@ -522,7 +533,7 @@ SIM70XX_Error_t SIM7020_GetFunctionality(SIM7020_t& p_Device)
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-     p_Device.Connection.Functionality = (SIM7020_Func_t)SIM70XX_Tools_StringToUnsigned(Response);
+    p_Device.Connection.Functionality = (SIM7020_Func_t)SIM70XX_Tools_StringToUnsigned(Response);
 
     SIM70XX_LOGI(TAG, "Functionality: %u", p_Device.Connection.Functionality);
 

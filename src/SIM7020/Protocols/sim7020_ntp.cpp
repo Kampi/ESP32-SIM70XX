@@ -32,7 +32,7 @@
 
 static const char* TAG = "SIM7020_NTP";
 
-SIM70XX_Error_t SIM7020_NTP_Sync(SIM7020_t& p_Device, std::string Server, int8_t TimeZone, struct tm* p_Time, uint32_t Timeout)
+SIM70XX_Error_t SIM7020_NTP_Sync(SIM7020_t& p_Device, std::string Server, int8_t TimeZone, struct tm* const p_Time, uint32_t Timeout)
 {
     uint32_t Now;
     std::string Response;
@@ -119,7 +119,7 @@ SIM70XX_Error_t SIM7020_NTP_Sync(SIM7020_t& p_Device, std::string Server, int8_t
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_NTP_GetTime(SIM7020_t& p_Device, struct tm* p_Time, int8_t* p_Timezone)
+SIM70XX_Error_t SIM7020_NTP_GetTime(SIM7020_t& p_Device, struct tm* const p_Time, int8_t* const p_Timezone)
 {
     size_t Index;
     std::string Status;

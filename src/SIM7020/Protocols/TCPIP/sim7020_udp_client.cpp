@@ -52,14 +52,14 @@ SIM70XX_Error_t SIM7020_UDP_Client_Transmit(SIM7020_t& p_Device, SIM7020_TCPIP_S
     return SIM7020_Client_Transmit(p_Device, p_Socket, p_Buffer, Length, PacketSize);
 }
 
-SIM70XX_Error_t SIM7020_UDP_Client_Receive(SIM7020_t& p_Device, SIM7020_TCPIP_Socket_t* p_Socket, std::string* p_Buffer)
+SIM70XX_Error_t SIM7020_UDP_Client_Receive(SIM7020_t& p_Device, SIM7020_TCPIP_Socket_t* p_Socket, std::string* p_Buffer, uint8_t Timeout)
 {
     if(p_Socket->Internal.Type != SIM7020_TCP_TYPE_UDP)
     {
         return SIM70XX_ERR_INVALID_SOCKET;
     }
 
-    return SIM7020_Client_Receive(p_Device, p_Socket, p_Buffer);
+    return SIM7020_Client_Receive(p_Device, p_Socket, p_Buffer, Timeout);
 }
 
 SIM70XX_Error_t SIM7020_UDP_Client_Disconnect(SIM7020_t& p_Device, SIM7020_TCPIP_Socket_t* p_Socket)

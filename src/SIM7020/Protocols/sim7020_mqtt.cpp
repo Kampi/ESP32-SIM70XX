@@ -31,7 +31,7 @@
 
 static const char* TAG = "SIM7020_MQTT";
 
-SIM70XX_Error_t SIM7020_MQTT_Create(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* p_Socket, std::string Broker, uint16_t Port, SIM7020_MQTT_Version_t Version, uint8_t CID)
+SIM70XX_Error_t SIM7020_MQTT_Create(SIM7020_t& p_Device, SIM7020_PDP_Context_t* const p_PDP, SIM7020_MQTT_Socket_t* const p_Socket, std::string Broker, uint16_t Port, SIM7020_MQTT_Version_t Version, uint8_t CID)
 {
     if(p_Socket == NULL)
     {
@@ -42,23 +42,22 @@ SIM70XX_Error_t SIM7020_MQTT_Create(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* 
     p_Socket->Port = Port;
     p_Socket->Timeout = 12000;
     p_Socket->BufferSize = 1024;
-    p_Socket->CID = CID;
     p_Socket->Version = Version;
     p_Socket->ClientID = "SIM7020_MQTT";
     p_Socket->KeepAlive = 600;
     p_Socket->CleanSession = true;
     p_Socket->WillFlag = false;
 
-    return SIM7020_MQTT_Create(p_Device, p_Socket);
+    return SIM7020_MQTT_Create(p_Device, p_PDP, p_Socket);
 }
 
-SIM70XX_Error_t SIM7020_MQTT_Create(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* p_Socket)
+SIM70XX_Error_t SIM7020_MQTT_Create(SIM7020_t& p_Device, SIM7020_PDP_Context_t* const p_PDP, SIM7020_MQTT_Socket_t* const p_Socket)
 {
     std::string Response;
     std::string CommandStr;
     SIM70XX_TxCmd_t* Command;
 
-    if((p_Socket == NULL) || (p_Socket->KeepAlive > 64800) || (p_Socket->Timeout > 60000) || (p_Socket->BufferSize < 20) || (p_Socket->BufferSize > 1132) || (p_Socket->Broker.size() > 50) || (p_Socket->CID > 10) ||
+    if((p_PDP == NULL) || (p_Socket == NULL) || (p_Socket->KeepAlive > 64800) || (p_Socket->Timeout > 60000) || (p_Socket->BufferSize < 20) || (p_Socket->BufferSize > 1132) || (p_Socket->Broker.size() > 50) ||
        (p_Socket->Version < SIM7020_MQTT_31) || (p_Socket->Version > SIM7020_MQTT_311) || (p_Socket->ClientID.size() == 0) || (p_Socket->ClientID.size() > 120) ||
        ((p_Socket->WillFlag == true) && ((p_Socket->p_LastWill->Topic.size() == 0) || (p_Socket->p_LastWill->Message.size() == 0))) || ((p_Socket->Username.size() > 100) && (p_Socket->Password.size() > 100)))
     {
@@ -68,6 +67,12 @@ SIM70XX_Error_t SIM7020_MQTT_Create(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* 
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
+    else if(p_PDP->Internal.isActive == false)
+    {
+        return SIM70XX_ERR_PDP_NOT_ACTIVE;
+    }
+
+    p_Socket->CID = p_PDP->ID;
 
     CommandStr = "AT+CMQNEW=\"" + p_Socket->Broker + "\"," + "\"" + std::to_string(p_Socket->Port) + "\"," + std::to_string(p_Socket->Timeout) + "," + std::to_string(p_Socket->BufferSize) + "," + std::to_string(p_Socket->CID);
     SIM70XX_CREATE_CMD(Command);
@@ -91,7 +96,7 @@ SIM70XX_Error_t SIM7020_MQTT_Create(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* 
     return SIM70XX_ERR_OK;    
 }
 
-SIM70XX_Error_t SIM7020_MQTT_Connect(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* p_Socket)
+SIM70XX_Error_t SIM7020_MQTT_Connect(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* const p_Socket)
 {
     std::string Response;
     std::string CommandStr;
@@ -142,12 +147,12 @@ SIM70XX_Error_t SIM7020_MQTT_Connect(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t*
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_MQTT_Publish(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* p_Socket, std::string Topic, std::string Message, SIM7020_MQTT_QoS_t QoS, bool Retained, bool Dup)
+SIM70XX_Error_t SIM7020_MQTT_Publish(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* const p_Socket, std::string Topic, std::string Message, SIM7020_MQTT_QoS_t QoS, bool Retained, bool Dup)
 {
     return SIM7020_MQTT_Publish(p_Device, p_Socket, Topic, Message.c_str(), Message.size(), QoS, Retained, Dup);
 }
 
-SIM70XX_Error_t SIM7020_MQTT_Publish(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* p_Socket, std::string Topic, const void* p_Buffer, uint32_t Length, SIM7020_MQTT_QoS_t QoS, bool Retained, bool Dup)
+SIM70XX_Error_t SIM7020_MQTT_Publish(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* const p_Socket, std::string Topic, const void* const p_Buffer, uint32_t Length, SIM7020_MQTT_QoS_t QoS, bool Retained, bool Dup)
 {
     std::string Buffer_Hex;
     std::string Response;
@@ -167,6 +172,8 @@ SIM70XX_Error_t SIM7020_MQTT_Publish(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t*
         return SIM70XX_ERR_NOT_CONNECTED;
     }
 
+    // TODO: Add support for larger transmission sizes.
+
     SIM70XX_Tools_Buf2Hex(p_Buffer, Length, &Buffer_Hex);
     CommandStr = "AT+CMQPUB=" + std::to_string(p_Socket->Internal.ID) + ",\"" + Topic + "\"," + std::to_string(1) + "," + std::to_string(Retained) + "," + std::to_string(Dup) + "," + std::to_string(Length * 2) + ",\"" + Buffer_Hex + "\"";
     SIM70XX_CREATE_CMD(Command);
@@ -180,7 +187,7 @@ SIM70XX_Error_t SIM7020_MQTT_Publish(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t*
     return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue);
 }
 
-SIM70XX_Error_t SIM7020_MQTT_Subscribe(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* p_Socket, std::string Topic, SIM7020_MQTT_QoS_t QoS)
+SIM70XX_Error_t SIM7020_MQTT_Subscribe(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* const p_Socket, std::string Topic, SIM7020_MQTT_QoS_t QoS)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;
@@ -217,7 +224,7 @@ SIM70XX_Error_t SIM7020_MQTT_Subscribe(SIM7020_t& p_Device, SIM7020_MQTT_Socket_
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_MQTT_GetSubscription(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* p_Socket, SIM7020_MQTT_Sub_Evt_t* p_Message)
+SIM70XX_Error_t SIM7020_MQTT_GetSubscription(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* const p_Socket, SIM7020_MQTT_Sub_Evt_t* const p_Message)
 {
     SIM7020_MQTT_Sub_Evt_t* Packet;
 
@@ -246,7 +253,7 @@ SIM70XX_Error_t SIM7020_MQTT_GetSubscription(SIM7020_t& p_Device, SIM7020_MQTT_S
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_MQTT_Unsubscribe(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* p_Socket, std::string Topic)
+SIM70XX_Error_t SIM7020_MQTT_Unsubscribe(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* const p_Socket, std::string Topic)
 {
     SIM70XX_TxCmd_t* Command;
 
@@ -289,7 +296,7 @@ SIM70XX_Error_t SIM7020_MQTT_Unsubscribe(SIM7020_t& p_Device, SIM7020_MQTT_Socke
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_MQTT_Disconnect(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* p_Socket)
+SIM70XX_Error_t SIM7020_MQTT_Disconnect(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* const p_Socket)
 {
     SIM70XX_TxCmd_t* Command;
 
@@ -336,7 +343,7 @@ SIM70XX_Error_t SIM7020_MQTT_Disconnect(SIM7020_t& p_Device, SIM7020_MQTT_Socket
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_MQTT_Destroy(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* p_Socket)
+SIM70XX_Error_t SIM7020_MQTT_Destroy(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* const p_Socket)
 {
     if(p_Socket == NULL)
     {

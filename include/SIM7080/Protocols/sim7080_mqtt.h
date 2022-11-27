@@ -32,7 +32,7 @@
  *  @param p_Socket Pointer to MQTT socket object
  *  @return         Number of messages ready.
  */
-inline __attribute__((always_inline)) uint32_t SIM7080_MQTT_MessagesAvailable(SIM7080_MQTT_Socket_t* p_Socket)
+inline __attribute__((always_inline)) uint32_t SIM7080_MQTT_GetSubcriptionItems(SIM7080_MQTT_Socket_t* p_Socket)
 {
     if(p_Socket->Internal.isConnected == false)
     {
@@ -99,12 +99,13 @@ SIM70XX_Error_t SIM7080_MQTT_Publish(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t*
  */
 SIM70XX_Error_t SIM7080_MQTT_Subscribe(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* p_Socket, std::string Topic, SIM7080_MQTT_QoS_t QoS = SIM7080_MQTT_QOS_0);
 
-/** @brief              Pop a message from the MQTT subscription queue.
+/** @brief              Get the next subscription message from the MQTT subscription queue.
  *  @param p_Device     SIM7080 device object
+ *  @param p_Socket     Pointer to MQTT socket object
  *  @param p_Message    Pointer to MQTT publish message object
  *  @return             SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_MQTT_GetMessage(SIM7080_MQTT_Socket_t* p_Socket, SIM7080_MQTT_Sub_Evt_t* p_Message);
+SIM70XX_Error_t SIM7080_MQTT_GetSubscription(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* p_Socket, SIM7080_MQTT_Sub_Evt_t* p_Message);
 
 /** @brief          Unsubscribe a MQTT topic.
  *  @param p_Device SIM7080 device object

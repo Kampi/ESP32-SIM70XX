@@ -22,69 +22,54 @@
 #if(CONFIG_SIMXX_DEV == 7080)
 
 #include "sim7080.h"
-#include "PDP/sim7080_pdp_defs.h"
+#include "sim7080_baerer.h"
 
 #include "../../Core/Queue/sim70xx_queue.h"
 #include "../../Core/Commands/sim70xx_commands.h"
 
 #include "../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
 
-SIM70XX_Error_t SIM7080_PDP_GPRS_Define(SIM7080_t& p_Device, SIM7080_PDP_GPRS_Type_t Type, SIM70XX_APN_t APN, uint8_t PDP)
+SIM70XX_Error_t SIM7080_Baerer_GRPS_Attach(SIM7080_t& p_Device)
 {
-    std::string CommandStr;
     SIM70XX_TxCmd_t* Command;
-    SIM70XX_Error_t Error;
 
     if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
-    else if((PDP == 0) || (PDP > 15))
-    {
-        return SIM70XX_ERR_INVALID_ARG;
-    }
-
-    if(Type == SIM7080_PDP_GPRS_IP)
-    {
-        CommandStr = "AT+CGDCONT=" + std::to_string(PDP) + ",\"IP\",\"" + APN.Name + "\"";
-    }
-    else if(Type == SIM7080_PDP_GPRS_IPV6)
-    {
-        CommandStr = "AT+CGDCONT=" + std::to_string(PDP) + ",\"IPV6\",\"" + APN.Name + "\"";
-    }
-    else if(Type == SIM7080_PDP_GPRS_IPV4V6)
-    {
-        CommandStr = "AT+CGDCONT=" + std::to_string(PDP) + ",\"IPV4V6\",\"" + APN.Name + "\"";
-    }
-    else if(Type == SIM7080_PDP_GPRS_NO_IP)
-    {
-        CommandStr = "AT+CGDCONT=" + std::to_string(PDP) + ",\"Non-IP\",\"" + APN.Name + "\"";
-    }
-
-    if((APN.Username.size() > 0) && (APN.Password.size() > 0))
-    {
-        CommandStr += ",\"" + APN.Username + "\",\"" + APN.Password + "\"";
-    }
 
     SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7080_AT_CGDCONT_W(CommandStr);
+    *Command = SIM70XX_AT_CGATT_W(true);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
     if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {
         return SIM70XX_ERR_FAIL;
     }
 
-    // NOTE: We can not use the error macro here because Response and Status are swapped.
-    Error = SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, NULL, &CommandStr);
-    if(CommandStr.find("OK") == std::string::npos)
-    {
-        return Error;
-    }
-
-    return SIM70XX_ERR_OK;
+    return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, NULL);
 }
 
-bool SIM7080_PGP_GRPS_isAttached(SIM7080_t& p_Device)
+SIM70XX_Error_t SIM7080_Baerer_GRPS_Deattach(SIM7080_t& p_Device)
+{
+    SIM70XX_TxCmd_t* Command;
+
+    if(p_Device.Internal.isInitialized == false)
+    {
+        return SIM70XX_ERR_NOT_INITIALIZED;
+    }
+
+    SIM70XX_CREATE_CMD(Command);
+    *Command = SIM70XX_AT_CGATT_W(false);
+    SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
+    if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
+    {
+        return SIM70XX_ERR_FAIL;
+    }
+
+    return SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, NULL);
+}
+
+bool SIM7080_Baerer_GRPS_isAttached(SIM7080_t& p_Device)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;

@@ -20,6 +20,8 @@
 #ifndef SIM7080_HTTP_DEFS_H_
 #define SIM7080_HTTP_DEFS_H_
 
+#include <freertos/queue.h>
+
 #include <string>
 #include <stdint.h>
 #include <stdbool.h>
@@ -40,26 +42,31 @@ typedef enum
  */
 typedef enum
 {
-    SIM7080_HTTP_GET            = 0,                /**< HTTP GET method. */
-    SIM7080_HTTP_POST,                              /**< HTTP POST method. */
-    SIM7080_HTTP_PUT,                               /**< HTTP PUT method. */
-    SIM7080_HTTP_DELETE,                            /**< HTTP DELETE method. */
+    SIM7080_HTTP_REQ_GET        = 0,                /**< HTTP GET method. */
+    SIM7080_HTTP_REQ_POST,                          /**< HTTP POST method. */
+    SIM7080_HTTP_REQ_PUT,                           /**< HTTP PUT method. */
+    SIM7080_HTTP_REQ_DELETE,                        /**< HTTP DELETE method. */
 } SIM7080_HTTP_Method_t;
 
-/** @brief SIM7020 HTTP Socket object.
+/** @brief SIM7080 HTTP Socket object.
  */
 typedef struct
 {
-    std::string Host;                               /**< HTTP(S) Host URL. */
+    std::string Host;                               /**< Host URL. */
     uint16_t Timeout;                               /**< Socket timeout in seconds. */
-    uint8_t ID;                                     /**< Socket ID from the module.
-                                                         NOTE: Handled by the device driver. */
-    bool isConnected;                               /**< #true when the socket is connected.
-                                                         NOTE: Handled by the device driver. */
-    bool isCreated;                                 /**< #true when the socket is created.
-                                                         NOTE: Handled by the device driver. */
     SIM7080_HTTP_Error_t Error;                     /**< Socket error.
                                                          NOTE: Handled by the device driver. */
+    struct
+    {
+        uint8_t ID;                                 /**< Socket ID from the module.
+                                                         NOTE: Handled by the device driver. */
+        bool isConnected;                           /**< #true when the socket is connected.
+                                                         NOTE: Handled by the device driver. */
+        bool isCreated;                             /**< #true when the socket is created.
+                                                         NOTE: Handled by the device driver. */
+        QueueHandle_t ResponseQueue;                /**< Response event queue.
+                                                         NOTE: Managed by the device driver. */
+    } Internal;
 } SIM7080_HTTP_Socket_t;
 
 #endif /* SIM7080_HTTP_DEFS_H_ */

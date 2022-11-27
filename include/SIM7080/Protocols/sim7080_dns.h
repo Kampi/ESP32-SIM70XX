@@ -32,7 +32,7 @@
  *  @param Timeout  (Optional) Message timeout for each the request in seconds
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_DNS_FetchAddress(SIM7080_t& p_Device, std::string Host, std::string* p_IP, SIM7080_DNS_Error_t* p_Error = NULL, uint32_t Timeout = 60);
+SIM70XX_Error_t SIM7080_DNS_FetchAddress(SIM7080_t& p_Device, std::string Host, std::string* const p_IP, SIM7080_DNS_Error_t* const p_Error = NULL, uint32_t Timeout = 60);
 
 /** @brief          Set the PDP index for DNS.
  *  @param p_Device SIM7080 device object
@@ -46,7 +46,7 @@ SIM70XX_Error_t SIM7080_DNS_SetIndex(SIM7080_t& p_Device, uint8_t Index);
  *  @param p_Index  Pointer to PDP index
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_DNS_GetIndex(SIM7080_t& p_Device, uint8_t* p_Index);
+SIM70XX_Error_t SIM7080_DNS_GetIndex(SIM7080_t& p_Device, uint8_t* const p_Index);
 
 /** @brief          Set the DNS server configuration.
  *  @param p_Device SIM7080 device object
@@ -61,6 +61,6 @@ SIM70XX_Error_t SIM7080_DNS_SetServer(SIM7080_t& p_Device, SIM7080_DNS_Server_t 
  *  @param p_IPv6   (Optional) Pointer to IPv6 DNS server configuration object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_DNS_GetServer(SIM7080_t& p_Device, SIM7080_DNS_Server_t* p_IPv4, SIM7080_DNS_Server_t* p_IPv6 = NULL);
+SIM70XX_Error_t SIM7080_DNS_GetServer(SIM7080_t& p_Device, SIM7080_DNS_Server_t* const p_IPv4, SIM7080_DNS_Server_t* const p_IPv6 = NULL);
 
 #endif /* SIM7080_DNS_H_ */

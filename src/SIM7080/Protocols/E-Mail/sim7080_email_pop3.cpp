@@ -38,7 +38,7 @@ static const char* TAG = "SIM7080_EMail";
  *  @return             SIM70XX_ERR_OK when successful
  *                      SIM70XX_ERR_MAIL_INVALID_RESPONSE when an e-mail error occurs. See \ref p_Error for more informations.
  */
-static SIM70XX_Error_t SIM7080_EMail_POP3_ErrorCheck(std::string ErrorCode, SIM7080_EMail_Error_t* p_Error = NULL)
+static SIM70XX_Error_t SIM7080_EMail_POP3_ErrorCheck(std::string ErrorCode, SIM7080_EMail_Error_t* const p_Error = NULL)
 {
     SIM7080_EMail_Error_t ServerError;
 
@@ -61,7 +61,7 @@ static SIM70XX_Error_t SIM7080_EMail_POP3_ErrorCheck(std::string ErrorCode, SIM7
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7080_EMail_POP3_Login(SIM7080_t& p_Device, SIM7080_EMail_Config_t* p_Config, SIM7080_EMail_Error_t* p_Error)
+SIM70XX_Error_t SIM7080_EMail_POP3_Login(SIM7080_t& p_Device, SIM7080_EMail_Config_t* const p_Config, SIM7080_EMail_Error_t* const p_Error)
 {
     uint8_t Timeout;
     std::string Response;
@@ -123,7 +123,7 @@ SIM70XX_Error_t SIM7080_EMail_POP3_Login(SIM7080_t& p_Device, SIM7080_EMail_Conf
     return SIM7080_EMail_POP3_ErrorCheck(Response, p_Error);
 }
 
-SIM70XX_Error_t SIM7080_EMail_POP3_ReadInbox(SIM7080_t& p_Device, uint32_t* p_Num, uint32_t* p_Size, SIM7080_EMail_Error_t* p_Error)
+SIM70XX_Error_t SIM7080_EMail_POP3_ReadInbox(SIM7080_t& p_Device, uint32_t* const p_Num, uint32_t* const p_Size, SIM7080_EMail_Error_t* const p_Error)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;
@@ -156,7 +156,7 @@ SIM70XX_Error_t SIM7080_EMail_POP3_ReadInbox(SIM7080_t& p_Device, uint32_t* p_Nu
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7080_EMail_POP3_ReadEMailMeta(SIM7080_t& p_Device, uint32_t Mail, uint32_t* p_Size, std::string* p_ID, SIM7080_EMail_Error_t* p_Error)
+SIM70XX_Error_t SIM7080_EMail_POP3_ReadEMailMeta(SIM7080_t& p_Device, uint32_t Mail, uint32_t* const p_Size, std::string* const p_ID, SIM7080_EMail_Error_t* const p_Error)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;
@@ -212,7 +212,7 @@ SIM70XX_Error_t SIM7080_EMail_POP3_ReadEMailMeta(SIM7080_t& p_Device, uint32_t M
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7080_EMail_POP3_ReadEMail(SIM7080_t& p_Device, uint32_t ID, std::string* p_Mail, SIM7080_EMail_Error_t* p_Error, uint16_t PacketSize)
+SIM70XX_Error_t SIM7080_EMail_POP3_ReadEMail(SIM7080_t& p_Device, uint32_t ID, std::string* const p_Mail, SIM7080_EMail_Error_t* const p_Error, uint16_t PacketSize)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;
@@ -329,7 +329,7 @@ SIM70XX_Error_t SIM7080_EMail_POP3_ReadEMail(SIM7080_t& p_Device, uint32_t ID, s
     return Error;
 }
 
-SIM70XX_Error_t SIM7080_EMail_POP3_DeleteEMail(SIM7080_t& p_Device, uint32_t ID, SIM7080_EMail_Error_t* p_Error)
+SIM70XX_Error_t SIM7080_EMail_POP3_DeleteEMail(SIM7080_t& p_Device, uint32_t ID, SIM7080_EMail_Error_t* const p_Error)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;

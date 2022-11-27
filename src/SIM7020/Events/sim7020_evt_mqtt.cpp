@@ -73,11 +73,9 @@ void SIM7020_Evt_on_MQTT_Pub(SIM7020_t* const p_Device, std::string* p_Message)
     {
         if((*it)->Internal.ID == SubMessage->ID)
         {
-            if(((*it)->Internal.SubQueue == NULL) ||
-               (xQueueSend((*it)->Internal.SubQueue, &SubMessage, 0) != pdPASS)
-              )
+            if((*it)->Internal.SubQueue == NULL)
             {
-                delete SubMessage;
+                xQueueSend((*it)->Internal.SubQueue, &SubMessage, 0);
             }
         }
     }

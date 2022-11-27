@@ -89,8 +89,37 @@ SIM70XX_Error_t SIM7080_Info_GetQuality(SIM7080_t& p_Device, SIM70XX_Qual_t* con
  *  @param p_Device SIM7080 device object
  *  @param p_Info   Pointer to UE system information object
  *  @return         SIM70XX_ERR_OK when successful
- *                  SIM70XX_ERR_NOT_READY when no service is available
  */
-SIM70XX_Error_t SIM7080_Info_GetEquipmentInfo(SIM7080_t& p_Device, SIM7080_UEInfo_t* p_Info);
+SIM70XX_Error_t SIM7080_Info_GetEquipmentInfo(SIM7080_t& p_Device, SIM7080_UE_Info_t* p_Info);
+
+/** @brief              Read the battery status.
+ *  @param p_Device     SIM7080 device object
+ *  @param p_Charge     Pointer to charging state
+ *  @return             SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_Info_ReadBattery(SIM7080_t& p_Device, SIM7080_ChargeState_t* const p_Charge);
+
+/** @brief              Read the battery status.
+ *  @param p_Device     SIM7080 device object
+ *  @param p_Battery    Pointer to battery level (0 - 100%)
+ *  @return             SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_Info_ReadBattery(SIM7080_t& p_Device, uint8_t* const p_Battery);
+
+/** @brief              Read the battery status.
+ *  @param p_Device     SIM7080 device object
+ *  @param p_Voltage    Pointer to battery voltage
+ *  @return             SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_Info_ReadBattery(SIM7080_t& p_Device, uint16_t* const p_Voltage);
+
+/** @brief              Read the battery status.
+ *  @param p_Device     SIM7080 device object
+ *  @param p_Charge     Pointer to charging state
+ *  @param p_Battery    Pointer to battery level (0 - 100%)
+ *  @param p_Voltage    Pointer to battery voltage
+ *  @return             SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_Info_ReadBattery(SIM7080_t& p_Device, SIM7080_ChargeState_t* const p_Charge, uint8_t* const p_Battery, uint16_t* const p_Voltage);
 
 #endif /* SIM7080_INFO_H_ */

@@ -32,7 +32,7 @@
 
 static const char* TAG = "SIM7020_NVRAM";
 
-SIM70XX_Error_t SIM7020_NVRAM_Write(SIM7020_t& p_Device, std::string Key, const std::string Data, SIM7020_NVRAM_Error_t* p_Error)
+SIM70XX_Error_t SIM7020_NVRAM_Write(SIM7020_t& p_Device, std::string Key, const std::string Data, SIM7020_NVRAM_Error_t* const p_Error)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;
@@ -73,7 +73,7 @@ SIM70XX_Error_t SIM7020_NVRAM_Write(SIM7020_t& p_Device, std::string Key, const 
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_NVRAM_Write(SIM7020_t& p_Device, std::string Key, const uint8_t* p_Buffer, uint16_t Length, SIM7020_NVRAM_Error_t* p_Error)
+SIM70XX_Error_t SIM7020_NVRAM_Write(SIM7020_t& p_Device, std::string Key, const uint8_t* const p_Buffer, uint16_t Length, SIM7020_NVRAM_Error_t* const p_Error)
 {
     std::string HexString;
 
@@ -87,7 +87,7 @@ SIM70XX_Error_t SIM7020_NVRAM_Write(SIM7020_t& p_Device, std::string Key, const 
     return SIM7020_NVRAM_Write(p_Device, Key, HexString, p_Error);
 }
 
-SIM70XX_Error_t SIM7020_NVRAM_Read(SIM7020_t& p_Device, std::string Key, std::string* p_Payload, SIM7020_NVRAM_Error_t* p_Error)
+SIM70XX_Error_t SIM7020_NVRAM_Read(SIM7020_t& p_Device, std::string Key, std::string* const p_Payload, SIM7020_NVRAM_Error_t* const p_Error)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;
@@ -141,7 +141,7 @@ SIM70XX_Error_t SIM7020_NVRAM_Read(SIM7020_t& p_Device, std::string Key, std::st
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_NVRAM_Erase(SIM7020_t& p_Device, std::string Key, SIM7020_NVRAM_Error_t* p_Error)
+SIM70XX_Error_t SIM7020_NVRAM_Erase(SIM7020_t& p_Device, std::string Key, SIM7020_NVRAM_Error_t* const p_Error)
 {
     std::string Response;
     SIM70XX_TxCmd_t* Command;
@@ -181,7 +181,7 @@ SIM70XX_Error_t SIM7020_NVRAM_Erase(SIM7020_t& p_Device, std::string Key, SIM702
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7020_NVRAM_GetKeys(SIM7020_t& p_Device, std::vector<std::string>* p_Keys)
+SIM70XX_Error_t SIM7020_NVRAM_GetKeys(SIM7020_t& p_Device, std::vector<std::string>* const p_Keys)
 {
     SIM70XX_Error_t Error = SIM70XX_ERR_OK;
     SIM70XX_TxCmd_t Command;

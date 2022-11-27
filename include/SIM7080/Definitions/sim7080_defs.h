@@ -32,7 +32,7 @@
 #include <algorithm>
 
 #include "sim70xx_defs.h"
-#include "sim7080_pdp_defs.h"
+#include "sim7080_baerer_defs.h"
 
 #include <sdkconfig.h>
 
@@ -52,7 +52,7 @@
  */
 typedef enum
 {
-    SIM7080_SIM_READY       = 0,                            /**< MT is not pending for any password. */
+    SIM7080_SIM_READY           = 0,                        /**< MT is not pending for any password. */
     SIM7080_SIM_WAIT_PIN,                                   /**< MT is waiting SIM PIN to be given. */
     SIM7080_SIM_WAIT_PUK,                                   /**< MT is waiting for SIM PUK to be given. */
     SIM7080_SIM_WAIT_PH_PIN,                                /**< ME is waiting for phone to SIM card (antitheft). */
@@ -66,10 +66,10 @@ typedef enum
  */
 typedef enum
 {
-    SIM7080_NETREG_DISABLE  = 0,                            /**< Disable network registration unsolicited result code. */
-    SIM7080_NETREG_ENABLE   = 1,                            /**< Enable network registration unsolicited result code. */
-    SIM7080_NETREG_LOCATION = 2,                            /**< Enable network registration and location information unsolicited result code. */
-    SIM7080_NETREG_PSM      = 4,                            /**< For a UE that wants to apply PSM, enable network registration and
+    SIM7080_NETREG_DISABLE      = 0,                        /**< Disable network registration unsolicited result code. */
+    SIM7080_NETREG_ENABLE       = 1,                        /**< Enable network registration unsolicited result code. */
+    SIM7080_NETREG_LOCATION     = 2,                        /**< Enable network registration and location information unsolicited result code. */
+    SIM7080_NETREG_PSM          = 4,                        /**< For a UE that wants to apply PSM, enable network registration and
                                                                  location information unsolicited result code. */
 } SIM7080_NetReg_t;
 
@@ -77,48 +77,48 @@ typedef enum
  */
 typedef enum
 {
-    SIM7080_NETMODE_AUTO    = 2,                            /**< Automatic mode selection. */
-    SIM7080_NETMODE_GSM     = 13,                           /**< GSM only mode. */
-    SIM7080_NETMODE_LTE     = 38,                           /**< LTE mode only. */
-    SIM7080_NETMODE_GSM_LTE = 51,                           /**< GSM and LTE mode only. */
+    SIM7080_NETMODE_AUTO        = 2,                        /**< Automatic mode selection. */
+    SIM7080_NETMODE_GSM         = 13,                       /**< GSM only mode. */
+    SIM7080_NETMODE_LTE         = 38,                       /**< LTE mode only. */
+    SIM7080_NETMODE_GSM_LTE     = 51,                       /**< GSM and LTE mode only. */
 } SIM7080_NetMode_t;
 
 /** @brief SIM7080 preferred selections between CAT-M and NB-IoT.
  */
 typedef enum
 {
-    SIM7080_MODE_CAT        = 1,                            /**< Select CAT-M. */
-    SIM7080_MODE_NB         = 2,                            /**< Select NB-IoT. */
-    SIM7080_MODE_BOTH       = 3,                            /**< Select NB-IoT and CAT-M. */
+    SIM7080_MODE_CAT            = 1,                        /**< Select CAT-M. */
+    SIM7080_MODE_NB             = 2,                        /**< Select NB-IoT. */
+    SIM7080_MODE_BOTH           = 3,                        /**< Select NB-IoT and CAT-M. */
 } SIM7080_Mode_t;
 
 /** @brief SIM7080 supported frequency bands.
  */
 typedef enum
 {
-    SIM7080_BAND_EGSM       = 253,                          /**< EGSM mode. */
-    SIM7080_BAND_DCS        = 254,                          /**< DCS mode. */
-    SIM7080_BAND_ALL        = 255,                          /**< All band mode. */
+    SIM7080_BAND_EGSM           = 253,                      /**< EGSM mode. */
+    SIM7080_BAND_DCS            = 254,                      /**< DCS mode. */
+    SIM7080_BAND_ALL            = 255,                      /**< All band mode. */
 } SIM7080_Band_t;
 
 /** @brief SIM7080 phone functionallity definitions.
  */
 typedef enum
 {
-    SIM7080_FUNC_MIN        = 0,                            /**< Minimum functionality. */
-    SIM7080_FUNC_FULL       = 1,                            /**< Full functionality. */
-    SIM7080_FUNC_DIS_RF     = 4,                            /**< Disable phone both transmit and receive RF circuits. */
-    SIM7080_FUNC_TEST       = 5,                            /**< Factory Test mode. */
-    SIM7080_FUNC_RESET      = 6,                            /**< Reset. */
-    SIM7080_FUNC_OFFLINE    = 7,                            /**< Offline mode. */
+    SIM7080_FUNC_MIN            = 0,                        /**< Minimum functionality. */
+    SIM7080_FUNC_FULL           = 1,                        /**< Full functionality. */
+    SIM7080_FUNC_DIS_RF         = 4,                        /**< Disable phone both transmit and receive RF circuits. */
+    SIM7080_FUNC_TEST           = 5,                        /**< Factory Test mode. */
+    SIM7080_FUNC_RESET          = 6,                        /**< Reset. */
+    SIM7080_FUNC_OFFLINE        = 7,                        /**< Offline mode. */
 } SIM7080_Func_t;
 
 /** @brief SIM7080 phone functionallity reset definitions.
  */
 typedef enum
 {
-    SIM7080_RESET_NO        = 0,                            /**< Do not Reset the MT before setting it to <fun> power level. */
-    SIM7080_RESET_RESET     = 1,                            /**< Reset the MT before setting it to <fun> power level. */
+    SIM7080_RESET_NO            = 0,                        /**< Do not Reset the MT before setting it to <fun> power level. */
+    SIM7080_RESET_RESET         = 1,                        /**< Reset the MT before setting it to <fun> power level. */
 } SIM7080_Reset_t;
 
 /** @brief SIM7080 network registration status codes.
@@ -144,11 +144,11 @@ typedef enum
  */
 typedef enum
 {
-    SIM7080_ACT_USER_GSM    = 0,                            /**< User-specific GSM. */
-    SIM7080_ACT_GSM         = 1,                            /**< GSM compact. */
-    SIM7080_ACT_EGPRS       = 3,                            /**< GSM EGPRS. */
-    SIM7080_ACT_USER_LTE_M1 = 7,                            /**< User-specific LTE M1 A GB. */
-    SIM7080_ACT_USER_LTE_NB = 9,                            /**< User-specific LTE NB S1. */
+    SIM7080_ACT_USER_GSM        = 0,                        /**< User-specific GSM. */
+    SIM7080_ACT_GSM             = 1,                        /**< GSM compact. */
+    SIM7080_ACT_EGPRS           = 3,                        /**< GSM EGPRS. */
+    SIM7080_ACT_USER_LTE_M1     = 7,                        /**< User-specific LTE M1 A GB. */
+    SIM7080_ACT_USER_LTE_NB     = 9,                        /**< User-specific LTE NB S1. */
 } SIM7080_AcT_t;
 
 /** @brief SIM7080 device object.
