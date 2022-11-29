@@ -242,7 +242,7 @@ SIM70XX_Error_t SIM7080_EMail_SendText(SIM7080_t& p_Device, SIM7080_PDP_Context_
 
     Response.erase(Response.find("+SMTPSEND: "), std::string("+SMTPSEND: ").size());
 
-    MailError = (SIM7080_EMail_Error_t)SIM70XX_Tools_StringToUnsigned(Response);
+    MailError = static_cast<SIM7080_EMail_Error_t>(SIM70XX_Tools_StringToUnsigned(Response));
     if(p_Error != NULL)
     {
         *p_Error = MailError;

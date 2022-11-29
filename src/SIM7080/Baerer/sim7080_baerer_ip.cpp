@@ -106,7 +106,7 @@ SIM70XX_Error_t SIM7080_Baerer_PDP_Enable(SIM7080_t& p_Device, SIM7080_PDP_Conte
 
     Status.erase(Index, std::string("+APP PDP: ").size());
 
-    p_PDP->ID = (uint8_t)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Status));
+    p_PDP->ID = static_cast<uint8_t>(SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Status)));
 
     if(Status.find("ACTIVE") != std::string::npos)
     {
@@ -156,7 +156,7 @@ SIM70XX_Error_t SIM7080_Baerer_PDP_Disable(SIM7080_t& p_Device, SIM7080_PDP_Cont
 
     Status.erase(Index, std::string("+APP PDP: ").size());
 
-    p_PDP->ID = (uint8_t)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Status));
+    p_PDP->ID = static_cast<uint8_t>(SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Status)));
 
     if(Status.find("DEACTIVE") != std::string::npos)
     {
@@ -232,8 +232,8 @@ SIM70XX_Error_t SIM7080_Baerer_IP_CheckNetworks(SIM7080_t& p_Device, std::vector
         Dummy = Response.substr(0, Index).c_str();
         Response.erase(0, Index + 1);
 
-        Result.ID = (uint8_t)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Dummy));
-        Result.Status = (SIM7080_PDP_Status_t)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Dummy));
+        Result.ID = static_cast<uint8_t>(SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Dummy)));
+        Result.Status = static_cast<SIM7080_PDP_Status_t>(SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Dummy)));
         Result.IP = SIM70XX_Tools_SubstringSplitErase(&Dummy);
 
         p_Networks->push_back(Result);

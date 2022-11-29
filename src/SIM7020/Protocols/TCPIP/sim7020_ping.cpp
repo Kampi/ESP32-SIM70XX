@@ -112,10 +112,10 @@ SIM70XX_Error_t SIM7020_TCPIP_Ping(SIM7020_t& p_Device, const SIM7020_Ping_t* co
                 Result.IP =  SIM70XX_Tools_SubstringSplitErase(&Response);
 
                 // Filter out the reply time.
-                Result.ReplyTime = (uint8_t)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response));
+                Result.ReplyTime = static_cast<uint8_t>(SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response)));
 
                 // Filter out the time to live.
-                Result.TTL = (uint8_t)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response, "\n"));
+                Result.TTL = static_cast<uint8_t>(SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response, "\n")));
 
                 p_Result->push_back(Result);
 

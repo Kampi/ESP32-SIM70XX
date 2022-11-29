@@ -84,7 +84,7 @@ SIM70XX_Error_t SIM7020_MQTT_Create(SIM7020_t& p_Device, SIM7020_PDP_Context_t* 
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    p_Socket->Internal.ID = (uint8_t)SIM70XX_Tools_StringToUnsigned(Response);
+    p_Socket->Internal.ID = static_cast<uint8_t>(SIM70XX_Tools_StringToUnsigned(Response));
 
     // Everything okay. The socket is active now.
     SIM70XX_LOGI(TAG, "Socket %u opened...", p_Socket->Internal.ID);

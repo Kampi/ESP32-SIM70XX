@@ -199,7 +199,7 @@ SIM70XX_Error_t SIM7080_Info_GetNetworkRegistrationStatus(SIM7080_t& p_Device)
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    p_Device.Connection.Status = (SIM7080_NetRegistration_t)SIM70XX_Tools_StringToUnsigned(Response.substr(Response.find(",") + 1));
+    p_Device.Connection.Status = static_cast<SIM7080_NetRegistration_t>(SIM70XX_Tools_StringToUnsigned(Response.substr(Response.find(",") + 1)));
 
     return SIM70XX_ERR_OK;
 }
@@ -234,7 +234,7 @@ SIM70XX_Error_t SIM7080_Info_GetQuality(SIM7080_t& p_Device, SIM70XX_Qual_t* p_R
         return SIM70XX_ERR_FAIL;
     }
 
-    p_Report->RSSI = (int8_t)SIM70XX_Tools_StringToSigned(Response.substr(0, Index));
+    p_Report->RSSI = static_cast<int8_t>(SIM70XX_Tools_StringToSigned(Response.substr(0, Index)));
     if(p_Report->RSSI == 99)
     {
         p_Report->RSSI = 0;
@@ -256,7 +256,7 @@ SIM70XX_Error_t SIM7080_Info_GetQuality(SIM7080_t& p_Device, SIM70XX_Qual_t* p_R
         p_Report->RSSI = -110 + ((p_Report->RSSI - 2) * 2);
     }
 
-    p_Report->RXQual = (uint8_t)SIM70XX_Tools_StringToUnsigned(Response.substr(Response.find_last_of(",") + 1));
+    p_Report->RXQual = static_cast<uint8_t>(SIM70XX_Tools_StringToUnsigned(Response.substr(Response.find_last_of(",") + 1)));
     if(p_Report->RXQual == 99)
     {
         p_Report->RXQual = 0;

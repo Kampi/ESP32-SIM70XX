@@ -43,9 +43,9 @@ extern void SIM70XX_Evt_MessageFilter(void* p_Device, std::string* const p_Messa
 SIM70XX_Error_t SIM70XX_Evt_StartTask(SIM70XX_UART_Conf_t& p_Config, void* const p_Arg);
 
 /** @brief          Stop the SIM70XX event task.
- *  @param p_Handle Pointer to task handle
+ *  @param p_Config Pointer to UART configuration
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM70XX_Evt_StopTask(TaskHandle_t Handle);
+SIM70XX_Error_t SIM70XX_Evt_StopTask(SIM70XX_UART_Conf_t& p_Config);
 
 #endif /* SIM70XX_EVT_H_ */

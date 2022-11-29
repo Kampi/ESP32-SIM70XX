@@ -92,7 +92,7 @@ SIM70XX_Error_t SIM7080_FS_GetFileSize(SIM7080_t& p_Device, SIM7080_FS_Path_t Pa
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    *p_Size = (size_t)SIM70XX_Tools_StringToUnsigned(Response);
+    *p_Size = static_cast<size_t>(SIM70XX_Tools_StringToUnsigned(Response));
 
     return SIM7080_FS_Deinit(p_Device);
 }

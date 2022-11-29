@@ -161,7 +161,7 @@ SIM70XX_Error_t SIM7020_PSM_GetStatus(SIM7020_t& p_Device, bool* const p_Status)
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    *p_Status = (bool)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response));
+    *p_Status = static_cast<bool>(SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response)));
 
     ESP_LOGI(TAG, "PSM Status: %u", *p_Status);
 
@@ -191,7 +191,7 @@ SIM70XX_Error_t SIM7020_PSM_GetEventStatus(SIM7020_t& p_Device, bool* const p_En
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    *p_Enable = (bool)SIM70XX_Tools_StringToUnsigned(Response);
+    *p_Enable = static_cast<bool>(SIM70XX_Tools_StringToUnsigned(Response));
 
     return SIM70XX_ERR_OK;
 }

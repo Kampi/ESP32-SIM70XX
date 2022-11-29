@@ -228,7 +228,7 @@ SIM70XX_Error_t SIM7080_GNSS_isEnabled(SIM7080_t& p_Device, bool* p_Enable)
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    *p_Enable = (bool)SIM70XX_Tools_StringToUnsigned(Response);
+    *p_Enable = static_cast<bool>(SIM70XX_Tools_StringToUnsigned(Response));
 
     return SIM70XX_ERR_OK;
 }
@@ -342,7 +342,7 @@ SIM70XX_Error_t SIM7080_GNSS_GetNavInfo(SIM7080_t& p_Device, SIM7080_GNSS_Info_t
         SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
         // Check if GPS is on.
-        if((bool)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response)))
+        if(static_cast<bool>(SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response))))
         {
             std::string Substring;
 
@@ -351,7 +351,7 @@ SIM70XX_Error_t SIM7080_GNSS_GetNavInfo(SIM7080_t& p_Device, SIM7080_GNSS_Info_t
             Substring = SIM70XX_Tools_SubstringSplitErase(&Response);
             if(Substring.size() > 0)
             {
-                Enabled = (bool)SIM70XX_Tools_StringToUnsigned(Substring);
+                Enabled = static_cast<bool>(SIM70XX_Tools_StringToUnsigned(Substring));
             }
             else
             {
@@ -383,7 +383,7 @@ SIM70XX_Error_t SIM7080_GNSS_GetNavInfo(SIM7080_t& p_Device, SIM7080_GNSS_Info_t
                 // Reserved.
                 SIM70XX_Tools_SubstringSplitErase(&Response);
 
-                p_Info->Satellites = (uint8_t)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response));
+                p_Info->Satellites = static_cast<uint8_t>(SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response)));
 
                 // Reserved.
                 SIM70XX_Tools_SubstringSplitErase(&Response);

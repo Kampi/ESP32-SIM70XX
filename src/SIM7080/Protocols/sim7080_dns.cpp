@@ -152,7 +152,7 @@ SIM70XX_Error_t SIM7080_DNS_GetIndex(SIM7080_t& p_Device, uint8_t* const p_Index
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    *p_Index = (uint8_t)SIM70XX_Tools_StringToUnsigned(Response);
+    *p_Index = static_cast<uint8_t>(SIM70XX_Tools_StringToUnsigned(Response));
 
     return SIM70XX_ERR_OK;
 }

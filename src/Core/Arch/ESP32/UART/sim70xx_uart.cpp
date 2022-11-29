@@ -173,11 +173,6 @@ SIM70XX_Error_t SIM70XX_UART_Init(SIM70XX_UART_Conf_t& p_Config)
 
         SIM70XX_LOGD(TAG, "UART initialized...");
 
-        if(p_Config.TaskHandle != NULL)
-        {
-            SIM70XX_WDT_AddHandle(p_Config.TaskHandle);
-        }
-
         p_Config.isInitialized = true;
 
         return SIM70XX_ERR_OK;

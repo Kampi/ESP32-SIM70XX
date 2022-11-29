@@ -313,13 +313,19 @@ SIM70XX_Error_t SIM70XX_Evt_StartTask(SIM70XX_UART_Conf_t& p_Config, void* const
 
     SIM70XX_ERROR_CHECK(SIM70XX_UART_Init(p_Config));
 
+    SIM70XX_WDT_AddHandle(p_Config.TaskHandle);
+
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM70XX_Evt_StopTask(TaskHandle_t Handle)
+SIM70XX_Error_t SIM70XX_Evt_StopTask(SIM70XX_UART_Conf_t& p_Config)
 {
-    vTaskSuspend(Handle);
-    vTaskDelete(Handle);
+    SIM70XX_ERROR_CHECK(SIM70XX_WDT_RemoveHanndle(p_Config.TaskHandle));
 
-    return SIM70XX_WDT_RemoveHanndle(Handle);
+    vTaskSuspend(p_Config.TaskHandle);
+    vTaskDelete(p_Config.TaskHandle);
+
+    p_Config.TaskHandle = NULL;
+
+    return SIM70XX_UART_Deinit(p_Config);
 }

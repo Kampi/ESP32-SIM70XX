@@ -108,7 +108,7 @@ SIM70XX_Error_t SIM7080_Client_ConnectSocket(SIM7080_t& p_Device, SIM7080_TCPIP_
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
     SIM70XX_Tools_SubstringSplitErase(&Response);
-    Result = (SIM7080_TCP_Error_t)SIM70XX_Tools_StringToUnsigned(Response);
+    Result = static_cast<SIM7080_TCP_Error_t>(SIM70XX_Tools_StringToUnsigned(Response));
 
     if(p_Result != NULL)
     {

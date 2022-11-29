@@ -75,7 +75,7 @@ SIM70XX_Error_t SIM7020_DNS_FetchAddress(SIM7020_t& p_Device, std::string Host, 
 
     // Filter out the error code.
     Index = Response.find(",");
-    DNS_Error = (SIM7020_DNS_Error_t)SIM70XX_Tools_StringToUnsigned(Response.substr(Index - 1, 1));
+    DNS_Error = static_cast<SIM7020_DNS_Error_t>(SIM70XX_Tools_StringToUnsigned(Response.substr(Index - 1, 1)));
 
     if(DNS_Error == 1)
     {
@@ -95,7 +95,7 @@ SIM70XX_Error_t SIM7020_DNS_FetchAddress(SIM7020_t& p_Device, std::string Host, 
     // Handle the error codes.
     else if(DNS_Error != 0)
     {
-        DNS_Error = (SIM7020_DNS_Error_t)SIM70XX_Tools_StringToUnsigned(Response.substr(Index + 1));
+        DNS_Error = static_cast<SIM7020_DNS_Error_t>(SIM70XX_Tools_StringToUnsigned(Response.substr(Index + 1)));
 
         SIM70XX_LOGE(TAG, "DNS_Error: %u", DNS_Error);
     }

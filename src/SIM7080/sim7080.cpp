@@ -166,8 +166,7 @@ SIM70XX_Error_t SIM7080_Deinit(SIM7080_t& p_Device, bool Skip)
 
     SIM70XX_LOGI(TAG, "Modem inactive...");
 
-    SIM70XX_Evt_StopTask(p_Device.UART.TaskHandle);
-    p_Device.UART.TaskHandle = NULL;
+    SIM70XX_Evt_StopTask(p_Device.UART);
 
     // Delete the message queues.
     #ifdef CONFIG_SIM70XX_DRIVER_WITH_GNSS
@@ -178,8 +177,7 @@ SIM70XX_Error_t SIM7080_Deinit(SIM7080_t& p_Device, bool Skip)
     vQueueDelete(p_Device.Internal.TxQueue);
     vQueueDelete(p_Device.Internal.EventQueue);
 
-    // Deinitialize the UART interface.
-    return SIM70XX_UART_Deinit(p_Device.UART);
+    return SIM70XX_ERR_OK;
 }
 
 SIM70XX_Error_t SIM7080_SoftReset(SIM7080_t& p_Device, uint32_t Timeout)
@@ -509,7 +507,7 @@ SIM70XX_Error_t SIM7080_GetBand(SIM7080_t& p_Device, SIM7080_Band_t* const p_Ban
     }
     else
     {
-        *p_Band = (SIM7080_Band_t)SIM70XX_Tools_StringToUnsigned(Response);
+        *p_Band = static_cast<SIM7080_Band_t>(SIM70XX_Tools_StringToUnsigned(Response));
     }
 
     SIM70XX_LOGD(TAG, "Band: %u", *p_Band);
@@ -565,7 +563,7 @@ SIM70XX_Error_t SIM7080_GetNetMode(SIM7080_t& p_Device, SIM7080_NetMode_t* const
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    *p_Mode = (SIM7080_NetMode_t)SIM70XX_Tools_StringToUnsigned(Response);
+    *p_Mode = static_cast<SIM7080_NetMode_t>(SIM70XX_Tools_StringToUnsigned(Response));
 
     SIM70XX_LOGD(TAG, "Mode: %u", *p_Mode);
 
@@ -620,7 +618,7 @@ SIM70XX_Error_t SIM7080_GetSelectedMode(SIM7080_t& p_Device, SIM7080_Mode_t* p_M
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    *p_Mode = (SIM7080_Mode_t)SIM70XX_Tools_StringToUnsigned(Response);
+    *p_Mode = static_cast<SIM7080_Mode_t>(SIM70XX_Tools_StringToUnsigned(Response));
 
     SIM70XX_LOGD(TAG, "Selected mode: %u", *p_Mode);
 
@@ -691,7 +689,7 @@ SIM70XX_Error_t SIM7080_GetFunctionality(SIM7080_t& p_Device)
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    p_Device.Connection.Functionality = (SIM7080_Func_t)SIM70XX_Tools_StringToUnsigned(Response);
+    p_Device.Connection.Functionality = static_cast<SIM7080_Func_t>(SIM70XX_Tools_StringToUnsigned(Response));
 
     SIM70XX_LOGI(TAG, "Functionality: %u", p_Device.Connection.Functionality);
 

@@ -98,7 +98,7 @@ bool SIM7020_Baerer_GRPS_isAttached(SIM7020_t& p_Device, bool* const p_Deactivat
 
     *p_Deactivated = false;
 
-    return (bool)SIM70XX_Tools_StringToUnsigned(Response);
+    return static_cast<bool>(SIM70XX_Tools_StringToUnsigned(Response));
 }
 
 SIM70XX_Error_t SIM7020_Baerer_PDP_Configure(SIM7020_t& p_Device, SIM70XX_APN_t APN, SIM7020_PDP_Context_t* const p_PDP)
@@ -292,10 +292,10 @@ SIM70XX_Error_t SIM7020_PDP_GetStatus(SIM7020_t& p_Device, SIM7020_PDP_Context_t
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    ID = (uint8_t)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response));
+    ID = static_cast<uint8_t>(SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response)));
     if(ID == p_PDP->ID)
     {
-        p_PDP->Internal.isActive = (bool)SIM70XX_Tools_StringToUnsigned(Response);
+        p_PDP->Internal.isActive = static_cast<bool>(SIM70XX_Tools_StringToUnsigned(Response));
     }
 
     return SIM70XX_ERR_OK;

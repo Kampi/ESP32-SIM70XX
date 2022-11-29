@@ -87,7 +87,7 @@ bool SIM7080_Baerer_GRPS_isAttached(SIM7080_t& p_Device)
         return false;
     }
 
-    return (bool)SIM70XX_Tools_StringToUnsigned(Response);
+    return static_cast<bool>(SIM70XX_Tools_StringToUnsigned(Response));
 }
 
 #endif

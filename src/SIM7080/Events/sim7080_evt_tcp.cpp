@@ -47,7 +47,7 @@ void SIM7080_Evt_on_TCP_Disconnect(SIM7080_t* const p_Device, std::string* p_Mes
     Message = p_Message->substr(Index, p_Message->find("\r\n\r\n", Index) - Index);
     Index = Message.find(",");
     CID = SIM70XX_Tools_StringToUnsigned(Message.substr((Index - 1), Index));
-    Error = (SIM7080_TCP_Error_t)SIM70XX_Tools_StringToUnsigned(Message.substr(Index + 1));
+    Error = static_cast<SIM7080_TCP_Error_t>(SIM70XX_Tools_StringToUnsigned(Message.substr(Index + 1)));
 
     for(std::vector<SIM7080_TCPIP_Socket_t*>::iterator it = p_Device->TCP.Sockets.begin(); it != p_Device->TCP.Sockets.end(); ++it)
     {

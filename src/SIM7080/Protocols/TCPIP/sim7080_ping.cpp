@@ -108,7 +108,7 @@ SIM70XX_Error_t SIM7080_TCPIP_Ping(SIM7080_t& p_Device, const SIM7080_Ping_t* co
 
         SIM70XX_Tools_SubstringSplitErase(&Dummy);
         Result.IP = SIM70XX_Tools_SubstringSplitErase(&Dummy);
-        Result.ReplyTime = (uint16_t)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Dummy));
+        Result.ReplyTime = static_cast<uint16_t>(SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Dummy)));
 
         p_Result->push_back(Result);
     } while(Index != std::string::npos);

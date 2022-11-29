@@ -52,8 +52,8 @@ void SIM7020_Evt_on_HTTP_Error(SIM7020_t* const p_Device, std::string* p_Message
 
     Index = p_Message->find(",");
 
-    ID = (uint8_t)SIM70XX_Tools_StringToUnsigned(p_Message->substr(Index - 1, 1));
-    HTTP_Error = (SIM7020_HTTP_Error_t)SIM70XX_Tools_StringToUnsigned(p_Message->substr(Index + 1));
+    ID = static_cast<uint8_t>(SIM70XX_Tools_StringToUnsigned(p_Message->substr(Index - 1, 1)));
+    HTTP_Error = static_cast<SIM7020_HTTP_Error_t>(SIM70XX_Tools_StringToUnsigned(p_Message->substr(Index + 1)));
 
     // Iterate through the list of active sockets and close the socket with the given ID.
     for(std::vector<SIM7020_HTTP_Socket_t*>::iterator it = p_Device->HTTP.Sockets.begin(); it != p_Device->HTTP.Sockets.end(); ++it)
@@ -88,10 +88,10 @@ void SIM7020_Evt_on_HTTP_Header(SIM7020_t* const p_Device, std::string* p_Messag
     Message = p_Message->substr(Index + std::string("+CHTTPNMIH: ").size());
 
     // Get the socket ID from the response.
-    Response->ID = (uint8_t)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Message));
+    Response->ID = static_cast<uint8_t>(SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Message)));
 
     // Get the response code from the response.
-    Response->ResponseCode = (uint16_t)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Message));
+    Response->ResponseCode = static_cast<uint16_t>(SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Message)));
 
     // Remove the header length from the response.
     SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Message));
@@ -106,7 +106,7 @@ void SIM7020_Evt_on_HTTP_Header(SIM7020_t* const p_Device, std::string* p_Messag
         SIM70XX_Tools_SubstringSplitErase(&Message);
 
         // Get the flag.
-        Flag = (bool)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Message));
+        Flag = static_cast<bool>(SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Message)));
 
         // Remove the total length.
         SIM70XX_Tools_SubstringSplitErase(&Message);

@@ -50,13 +50,13 @@ void SIM7020_Evt_on_MQTT_Pub(SIM7020_t* const p_Device, std::string* p_Message)
     SubMessage->Topic = SIM70XX_Tools_SubstringSplitErase(p_Message);
 
     // Get the quality of service.
-    SubMessage->QoS = (SIM7020_MQTT_QoS_t)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(p_Message));
+    SubMessage->QoS = static_cast<SIM7020_MQTT_QoS_t>(SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(p_Message)));
 
     // Get the retained flag.
-    SubMessage->Retained = (bool)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(p_Message));
+    SubMessage->Retained = static_cast<bool>(SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(p_Message)));
 
     // Get the duplicate flag.
-    SubMessage->Dup = (bool)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(p_Message));
+    SubMessage->Dup = static_cast<bool>(SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(p_Message)));
 
     SIM70XX_Tools_StringRemove(p_Message);
 
@@ -97,7 +97,7 @@ void SIM7020_Evt_on_MQTT_Disconnect(SIM7020_t* const p_Device, std::string* p_Me
     Index = p_Message->find("=", Index);
     SIMXX_TOOLS_REMOVE_LINEEND((*p_Message));
 
-    ID = (uint8_t)SIM70XX_Tools_StringToUnsigned(p_Message->substr(Index - 1, 1));
+    ID = static_cast<uint8_t>(SIM70XX_Tools_StringToUnsigned(p_Message->substr(Index - 1, 1)));
 
     for(std::vector<SIM7020_MQTT_Socket_t*>::iterator it = p_Device->MQTT.Sockets.begin(); it != p_Device->MQTT.Sockets.end(); ++it)
     {

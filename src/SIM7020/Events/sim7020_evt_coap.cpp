@@ -40,7 +40,7 @@ void SIM7020_Evt_on_CoAP(SIM7020_t* const p_Device, std::string* p_Message)
 
     Index = p_Message->find("+CCOAPNMI");
     Index = p_Message->find(",", Index);
-    ID = (uint8_t)SIM70XX_Tools_StringToUnsigned(p_Message->substr(Index - 1, 1));
+    ID = static_cast<uint8_t>(SIM70XX_Tools_StringToUnsigned(p_Message->substr(Index - 1, 1)));
 
     for(std::vector<SIM7020_CoAP_Socket_t*>::iterator it = p_Device->CoAP.Sockets.begin(); it != p_Device->CoAP.Sockets.end(); ++it)
     {

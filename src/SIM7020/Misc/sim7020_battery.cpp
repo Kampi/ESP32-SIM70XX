@@ -59,8 +59,8 @@ SIM70XX_Error_t SIM7020_Info_ReadBattery(SIM7020_t& p_Device, uint8_t* const p_B
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    Battery = (uint8_t)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response));
-    Voltage = (uint16_t)SIM70XX_Tools_StringToUnsigned(Response);
+    Battery = static_cast<uint8_t>(SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response)));
+    Voltage = static_cast<uint16_t>(SIM70XX_Tools_StringToUnsigned(Response));
 
 
     if(p_Battery != NULL)

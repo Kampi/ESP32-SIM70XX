@@ -200,7 +200,7 @@ SIM70XX_Error_t SIM7020_Info_GetNetworkRegistrationStatus(SIM7020_t& p_Device)
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    p_Device.Connection.Status = (SIM7020_NetReg_t)SIM70XX_Tools_StringToUnsigned(Response.substr(Response.find(",") + 1));
+    p_Device.Connection.Status = static_cast<SIM7020_NetReg_t>(SIM70XX_Tools_StringToUnsigned(Response.substr(Response.find(",") + 1)));
 
     return SIM70XX_ERR_OK;
 }
@@ -230,8 +230,8 @@ SIM70XX_Error_t SIM7020_Info_GetQuality(SIM7020_t& p_Device, SIM70XX_Qual_t* p_R
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    RSSI = (int8_t)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response));
-    RXQual = (uint8_t)SIM70XX_Tools_StringToUnsigned(Response);
+    RSSI = static_cast<int8_t>(SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response)));
+    RXQual = static_cast<uint8_t>(SIM70XX_Tools_StringToUnsigned(Response));
 
     if(RSSI == 0)
     {
@@ -297,8 +297,8 @@ SIM70XX_Error_t SIM7020_Info_GetNetworkStatus(SIM7020_t& p_Device, SIM7020_NetSt
     }
 
     p_Status->sc_earfcn = SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response));
-    p_Status->sc_earfcn_offset = (int8_t)SIM70XX_Tools_StringToSigned(SIM70XX_Tools_SubstringSplitErase(&Response));
-    p_Status->sc_pci = (uint16_t)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response));
+    p_Status->sc_earfcn_offset = static_cast<int8_t>(SIM70XX_Tools_StringToSigned(SIM70XX_Tools_SubstringSplitErase(&Response)));
+    p_Status->sc_pci = static_cast<uint16_t>(SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response)));
 
     p_Status->sc_cellid = SIM70XX_Tools_SubstringSplitErase(&Response);
     p_Status->sc_cellid.erase(std::remove(p_Status->sc_cellid.begin(), p_Status->sc_cellid.end(), '\"'), p_Status->sc_cellid.end());
@@ -306,31 +306,31 @@ SIM70XX_Error_t SIM7020_Info_GetNetworkStatus(SIM7020_t& p_Device, SIM7020_NetSt
     Dummy = SIM70XX_Tools_SubstringSplitErase(&Response);
     if(Dummy.size())
     {
-        p_Status->sc_rsrp = (int16_t)SIM70XX_Tools_StringToSigned(Dummy);
+        p_Status->sc_rsrp = static_cast<int16_t>(SIM70XX_Tools_StringToSigned(Dummy));
     }
 
     Dummy = SIM70XX_Tools_SubstringSplitErase(&Response);
     if(Dummy.size())
     {
-        p_Status->sc_rsrq = (int16_t)SIM70XX_Tools_StringToSigned(Dummy);
+        p_Status->sc_rsrq = static_cast<int16_t>(SIM70XX_Tools_StringToSigned(Dummy));
     }
 
     Dummy = SIM70XX_Tools_SubstringSplitErase(&Response);
     if(Dummy.size())
     {
-        p_Status->sc_rssi = (int16_t)SIM70XX_Tools_StringToSigned(Dummy);
+        p_Status->sc_rssi = static_cast<int16_t>(SIM70XX_Tools_StringToSigned(Dummy));
     }
 
     Dummy = SIM70XX_Tools_SubstringSplitErase(&Response);
     if(Dummy.size())
     {
-        p_Status->sc_snr = (int16_t)SIM70XX_Tools_StringToSigned(Dummy);
+        p_Status->sc_snr = static_cast<int16_t>(SIM70XX_Tools_StringToSigned(Dummy));
     }
 
     Dummy = SIM70XX_Tools_SubstringSplitErase(&Response);
     if(Dummy.size())
     {
-        p_Status->sc_band = (int16_t)SIM70XX_Tools_StringToSigned(Dummy);
+        p_Status->sc_band = static_cast<int16_t>(SIM70XX_Tools_StringToSigned(Dummy));
     }
 
     Dummy = SIM70XX_Tools_SubstringSplitErase(&Response);
@@ -343,19 +343,19 @@ SIM70XX_Error_t SIM7020_Info_GetNetworkStatus(SIM7020_t& p_Device, SIM7020_NetSt
     Dummy = SIM70XX_Tools_SubstringSplitErase(&Response);
     if(Dummy.size())
     {
-        p_Status->sc_ecl = (int16_t)SIM70XX_Tools_StringToSigned(Dummy);
+        p_Status->sc_ecl = static_cast<int16_t>(SIM70XX_Tools_StringToSigned(Dummy));
     }
 
     Dummy = SIM70XX_Tools_SubstringSplitErase(&Response);
     if(Dummy.size())
     {
-        p_Status->sc_tx_pwr = (int16_t)SIM70XX_Tools_StringToSigned(Dummy);
+        p_Status->sc_tx_pwr = static_cast<int16_t>(SIM70XX_Tools_StringToSigned(Dummy));
     }
 
     Dummy = SIM70XX_Tools_SubstringSplitErase(&Response);
     if(Dummy.size())
     {
-        p_Status->sc_re_rsrp = (int16_t)SIM70XX_Tools_StringToSigned(Dummy);
+        p_Status->sc_re_rsrp = static_cast<int16_t>(SIM70XX_Tools_StringToSigned(Dummy));
     }
 
     SIM70XX_LOGD(TAG, "sc_earfcn: %u", p_Status->sc_earfcn);

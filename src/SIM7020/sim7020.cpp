@@ -148,15 +148,13 @@ SIM70XX_Error_t SIM7020_Deinit(SIM7020_t& p_Device, bool Skip)
     SIM70XX_LOGI(TAG, "Modem inactive...");
 
     SIM70XX_Evt_StopTask(p_Device.UART.TaskHandle);
-    p_Device.UART.TaskHandle = NULL;
 
     // Delete the message queues.
     vQueueDelete(p_Device.Internal.RxQueue);
     vQueueDelete(p_Device.Internal.TxQueue);
     vQueueDelete(p_Device.Internal.EventQueue);
 
-    // Deinitialize the UART interface.
-    return SIM70XX_UART_Deinit(p_Device.UART);
+    return SIM70XX_ERR_OK;
 }
 
 SIM70XX_Error_t SIM7020_SoftReset(SIM7020_t& p_Device, uint32_t Timeout)
@@ -323,8 +321,8 @@ SIM70XX_Error_t SIM7020_GetOperator(SIM7020_t& p_Device, SIM70XX_Operator_t* con
 
     if(Response.size())
     {
-        *p_Mode = (SIM70XX_OpMode_t)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response));
-        p_Operator->Format = (SIM70XX_OpForm_t)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response));
+        *p_Mode = static_cast<SIM70XX_OpMode_t>(SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response)));
+        p_Operator->Format = static_cast<SIM70XX_OpForm_t>(SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response)));
 
         if(p_Operator->Format == SIM_FORM_LONG)
         {
@@ -343,7 +341,7 @@ SIM70XX_Error_t SIM7020_GetOperator(SIM7020_t& p_Device, SIM70XX_Operator_t* con
         }
 
         p_Operator->Stat = SIM_OP_CUR;
-        p_Operator->Act = (uint8_t)SIM70XX_Tools_StringToUnsigned(Response);
+        p_Operator->Act = static_cast<uint8_t>(SIM70XX_Tools_StringToUnsigned(Response));
     }
 
     return SIM70XX_ERR_OK;
@@ -399,14 +397,14 @@ SIM70XX_Error_t SIM7020_GetAvailOperators(SIM7020_t& p_Device, std::vector<SIM70
             Entry = List.substr(Start + 1, List.find(")") - Start - 1);
             List.erase(Start, Entry.size() + 2);
 
-            Operator.Stat = (SIM70XX_OpStat_t)SIM70XX_Tools_StringToUnsigned((SIM70XX_Tools_SubstringSplitErase(&Entry)));
+            Operator.Stat = static_cast<SIM70XX_OpStat_t>(SIM70XX_Tools_StringToUnsigned((SIM70XX_Tools_SubstringSplitErase(&Entry))));
             Operator.Long = SIM70XX_Tools_SubstringSplitErase(&Entry);
             Operator.Long.erase(std::remove(Operator.Long.begin(), Operator.Long.end(), '\"'), Operator.Long.end());
             Operator.Short = SIM70XX_Tools_SubstringSplitErase(&Entry);
             Operator.Short.erase(std::remove(Operator.Short.begin(), Operator.Short.end(), '\"'), Operator.Short.end());
             Operator.Numeric = SIM70XX_Tools_SubstringSplitErase(&Entry);
             Operator.Numeric.erase(std::remove(Operator.Numeric.begin(), Operator.Numeric.end(), '\"'), Operator.Numeric.end());
-            Operator.Act = (uint8_t)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Entry));
+            Operator.Act = static_cast<uint8_t>(SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Entry)));
 
             p_Operators->push_back(Operator);
         }
@@ -462,7 +460,7 @@ SIM70XX_Error_t SIM7020_GetBand(SIM7020_t& p_Device, SIM7020_Band_t* const p_Ban
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    *p_Band = (SIM7020_Band_t)SIM70XX_Tools_StringToUnsigned(Response);
+    *p_Band = static_cast<SIM7020_Band_t>(SIM70XX_Tools_StringToUnsigned(Response));
 
     SIM70XX_LOGD(TAG, "Band: %u", *p_Band);
 
@@ -533,7 +531,7 @@ SIM70XX_Error_t SIM7020_GetFunctionality(SIM7020_t& p_Device)
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    p_Device.Connection.Functionality = (SIM7020_Func_t)SIM70XX_Tools_StringToUnsigned(Response);
+    p_Device.Connection.Functionality = static_cast<SIM7020_Func_t>(SIM70XX_Tools_StringToUnsigned(Response));
 
     SIM70XX_LOGI(TAG, "Functionality: %u", p_Device.Connection.Functionality);
 

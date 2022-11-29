@@ -7,11 +7,6 @@
   - [About](#about)
   - [TODO](#todo)
   - [Driver status](#driver-status)
-    - [Description](#description)
-      - [Not started](#not-started)
-      - [Open](#open)
-      - [Basic](#basic)
-      - [Complete](#complete)
   - [Examples](#examples)
     - [Using esp-idf](#using-esp-idf)
     - [NVRAM](#nvram)
@@ -45,42 +40,29 @@ Multidevice driver for SIMCom modules with UART interface.
 
 ## Driver status
 
+`√` means supported
+`×` means not supported
+`○` means supported but not tested
+`-` means no such peripheral
+
 | Driver        | SIM7020       | SIM7080       |
 |---------------|---------------|---------------|
-| NTP           | Complete      | Complete      |
-| DNS           | Complete      | Complete      |
-| Ping          | Complete      | Complete      |
-| GNSS          |               | Basic         |
-| E-Mail        |               | Complete      |
-| File system   |               | Complete      |
-| SSL / TLS     | Open          | Open          |
-| NVRAM         | Complete      |               |
-| TCP (Client)  | Complete      | Complete      |
-| UDP (Client)  | Complete      | Complete      |
-| TCP (Server)  | Open          | Not started   |
-| HTTP          | Complete      | Not started   |
-| CoAP          | Complete      | Not started   |
-| MQTT          | Complete      | Complete      |
-| FTP           |               |               |
-| PSM           | Basic         | Basic         |
-
-### Description
-
-#### Not started
-
-Driver implementation has not started.
-
-#### Open
-
-On-going implementation. The driver is not ready to use.
-
-#### Basic
-
-Basic functionallity is implemented and tested. Advanced configuration is not implemented.
-
-#### Complete
-
-All functionallity is implemented and tested.
+| NTP           | √   | √ |
+| DNS           | √   | √ |
+| Ping          | √   | √ |
+| GNSS          | -   | x |
+| E-Mail        | -   | √ |
+| File system   | -   | √ |
+| SSL / TLS     | x   | x |
+| NVRAM         | √   | - |
+| TCP (Client)  | √   | √ |
+| UDP (Client)  | √   | √ |
+| TCP (Server)  | x   | x |
+| HTTP          | √   | x |
+| CoAP          | √   | x |
+| MQTT          | √   | √ |
+| FTP           | -   | - |
+| PSM           | ○   | ○ |
 
 ## Examples
 

@@ -42,7 +42,7 @@ static SIM70XX_Error_t SIM7080_EMail_POP3_ErrorCheck(std::string ErrorCode, SIM7
 {
     SIM7080_EMail_Error_t ServerError;
 
-    ServerError = (SIM7080_EMail_Error_t)SIM70XX_Tools_StringToUnsigned(ErrorCode);
+    ServerError = static_cast<SIM7080_EMail_Error_t>(SIM70XX_Tools_StringToUnsigned(ErrorCode));
 
     if(p_Error != NULL)
     {
@@ -150,8 +150,8 @@ SIM70XX_Error_t SIM7080_EMail_POP3_ReadInbox(SIM7080_t& p_Device, uint32_t* cons
     Response.erase(Response.find("+POP3NUM: "), std::string("+POP3NUM: ").size());
     SIM70XX_ERROR_CHECK(SIM7080_EMail_POP3_ErrorCheck(SIM70XX_Tools_SubstringSplitErase(&Response), p_Error));
 
-    *p_Num = (uint32_t)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response));
-    *p_Size = (uint32_t)SIM70XX_Tools_StringToUnsigned(Response);
+    *p_Num = SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response));
+    *p_Size = SIM70XX_Tools_StringToUnsigned(Response);
 
     return SIM70XX_ERR_OK;
 }
@@ -186,7 +186,7 @@ SIM70XX_Error_t SIM7080_EMail_POP3_ReadEMailMeta(SIM7080_t& p_Device, uint32_t M
     // Remove the mail number.
     SIM70XX_Tools_SubstringSplitErase(&Response);
 
-    *p_Size = (uint32_t)SIM70XX_Tools_StringToUnsigned(Response);
+    *p_Size = SIM70XX_Tools_StringToUnsigned(Response);
 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_POP3UIDL(Mail);
@@ -275,8 +275,8 @@ SIM70XX_Error_t SIM7080_EMail_POP3_ReadEMail(SIM7080_t& p_Device, uint32_t ID, s
 
         SIM70XX_LOGI(TAG, "Response: %s", Response.c_str());
         Response.erase(Response.find("+POP3READ: "), std::string("+POP3READ: ").size());
-        StatusCode = (uint8_t)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response));
-        BytesReceived = (uint16_t)SIM70XX_Tools_StringToUnsigned(Response);
+        StatusCode = static_cast<uint8_t>(SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response)));
+        BytesReceived = static_cast<uint16_t>(SIM70XX_Tools_StringToUnsigned(Response));
 
         SIM70XX_LOGD(TAG, "Status code: %u", StatusCode);
         SIM70XX_LOGD(TAG, "Bytes received: %u", BytesReceived);

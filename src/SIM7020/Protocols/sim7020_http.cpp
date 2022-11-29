@@ -88,7 +88,7 @@ SIM70XX_Error_t SIM7020_HTTP_Create(SIM7020_t& p_Device, SIM7020_HTTP_Socket_t* 
 
     p_Socket->Internal.isConnected = false;
     p_Socket->Internal.isCreated = true;
-    p_Socket->Internal.ID = (uint8_t)SIM70XX_Tools_StringToUnsigned(Response);
+    p_Socket->Internal.ID = static_cast<uint8_t>(SIM70XX_Tools_StringToUnsigned(Response));
 
     SIM70XX_LOGI(TAG, "Socket %u created...", p_Socket->Internal.ID);
 

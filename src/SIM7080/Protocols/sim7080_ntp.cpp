@@ -87,12 +87,12 @@ SIM70XX_Error_t SIM7080_NTP_Sync(SIM7080_t& p_Device, SIM7080_PDP_Context_t* p_P
     // No "," detected -> We have a response without time.
     if(Index == std::string::npos)
     {
-        NTP_Error = (SIM7080_NTP_Error_t)SIM70XX_Tools_StringToUnsigned(Response);
+        NTP_Error = static_cast<SIM7080_NTP_Error_t>(SIM70XX_Tools_StringToUnsigned(Response));
     }
     // "," detected -> We have a response with time.
     else
     {
-        NTP_Error = (SIM7080_NTP_Error_t)SIM70XX_Tools_StringToUnsigned(Response.substr(Index - 1, Index));
+        NTP_Error = static_cast<SIM7080_NTP_Error_t>(SIM70XX_Tools_StringToUnsigned(Response.substr(Index - 1, Index)));
 
         SIM70XX_LOGI(TAG, "NTP Error: %u", NTP_Error);
 
@@ -150,7 +150,7 @@ SIM70XX_Error_t SIM7080_NTP_GetTime(SIM7080_t& p_Device, struct tm* const p_Time
     Index = Response.find("+");
     if(p_Timezone != NULL)
     {
-        *p_Timezone = (int8_t)SIM70XX_Tools_StringToSigned(Response.substr(Index + 1));
+        *p_Timezone = static_cast<int8_t>(SIM70XX_Tools_StringToSigned(Response.substr(Index + 1)));
     }
     Response.erase(Index);
 

@@ -65,9 +65,9 @@ SIM70XX_Error_t SIM7080_Info_ReadBattery(SIM7080_t& p_Device, SIM7080_ChargeStat
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    Charge = (SIM7080_ChargeState_t)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response));
-    Battery = (uint8_t)SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response));
-    Voltage = (uint16_t)SIM70XX_Tools_StringToUnsigned(Response);
+    Charge = static_cast<SIM7080_ChargeState_t>(SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response)));
+    Battery = static_cast<uint8_t>(SIM70XX_Tools_StringToUnsigned(SIM70XX_Tools_SubstringSplitErase(&Response)));
+    Voltage = static_cast<uint16_t>(SIM70XX_Tools_StringToUnsigned(Response));
 
     if(p_Charge != NULL)
     {
