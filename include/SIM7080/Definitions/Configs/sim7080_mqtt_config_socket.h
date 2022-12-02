@@ -1,5 +1,5 @@
  /*
- * sim7020_tcp_server.cpp
+ * sim7080_mqtt_config_socket.h
  *
  *  Copyright (C) Daniel Kampert, 2022
  *	Website: www.kampis-elektroecke.de
@@ -17,32 +17,18 @@
  * Errors and commissions should be reported to DanielKampert@kampis-elektroecke.de.
  */
 
-#include <sdkconfig.h>
+#ifndef SIM7080_MQTT_CONFIG_SOCKET_H_
+#define SIM7080_MQTT_CONFIG_SOCKET_H_
 
-#if((CONFIG_SIMXX_DEV == 7020) && (defined CONFIG_SIM70XX_DRIVER_WITH_TCPIP))
+/** @brief          Declare a default MQTT socket. The socket is defined with the following parameter
+ *                      Timeout         12000 ms
+ *                      Buffersize      1024 Bytes
+ *                      MQTT Version    3.1
+ *                      Client ID       SIM7020 MQTT
+ *                      Keep Alive      600 s
+ *  @param Host     
+ *  @param Port
+ */
+#define SIM7080_MQTT_DEFAULT_SOCKET(Host, Port)
 
-#include "sim7020.h"
-#include "sim7020_tcpip.h"
-#include "Private/Server/sim7020_server.h"
-
-SIM70XX_Error_t SIM7020_TCP_Server_Create(SIM7020_t& p_Device, std::string IP, uint16_t Port, SIM7020_TCPIP_Socket_t* p_Socket)
-{
-    return SIM7020_Server_CreateSocket(p_Device, SIM7020_TCP_TYPE_TCP, IP, Port, p_Socket);
-}
-
-SIM70XX_Error_t SIM7020_TCP_Server_Bind(SIM7020_t& p_Device, SIM7020_TCPIP_Socket_t* p_Socket)
-{
-    return SIM7020_Server_BindSocket(p_Device, p_Socket);
-}
-
-SIM70XX_Error_t SIM7020_TCP_Server_Listen(SIM7020_t& p_Device, SIM7020_TCPIP_Socket_t* p_Socket)
-{
-    return SIM7020_Server_Listen(p_Device, p_Socket);
-}
-
-SIM70XX_Error_t SIM7020_TCP_Server_Destroy(SIM7020_t& p_Device, SIM7020_TCPIP_Socket_t* p_Socket)
-{
-    return SIM7020_Server_DestroySocket(p_Device, p_Socket);
-}
-
-#endif
+#endif /* SIM7080_MQTT_CONFIG_SOCKET_H_ */

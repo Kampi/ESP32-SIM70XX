@@ -28,6 +28,7 @@
 
 #include "../../../Core/Arch/ESP32/UART/sim70xx_uart.h"
 #include "../../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
+#include "../../../Core/Arch/ESP32/Watchdog/sim70xx_watchdog.h"
 
 static const char* TAG = "SIM7080_EMail";
 
@@ -159,7 +160,7 @@ SIM70XX_Error_t SIM7080_EMail_SendText(SIM7080_t& p_Device, SIM7080_PDP_Context_
     SIM70XX_TxCmd_t* Command;
     SIM7080_EMail_Error_t MailError;
 
-    if((p_Config == NULL) || (CID > 4))
+    if((p_PDP == NULL) || (p_Config == NULL))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
@@ -217,11 +218,11 @@ SIM70XX_Error_t SIM7080_EMail_SendText(SIM7080_t& p_Device, SIM7080_PDP_Context_
         return SIM70XX_ERR_FAIL;
     }
 
-    vTaskSuspend(p_Device.UART.TaskHandle);
+    SIM70XX_WDT_PAUSE_TASK(p_Device.UART.TaskHandle);
     SIM70XX_UART_Send(p_Device.UART, Body.c_str(), Body.size());
     SIM70XX_UART_ReadStringUntil(p_Device.UART);
     SIM70XX_UART_ReadStringUntil(p_Device.UART);
-    vTaskResume(p_Device.UART.TaskHandle);
+    SIM70XX_WDT_CONTINUE_TASK(p_Device.UART.TaskHandle);
 
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7080_AT_SMTPSEND;

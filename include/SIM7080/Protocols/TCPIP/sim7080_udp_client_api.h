@@ -45,12 +45,12 @@ inline __attribute__((always_inline)) bool SIM7080_UDP_Client_isDataAvailable(SI
  *  @param IP           IP address
  *  @param Port         UDP port
  *  @param p_Socket     Pointer to UDP socket object
- *  @param CID          (Optional) Context Identifier
+ *  @param p_PDP        Pointer to PDP context
  *  @param ReadManually (Optional) Set to #true to automatically read receiving data
  *                      NOTE: Not supported yet
  *  @return             SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_UDP_Client_Create(SIM7080_t& p_Device, std::string IP, uint16_t Port, SIM7080_TCPIP_Socket_t* p_Socket, uint8_t CID = 0, bool ReadManually = false);
+SIM70XX_Error_t SIM7080_UDP_Client_Create(SIM7080_t& p_Device, std::string IP, uint16_t Port, SIM7080_TCPIP_Socket_t* p_Socket, const SIM7080_PDP_Context_t* const p_PDP, bool ReadManually = false);
 
 /** @brief          Open a UDP connection to a remote server.
  *  @param p_Device SIM7080 device object
@@ -61,7 +61,7 @@ SIM70XX_Error_t SIM7080_UDP_Client_Create(SIM7080_t& p_Device, std::string IP, u
  *  @param Timeout  (Optional) Transmission timeout in milliseconds
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_UDP_Client_Connect(SIM7080_t& p_Device, SIM7080_TCPIP_Socket_t* p_Socket, SIM7080_PDP_Context_t* p_PDP, SIM7080_TCP_Error_t* p_Result = NULL);
+SIM70XX_Error_t SIM7080_UDP_Client_Connect(SIM7080_t& p_Device, SIM7080_TCPIP_Socket_t* p_Socket, const SIM7080_PDP_Context_t* const p_PDP, SIM7080_TCP_Error_t* p_Result = NULL);
 
 /** @brief              Transmit a UDP message.
  *  @param p_Device     SIM7080 device object
@@ -102,10 +102,10 @@ SIM70XX_Error_t SIM7080_UDP_Client_Destroy(SIM7080_t& p_Device, SIM7080_TCPIP_So
     /** @brief          Enable / Disable SSL support for the UDP client.
      *  @param p_Device SIM7080 device object
      *  @param Enable   Enable / Disable SSL
-     *  @param CID      (Optional) Context Identifier
+     *  @param p_PDP    Pointer to PDP context
      *  @return         SIM70XX_ERR_OK when successful
      */
-    SIM70XX_Error_t SIM7080_UDP_Client_EnableSSL(SIM7080_t& p_Device, bool Enable, uint8_t CID = 0);
+    SIM70XX_Error_t SIM7080_UDP_Client_EnableSSL(SIM7080_t& p_Device, bool Enable, const SIM7080_PDP_Context_t* const p_PDP);
 #endif
 
 #endif /* SIM7080_UDP_CLIENT_API_H_ */

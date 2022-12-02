@@ -25,12 +25,12 @@
 #include "sim7080_tcpip.h"
 #include "Private/Client/sim7080_client.h"
 
-SIM70XX_Error_t SIM7080_TCP_Client_Create(SIM7080_t& p_Device, std::string IP, uint16_t Port, SIM7080_TCPIP_Socket_t* p_Socket, uint8_t CID)
+SIM70XX_Error_t SIM7080_TCP_Client_Create(SIM7080_t& p_Device, std::string IP, uint16_t Port, SIM7080_TCPIP_Socket_t* p_Socket, const SIM7080_PDP_Context_t* const p_PDP)
 {
-    return SIM7080_Client_CreateSocket(p_Device, SIM7080_TCP_TYPE_TCP, IP, Port, p_Socket, CID, false);
+    return SIM7080_Client_CreateSocket(p_Device, SIM7080_TCP_TYPE_TCP, IP, Port, p_Socket, p_PDP->ID, false);
 }
 
-SIM70XX_Error_t SIM7080_TCP_Client_Connect(SIM7080_t& p_Device, SIM7080_TCPIP_Socket_t* p_Socket, SIM7080_PDP_Context_t* p_PDP, SIM7080_TCP_Error_t* p_Result)
+SIM70XX_Error_t SIM7080_TCP_Client_Connect(SIM7080_t& p_Device, SIM7080_TCPIP_Socket_t* p_Socket, const SIM7080_PDP_Context_t* const p_PDP, SIM7080_TCP_Error_t* p_Result)
 {
     if(p_Socket->Internal.Type != SIM7080_TCP_TYPE_TCP)
     {
@@ -80,16 +80,11 @@ SIM70XX_Error_t SIM7080_TCP_Client_Destroy(SIM7080_t& p_Device, SIM7080_TCPIP_So
     return SIM7080_Client_DestroySocket(p_Device, p_Socket);
 }
 
-#ifdef CONFIG_SIM70XX_DRIVER_WITH_SSL
-    SIM70XX_Error_t SIM7080_TCP_Client_EnableSSL(SIM7080_t& p_Device, bool Enable, uint8_t CID)
-    {
-        if(p_Socket->Internal.Type != SIM7080_TCP_TYPE_TCP)
+    #ifdef CONFIG_SIM70XX_DRIVER_WITH_SSL
+        SIM70XX_Error_t SIM7080_TCP_Client_EnableSSL(SIM7080_t& p_Device, bool Enable, const SIM7080_PDP_Context_t* const p_PDP)
         {
-            return SIM70XX_ERR_INVALID_SOCKET;
+            return SIM7080_Client_EnableSSL(p_Device, Enable, p_PDP);
         }
-
-        return SIM7080_Client_EnableSSL(p_Device, Enable, CID);
-    }
-#endif
+    #endif
 
 #endif

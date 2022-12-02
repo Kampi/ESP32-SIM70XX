@@ -23,14 +23,19 @@
 /** @brief          Default PDP context definition.
  *  @param Context  Context ID
  */
-#define SIM7020_PDP_DEFAULT_CONTEXT(Context)                        {                                   \
-                                                                        .ID = Context,                  \
-                                                                        .Type = SIM7020_PDP_IP,         \
-                                                                        .Address = "",                  \
-                                                                        .Internal = {                   \
-                                                                            .isConfigured = false,      \
-                                                                            .isActive = false           \
-                                                                        }                               \
+#define SIM7020_PDP_DEFAULT_CONTEXT(Context)                        {                                       \
+                                                                        .ID = Context,                      \
+                                                                        .IPv4_MTU = 0,                      \
+                                                                        .Non_MTU = 0,                       \
+                                                                        .Type = SIM7020_PDP_IP,             \
+                                                                        .APN = "",                          \
+                                                                        .Address = "",                      \
+                                                                        .D_Comp = SIM7020_PDP_DCOMP_OFF,    \
+                                                                        .H_Comp = SIM7020_PDP_HCOMP_OFF,    \
+                                                                        .Internal = {                       \
+                                                                            .isConfigured = false,          \
+                                                                            .isActive = false               \
+                                                                        }                                   \
                                                                     }
 
 #endif /* SIM7020_PDP_CONTEXT_H_ */

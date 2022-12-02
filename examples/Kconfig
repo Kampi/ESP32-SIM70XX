@@ -2,6 +2,11 @@ menu "Demo"
     config DEMO_READ_OPERATOR
         bool "Read the available operators"
 
+    menu "Power Management"
+        config DEMO_USE_PSM
+            bool "Enable the PSM demo"
+    endmenu
+
     menu "NTP"
 	    depends on SIM70XX_DRIVER_WITH_NTP
 
@@ -119,6 +124,13 @@ menu "Demo"
 
         config DEMO_USE_NVRAM
             bool "Enable the NVRAM demo"
+	endmenu
+
+	menu "SSL"
+	    depends on SIM70XX_DRIVER_WITH_SSL
+
+        config DEMO_USE_SSL
+            bool "Enable the SSL support for the demos"
 	endmenu
 
 	menu "MQTT"

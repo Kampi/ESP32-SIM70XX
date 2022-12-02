@@ -31,7 +31,7 @@
 
 static const char* TAG = "SIM7080_NTP";
 
-SIM70XX_Error_t SIM7080_NTP_Sync(SIM7080_t& p_Device, SIM7080_PDP_Context_t* p_PDP, std::string Server, int8_t TimeZone, struct tm* const p_Time, SIM7080_NTP_Error_t* const p_Error)
+SIM70XX_Error_t SIM7080_NTP_Sync(SIM7080_t& p_Device, const SIM7080_PDP_Context_t* const p_PDP, std::string Server, int8_t TimeZone, struct tm* const p_Time, SIM7080_NTP_Error_t* const p_Error)
 {
     size_t Index;
     std::string Status;
@@ -40,7 +40,7 @@ SIM70XX_Error_t SIM7080_NTP_Sync(SIM7080_t& p_Device, SIM7080_PDP_Context_t* p_P
     SIM70XX_TxCmd_t* Command;
     SIM70XX_Error_t Error = SIM70XX_ERR_FAIL;
 
-    if((TimeZone < -47) || (TimeZone > 48) || (p_Time == NULL))
+    if((p_PDP == NULL) || (TimeZone < -47) || (TimeZone > 48) || (p_Time == NULL))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }

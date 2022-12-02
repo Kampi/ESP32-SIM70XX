@@ -29,6 +29,7 @@
 
 #include "../../../../../Core/Arch/ESP32/UART/sim70xx_uart.h"
 #include "../../../../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
+#include "../../../../../Core/Arch/ESP32/Watchdog/sim70xx_watchdog.h"
 
 static const char* TAG = "SIM7080_TCPIP_Client";
 
@@ -62,7 +63,7 @@ SIM70XX_Error_t SIM7080_Client_CreateSocket(SIM7080_t& p_Device, SIM7080_TCP_Typ
     return SIM70XX_ERR_OK;
 }
 
-SIM70XX_Error_t SIM7080_Client_ConnectSocket(SIM7080_t& p_Device, SIM7080_TCPIP_Socket_t* p_Socket, SIM7080_PDP_Context_t* p_PDP, SIM7080_TCP_Error_t* p_Result)
+SIM70XX_Error_t SIM7080_Client_ConnectSocket(SIM7080_t& p_Device, SIM7080_TCPIP_Socket_t* p_Socket, const SIM7080_PDP_Context_t* const p_PDP, SIM7080_TCP_Error_t* p_Result)
 {
     std::string Type;
     std::string Response;
@@ -88,6 +89,10 @@ SIM70XX_Error_t SIM7080_Client_ConnectSocket(SIM7080_t& p_Device, SIM7080_TCPIP_
     else if(p_Socket->Internal.isServer == true)
     {
         return SIM70XX_ERR_INVALID_SOCKET;
+    }
+    else if(p_PDP->Internal.isActive == false)
+    {
+        return SIM70XX_ERR_PDP_NOT_ACTIVE;
     }
 
     if(p_Socket->Internal.Type == SIM7080_TCP_TYPE_TCP)
@@ -136,7 +141,7 @@ SIM70XX_Error_t SIM7080_Client_Transmit(SIM7080_t& p_Device, SIM7080_TCPIP_Socke
     uint32_t Remaining = Length;
     SIM70XX_Error_t Error = SIM70XX_ERR_OK;
 
-    if((p_Socket == NULL) || ((p_Buffer == NULL) && (Length > 0)) || (PacketSize > SIM7080_TCP_MAX_PAYLOAD_SIZE))
+    if((p_Socket == NULL) || ((Buffer == NULL) && (Length > 0)) || (PacketSize > SIM7080_TCP_MAX_PAYLOAD_SIZE))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
@@ -162,7 +167,7 @@ SIM70XX_Error_t SIM7080_Client_Transmit(SIM7080_t& p_Device, SIM7080_TCPIP_Socke
     }
 
     // NOTE: We can not use the standard process here, because the response (">") does not contain a new line. The command will end with an empty space (0x20).
-    vTaskSuspend(p_Device.UART.TaskHandle);
+    SIM70XX_WDT_PAUSE_TASK(p_Device.UART.TaskHandle);
     SIM70XX_LOGI(TAG, "Total %u bytes to transmit...", Remaining);
     RetryCounter = 0;
     do
@@ -191,9 +196,7 @@ SIM70XX_Error_t SIM7080_Client_Transmit(SIM7080_t& p_Device, SIM7080_TCPIP_Socke
         if(Response.find(">") == std::string::npos)
         {
             SIM70XX_LOGE(TAG, "Invalid response. Expect '>', got: %s", Response.c_str());
-
-            Error = SIM70XX_ERR_FAIL;
-            break;
+            continue;
         }
 
         // Send the data.
@@ -213,7 +216,7 @@ SIM70XX_Error_t SIM7080_Client_Transmit(SIM7080_t& p_Device, SIM7080_TCPIP_Socke
                 RetryCounter++;
 
                 // Give a short break to allow the modem to handle the error.
-                vTaskDelay(1000 / portTICK_PERIOD_MS);
+                vTaskDelay(100 / portTICK_PERIOD_MS);
                 continue;
             }
             else
@@ -236,8 +239,10 @@ SIM70XX_Error_t SIM7080_Client_Transmit(SIM7080_t& p_Device, SIM7080_TCPIP_Socke
             Buffer += BytesToSend;
             Remaining -= BytesToSend;
         }
+
+        vTaskDelay(50 / portTICK_PERIOD_MS);
     } while(Remaining > 0);
-    vTaskResume(p_Device.UART.TaskHandle);
+    SIM70XX_WDT_CONTINUE_TASK(p_Device.UART.TaskHandle);
 
     return Error;
 }
@@ -269,10 +274,10 @@ SIM70XX_Error_t SIM7080_Client_Receive(SIM7080_t& p_Device, SIM7080_TCPIP_Socket
 
     // We have to use the event queue here, because payload can contain CR and LF which will lead to wrong results when we use the normal way here.
     SIM70XX_LOGI(TAG, "Transmit command: %s", Command.Command.c_str());
-    vTaskSuspend(p_Device.UART.TaskHandle);
+    SIM70XX_WDT_PAUSE_TASK(p_Device.UART.TaskHandle);
     Command = SIM7080_AT_CARECV(p_Socket->Internal.CID, Length);
     SIM70XX_UART_SendLine(p_Device.UART, Command.Command);
-    vTaskResume(p_Device.UART.TaskHandle);
+    SIM70XX_WDT_CONTINUE_TASK(p_Device.UART.TaskHandle);
 
     while(SIM70XX_Queue_isEvent(p_Device.Internal.EventQueue, "+CARECV" , p_Buffer) == false)
     {
@@ -347,12 +352,12 @@ SIM70XX_Error_t SIM7080_Client_DestroySocket(SIM7080_t& p_Device, SIM7080_TCPIP_
 }
 
 #ifdef CONFIG_SIM70XX_DRIVER_WITH_SSL
-    SIM70XX_Error_t SIM7080_Client_EnableSSL(SIM7080_t& p_Device, bool Enable, uint8_t CID)
+    SIM70XX_Error_t SIM7080_Client_EnableSSL(SIM7080_t& p_Device, bool Enable, const SIM7080_PDP_Context_t* const p_PDP)
     {
         SIM70XX_TxCmd_t* Command;
         std::string CommandStr;
 
-        if(CID > 12)
+        if(p_PDP == NULL)
         {
             return SIM70XX_ERR_INVALID_ARG;
         }
@@ -360,8 +365,12 @@ SIM70XX_Error_t SIM7080_Client_DestroySocket(SIM7080_t& p_Device, SIM7080_TCPIP_
         {
             return SIM70XX_ERR_NOT_INITIALIZED;
         }
+        else if(p_PDP->Internal.isActive == false)
+        {
+            return SIM70XX_ERR_PDP_NOT_ACTIVE;
+        }
 
-        CommandStr = "AT+CASSLCFG=" + std::to_string(CID) + ",\"SSL\"," + std::to_string(Enable);
+        CommandStr = "AT+CASSLCFG=" + std::to_string(p_PDP->ID) + ",\"SSL\"," + std::to_string(Enable);
 
         SIM70XX_CREATE_CMD(Command);
         *Command = SIM7080_AT_CASSLCFG(CommandStr);

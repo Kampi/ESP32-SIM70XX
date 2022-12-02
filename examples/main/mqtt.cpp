@@ -31,7 +31,7 @@ static const char* TAG                                              = "MQTT";
     static SIM7020_MQTT_Socket_t _MQTT_Socket;
     static SIM7020_MQTT_Sub_Evt_t _MQTT_Message;
 
-    #define SIMXX_Create(Device, Socket)                            SIM7020_MQTT_Create(Device, Socket)
+    #define SIMXX_Create(Device, Context, Socket)                   SIM7020_MQTT_Create(Device, Socket)
     #define SIMXX_Connect(Device, Socket)                           SIM7020_MQTT_Connect(Device, Socket)
     #define SIMXX_Subscribe(Device, Socket, Topic)                  SIM7020_MQTT_Subscribe(Device, Socket, Topic)
     #define SIMXX_WaitSubscription(Socket)                          SIM7020_MQTT_GetSubcriptionItems(Socket)
@@ -44,7 +44,7 @@ static const char* TAG                                              = "MQTT";
     static SIM7080_MQTT_Socket_t _MQTT_Socket;
     static SIM7080_MQTT_Sub_Evt_t _MQTT_Message;
 
-    #define SIMXX_Create(Device, Socket)                            SIM7080_MQTT_Create(Device, Socket)
+    #define SIMXX_Create(Device, Context, Socket)                   SIM7080_MQTT_Create(Device, Socket)
     #define SIMXX_Connect(Device, Socket)                           SIM7080_MQTT_Connect(Device, Socket)
     #define SIMXX_Subscribe(Device, Socket, Topic)                  SIM7080_MQTT_Subscribe(Device, Socket, Topic)
     #define SIMXX_WaitSubscription(Socket)                          SIM7080_MQTT_GetSubcriptionItems(Socket)
@@ -55,50 +55,52 @@ static const char* TAG                                              = "MQTT";
     #define SIMXX_Destroy(Device, Socket)                           SIM7080_MQTT_Destroy(Device, Socket)
 #endif
 
-void MQTT_Run(DEVICE_TYPE& p_Device, std::string SubTopic, std::string PubTopic)
+void MQTT_Run(DEVICE_TYPE& p_Device, void* p_Opts, std::string SubTopic, std::string PubTopic)
 {
     SIM70XX_Error_t Error;
 
 	ESP_LOGI(TAG, "Run MQTT example...");
 
+    _MQTT_Socket = SIM7020_MQTT_DEFAULT_SOCKET(CONFIG_DEMO_MQTT_BROKER, CONFIG_DEMO_MQTT_PORT);
     _MQTT_Socket.KeepAlive = 60;
-    _MQTT_Socket.Broker = CONFIG_DEMO_MQTT_BROKER;
-    _MQTT_Socket.Port = CONFIG_DEMO_MQTT_PORT;
     _MQTT_Socket.ClientID = "SIM70XX-MQTT";
     _MQTT_Socket.CleanSession = true;
+    _MQTT_Socket.Version = SIM7020_MQTT_31;
 
     #ifdef CONFIG_DEMO_MQTT_USE_LOGIN
         _MQTT_Socket.Username = CONFIG_DEMO_MQTT_USER;
         _MQTT_Socket.Password = CONFIG_DEMO_MQTT_PASSWORD;
     #endif
 
-    Error = SIMXX_Create(p_Device, &_MQTT_Socket);
+    Error = SIMXX_Create(p_Device, p_Opts, &_MQTT_Socket);
     if(Error == SIM70XX_ERR_OK)
     {
         Error = SIMXX_Connect(p_Device, &_MQTT_Socket);
         if(Error == SIM70XX_ERR_OK)
         {
-            SIMXX_Subscribe(p_Device, &_MQTT_Socket, SubTopic);
-            SIMXX_Publish(p_Device, &_MQTT_Socket, PubTopic, "Hello from Cellular!");
+            Error = SIMXX_Subscribe(p_Device, &_MQTT_Socket, SubTopic) | SIMXX_Publish(p_Device, &_MQTT_Socket, PubTopic, "Hello from Cellular!");
 
-            while(true)
+            if(Error == SIM70XX_ERR_OK)
             {
-                while(SIMXX_WaitSubscription(&_MQTT_Socket) == 0)
+                while(true)
                 {
-                    vTaskDelay(1000 / portTICK_PERIOD_MS);
+                    while(SIMXX_WaitSubscription(&_MQTT_Socket) == 0)
+                    {
+                        vTaskDelay(1000 / portTICK_PERIOD_MS);
+                    }
+
+                    ESP_LOGI(TAG, "Receive subscription...");
+
+                    if(SIMXX_GetSubscription(p_Device, &_MQTT_Socket, &_MQTT_Message) == SIM70XX_ERR_OK)
+                    {
+                        ESP_LOGI(TAG, "Topic: %s", _MQTT_Message.Topic.c_str());
+                        ESP_LOGI(TAG, "Payload: %s", _MQTT_Message.Payload.c_str());
+
+                        break;
+                    }
+
+                    vTaskDelay(100 / portTICK_PERIOD_MS);
                 }
-
-                ESP_LOGI(TAG, "Receive subscription...");
-
-                if(SIMXX_GetSubscription(p_Device, &_MQTT_Socket, &_MQTT_Message) == SIM70XX_ERR_OK)
-                {
-                    ESP_LOGI(TAG, "Topic: %s", _MQTT_Message.Topic.c_str());
-                    ESP_LOGI(TAG, "Payload: %s", _MQTT_Message.Payload.c_str());
-
-                    break;
-                }
-
-                vTaskDelay(100 / portTICK_PERIOD_MS);
             }
 
             SIMXX_Unsubscribe(p_Device, &_MQTT_Socket, SubTopic);

@@ -139,14 +139,6 @@ void StartExamples(void)
             Error = SIM7080_Baerer_SetAPN(_Device, _Config.APN, &_PDP);
             if(Error == SIM70XX_ERR_OK)
             {
-                std::vector<uint8_t> Bands;
-
-                SIM7080_GetBandConfig(_Device, SIM7080_MODE_CAT, &Bands);
-
-                while(1)
-                {
-                    vTaskDelay(1000);
-                }
                 SIM7080_Baerer_IP_CheckNetworks(_Device, &Networks);
                 SIM7080_Info_GetEquipmentInfo(_Device, &UE_Info);
             }

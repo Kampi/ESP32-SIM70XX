@@ -40,21 +40,20 @@ inline __attribute__((always_inline)) uint32_t SIM7020_MQTT_GetSubcriptionItems(
 
 /** @brief          Create a MQTT socket by using default settings.
  *  @param p_Device SIM7020 device object
- *  @param p_PDP    Pointer to PDP context
  *  @param Broker   MQTT broker address
  *  @param p_Socket Pointer to MQTT socket object
  *  @param Port     (Optional) MQTT broker port
  *  @param Version  (Optional) MQTT protocol version
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_MQTT_Create(SIM7020_t& p_Device, SIM7020_PDP_Context_t* const p_PDP, SIM7020_MQTT_Socket_t* const p_Socket, std::string Broker, uint16_t Port = 1883, SIM7020_MQTT_Version_t Version = SIM7020_MQTT_311);
+SIM70XX_Error_t SIM7020_MQTT_Create(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* const p_Socket, std::string Broker, uint16_t Port = 1883, SIM7020_MQTT_Version_t Version = SIM7020_MQTT_311);
 
 /** @brief          Create a MQTT socket.
  *  @param p_Device SIM7020 device object
  *  @param p_Socket Pointer to MQTT socket object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_MQTT_Create(SIM7020_t& p_Device, SIM7020_PDP_Context_t* const p_PDP, SIM7020_MQTT_Socket_t* const p_Socket);
+SIM70XX_Error_t SIM7020_MQTT_Create(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* const p_Socket);
 
 /** @brief          Open a connection to a MQTT socket.
  *  @param p_Device SIM7020 device object

@@ -104,11 +104,11 @@ SIM70XX_Error_t SIM7080_DNS_FetchAddress(SIM7080_t& p_Device, std::string Host, 
     return SIM70XX_ERR_FAIL;
 }
 
-SIM70XX_Error_t SIM7080_DNS_SetIndex(SIM7080_t& p_Device, uint8_t Index)
+SIM70XX_Error_t SIM7080_DNS_SetIndex(SIM7080_t& p_Device, const SIM7080_PDP_Context_t* const p_PDP)
 {
     SIM70XX_TxCmd_t* Command;
 
-    if(Index > 4)
+    if(p_PDP == NULL)
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
@@ -116,9 +116,13 @@ SIM70XX_Error_t SIM7080_DNS_SetIndex(SIM7080_t& p_Device, uint8_t Index)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
+    else if(p_PDP->Internal.isActive == false)
+    {
+        return SIM70XX_ERR_PDP_NOT_ACTIVE;
+    }
 
     SIM70XX_CREATE_CMD(Command);
-    *Command = SIM7080_AT_CDNSPDPID_W(Index);
+    *Command = SIM7080_AT_CDNSPDPID_W(p_PDP->ID);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
     if(SIM70XX_Queue_Wait(p_Device.Internal.RxQueue, Command->Timeout) == false)
     {

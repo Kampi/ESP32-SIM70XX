@@ -40,43 +40,43 @@ void NVRAM_Run(DEVICE_TYPE& p_Device, std::string Key)
 	SIM70XX_Error_t Error;
 	std::vector<std::string> Keys;
 
-	SIM70XX_LOGI(TAG, "Run NVRAM example...");
+	ESP_LOGI(TAG, "Run NVRAM example...");
 
-	SIM70XX_LOGI(TAG, "Writing data to NVRAM...");
+	ESP_LOGI(TAG, "Writing data to NVRAM...");
 	Error = SIMXX_Write(p_Device, Key, "Hello, World!");
 	if(Error != SIM70XX_ERR_OK)
 	{
-		SIM70XX_LOGE(TAG, "Can not write to NVRAM. Error: 0x%X", Error);
+		ESP_LOGE(TAG, "Can not write to NVRAM. Error: 0x%X", Error);
 		return;
 	}
 
-	SIM70XX_LOGI(TAG, "Reading data from NVRAM...");
+	ESP_LOGI(TAG, "Reading data from NVRAM...");
 	Error = SIMXX_Read(p_Device, Key, &Data);
 	if(Error != SIM70XX_ERR_OK)
 	{
-		SIM70XX_LOGE(TAG, "Can not read from NVRAM. Error: 0x%X", Error);
+		ESP_LOGE(TAG, "Can not read from NVRAM. Error: 0x%X", Error);
 		return;
 	}
-	SIM70XX_LOGI(TAG, "		Data: %s", Data.c_str());
+	ESP_LOGI(TAG, "		Data: %s", Data.c_str());
 
-	SIM70XX_LOGI(TAG, "Reading keys from NVRAM...");
+	ESP_LOGI(TAG, "Reading keys from NVRAM...");
 	Error = SIMXX_ReadKeys(p_Device, &Keys);
 	if(Error != SIM70XX_ERR_OK)
 	{
-		SIM70XX_LOGE(TAG, "Can not read keys from NVRAM. Error: 0x%X", Error);
+		ESP_LOGE(TAG, "Can not read keys from NVRAM. Error: 0x%X", Error);
 		return;
 	}
 
 	for(uint32_t i = 0; i < Keys.size(); i++)
 	{
-		SIM70XX_LOGI(TAG, "	Key %u: %s", i + 1, Keys.at(i).c_str());
+		ESP_LOGI(TAG, "	Key %u: %s", i + 1, Keys.at(i).c_str());
 	}
 
-	SIM70XX_LOGI(TAG, "Erase key from NVRAM...");
+	ESP_LOGI(TAG, "Erase key from NVRAM...");
 	Error = SIM7020_NVRAM_Erase(p_Device, Key);
 	if(Error != SIM70XX_ERR_OK)
 	{
-		SIM70XX_LOGE(TAG, "Can not erase key \"%s\". Error: 0x%X", Key.c_str(), Error);
+		ESP_LOGE(TAG, "Can not erase key \"%s\". Error: 0x%X", Key.c_str(), Error);
 	}
 }
 

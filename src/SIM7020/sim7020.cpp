@@ -35,6 +35,49 @@
 
 static const char* TAG = "SIM7020";
 
+/** @brief          Perform the basic initialization of the device object.
+ *  @param p_Device SIM7020 device object
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+static SIM70XX_Error_t SIM7020_BasicInit(SIM7020_t& p_Device)
+{
+    p_Device.Internal.RxQueue = xQueueCreate(CONFIG_SIM70XX_QUEUE_LENGTH, sizeof(SIM70XX_CmdResp_t*));
+    p_Device.Internal.TxQueue = xQueueCreate(CONFIG_SIM70XX_QUEUE_LENGTH, sizeof(SIM70XX_TxCmd_t*));
+    p_Device.Internal.EventQueue = xQueueCreate(CONFIG_SIM70XX_QUEUE_LENGTH, sizeof(std::string*));
+    if(p_Device.Internal.RxQueue == NULL)
+    {
+        goto SIM7020_BasicInit_NoRxQueue;
+    }
+
+    if(p_Device.Internal.TxQueue == NULL)
+    {
+        goto SIM7020_BasicInit_NoTxQueue;
+    }
+
+    if(p_Device.Internal.EventQueue == NULL)
+    {
+        goto SIM7020_BasicInit_NoEventQueue;
+    }
+
+    SIM70XX_GPIO_Init();
+
+    if(SIM70XX_Evt_StartTask(p_Device.UART, &p_Device) == SIM70XX_ERR_OK)
+    {
+        return SIM70XX_ERR_OK;
+    }
+
+    SIM70XX_GPIO_Deinit();
+
+SIM7020_BasicInit_NoEventQueue:
+    vQueueDelete(p_Device.Internal.TxQueue);
+
+SIM7020_BasicInit_NoTxQueue:
+    vQueueDelete(p_Device.Internal.RxQueue);
+
+SIM7020_BasicInit_NoRxQueue:
+    return SIM70XX_ERR_NO_MEM;
+}
+
 SIM70XX_Error_t SIM7020_Init(SIM7020_t& p_Device, SIM7020_Config_t& p_Config, uint32_t Timeout)
 {
     return SIM7020_Init(p_Device, p_Config, Timeout, SIM_BAUD_AUTO);
@@ -52,23 +95,12 @@ SIM70XX_Error_t SIM7020_Init(SIM7020_t& p_Device, SIM7020_Config_t& p_Config, ui
         SIM7020_Deinit(p_Device);
     }
 
-    p_Device.Internal.RxQueue = xQueueCreate(CONFIG_SIM70XX_QUEUE_LENGTH, sizeof(SIM70XX_CmdResp_t*));
-    p_Device.Internal.TxQueue = xQueueCreate(CONFIG_SIM70XX_QUEUE_LENGTH, sizeof(SIM70XX_TxCmd_t*));
-    p_Device.Internal.EventQueue = xQueueCreate(CONFIG_SIM70XX_QUEUE_LENGTH, sizeof(std::string*));
-    if((p_Device.Internal.RxQueue == NULL) || (p_Device.Internal.TxQueue == NULL) || (p_Device.Internal.EventQueue == NULL))
-    {
-        return SIM70XX_ERR_NO_MEM;
-    }
-
     p_Device.UART.Interface = p_Config.UART.Interface;
     p_Device.UART.Rx = p_Config.UART.Rx;
     p_Device.UART.Tx = p_Config.UART.Tx;
     p_Device.UART.Baudrate = p_Config.UART.Baudrate;
 
-    SIM70XX_GPIO_Init();
-
-    // No receive task started yet. Start the receive task and subscribe the tasks to the watchdog.
-    SIM70XX_ERROR_CHECK(SIM70XX_Evt_StartTask(p_Device.UART, &p_Device));
+    SIM70XX_ERROR_CHECK(SIM7020_BasicInit(p_Device));
 
     p_Device.Internal.isInitialized = true;
 
@@ -88,7 +120,7 @@ SIM70XX_Error_t SIM7020_Init(SIM7020_t& p_Device, SIM7020_Config_t& p_Config, ui
     }
 
 	#ifdef CONFIG_SIM70XX_GPIO_USE_RESET
-        SIM70XX_GPIO_Hardware_Reset();
+        SIM70XX_GPIO_HardReset();
     #else
         SIM70XX_ERROR_CHECK(SIM7020_SoftReset(p_Device, Timeout));
 	#endif
@@ -106,10 +138,10 @@ SIM70XX_Error_t SIM7020_Init(SIM7020_t& p_Device, SIM7020_Config_t& p_Config, ui
     SIM70XX_ERROR_CHECK(SIM7020_GetFunctionality(p_Device))
 
     // TODO: Needs check with PDP context activation functions (SIM7020_Baerer_SetAPN)
-    SIM70XX_ERROR_CHECK(SIM7020_SetFunctionality(p_Device, SIM7020_FUNC_MIN));
-    SIM70XX_ERROR_CHECK(SIM7020_SetPSD(p_Device, SIM7020_PDP_IP, p_Config.APN));
-    SIM70XX_ERROR_CHECK(SIM7020_SetFunctionality(p_Device, SIM7020_FUNC_FULL));
-    SIM70XX_ERROR_CHECK(SIM7020_SetOperator(p_Device, SIM_MODE_MANUAL, p_Config.OperatorFormat, p_Config.Operator));
+    //SIM70XX_ERROR_CHECK(SIM7020_SetFunctionality(p_Device, SIM7020_FUNC_MIN));
+   // SIM70XX_ERROR_CHECK(SIM7020_SetPSD(p_Device, SIM7020_PDP_IP, p_Config.APN));
+    //SIM70XX_ERROR_CHECK(SIM7020_SetFunctionality(p_Device, SIM7020_FUNC_FULL));
+    //SIM70XX_ERROR_CHECK(SIM7020_SetOperator(p_Device, SIM_MODE_MANUAL, p_Config.OperatorFormat, p_Config.Operator));
     SIM70XX_ERROR_CHECK(SIM7020_SetBand(p_Device, p_Config.Band));
 
     return SIM7020_Baerer_PDP_DisableAll(p_Device);
@@ -157,6 +189,38 @@ SIM70XX_Error_t SIM7020_Deinit(SIM7020_t& p_Device, bool Skip)
     return SIM70XX_ERR_OK;
 }
 
+void SIM7020_PrepareSleep(SIM7020_t& p_Device)
+{
+    if(p_Device.Internal.isInitialized == false)
+    {
+        return;
+    }
+
+    ESP_LOGI(TAG, "Prepare driver for entering sleep mode...");
+
+    SIM70XX_Evt_StopTask(p_Device.UART);
+
+    p_Device.Internal.isInitialized = false;
+}
+
+SIM70XX_Error_t SIM7020_WakeUp(SIM7020_t& p_Device)
+{
+    std::string Response;
+
+    if(p_Device.Internal.isInitialized == true)
+    {
+        return SIM70XX_ERR_OK;
+    }
+
+    ESP_LOGI(TAG, "Wake up driver from sleep mode...");
+
+    SIM70XX_ERROR_CHECK(SIM7020_BasicInit(p_Device));
+
+    p_Device.Internal.isInitialized = true;
+
+    return SIM7020_Ping(p_Device);
+}
+
 SIM70XX_Error_t SIM7020_SoftReset(SIM7020_t& p_Device, uint32_t Timeout)
 {
     uint32_t Now;
@@ -169,7 +233,7 @@ SIM70XX_Error_t SIM7020_SoftReset(SIM7020_t& p_Device, uint32_t Timeout)
 
     if(p_Device.UART.TaskHandle != NULL)
     {
-        vTaskSuspend(p_Device.UART.TaskHandle);
+        SIM70XX_WDT_PAUSE_TASK(p_Device.UART.TaskHandle);
     }
 
     SIM70XX_LOGI(TAG, "Performing soft reset...");
@@ -190,7 +254,7 @@ SIM70XX_Error_t SIM7020_SoftReset(SIM7020_t& p_Device, uint32_t Timeout)
 
             if(p_Device.UART.TaskHandle != NULL)
             {
-                vTaskResume(p_Device.UART.TaskHandle);
+                SIM70XX_WDT_CONTINUE_TASK(p_Device.UART.TaskHandle);
             }
 
             return SIM70XX_ERR_OK;
@@ -203,7 +267,7 @@ SIM70XX_Error_t SIM7020_SoftReset(SIM7020_t& p_Device, uint32_t Timeout)
 
     if(p_Device.UART.TaskHandle != NULL)
     {
-        vTaskResume(p_Device.UART.TaskHandle);
+        SIM70XX_WDT_CONTINUE_TASK(p_Device.UART.TaskHandle);
     }
 
     return SIM70XX_ERR_FAIL;
@@ -484,8 +548,7 @@ SIM70XX_Error_t SIM7020_SetFunctionality(SIM7020_t& p_Device, SIM7020_Func_t Fun
     }
 
     Command = SIM70XX_AT_CFUN_W(Func, Reset);
-    SIM70XX_LOGI(TAG, "Tranmit command: %s", Command.Command.c_str());
-    vTaskSuspend(p_Device.UART.TaskHandle);
+    SIM70XX_WDT_PAUSE_TASK(p_Device.UART.TaskHandle);
     SIM70XX_UART_SendLine(p_Device.UART, Command.Command);
     Now = SIM70XX_Timer_GetMilliseconds();
     do
@@ -500,7 +563,7 @@ SIM70XX_Error_t SIM7020_SetFunctionality(SIM7020_t& p_Device, SIM7020_Func_t Fun
 
         vTaskDelay(100 / portTICK_PERIOD_MS);
     } while(((Response.find("CPIN") == std::string::npos) || (Response.find("OK") == std::string::npos)) &&(Response.find("ERROR") == std::string::npos));
-    vTaskResume(p_Device.UART.TaskHandle);
+    SIM70XX_WDT_CONTINUE_TASK(p_Device.UART.TaskHandle);
 
     if(Response.find("OK") == std::string::npos)
     {
@@ -508,6 +571,8 @@ SIM70XX_Error_t SIM7020_SetFunctionality(SIM7020_t& p_Device, SIM7020_Func_t Fun
     }
 
     p_Device.Connection.Functionality = Func;
+
+    SIM70XX_LOGI(TAG, "New functionality: %u", p_Device.Connection.Functionality);
 
     return SIM70XX_ERR_OK;
 }

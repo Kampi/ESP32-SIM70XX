@@ -45,32 +45,32 @@
         .Name           = "Kampi"
     };
 
-    #define SIM70XX_SSL_Enable(Device, Enable)                              SIM7080_EMail_EnableSSL(Device, Enable)
-    #define SIM70XX_Mail_SendText(Device, Config, From, To, Subject, Body)  SIM7080_EMail_SendText(Device, Config, From, To, Subject, Body)
+    #define SIM70XX_SSL_Enable(Device, Enable)                                          SIM7080_EMail_EnableSSL(Device, Enable)
+    #define SIM70XX_Mail_SendText(Device, Context, Config, From, To, Subject, Body)     SIM7080_EMail_SendText(Device, (SIM7080_PDP_Context_t*)Context, Config, From, To, Subject, Body)
 #endif
 
 static const char* TAG = "E-Mail";
 
-void EMail_Run(DEVICE_TYPE& p_Device)
+void EMail_Run(DEVICE_TYPE& p_Device, void* p_Opts)
 {
     SIM70XX_Error_t Error;
 
-	SIM70XX_LOGI(TAG, "Run E-Mail example...");
+	ESP_LOGI(TAG, "Run E-Mail example...");
 
     #ifdef CONFIG_DEMO_USE_SSL
         Error = SIM70XX_SSL_Enable(p_Device, true);
         if(Error != SIM70XX_ERR_OK)
         {
-            SIM70XX_LOGE(TAG, "Can not enable SSL! Error: 0x%x", Error);
+            ESP_LOGE(TAG, "Can not enable SSL! Error: 0x%x", Error);
             return;
         }
     #endif
 
-    SIM70XX_LOGI(TAG, "Sending E-Mail...");
-    Error = SIM70XX_Mail_SendText(p_Device, &_EMail_Config, &Sender, &To, "SIM70XX Test Mail", "Hello, World from Cellular!");
+    ESP_LOGI(TAG, "Sending E-Mail...");
+    Error = SIM70XX_Mail_SendText(p_Device, p_Opts, &_EMail_Config, &Sender, &To, "SIM70XX Test Mail", "Hello, World from Cellular!");
     if(Error != SIM70XX_ERR_OK)
     {
-        SIM70XX_LOGE(TAG, "Can not send E-Mail! Error: 0x%x", Error);
+        ESP_LOGE(TAG, "Can not send E-Mail! Error: 0x%x", Error);
         return;
     }
 
@@ -84,51 +84,51 @@ void EMail_Run(DEVICE_TYPE& p_Device)
         Error = SIM7080_EMail_POP3_Login(p_Device, &_EMail_Config);
         if(Error != SIM70XX_ERR_OK)
         {
-            SIM70XX_LOGE(TAG, "Can not login to POP3 server! Error: 0x%x", Error);
+            ESP_LOGE(TAG, "Can not login to POP3 server! Error: 0x%x", Error);
             return;
         }
 
-        SIM70XX_LOGI(TAG, "Reading inbox...");
+        ESP_LOGI(TAG, "Reading inbox...");
         Error = SIM7080_EMail_POP3_ReadInbox(p_Device, &Num, &Size);
         if(Error != SIM70XX_ERR_OK)
         {
-            SIM70XX_LOGE(TAG, "Can not get read inbox! Error: 0x%x", Error);
+            ESP_LOGE(TAG, "Can not get read inbox! Error: 0x%x", Error);
             return;
         }
-        SIM70XX_LOGI(TAG, "     Number of E-Mails: %u", Num);
-        SIM70XX_LOGI(TAG, "     Size: %u bytes", Size);
+        ESP_LOGI(TAG, "     Number of E-Mails: %u", Num);
+        ESP_LOGI(TAG, "     Size: %u bytes", Size);
 
-        SIM70XX_LOGI(TAG, "Get E-Mails...");
+        ESP_LOGI(TAG, "Get E-Mails...");
         for(uint32_t i = 1; i <= Num; i++)
         {
             std::string ID;
             std::string Mail;
 
-            SIM70XX_LOGI(TAG, "     E-Mail %u / %u", i, Num);
+            ESP_LOGI(TAG, "     E-Mail %u / %u", i, Num);
             Error = SIM7080_EMail_POP3_ReadEMailMeta(p_Device, i, &Size, &ID);
             if(Error != SIM70XX_ERR_OK)
             {
-                SIM70XX_LOGE(TAG, "Can not get E-Mail meta data! Error: 0x%x", Error);
+                ESP_LOGE(TAG, "Can not get E-Mail meta data! Error: 0x%x", Error);
                 break;
             }
 
-            SIM70XX_LOGI(TAG, "     Size: %u kB", Size);
-            SIM70XX_LOGI(TAG, "     ID: %s", ID.c_str());
+            ESP_LOGI(TAG, "     Size: %u kB", Size);
+            ESP_LOGI(TAG, "     ID: %s", ID.c_str());
 
             Error = SIM7080_EMail_POP3_ReadEMail(p_Device, i, &Mail);
             if(Error != SIM70XX_ERR_OK)
             {
-                SIM70XX_LOGE(TAG, "Can not read E-Mail! Error: 0x%x", Error);
+                ESP_LOGE(TAG, "Can not read E-Mail! Error: 0x%x", Error);
                 break;
             }
 
-            SIM70XX_LOGI(TAG, "E-Mail: %s", Mail.c_str());
-            SIM70XX_LOGI(TAG, "Size: %u", Mail.size());
+            ESP_LOGI(TAG, "E-Mail: %s", Mail.c_str());
+            ESP_LOGI(TAG, "Size: %u", Mail.size());
 
             Error = SIM7080_EMail_POP3_DeleteEMail(p_Device, i);
             if(Error != SIM70XX_ERR_OK)
             {
-                SIM70XX_LOGE(TAG, "Can not delete E-Mail! Error: 0x%x", Error);
+                ESP_LOGE(TAG, "Can not delete E-Mail! Error: 0x%x", Error);
                 break;
             }
 
@@ -138,7 +138,7 @@ void EMail_Run(DEVICE_TYPE& p_Device)
         Error = SIM7080_EMail_POP3_Logout(p_Device);
         if(Error != SIM70XX_ERR_OK)
         {
-            SIM70XX_LOGE(TAG, "Can not logout from POP3 server! Error: 0x%x", Error);
+            ESP_LOGE(TAG, "Can not logout from POP3 server! Error: 0x%x", Error);
             return;
         }
     #endif

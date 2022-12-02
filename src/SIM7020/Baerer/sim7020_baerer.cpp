@@ -46,17 +46,10 @@ SIM70XX_Error_t SIM7020_Baerer_SetAPN(SIM7020_t& p_Device, SIM70XX_APN_t APN, SI
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
-// TODO: This doesn´t work!
-/*
-    if(p_Device.Connection.Functionality != SIM7020_FUNC_MIN)
-    {
-        SIM70XX_ERROR_CHECK(SIM7020_SetFunctionality(p_Device, SIM7020_FUNC_MIN));
-    }
-
-    SIM70XX_ERROR_CHECK(SIM7020_SetFunctionality(p_Device, SIM7020_FUNC_FULL));
+    SIM70XX_ERROR_CHECK(SIM7020_SetFunctionality(p_Device, SIM7020_FUNC_MIN));
     SIM70XX_ERROR_CHECK(SIM7020_Baerer_PDP_Configure(p_Device, APN, p_PDP));
-    SIM70XX_ERROR_CHECK(SIM7020_PDP_GetStatus(p_Device, p_PDP));
-
+    SIM70XX_ERROR_CHECK(SIM7020_SetFunctionality(p_Device, SIM7020_FUNC_FULL));
+/*
     if(p_PDP->Internal.isActive == false)
     {
         SIM70XX_ERROR_CHECK(SIM7020_Baerer_PDP_Enable(p_Device, p_PDP));
@@ -89,6 +82,13 @@ SIM70XX_Error_t SIM7020_Baerer_SetAPN(SIM7020_t& p_Device, SIM70XX_APN_t APN, SI
         return SIM70XX_ERR_TIMEOUT;
     }
 
+    SIM70XX_ERROR_CHECK(SIM7020_PDP_GetStatus(p_Device, p_PDP));
+
+    if(p_PDP->Internal.isActive == false)
+    {
+        return SIM70XX_ERR_FAIL;
+    }
+
     return SIM70XX_ERR_OK;
 }
 
@@ -104,6 +104,10 @@ SIM70XX_Error_t SIM7020_PDP_ReadDynamicParameters(SIM7020_t& p_Device, SIM7020_P
     else if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
+    }
+    else if(p_Context->Internal.isActive == false)
+    {
+        return SIM70XX_ERR_PDP_NOT_ACTIVE;
     }
 
     SIM70XX_CREATE_CMD(Command);

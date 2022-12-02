@@ -33,7 +33,7 @@
  *  @param p_Error      (Optional) NTP synchronization error code
  *  @return             SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_NTP_Sync(SIM7080_t& p_Device, SIM7080_PDP_Context_t* p_PDP, std::string Server, int8_t TimeZone, struct tm* const p_Time, SIM7080_NTP_Error_t* const p_Error = NULL);
+SIM70XX_Error_t SIM7080_NTP_Sync(SIM7080_t& p_Device, const SIM7080_PDP_Context_t* const p_PDP, std::string Server, int8_t TimeZone, struct tm* const p_Time, SIM7080_NTP_Error_t* const p_Error = NULL);
 
 /** @brief              Get the current time from the module.
  *                      NOTE: Use \ref SIM7080_NTP_Sync to sync the time first!

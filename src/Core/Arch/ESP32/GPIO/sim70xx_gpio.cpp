@@ -143,8 +143,25 @@ void SIM70XX_GPIO_Init(void)
     #endif
 }
 
+void SIM70XX_GPIO_Deinit(void)
+{
+    gpio_reset_pin((gpio_num_t)CONFIG_SIM70XX_GPIO_PWRKEY_PIN);
+
+    #ifdef CONFIG_SIM70XX_GPIO_USE_RESET
+        gpio_reset_pin((gpio_num_t)CONFIG_SIM70XX_GPIO_RESET_PIN);
+    #endif
+
+    #ifdef CONFIG_SIM70XX_GPIO_USE_STATUS
+        gpio_reset_pin((gpio_num_t)CONFIG_SIM70XX_GPIO_STATUS_PIN);
+    #endif
+
+    #ifdef CONFIG_SIM70XX_GPIO_USE_NETLIGHT
+        gpio_reset_pin((gpio_num_t)CONFIG_SIM70XX_GPIO_NETLIGHT_PIN);
+    #endif
+}
+
 #ifdef CONFIG_SIM70XX_GPIO_USE_RESET
-	void SIM70XX_GPIO_Hardware_Reset(void)
+	void SIM70XX_GPIO_HardReset(void)
 	{
         #ifdef SIM70XX_GPIO_RESET_INVERT
             gpio_set_level((gpio_num_t)CONFIG_SIM70XX_GPIO_RESET_PIN, true);

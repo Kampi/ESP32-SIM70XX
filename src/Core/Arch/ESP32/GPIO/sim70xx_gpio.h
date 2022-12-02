@@ -43,11 +43,15 @@ inline __attribute__((always_inline)) void SIM70XX_GPIO_SetPwrKey(bool Enable)
  */
 void SIM70XX_GPIO_Init(void);
 
+/** @brief Deinitialize the GPIO support for the module.
+ */
+void SIM70XX_GPIO_Deinit(void);
+
 #ifdef CONFIG_SIM70XX_GPIO_USE_RESET
     /** @brief  Perform a hardware reset of the module.
      *          NOTE: You have to call \ref SIM70XX_GPIO_Init first to initialize the GPIO!
      */
-	void SIM70XX_GPIO_Hardware_Reset(void);
+	void SIM70XX_GPIO_HardReset(void);
 #endif
 
 #endif /* SIM70XX_GPIO_H_ */

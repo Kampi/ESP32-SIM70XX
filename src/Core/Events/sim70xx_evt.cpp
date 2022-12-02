@@ -320,7 +320,7 @@ SIM70XX_Error_t SIM70XX_Evt_StartTask(SIM70XX_UART_Conf_t& p_Config, void* const
 
 SIM70XX_Error_t SIM70XX_Evt_StopTask(SIM70XX_UART_Conf_t& p_Config)
 {
-    SIM70XX_ERROR_CHECK(SIM70XX_WDT_RemoveHanndle(p_Config.TaskHandle));
+    SIM70XX_ERROR_CHECK(SIM70XX_WDT_RemoveHandle(p_Config.TaskHandle));
 
     vTaskSuspend(p_Config.TaskHandle);
     vTaskDelete(p_Config.TaskHandle);

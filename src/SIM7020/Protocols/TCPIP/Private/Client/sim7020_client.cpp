@@ -25,6 +25,7 @@
 #include "../../../../../Core/Queue/sim70xx_queue.h"
 #include "../../../../../Core/Commands/sim70xx_commands.h"
 
+#include "../../../../../Core/Arch/ESP32/Timer/sim70xx_timer.h"
 #include "../../../../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
 
 static const char* TAG = "SIM7020_TCPIP_Client";
@@ -182,6 +183,7 @@ SIM70XX_Error_t SIM7020_Client_Receive(SIM7020_t& p_Device, SIM7020_TCPIP_Socket
     size_t Index;
     std::string Response;
     SIM70XX_TxCmd_t Command;
+    uint32_t Now;
 
     if((p_Socket == NULL) || (p_Buffer == NULL))
     {
@@ -206,8 +208,14 @@ SIM70XX_Error_t SIM7020_Client_Receive(SIM7020_t& p_Device, SIM7020_TCPIP_Socket
 
     p_Buffer->clear();
 
+    Now = SIM70XX_Timer_GetMilliseconds();
     while(SIM70XX_Queue_isEvent(p_Device.Internal.EventQueue, "+CSONMI: " + std::to_string(p_Socket->Internal.ID), &Response) == false)
     {
+        if((SIM70XX_Timer_GetMilliseconds() - Now) > (Timeout * 1000UL))
+        {
+            return SIM70XX_ERR_TIMEOUT;
+        }
+
         vTaskDelay(100 / portTICK_PERIOD_MS);
     }
 

@@ -31,7 +31,7 @@
 
 static const char* TAG = "SIM7020_MQTT";
 
-SIM70XX_Error_t SIM7020_MQTT_Create(SIM7020_t& p_Device, SIM7020_PDP_Context_t* const p_PDP, SIM7020_MQTT_Socket_t* const p_Socket, std::string Broker, uint16_t Port, SIM7020_MQTT_Version_t Version, uint8_t CID)
+SIM70XX_Error_t SIM7020_MQTT_Create(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* const p_Socket, std::string Broker, uint16_t Port, SIM7020_MQTT_Version_t Version)
 {
     if(p_Socket == NULL)
     {
@@ -46,20 +46,22 @@ SIM70XX_Error_t SIM7020_MQTT_Create(SIM7020_t& p_Device, SIM7020_PDP_Context_t* 
     p_Socket->ClientID = "SIM7020_MQTT";
     p_Socket->KeepAlive = 600;
     p_Socket->CleanSession = true;
-    p_Socket->WillFlag = false;
+    p_Socket->p_LastWill = NULL;
+    p_Socket->Username = std::string();
+    p_Socket->Password = std::string();
 
-    return SIM7020_MQTT_Create(p_Device, p_PDP, p_Socket);
+    return SIM7020_MQTT_Create(p_Device, p_Socket);
 }
 
-SIM70XX_Error_t SIM7020_MQTT_Create(SIM7020_t& p_Device, SIM7020_PDP_Context_t* const p_PDP, SIM7020_MQTT_Socket_t* const p_Socket)
+SIM70XX_Error_t SIM7020_MQTT_Create(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t* const p_Socket)
 {
     std::string Response;
     std::string CommandStr;
     SIM70XX_TxCmd_t* Command;
 
-    if((p_PDP == NULL) || (p_Socket == NULL) || (p_Socket->KeepAlive > 64800) || (p_Socket->Timeout > 60000) || (p_Socket->BufferSize < 20) || (p_Socket->BufferSize > 1132) || (p_Socket->Broker.size() > 50) ||
+    if((p_Socket == NULL) || (p_Socket->KeepAlive > 64800) || (p_Socket->Timeout > 60000) || (p_Socket->BufferSize < 20) || (p_Socket->BufferSize > 1132) || (p_Socket->Broker.size() > 50) ||
        (p_Socket->Version < SIM7020_MQTT_31) || (p_Socket->Version > SIM7020_MQTT_311) || (p_Socket->ClientID.size() == 0) || (p_Socket->ClientID.size() > 120) ||
-       ((p_Socket->WillFlag == true) && ((p_Socket->p_LastWill->Topic.size() == 0) || (p_Socket->p_LastWill->Message.size() == 0))) || ((p_Socket->Username.size() > 100) && (p_Socket->Password.size() > 100)))
+       ((p_Socket->p_LastWill != NULL) && ((p_Socket->p_LastWill->Topic.size() == 0) || (p_Socket->p_LastWill->Message.size() == 0))) || ((p_Socket->Username.size() > 100) && (p_Socket->Password.size() > 100)))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
@@ -67,14 +69,8 @@ SIM70XX_Error_t SIM7020_MQTT_Create(SIM7020_t& p_Device, SIM7020_PDP_Context_t* 
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
-    else if(p_PDP->Internal.isActive == false)
-    {
-        return SIM70XX_ERR_PDP_NOT_ACTIVE;
-    }
 
-    p_Socket->CID = p_PDP->ID;
-
-    CommandStr = "AT+CMQNEW=\"" + p_Socket->Broker + "\"," + "\"" + std::to_string(p_Socket->Port) + "\"," + std::to_string(p_Socket->Timeout) + "," + std::to_string(p_Socket->BufferSize) + "," + std::to_string(p_Socket->CID);
+    CommandStr = "AT+CMQNEW=\"" + p_Socket->Broker + "\"," + "\"" + std::to_string(p_Socket->Port) + "\"," + std::to_string(p_Socket->Timeout) + "," + std::to_string(p_Socket->BufferSize);
     SIM70XX_CREATE_CMD(Command);
     *Command = SIM7020_AT_CMQNEW(CommandStr);
     SIM70XX_PUSH_QUEUE(p_Device.Internal.TxQueue, Command);
@@ -119,12 +115,16 @@ SIM70XX_Error_t SIM7020_MQTT_Connect(SIM7020_t& p_Device, SIM7020_MQTT_Socket_t*
         return SIM70XX_ERR_OK;
     }
 
-    CommandStr = "AT+CMQCON=" + std::to_string(p_Socket->Internal.ID) + "," + std::to_string(p_Socket->Version) + ",\"" + p_Socket->ClientID + "\"," + std::to_string(p_Socket->KeepAlive) + "," + std::to_string(p_Socket->CleanSession) + ","  + std::to_string(p_Socket->WillFlag);
+    CommandStr = "AT+CMQCON=" + std::to_string(p_Socket->Internal.ID) + "," + std::to_string(p_Socket->Version) + ",\"" + p_Socket->ClientID + "\"," + std::to_string(p_Socket->KeepAlive) + "," + std::to_string(p_Socket->CleanSession);
 
-    if(p_Socket->WillFlag)
+    if(p_Socket->p_LastWill != NULL)
     {
         // TODO
         CommandStr += "";
+    }
+    else
+    {
+        CommandStr += ","  + std::to_string(false);
     }
 
     if((p_Socket->Username.size() > 0) && (p_Socket->Password.size() > 0))

@@ -29,6 +29,7 @@
 
 #include "../../Core/Arch/ESP32/UART/sim70xx_uart.h"
 #include "../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
+#include "../../Core/Arch/ESP32/Watchdog/sim70xx_watchdog.h"
 
 static const char* TAG = "SIM7020_NVRAM";
 
@@ -198,7 +199,7 @@ SIM70XX_Error_t SIM7020_NVRAM_GetKeys(SIM7020_t& p_Device, std::vector<std::stri
     p_Keys->clear();
 
     // We have to pause the UART thread here and receive the response line by line, because we don´t know the exakt number of keys.
-    vTaskSuspend(p_Device.UART.TaskHandle);
+    SIM70XX_WDT_PAUSE_TASK(p_Device.UART.TaskHandle);
 
     // Transmit the command.
     Command = SIM7020_AT_CNVMGET;
@@ -247,7 +248,7 @@ SIM70XX_Error_t SIM7020_NVRAM_GetKeys(SIM7020_t& p_Device, std::vector<std::stri
 
         vTaskDelay(100 / portTICK_PERIOD_MS);
     } while(true);
-    vTaskResume(p_Device.UART.TaskHandle);
+    SIM70XX_WDT_CONTINUE_TASK(p_Device.UART.TaskHandle);
 
     return Error;
 }

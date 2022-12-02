@@ -35,6 +35,63 @@
 
 static const char* TAG = "SIM7080";
 
+/** @brief          Perform the basic initialization of the device object.
+ *  @param p_Device SIM7080 device object
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+static SIM70XX_Error_t SIM7080_BasicInit(SIM7080_t& p_Device)
+{
+    p_Device.Internal.RxQueue = xQueueCreate(CONFIG_SIM70XX_QUEUE_LENGTH, sizeof(SIM70XX_CmdResp_t*));
+    p_Device.Internal.TxQueue = xQueueCreate(CONFIG_SIM70XX_QUEUE_LENGTH, sizeof(SIM70XX_TxCmd_t*));
+    p_Device.Internal.EventQueue = xQueueCreate(CONFIG_SIM70XX_QUEUE_LENGTH, sizeof(std::string*));
+    if(p_Device.Internal.RxQueue == NULL)
+    {
+        goto SIM7080_BasicInit_NoRxQueue;
+    }
+
+    if(p_Device.Internal.TxQueue == NULL)
+    {
+        goto SIM7080_BasicInit_NoTxQueue;
+    }
+
+    if(p_Device.Internal.EventQueue == NULL)
+    {
+        goto SIM7080_BasicInit_NoEventQueue;
+    }
+
+    #ifdef CONFIG_SIM70XX_DRIVER_WITH_GNSS
+        p_Device.GNSS.EventQueue = xQueueCreate(CONFIG_SIM70XX_QUEUE_LENGTH, sizeof(SIM7080_GNSS_Data_t*));
+        if(p_Device.GNSS.EventQueue == NULL)
+        {
+            goto SIM7080_BasicInit_NoGNSSEventQueue;
+        }
+        p_Device.GNSS.isListening = false;
+    #endif
+
+    SIM70XX_GPIO_Init();
+
+    if(SIM70XX_Evt_StartTask(p_Device.UART, &p_Device) == SIM70XX_ERR_OK)
+    {
+        return SIM70XX_ERR_OK;
+    }
+
+    SIM70XX_GPIO_Deinit();
+
+#ifdef CONFIG_SIM70XX_DRIVER_WITH_GNSS
+    SIM7080_BasicInit_NoGNSSEventQueue:
+        vQueueDelete(p_Device.Internal.EventQueue);
+#endif
+
+SIM7080_BasicInit_NoEventQueue:
+    vQueueDelete(p_Device.Internal.TxQueue);
+
+SIM7080_BasicInit_NoTxQueue:
+    vQueueDelete(p_Device.Internal.RxQueue);
+
+SIM7080_BasicInit_NoRxQueue:
+    return SIM70XX_ERR_NO_MEM;
+}
+
 SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t& p_Config, SIM7080_Info_t* const p_Info)
 {
     return SIM7080_Init(p_Device, p_Config, 10, SIM_BAUD_AUTO, p_Info);
@@ -57,31 +114,12 @@ SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t& p_Conf
         SIM7080_Deinit(p_Device);
     }
 
-    p_Device.Internal.RxQueue = xQueueCreate(CONFIG_SIM70XX_QUEUE_LENGTH, sizeof(SIM70XX_CmdResp_t*));
-    p_Device.Internal.TxQueue = xQueueCreate(CONFIG_SIM70XX_QUEUE_LENGTH, sizeof(SIM70XX_TxCmd_t*));
-    p_Device.Internal.EventQueue = xQueueCreate(CONFIG_SIM70XX_QUEUE_LENGTH, sizeof(std::string*));
-    if((p_Device.Internal.RxQueue == NULL) || (p_Device.Internal.TxQueue == NULL) || (p_Device.Internal.EventQueue == NULL))
-    {
-        return SIM70XX_ERR_NO_MEM;
-    }
-
-    #ifdef CONFIG_SIM70XX_DRIVER_WITH_GNSS
-        p_Device.GNSS.EventQueue = xQueueCreate(CONFIG_SIM70XX_QUEUE_LENGTH, sizeof(SIM7080_GNSS_Data_t*));
-        if(p_Device.GNSS.EventQueue == NULL)
-        {
-            return SIM70XX_ERR_NO_MEM;
-        }
-        p_Device.GNSS.isListening = false;
-    #endif
-
     p_Device.UART.Interface = p_Config.UART.Interface;
     p_Device.UART.Rx = p_Config.UART.Rx;
     p_Device.UART.Tx = p_Config.UART.Tx;
     p_Device.UART.Baudrate = p_Config.UART.Baudrate;
 
-    SIM70XX_GPIO_Init();
-
-    SIM70XX_ERROR_CHECK(SIM70XX_Evt_StartTask(p_Device.UART, &p_Device));
+    SIM70XX_ERROR_CHECK(SIM7080_BasicInit(p_Device));
 
     p_Device.Internal.isInitialized = true;
 
@@ -199,6 +237,38 @@ SIM70XX_Error_t SIM7080_Deinit(SIM7080_t& p_Device, bool Skip)
     return SIM70XX_ERR_OK;
 }
 
+void SIM7080_PrepareSleep(SIM7080_t& p_Device)
+{
+    if(p_Device.Internal.isInitialized == false)
+    {
+        return;
+    }
+
+    ESP_LOGI(TAG, "Prepare driver for entering sleep mode...");
+
+    SIM70XX_Evt_StopTask(p_Device.UART);
+
+    p_Device.Internal.isInitialized = false;
+}
+
+SIM70XX_Error_t SIM7080_WakeUp(SIM7080_t& p_Device)
+{
+    std::string Response;
+
+    if(p_Device.Internal.isInitialized == true)
+    {
+        return SIM70XX_ERR_OK;
+    }
+
+    ESP_LOGI(TAG, "Wake up driver from sleep mode...");
+
+    SIM70XX_ERROR_CHECK(SIM7080_BasicInit(p_Device));
+
+    p_Device.Internal.isInitialized = true;
+
+    return SIM7080_Ping(p_Device);
+}
+
 SIM70XX_Error_t SIM7080_SoftReset(SIM7080_t& p_Device, uint32_t Timeout)
 {
     uint32_t Now;
@@ -210,7 +280,7 @@ SIM70XX_Error_t SIM7080_SoftReset(SIM7080_t& p_Device, uint32_t Timeout)
     }
     else if(p_Device.UART.TaskHandle != NULL)
     {
-        vTaskSuspend(p_Device.UART.TaskHandle);
+        SIM70XX_WDT_PAUSE_TASK(p_Device.UART.TaskHandle);
     }
 
     SIM70XX_LOGI(TAG, "Performing soft reset...");
@@ -231,7 +301,7 @@ SIM70XX_Error_t SIM7080_SoftReset(SIM7080_t& p_Device, uint32_t Timeout)
 
             if(p_Device.UART.TaskHandle != NULL)
             {
-                vTaskResume(p_Device.UART.TaskHandle);
+                SIM70XX_WDT_CONTINUE_TASK(p_Device.UART.TaskHandle);
             }
 
             return SIM70XX_ERR_OK;
@@ -244,7 +314,7 @@ SIM70XX_Error_t SIM7080_SoftReset(SIM7080_t& p_Device, uint32_t Timeout)
 
     if(p_Device.UART.TaskHandle != NULL)
     {
-        vTaskResume(p_Device.UART.TaskHandle);
+        SIM70XX_WDT_CONTINUE_TASK(p_Device.UART.TaskHandle);
     }
 
     return SIM70XX_ERR_FAIL;
@@ -666,7 +736,7 @@ SIM70XX_Error_t SIM7080_SetFunctionality(SIM7080_t& p_Device, SIM7080_Func_t Fun
 
     Command = SIM70XX_AT_CFUN_W(Func, Reset);
     SIM70XX_LOGI(TAG, "Tranmit command: %s", Command.Command.c_str());
-    vTaskSuspend(p_Device.UART.TaskHandle);
+    SIM70XX_WDT_PAUSE_TASK(p_Device.UART.TaskHandle);
     SIM70XX_UART_SendLine(p_Device.UART, Command.Command);
     Now = SIM70XX_Timer_GetMilliseconds();
     do
@@ -681,7 +751,7 @@ SIM70XX_Error_t SIM7080_SetFunctionality(SIM7080_t& p_Device, SIM7080_Func_t Fun
 
         vTaskDelay(100 / portTICK_PERIOD_MS);
     } while(((Response.find("CPIN") == std::string::npos) || (Response.find("OK") == std::string::npos)) &&(Response.find("ERROR") == std::string::npos));
-    vTaskResume(p_Device.UART.TaskHandle);
+    SIM70XX_WDT_CONTINUE_TASK(p_Device.UART.TaskHandle);
 
     if(Response.find("OK") == std::string::npos)
     {

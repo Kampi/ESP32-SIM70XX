@@ -29,6 +29,7 @@
 
 #include "../../Core/Arch/ESP32/UART/sim70xx_uart.h"
 #include "../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
+#include "../../Core/Arch/ESP32/Watchdog/sim70xx_watchdog.h"
 
 static const char* TAG = "SIM7080_FS";
 
@@ -132,11 +133,11 @@ SIM70XX_Error_t SIM7080_FS_Write(SIM7080_t& p_Device, SIM7080_FS_Path_t Path, st
         goto SIM7080_FS_Write_Exit;
     }
 
-    vTaskSuspend(p_Device.UART.TaskHandle);
+    SIM70XX_WDT_PAUSE_TASK(p_Device.UART.TaskHandle);
     SIM70XX_UART_Send(p_Device.UART, p_Buffer, Length);
     SIM70XX_UART_ReadStringUntil(p_Device.UART);
     Response = SIM70XX_UART_ReadStringUntil(p_Device.UART);
-    vTaskResume(p_Device.UART.TaskHandle);
+    SIM70XX_WDT_CONTINUE_TASK(p_Device.UART.TaskHandle);
     if(Response.find("OK") == std::string::npos)
     {
         Error = SIM70XX_ERR_FAIL;
@@ -194,7 +195,7 @@ SIM70XX_Error_t SIM7080_FS_Read(SIM7080_t& p_Device, SIM7080_FS_Path_t Path, std
         return SIM70XX_ERR_FAIL;
     }
 
-    vTaskSuspend(p_Device.UART.TaskHandle);
+    SIM70XX_WDT_PAUSE_TASK(p_Device.UART.TaskHandle);
     BytesRead = 0;
     do
     {
@@ -213,7 +214,7 @@ SIM70XX_Error_t SIM7080_FS_Read(SIM7080_t& p_Device, SIM7080_FS_Path_t Path, std
     SIM70XX_UART_ReadStringUntil(p_Device.UART);
     Response = SIM70XX_UART_ReadStringUntil(p_Device.UART);
 
-    vTaskResume(p_Device.UART.TaskHandle);
+    SIM70XX_WDT_CONTINUE_TASK(p_Device.UART.TaskHandle);
 
     SIM70XX_LOGI(TAG, "Response: %s", Response.c_str());
 

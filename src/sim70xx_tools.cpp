@@ -27,6 +27,7 @@
 #include "Core/Arch/ESP32/UART/sim70xx_uart.h"
 #include "Core/Arch/ESP32/GPIO/sim70xx_gpio.h"
 #include "Core/Arch/ESP32/Logging/sim70xx_logging.h"
+#include "Core/Arch/ESP32/Watchdog/sim70xx_watchdog.h"
 
 static const char* TAG = "SIM70XX_Tools";
 
@@ -280,7 +281,7 @@ SIM70XX_Error_t SIM70XX_Tools_DisableEcho(SIM70XX_UART_Conf_t& p_Config)
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
-    vTaskSuspend(p_Config.TaskHandle);
+    SIM70XX_WDT_PAUSE_TASK(p_Config.TaskHandle);
 
     // Check if echo mode is enabled. With echo mode enable the answer will have the following format:
     //  AT<CR><LF>
@@ -302,7 +303,7 @@ SIM70XX_Error_t SIM70XX_Tools_DisableEcho(SIM70XX_UART_Conf_t& p_Config)
         SIM70XX_LOGI(TAG, "Echo mode disabled...");
     }
 
-    vTaskResume(p_Config.TaskHandle);
+    SIM70XX_WDT_CONTINUE_TASK(p_Config.TaskHandle);
 
     return SIM70XX_ERR_OK;
 }
@@ -319,7 +320,7 @@ SIM70XX_Error_t SIM70XX_Tools_SetBaudrate(SIM70XX_UART_Conf_t& p_Config, SIM70XX
     p_Device.UART.Baudrate = Old;
     SIM70XX_ERROR_CHECK(SIM70XX_UART_Deinit(p_Device.UART));
     SIM70XX_ERROR_CHECK(SIM70XX_UART_Init(p_Device.UART));
-    vTaskResume(p_Device.UART.TaskHandle);
+    SIM70XX_WDT_CONTINUE_TASK(p_Device.UART.TaskHandle);
 
     // Set the new baudrate.
     SIM70XX_CREATE_CMD(Command);
@@ -336,11 +337,11 @@ SIM70XX_Error_t SIM70XX_Tools_SetBaudrate(SIM70XX_UART_Conf_t& p_Config, SIM70XX
         SIM70XX_LOGE(TAG, "Can not enable new baudrate!");
 
         // Switch back to the old baudrate.
-        vTaskSuspend(p_Device.UART.TaskHandle);
+        SIM70XX_WDT_PAUSE_TASK(p_Device.UART.TaskHandle);
         p_Device.UART.Baudrate = Old;
         SIM70XX_ERROR_CHECK(SIM70XX_UART_Deinit(p_Device.UART));
         SIM70XX_ERROR_CHECK(SIM70XX_UART_Init(p_Device.UART));
-        vTaskResume(p_Device.UART.TaskHandle);
+        SIM70XX_WDT_CONTINUE_TASK(p_Device.UART.TaskHandle);
 
         return SIM70XX_ERR_FAIL;
     }
@@ -348,11 +349,11 @@ SIM70XX_Error_t SIM70XX_Tools_SetBaudrate(SIM70XX_UART_Conf_t& p_Config, SIM70XX
     SIM70XX_LOGI(TAG, "New baudrate enabled. Reinitialize the interface!");
 
     // Reinitialize the interface with the new baudrate.
-    vTaskSuspend(p_Device.UART.TaskHandle);
+    SIM70XX_WDT_PAUSE_TASK(p_Device.UART.TaskHandle);
     p_Device.UART.Baudrate = New;
     SIM70XX_ERROR_CHECK(SIM70XX_UART_Deinit(p_Device.UART));
     SIM70XX_ERROR_CHECK(SIM70XX_UART_Init(p_Device.UART));
-    vTaskResume(p_Device.UART.TaskHandle);
+    SIM70XX_WDT_CONTINUE_TASK(p_Device.UART.TaskHandle);
 */
     return SIM70XX_ERR_OK;
 }

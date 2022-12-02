@@ -29,6 +29,7 @@
 
 #include "../../Core/Arch/ESP32/UART/sim70xx_uart.h"
 #include "../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
+#include "../../Core/Arch/ESP32/Watchdog/sim70xx_watchdog.h"
 
 static const char* TAG = "SIM7080_MQTT";
 
@@ -253,7 +254,7 @@ SIM70XX_Error_t SIM7080_MQTT_Publish(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t*
         return SIM70XX_ERR_NOT_CONNECTED;
     }
 
-    vTaskSuspend(p_Device.UART.TaskHandle);
+    SIM70XX_WDT_PAUSE_TASK(p_Device.UART.TaskHandle);
     SIM70XX_LOGI(TAG, "Total %u bytes to transmit...", Remaining);
     RetryCounter = 0;
     do
@@ -321,7 +322,7 @@ SIM70XX_Error_t SIM7080_MQTT_Publish(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t*
             Remaining -= BytesToSend;
         }
     } while(Remaining > 0);
-    vTaskResume(p_Device.UART.TaskHandle);
+    SIM70XX_WDT_CONTINUE_TASK(p_Device.UART.TaskHandle);
 
     return Error;
 }

@@ -36,10 +36,10 @@ SIM70XX_Error_t SIM7080_DNS_FetchAddress(SIM7080_t& p_Device, std::string Host, 
 
 /** @brief          Set the PDP index for DNS.
  *  @param p_Device SIM7080 device object
- *  @param Index    PDP index
+ *  @param p_PDP    Pointer to PDP context
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_DNS_SetIndex(SIM7080_t& p_Device, uint8_t Index);
+SIM70XX_Error_t SIM7080_DNS_SetIndex(SIM7080_t& p_Device, const SIM7080_PDP_Context_t* const p_PDP);
 
 /** @brief          Get the PDP index for DNS.
  *  @param p_Device SIM7080 device object

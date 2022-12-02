@@ -41,13 +41,13 @@ SIM70XX_Error_t SIM7080_TCPIP_Ping(SIM7080_t& p_Device, const SIM7080_Ping_t* co
     std::string CommandStr;
     SIM70XX_TxCmd_t* Command;
 
-    if(p_Device.Internal.isInitialized == false)
-    {
-        return SIM70XX_ERR_NOT_INITIALIZED;
-    }
-    else if((p_Result == NULL) || (p_Config == NULL) || (p_Config->Retries == 0) || (p_Config->Size == 0) || (p_Config->Timeout == 0))
+    if((p_Result == NULL) || (p_Config == NULL) || (p_Config->Retries == 0) || (p_Config->Size == 0) || (p_Config->Timeout == 0))
     {
         return SIM70XX_ERR_INVALID_ARG;
+    }
+    else if(p_Device.Internal.isInitialized == false)
+    {
+        return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
     p_Result->clear();

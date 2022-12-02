@@ -29,6 +29,7 @@
 
 #include "../../../Core/Arch/ESP32/UART/sim70xx_uart.h"
 #include "../../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
+#include "../../../Core/Arch/ESP32/Watchdog/sim70xx_watchdog.h"
 
 static const char* TAG = "SIM7080_EMail";
 
@@ -142,7 +143,6 @@ SIM70XX_Error_t SIM7080_EMail_POP3_ReadInbox(SIM7080_t& p_Device, uint32_t* cons
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    // Wait for the response.
     while(SIM70XX_Queue_isEvent(p_Device.Internal.EventQueue, "+POP3NUM:", &Response) == false)
     {
         vTaskDelay(100 / portTICK_PERIOD_MS);
@@ -175,7 +175,6 @@ SIM70XX_Error_t SIM7080_EMail_POP3_ReadEMailMeta(SIM7080_t& p_Device, uint32_t M
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue, &Response));
 
-    // Wait for the response.
     while(SIM70XX_Queue_isEvent(p_Device.Internal.EventQueue, "+POP3LIST:", &Response) == false)
     {
         vTaskDelay(100 / portTICK_PERIOD_MS);
@@ -238,7 +237,6 @@ SIM70XX_Error_t SIM7080_EMail_POP3_ReadEMail(SIM7080_t& p_Device, uint32_t ID, s
     }
     SIM70XX_ERROR_CHECK(SIM70XX_Queue_PopItem(p_Device.Internal.RxQueue));
 
-    // Wait for the response.
     while(SIM70XX_Queue_isEvent(p_Device.Internal.EventQueue, "+POP3CMD:", &Response) == false)
     {
         vTaskDelay(100 / portTICK_PERIOD_MS);
@@ -246,7 +244,7 @@ SIM70XX_Error_t SIM7080_EMail_POP3_ReadEMail(SIM7080_t& p_Device, uint32_t ID, s
     Response.erase(Response.find("+POP3CMD: "), std::string("+POP3CMD: ").size());
     SIM70XX_ERROR_CHECK(SIM7080_EMail_POP3_ErrorCheck(Response, p_Error));
 
-    vTaskSuspend(p_Device.UART.TaskHandle);
+    SIM70XX_WDT_PAUSE_TASK(p_Device.UART.TaskHandle);
     do
     {
         uint8_t StatusCode;
@@ -324,7 +322,7 @@ SIM70XX_Error_t SIM7080_EMail_POP3_ReadEMail(SIM7080_t& p_Device, uint32_t ID, s
         {
         }
     } while(true);
-    vTaskResume(p_Device.UART.TaskHandle);
+    SIM70XX_WDT_CONTINUE_TASK(p_Device.UART.TaskHandle);
 
     return Error;
 }
@@ -353,6 +351,7 @@ SIM70XX_Error_t SIM7080_EMail_POP3_DeleteEMail(SIM7080_t& p_Device, uint32_t ID,
         vTaskDelay(100 / portTICK_PERIOD_MS);
     }
     Response.erase(Response.find("+POP3DEL: "), std::string("+POP3DEL: ").size());
+
     return SIM7080_EMail_POP3_ErrorCheck(Response, p_Error);
 }
 
@@ -380,6 +379,7 @@ SIM70XX_Error_t SIM7080_EMail_POP3_Logout(SIM7080_t& p_Device, SIM7080_EMail_Err
         vTaskDelay(100 / portTICK_PERIOD_MS);
     }
     Response.erase(Response.find("+POP3OUT: "), std::string("+POP3OUT: ").size());
+
     return SIM7080_EMail_POP3_ErrorCheck(Response, p_Error);
 }
 

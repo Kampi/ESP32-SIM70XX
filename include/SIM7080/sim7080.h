@@ -60,6 +60,7 @@
 
 #ifdef CONFIG_SIM70XX_DRIVER_WITH_MQTT
     #include "sim7080_mqtt.h"
+    #include "sim7080_mqtt_config_socket.h"
 #endif
 
 #ifdef CONFIG_SIM70XX_DRIVER_WITH_COAP
@@ -135,6 +136,17 @@ SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t& p_Conf
  *  @return         SIM70XX_ERR_OK when successful
  */
 SIM70XX_Error_t SIM7080_Deinit(SIM7080_t& p_Device, bool Skip = false);
+
+/** @brief          Prepare the driver to enter into the host CPU sleep mode.
+ *  @param p_Device SIM7080 device object
+ */
+void SIM7080_PrepareSleep(SIM7080_t& p_Device);
+
+/** @brief          Wake up the driver from host CPU sleep mode.
+ *  @param p_Device SIM7080 device object
+ *  @return         SIM70XX_ERR_OK when successful
+ */
+SIM70XX_Error_t SIM7080_WakeUp(SIM7080_t& p_Device);
 
 /** @brief          Perform a software reset of the device.
  *  @param p_Device SIM7080 device object

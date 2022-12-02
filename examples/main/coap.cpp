@@ -56,21 +56,21 @@ void CoAP_Run(DEVICE_TYPE& p_Device)
     std::string Response;
     uint8_t Payload[] = {/*0x40, 0x01, 0x41, 0xC7, */0xB7, 0x63, 0x6F, 0x75, 0x6E, 0x74, 0x65, 0x72};
 
-	SIM70XX_LOGI(TAG, "Run CoAP example...");
+	ESP_LOGI(TAG, "Run CoAP example...");
 
     Error = SIMXX_ParseDNS(p_Device, CONFIG_DEMO_COAP_SERVER, &_CoAP_DNS_IP);
     if(Error != SIM70XX_ERR_OK)
     {
-        SIM70XX_LOGE(TAG, "Can not fetch IP address! Error: 0x%X", Error);
+        ESP_LOGE(TAG, "Can not fetch IP address! Error: 0x%X", Error);
         return;
     }
 
     Error = SIMXX_ClientCreate(p_Device, _CoAP_DNS_IP, CONFIG_DEMO_COAP_PORT, &_CoAP_Socket);
     if(Error == SIM70XX_ERR_OK)
     {
-        SIM70XX_LOGI(TAG, "Connected with CoAP server: %s", _CoAP_DNS_IP.c_str());
+        ESP_LOGI(TAG, "Connected with CoAP server: %s", _CoAP_DNS_IP.c_str());
 
-        SIM70XX_LOGI(TAG, "Transmit data...");
+        ESP_LOGI(TAG, "Transmit data...");
         //Error = SIMXX_ClientTransmit(p_Device, &_CoAP_Socket, Payload, sizeof(Payload));
         //SIM7020_CoAP_Transmit(p_Device, &_CoAP_Socket, "counter", SIM7020_COAP_CON, 1, Payload, sizeof(Payload));
 
@@ -91,18 +91,18 @@ void CoAP_Run(DEVICE_TYPE& p_Device)
             }
 
             SIMXX_ClientReceive(p_Device, &_CoAP_Socket, &Response);
-            SIM70XX_LOGI(TAG, "Response from server: %s", Response.c_str());
+            ESP_LOGI(TAG, "Response from server: %s", Response.c_str());
         }
         else
         {
-            SIM70XX_LOGE(TAG, "Can not transmit data! Error: 0x%X", Error);
+            ESP_LOGE(TAG, "Can not transmit data! Error: 0x%X", Error);
         }
 
         SIMXX_ClientDestroy(p_Device, &_CoAP_Socket);
     }
     else
     {
-        SIM70XX_LOGE(TAG, "Can not create socket! Error: 0x%X", Error);
+        ESP_LOGE(TAG, "Can not create socket! Error: 0x%X", Error);
     }
 }
 

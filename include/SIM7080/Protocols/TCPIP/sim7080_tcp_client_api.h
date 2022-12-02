@@ -40,15 +40,15 @@ inline __attribute__((always_inline)) bool SIM7080_TCP_Client_isDataAvailable(SI
     return p_Socket->Internal.isDataReceived;
 }
 
-/** @brief              Create a socket for a TCP client.
- *  @param p_Device     SIM7080 device object
- *  @param IP           IP address
- *  @param Port         TCP port
- *  @param p_Socket     Pointer to TCP socket object
- *  @param CID          (Optional) Context Identifier
- *  @return             SIM70XX_ERR_OK when successful
+/** @brief          Create a socket for a TCP client.
+ *  @param p_Device SIM7080 device object
+ *  @param IP       IP address
+ *  @param Port     TCP port
+ *  @param p_Socket Pointer to TCP socket object
+ *  @param p_PDP    Pointer to PDP context
+ *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_TCP_Client_Create(SIM7080_t& p_Device, std::string IP, uint16_t Port, SIM7080_TCPIP_Socket_t* p_Socket, uint8_t CID = 0);
+SIM70XX_Error_t SIM7080_TCP_Client_Create(SIM7080_t& p_Device, std::string IP, uint16_t Port, SIM7080_TCPIP_Socket_t* p_Socket, const SIM7080_PDP_Context_t* const p_PDP);
 
 /** @brief          Open a TCP connection to a remote server.
  *  @param p_Device SIM7080 device object
@@ -59,7 +59,7 @@ SIM70XX_Error_t SIM7080_TCP_Client_Create(SIM7080_t& p_Device, std::string IP, u
  *  @param Timeout  (Optional) Transmission timeout in milliseconds
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_TCP_Client_Connect(SIM7080_t& p_Device, SIM7080_TCPIP_Socket_t* p_Socket, SIM7080_PDP_Context_t* p_PDP, SIM7080_TCP_Error_t* p_Result = NULL);
+SIM70XX_Error_t SIM7080_TCP_Client_Connect(SIM7080_t& p_Device, SIM7080_TCPIP_Socket_t* p_Socket, const SIM7080_PDP_Context_t* const p_PDP, SIM7080_TCP_Error_t* p_Result = NULL);
 
 /** @brief              Transmit a TCP message.
  *  @param p_Device     SIM7080 device object
@@ -100,10 +100,10 @@ SIM70XX_Error_t SIM7080_TCP_Client_Destroy(SIM7080_t& p_Device, SIM7080_TCPIP_So
     /** @brief          Enable / Disable SSL support for the TCP client.
      *  @param p_Device SIM7080 device object
      *  @param Enable   Enable / Disable SSL
-     *  @param CID      (Optional) Context Identifier
+     *  @param p_PDP    Pointer to PDP context
      *  @return         SIM70XX_ERR_OK when successful
      */
-    SIM70XX_Error_t SIM7080_TCP_Client_EnableSSL(SIM7080_t& p_Device, bool Enable, uint8_t CID = 0);
+    SIM70XX_Error_t SIM7080_TCP_Client_EnableSSL(SIM7080_t& p_Device, bool Enable, const SIM7080_PDP_Context_t* const p_PDP);
 #endif
 
 #endif /* SIM7080_TCP_CLIENT_API_H_ */

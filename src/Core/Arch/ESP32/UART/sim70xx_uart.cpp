@@ -155,7 +155,7 @@ SIM70XX_Error_t SIM70XX_UART_Init(SIM70XX_UART_Conf_t& p_Config)
         Flags = ESP_INTR_FLAG_IRAM;
     #endif
 
-    if(xSemaphoreTake(p_Config.Lock, 100 / portTICK_PERIOD_MS) == pdTRUE)
+    if(xSemaphoreTake(p_Config.Lock, portMAX_DELAY) == pdTRUE)
     {
         if((uart_driver_install(p_Config.Interface, CONFIG_SIM70XX_UART_BUFFER_SIZE * 2, 0, 0, NULL, Flags) ||
             uart_param_config(p_Config.Interface, &_SIM70XX_UART_Config) ||
@@ -190,7 +190,7 @@ SIM70XX_Error_t SIM70XX_UART_Deinit(SIM70XX_UART_Conf_t& p_Config)
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
-    if(xSemaphoreTake(p_Config.Lock, 100 / portTICK_PERIOD_MS) == pdTRUE)
+    if(xSemaphoreTake(p_Config.Lock, portMAX_DELAY) == pdTRUE)
     {
         SIM70XX_WDT_Reset();
 
@@ -200,6 +200,14 @@ SIM70XX_Error_t SIM70XX_UART_Deinit(SIM70XX_UART_Conf_t& p_Config)
             uart_driver_delete(p_Config.Interface);
             gpio_reset_pin(p_Config.Rx);
             gpio_reset_pin(p_Config.Tx);
+
+            #ifdef CONFIG_SIM70XX_UART_USE_RTS
+                gpio_reset_pin(CONFIG_SIM70XX_UART_RTS_PIN);
+            #endif
+
+            #ifdef CONFIG_SIM70XX_UART_USE_CTS
+                gpio_reset_pin(CONFIG_SIM70XX_UART_CTS_PIN);
+            #endif
         }
         xSemaphoreGive(p_Config.Lock);
 
@@ -211,7 +219,7 @@ SIM70XX_Error_t SIM70XX_UART_Deinit(SIM70XX_UART_Conf_t& p_Config)
 
         if(p_Config.TaskHandle != NULL)
         {
-            SIM70XX_WDT_RemoveHanndle(p_Config.TaskHandle);
+            SIM70XX_WDT_RemoveHandle(p_Config.TaskHandle);
         }
 
         return SIM70XX_ERR_OK;

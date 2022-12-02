@@ -27,6 +27,24 @@
 
 #include "sim70xx_errors.h"
 
+/** @brief          Pause a task.
+ *  @param Handle	Task handle
+ */
+#define SIM70XX_WDT_PAUSE_TASK(Handle)		do											\
+											{											\
+												SIM70XX_WDT_RemoveHandle(Handle);		\
+												vTaskSuspend(Handle);					\
+											} while(0);
+
+/** @brief          Continue a task.
+ *  @param Handle	Task handle
+ */
+#define SIM70XX_WDT_CONTINUE_TASK(Handle)	do											\
+											{											\
+												SIM70XX_WDT_AddHandle(Handle);			\
+												vTaskResume(Handle);					\
+											} while(0);
+
 /** @brief          Add a task to the task watchdog.
  *  @param Handle	Task handle
  *  @return			SIM70XX_ERR_OK when successful
@@ -45,7 +63,7 @@ inline __attribute__((always_inline)) SIM70XX_Error_t SIM70XX_WDT_AddHandle(Task
  *  @param Handle	Task handle
  *  @return			SIM70XX_ERR_OK when successful
  */
-inline __attribute__((always_inline)) SIM70XX_Error_t SIM70XX_WDT_RemoveHanndle(TaskHandle_t Handle)
+inline __attribute__((always_inline)) SIM70XX_Error_t SIM70XX_WDT_RemoveHandle(TaskHandle_t Handle)
 {
     if(esp_task_wdt_delete(Handle) == ESP_OK)
 	{

@@ -26,6 +26,8 @@
       - [Configure the CoAP project](#configure-the-coap-project)
     - [HTTP](#http)
       - [Configure the HTTP project](#configure-the-http-project)
+    - [SSL](#ssl)
+      - [Enable SSL](#enable-ssl)
   - [Maintainer](#maintainer)
 
 ## About
@@ -37,6 +39,9 @@ Multidevice driver for SIMCom modules with UART interface.
 - Baerer driver from SIM7080 for SIM7020
 - PDP definition from SIM7080 for SIM7020
 - Check MQTT for SIM7020 (no connection?)
+- Proper sleep handling (clean up and restore queues, etc)
+- Add complete SSL example
+- FOTA for SIM7080
 
 ## Driver status
 
@@ -222,6 +227,21 @@ This demo demo is sending and receiving data to and from a HTTP server. The demo
 - Open the menu `Demo` -> `HTTP`
 - Select `Enable the HTTP client demo`
 - Fill in the required informations
+- Run `make`
+- Execute the demo application
+
+### SSL
+
+It´s possible to enable SSL support for the different demos.
+
+>NOTE
+>SSL is only implemented and tested for TCP currently!
+
+#### Enable SSL
+
+- Run `make menuconfig`
+- Open the menu `Demo` -> `SSL`
+- Select `Enable the SSL support for the demos`
 - Run `make`
 - Execute the demo application
 

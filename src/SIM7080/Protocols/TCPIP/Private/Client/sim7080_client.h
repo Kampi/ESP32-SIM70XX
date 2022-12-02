@@ -49,7 +49,7 @@ SIM70XX_Error_t SIM7080_Client_CreateSocket(SIM7080_t& p_Device, SIM7080_TCP_Typ
  *  @param Timeout  (Optional) Transmission timeout in milliseconds
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_Client_ConnectSocket(SIM7080_t& p_Device, SIM7080_TCPIP_Socket_t* p_Socket, SIM7080_PDP_Context_t* p_PDP, SIM7080_TCP_Error_t* p_Result = NULL);
+SIM70XX_Error_t SIM7080_Client_ConnectSocket(SIM7080_t& p_Device, SIM7080_TCPIP_Socket_t* p_Socket, const SIM7080_PDP_Context_t* const p_PDP, SIM7080_TCP_Error_t* p_Result = NULL);
 
 /** @brief              Transmit a TCP / UDP message.
  *  @param p_Device     SIM7080 device object
@@ -90,10 +90,10 @@ SIM70XX_Error_t SIM7080_Client_DestroySocket(SIM7080_t& p_Device, SIM7080_TCPIP_
     /** @brief          Enable / Disable SSL support for the TCP / DUP client.
      *  @param p_Device SIM7080 device object
      *  @param Enable   Enable / Disable SSL
-     *  @param CID      (Optional) Context Identifier
+     *  @param p_PDP    Pointer to PDP context
      *  @return         SIM70XX_ERR_OK when successful
      */
-    SIM70XX_Error_t SIM7080_Client_EnableSSL(SIM7080_t& p_Device, bool Enable, uint8_t CID = 0);
+    SIM70XX_Error_t SIM7080_Client_EnableSSL(SIM7080_t& p_Device, bool Enable, const SIM7080_PDP_Context_t* const p_PDP);
 #endif
 
 #endif /* SIM7080_CLIENT_H_ */

@@ -71,25 +71,21 @@ typedef struct
 {
     std::string Broker;                             /**< MQTT broker URL. */
     uint16_t Port;                                  /**< MQTT port. */
-    uint8_t CID;                                    /**< Context Identifier. */
     uint16_t Timeout;                               /**< MQTT command timeout in milliseconds.
                                                          NOTE: Possible values are from 0 to 60000. */
-    uint32_t BufferSize;                            /**< Buffer size.
+    uint32_t BufferSize;                            /**< Buffer size in bytes.
                                                          NOTE: Possible values are from 20 to 1132. */
     SIM7020_MQTT_Version_t Version;                 /**< MQTT version. */
     std::string ClientID;                           /**< MQTT client ID. */
     uint16_t KeepAlive;                             /**< Keep alive interval in seconds. */
     bool CleanSession;                              /**< Clean session flag. */
-    bool WillFlag;                                  /**< Last will flag. */
-    SIM7020_MQTT_Will_t* p_LastWill;                /**< Pointer to last will configuration object.
-                                                         NOTE: Only needed when \ref SIM7020_MQTT_Socket_t.WillFlag is set to #true. */
+    SIM7020_MQTT_Will_t* p_LastWill;                /**< Pointer to last will configuration object. */
     std::string Username;                           /**< Optional username. */
     std::string Password;                           /**< Optional password. */
     struct
     {
         uint8_t ID;                                 /**< Socket ID from the module.
                                                          NOTE: Handled by the device driver. */
-
         bool isConnected;                           /**< Socket connected.
                                                          NOTE: Handled by the device driver. */
         bool isCreated;                             /**< #true when the socket is created.

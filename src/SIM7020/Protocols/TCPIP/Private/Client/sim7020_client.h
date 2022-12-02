@@ -62,9 +62,10 @@ SIM70XX_Error_t SIM7020_Client_Transmit(SIM7020_t& p_Device, SIM7020_TCPIP_Socke
  *  @param p_Device SIM7080 device object
  *  @param p_Socket Pointer to TCP/IP socket object
  *  @param p_Buffer Pointer to data buffer
+ *  @param Timeout  (Optional) Receive timeout in seconds
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7020_Client_Receive(SIM7020_t& p_Device, SIM7020_TCPIP_Socket_t* p_Socket, std::string* p_Buffer);
+SIM70XX_Error_t SIM7020_Client_Receive(SIM7020_t& p_Device, SIM7020_TCPIP_Socket_t* p_Socket, std::string* p_Buffer, uint8_t Timeout = 30);
 
 /** @brief          Disconnect a common TCP / UDP connection from a remote server.
  *  @param p_Device SIM7020 device object

@@ -25,8 +25,6 @@
 #include "sim7020_tcpip.h"
 #include "Private/Client/sim7020_client.h"
 
-#include "../../../Core/Arch/ESP32/Logging/sim70xx_logging.h"
-
 SIM70XX_Error_t SIM7020_TCP_Client_Create(SIM7020_t& p_Device, std::string IP, uint16_t Port, SIM7020_TCPIP_Socket_t* p_Socket, uint16_t Timeout, uint8_t CID, SIM7020_TCP_Domain_t Domain, SIM7020_TCP_Protocol_t Protocol)
 {
     return SIM7020_Client_CreateSocket(p_Device, SIM7020_TCP_TYPE_TCP, IP, Port, p_Socket, Timeout, Domain, Protocol, CID);
