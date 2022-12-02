@@ -63,7 +63,7 @@ void HTTP_Run(DEVICE_TYPE& p_Device)
     Error = SIMXX_Create(p_Device, CONFIG_DEMO_HTTP_SERVER, &_HTTP_Socket);
     if(Error == SIM70XX_ERR_OK)
     {
-        SIM70XX_LOGI(TAG, "Connecting with server...");
+        ESP_LOGI(TAG, "Connecting with server...");
         Error = SIMXX_Connect(p_Device, &_HTTP_Socket);
         if(Error == SIM70XX_ERR_OK)
         {
@@ -71,7 +71,7 @@ void HTTP_Run(DEVICE_TYPE& p_Device)
             std::string Payload;
             std::string ContentType;
 
-            SIM70XX_LOGI(TAG, "Sending GET request...");
+            ESP_LOGI(TAG, "Sending GET request...");
             Error = SIMXX_GetRequest(p_Device, &_HTTP_Socket, CONFIG_DEMO_HTTP_ENDPOINT);
             if(Error == SIM70XX_ERR_OK)
             {
@@ -80,52 +80,52 @@ void HTTP_Run(DEVICE_TYPE& p_Device)
                     vTaskDelay(1000 / portTICK_PERIOD_MS);
                 }
 
-                SIM70XX_LOGI(TAG, "Response received!");
+                ESP_LOGI(TAG, "Response received!");
 
                 Error = SIMXX_GetResponse(p_Device, &_HTTP_Socket, &_HTTP_Response);
                 if(Error == SIM70XX_ERR_OK)
                 {
-                    SIM70XX_LOGI(TAG, " Response code: %u", _HTTP_Response.ResponseCode);
-                    SIM70XX_LOGI(TAG, " Header: %s", _HTTP_Response.Header.c_str());
-                    SIM70XX_LOGI(TAG, " Content: %s", _HTTP_Response.Content.c_str());
-                    SIM70XX_LOGI(TAG, " Content length: %u", _HTTP_Response.Content.size());
+                    ESP_LOGI(TAG, " Response code: %u", _HTTP_Response.ResponseCode);
+                    ESP_LOGI(TAG, " Header: %s", _HTTP_Response.Header.c_str());
+                    ESP_LOGI(TAG, " Content: %s", _HTTP_Response.Content.c_str());
+                    ESP_LOGI(TAG, " Content length: %u", _HTTP_Response.Content.size());
                 }
                 else
                 {
-                    SIM70XX_LOGE(TAG, "Can not get response from queue! Error: 0x%X", Error);
+                    ESP_LOGE(TAG, "Can not get response from queue! Error: 0x%X", Error);
                 }
             }
             else
             {
-                SIM70XX_LOGE(TAG, "Can not send GET request! Error: 0x%X", Error);
+                ESP_LOGE(TAG, "Can not send GET request! Error: 0x%X", Error);
             }
 
-            SIM70XX_LOGI(TAG, "Sending POST request...");
+            ESP_LOGI(TAG, "Sending POST request...");
             Header = "";
             Payload = "{}";
             ContentType = "application/json";
             Error = SIMXX_PostRequest(p_Device, &_HTTP_Socket, CONFIG_DEMO_HTTP_ENDPOINT, ContentType, Header, Payload, &_HTTP_Response);
             if(Error == SIM70XX_ERR_OK)
             {
-                SIM70XX_LOGI(TAG, " Response code: %u", _HTTP_Response.ResponseCode);
+                ESP_LOGI(TAG, " Response code: %u", _HTTP_Response.ResponseCode);
             }
             else
             {
-                SIM70XX_LOGE(TAG, "Can not send POST request! Error: 0x%X", Error);
+                ESP_LOGE(TAG, "Can not send POST request! Error: 0x%X", Error);
             }
 
             SIMXX_Disconnect(p_Device, &_HTTP_Socket);
         }
         else
         {
-            SIM70XX_LOGE(TAG, "Can not connect with server! Error: 0x%X", Error);
+            ESP_LOGE(TAG, "Can not connect with server! Error: 0x%X", Error);
         }
 
         SIMXX_Destroy(p_Device, &_HTTP_Socket);
     }
     else
     {
-        SIM70XX_LOGE(TAG, "Can not create socket! Error: 0x%X", Error);
+        ESP_LOGE(TAG, "Can not create socket! Error: 0x%X", Error);
     }
 }
 

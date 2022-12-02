@@ -31,7 +31,7 @@ static const char* TAG                                              = "MQTT";
     static SIM7020_MQTT_Socket_t _MQTT_Socket;
     static SIM7020_MQTT_Sub_Evt_t _MQTT_Message;
 
-    #define SIMXX_Create(Device, Socket)                            SIM7020_MQTT_Create(Device, Socket)
+    #define SIMXX_Create(Device, Context, Socket)                   SIM7020_MQTT_Create(Device, (SIM7020_PDP_Context_t*)Context, Socket)
     #define SIMXX_Connect(Device, Socket)                           SIM7020_MQTT_Connect(Device, Socket)
     #define SIMXX_Subscribe(Device, Socket, Topic)                  SIM7020_MQTT_Subscribe(Device, Socket, Topic)
     #define SIMXX_WaitSubscription(Socket)                          SIM7020_MQTT_GetSubcriptionItems(Socket)
@@ -44,7 +44,7 @@ static const char* TAG                                              = "MQTT";
     static SIM7080_MQTT_Socket_t _MQTT_Socket;
     static SIM7080_MQTT_Sub_Evt_t _MQTT_Message;
 
-    #define SIMXX_Create(Device, Socket)                            SIM7080_MQTT_Create(Device, Socket)
+    #define SIMXX_Create(Device, Context, Socket)                   SIM7080_MQTT_Create(Device, Socket)
     #define SIMXX_Connect(Device, Socket)                           SIM7080_MQTT_Connect(Device, Socket)
     #define SIMXX_Subscribe(Device, Socket, Topic)                  SIM7080_MQTT_Subscribe(Device, Socket, Topic)
     #define SIMXX_WaitSubscription(Socket)                          SIM7080_MQTT_GetSubcriptionItems(Socket)
@@ -55,7 +55,7 @@ static const char* TAG                                              = "MQTT";
     #define SIMXX_Destroy(Device, Socket)                           SIM7080_MQTT_Destroy(Device, Socket)
 #endif
 
-void MQTT_Run(DEVICE_TYPE& p_Device, std::string SubTopic, std::string PubTopic)
+void MQTT_Run(DEVICE_TYPE& p_Device, void* p_Opts, std::string SubTopic, std::string PubTopic)
 {
     SIM70XX_Error_t Error;
 
@@ -72,7 +72,7 @@ void MQTT_Run(DEVICE_TYPE& p_Device, std::string SubTopic, std::string PubTopic)
         _MQTT_Socket.Password = CONFIG_DEMO_MQTT_PASSWORD;
     #endif
 
-    Error = SIMXX_Create(p_Device, &_MQTT_Socket);
+    Error = SIMXX_Create(p_Device, p_Opts, &_MQTT_Socket);
     if(Error == SIM70XX_ERR_OK)
     {
         Error = SIMXX_Connect(p_Device, &_MQTT_Socket);
