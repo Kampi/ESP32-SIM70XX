@@ -233,6 +233,7 @@ typedef struct
     SIM7080_NetMode_t NetMode;                              /**< Preferred network mode selection. */
     SIM7080_Mode_t Mode;                                    /**< Prefered mode selection between CAT-M and NB-IoT. */
     std::vector<uint8_t> Bandlist;                          /**< List with used frequency bands. */
+    SIM7080_AcT_t Access;                                   /**< Access technology. */
 } SIM7080_Config_t;
 
 #endif /* SIM7080_DEFS_H_ */

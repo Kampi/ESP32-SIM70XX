@@ -63,7 +63,7 @@
 #define SIM70XX_AT_CBAND_R                                      SIM70XX_CMD("AT+CBAND?", true, 10, 1)
 #define SIM70XX_AT_CGATT_W(Enable)                              SIM70XX_CMD("AT+CGATT=" + std::to_string(Enable), false, 10, 1)
 #define SIM70XX_AT_CGATT_R                                      SIM70XX_CMD("AT+CGATT?", true, 90, 1)
-#define SIM70XX_AT_CPIN_R                                       SIM70XX_CMD("AT+CPIN?", true, 10, 1)
+#define SIM70XX_AT_CPIN_R                                       SIM70XX_CMD("AT+CPIN?", true, 1, 1)
 #define SIM70XX_AT_IPR_W(Baud)                                  SIM70XX_CMD("AT+IPR=" + std::to_string(Baud), false, 10, 1)
 
 #if(CONFIG_SIMXX_DEV == 7020)

@@ -35,6 +35,11 @@
 
 static const char* TAG = "SIM7080";
 
+SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t& p_Config, SIM7080_Info_t* const p_Info)
+{
+    return SIM7080_Init(p_Device, p_Config, 10, SIM_BAUD_AUTO, p_Info);
+}
+
 SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t& p_Config, uint32_t Timeout)
 {
     return SIM7080_Init(p_Device, p_Config, Timeout, SIM_BAUD_AUTO);
@@ -45,7 +50,7 @@ SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t& p_Conf
     return SIM7080_Init(p_Device, p_Config, 10, Old);
 }
 
-SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t& p_Config, uint32_t Timeout, SIM70XX_Baud_t Old)
+SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t& p_Config, uint32_t Timeout, SIM70XX_Baud_t Old, SIM7080_Info_t* const p_Info)
 {
     if(p_Device.Internal.isInitialized)
     {
@@ -102,6 +107,20 @@ SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t& p_Conf
     SIM70XX_ERROR_CHECK(SIM7080_Ping(p_Device));
     SIM70XX_ERROR_CHECK(SIM7080_PSM_GetStatus(p_Device, &p_Device.PwrMgnt.PSM.isActive));
 
+    if(SIM7080_isSIMReady(p_Device) == false)
+    {
+        SIM70XX_LOGE(TAG, "SIM not ready!");
+
+        return SIM70XX_ERR_NOT_READY;
+    }
+    else
+    {
+        if(p_Info != NULL)
+        {
+            SIM70XX_ERROR_CHECK(SIM7080_Info_GetDeviceInformation(p_Device, p_Info));
+        }
+    }
+
     if(p_Device.PwrMgnt.PSM.isActive)
     {
         SIM70XX_ERROR_CHECK(SIM7080_PSM_Disable(p_Device));
@@ -115,10 +134,6 @@ SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t& p_Conf
         SIM70XX_ERROR_CHECK(SIM7080_FS_GetFree(p_Device, &p_Device.FS.Free));
     #endif
 
-    SIM70XX_ERROR_CHECK(SIM7080_SetNetMode(p_Device, p_Config.NetMode));
-    SIM70XX_ERROR_CHECK(SIM7080_SetSelectedMode(p_Device, p_Config.Mode));
-    SIM70XX_ERROR_CHECK(SIM7080_SetOperator(p_Device, SIM_MODE_MANUAL, p_Config.OperatorFormat, p_Config.Operator));
-
     if(p_Config.Mode == SIM7080_MODE_BOTH)
     {
         SIM70XX_ERROR_CHECK(SIM7080_SetBandConfig(p_Device, SIM7080_MODE_CAT, p_Config.Bandlist));
@@ -128,6 +143,10 @@ SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t& p_Conf
     {
         SIM70XX_ERROR_CHECK(SIM7080_SetBandConfig(p_Device, p_Config.Mode, p_Config.Bandlist));
     }
+
+    SIM70XX_ERROR_CHECK(SIM7080_SetNetMode(p_Device, p_Config.NetMode));
+    SIM70XX_ERROR_CHECK(SIM7080_SetSelectedMode(p_Device, p_Config.Mode));
+    SIM70XX_ERROR_CHECK(SIM7080_SetOperator(p_Device, SIM_MODE_MANUAL, p_Config.OperatorFormat, p_Config.Operator, p_Config.Access));
 
     return SIM7080_Baerer_PDP_DisableAll(p_Device);
 }
@@ -386,7 +405,11 @@ SIM70XX_Error_t SIM7080_SetBandConfig(SIM7080_t& p_Device, SIM7080_Mode_t Mode, 
     std::string Bandlist;
     SIM70XX_TxCmd_t* Command;
 
-    if(p_Device.Internal.isInitialized == false)
+    if(Bands.size() == 0)
+    {
+        return SIM70XX_ERR_INVALID_ARG;
+    }
+    else if(p_Device.Internal.isInitialized == false)
     {
         return SIM70XX_ERR_NOT_INITIALIZED;
     }

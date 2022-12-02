@@ -23,8 +23,8 @@
 /** @brief          Default configuration for using the SIM7020 module with the 1nce APN.
  *  @param Serial   Serial interface that should be used by the driver
  *  @param Baud     Baud rate that should be used by the driver
- *  @param Pin_Rx   Rx pin for the serial interface
- *  @param Pin_Tx   Tx pin for the serial interface
+ *  @param Pin_Rx   Rx pin (Host) for the serial interface
+ *  @param Pin_Tx   Tx pin (Host) for the serial interface
  */
 #define SIM70XX_DEFAULT_CONF_1NCE(Serial, Baud, Pin_Rx, Pin_Tx)     {                                                       \
                                                                         .UART = {                                           \

@@ -46,11 +46,9 @@ inline __attribute__((always_inline)) bool SIM7080_TCP_Client_isDataAvailable(SI
  *  @param Port         TCP port
  *  @param p_Socket     Pointer to TCP socket object
  *  @param CID          (Optional) Context Identifier
- *  @param ReadManually (Optional) Set to #true to automatically read receiving data
- *                      NOTE: Not supported yet
  *  @return             SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_TCP_Client_Create(SIM7080_t& p_Device, std::string IP, uint16_t Port, SIM7080_TCPIP_Socket_t* p_Socket, uint8_t CID = 0, bool ReadManually = false);
+SIM70XX_Error_t SIM7080_TCP_Client_Create(SIM7080_t& p_Device, std::string IP, uint16_t Port, SIM7080_TCPIP_Socket_t* p_Socket, uint8_t CID = 0);
 
 /** @brief          Open a TCP connection to a remote server.
  *  @param p_Device SIM7080 device object

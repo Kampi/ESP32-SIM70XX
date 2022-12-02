@@ -147,7 +147,7 @@ SIM70XX_Error_t SIM7020_Deinit(SIM7020_t& p_Device, bool Skip)
 
     SIM70XX_LOGI(TAG, "Modem inactive...");
 
-    SIM70XX_Evt_StopTask(p_Device.UART.TaskHandle);
+    SIM70XX_Evt_StopTask(p_Device.UART);
 
     // Delete the message queues.
     vQueueDelete(p_Device.Internal.RxQueue);

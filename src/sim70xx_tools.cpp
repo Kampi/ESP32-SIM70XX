@@ -221,9 +221,13 @@ bool SIM70XX_Tools_isActive(SIM70XX_UART_Conf_t& p_Config)
 {
     bool Result;
     std::string Response;
+    SIM70XX_Error_t Error;
 
-    if((SIM70XX_UART_Init(p_Config) != SIM70XX_ERR_OK) || (SIM70XX_UART_SendLine(p_Config, "AT") != SIM70XX_ERR_OK))
+    Error = SIM70XX_UART_Init(p_Config) | SIM70XX_UART_SendLine(p_Config, "AT");
+    if(Error != SIM70XX_ERR_OK)
     {
+        SIM70XX_LOGE(TAG, "Error: 0x%X", Error);
+
         Result = false;
         goto SIM70XX_Tools_isActive_Exit;
     }

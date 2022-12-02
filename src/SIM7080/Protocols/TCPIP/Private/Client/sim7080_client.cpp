@@ -34,7 +34,7 @@ static const char* TAG = "SIM7080_TCPIP_Client";
 
 SIM70XX_Error_t SIM7080_Client_CreateSocket(SIM7080_t& p_Device, SIM7080_TCP_Type_t Type, std::string IP, uint16_t Port, SIM7080_TCPIP_Socket_t* p_Socket, uint8_t CID, bool ReadManually)
 {
-    if(p_Socket == NULL)
+    if((p_Socket == NULL) || (IP.size() == 0))
     {
         return SIM70XX_ERR_INVALID_ARG;
     }
@@ -52,6 +52,7 @@ SIM70XX_Error_t SIM7080_Client_CreateSocket(SIM7080_t& p_Device, SIM7080_TCP_Typ
     p_Socket->Internal.CID = CID;
     p_Socket->Internal.Type = Type;
     p_Socket->Internal.isCreated = true;
+    p_Socket->Internal.isServer = false;
     p_Socket->Internal.isConnected = false;
     p_Socket->Internal.isReadManually = ReadManually;
     p_Socket->Internal.isDataReceived = false;

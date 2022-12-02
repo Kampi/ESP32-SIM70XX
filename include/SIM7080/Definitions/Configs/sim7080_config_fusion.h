@@ -47,5 +47,6 @@
                                                                         .NetMode = SIM7080_NETMODE_LTE,                     \
                                                                         .Mode = SIM7080_MODE_NB,                            \
                                                                         .Bandlist = std::vector<uint8_t>(),                 \
+                                                                        .Access = SIM7080_ACT_USER_LTE_M1,                  \
                                                                     };
 #endif /* SIM7080_CONFIG_FUSION_H_ */

@@ -77,7 +77,7 @@ SIM70XX_Error_t SIM7080_NTP_Sync(SIM7080_t& p_Device, SIM7080_PDP_Context_t* p_P
         return SIM70XX_ERR_FAIL;
     }
 
-    SIM70XX_LOGI(TAG, "Response: %s", Response.c_str());
+    SIM70XX_LOGD(TAG, "Response: %s", Response.c_str());
 
     Index = Response.find("+CNTP: ");
     Response.erase(Index, std::string("+CNTP: ").size());
@@ -94,7 +94,7 @@ SIM70XX_Error_t SIM7080_NTP_Sync(SIM7080_t& p_Device, SIM7080_PDP_Context_t* p_P
     {
         NTP_Error = static_cast<SIM7080_NTP_Error_t>(SIM70XX_Tools_StringToUnsigned(Response.substr(Index - 1, Index)));
 
-        SIM70XX_LOGI(TAG, "NTP Error: %u", NTP_Error);
+        SIM70XX_LOGD(TAG, "NTP Error: %u", NTP_Error);
 
         if(NTP_Error == SIM7080_NTP_ERROR_OK)
         {

@@ -91,8 +91,18 @@ inline __attribute__((always_inline)) bool SIM7080_isInitialized(SIM7080_t& p_De
 /** @brief          Initialize the communication interface and the SIM7080 module.
  *  @param p_Device SIM7080 device object
  *  @param p_Config SIM7080 device configuration object
+ *  @param p_Info   (Optional) Pointer to device information object
+ *  @return         SIM70XX_ERR_OK when successful
+ *                  SIM70XX_ERR_NOT_READY when no SIM card is attached
+ */
+SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t& p_Config, SIM7080_Info_t* const p_Info);
+
+/** @brief          Initialize the communication interface and the SIM7080 module.
+ *  @param p_Device SIM7080 device object
+ *  @param p_Config SIM7080 device configuration object
  *  @param Timeout  Reset timeout
  *  @return         SIM70XX_ERR_OK when successful
+ *                  SIM70XX_ERR_NOT_READY when no SIM card is attached
  */
 SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t& p_Config, uint32_t Timeout);
 
@@ -102,6 +112,7 @@ SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t& p_Conf
  *  @param Old      Old baudrate configuration
  *                  NOTE: Use this parameter if you want to change the baudrate of the module before the module initialization begins.
  *  @return         SIM70XX_ERR_OK when successful
+ *                  SIM70XX_ERR_NOT_READY when no SIM card is attached
  */
 SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t& p_Config, SIM70XX_Baud_t Old);
 
@@ -111,9 +122,11 @@ SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t& p_Conf
  *  @param Timeout  (Optional) Reset timeout
  *  @param Old      (Optional) Old baudrate configuration
  *                  NOTE: Use this parameter if you want to change the baudrate of the module before the module initialization begins.
+ *  @param p_Info   (Optional) Pointer to device information object
  *  @return         SIM70XX_ERR_OK when successful
+ *                  SIM70XX_ERR_NOT_READY when no SIM card is attached
  */
-SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t& p_Config, uint32_t Timeout = 10, SIM70XX_Baud_t Old = SIM_BAUD_AUTO);
+SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t& p_Config, uint32_t Timeout = 10, SIM70XX_Baud_t Old = SIM_BAUD_AUTO, SIM7080_Info_t* const p_Info = NULL);
 
 /** @brief          Deinitialize the SIM7080 module by using the serial interface.
  *  @param p_Device SIM7080 device object

@@ -155,7 +155,7 @@ SIM70XX_Error_t SIM70XX_UART_Init(SIM70XX_UART_Conf_t& p_Config)
         Flags = ESP_INTR_FLAG_IRAM;
     #endif
 
-    if(xSemaphoreTake(p_Config.Lock, 10 / portTICK_PERIOD_MS) == pdTRUE)
+    if(xSemaphoreTake(p_Config.Lock, 100 / portTICK_PERIOD_MS) == pdTRUE)
     {
         if((uart_driver_install(p_Config.Interface, CONFIG_SIM70XX_UART_BUFFER_SIZE * 2, 0, 0, NULL, Flags) ||
             uart_param_config(p_Config.Interface, &_SIM70XX_UART_Config) ||
@@ -178,6 +178,8 @@ SIM70XX_Error_t SIM70XX_UART_Init(SIM70XX_UART_Conf_t& p_Config)
         return SIM70XX_ERR_OK;
     }
 
+    SIM70XX_LOGE(TAG, "Can not initialize UART!");
+
     return SIM70XX_ERR_FAIL;
 }
 
@@ -188,8 +190,10 @@ SIM70XX_Error_t SIM70XX_UART_Deinit(SIM70XX_UART_Conf_t& p_Config)
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
-    if(xSemaphoreTake(p_Config.Lock, 10 / portTICK_PERIOD_MS) == pdTRUE)
+    if(xSemaphoreTake(p_Config.Lock, 100 / portTICK_PERIOD_MS) == pdTRUE)
     {
+        SIM70XX_WDT_Reset();
+
         if(uart_is_driver_installed(p_Config.Interface))
         {
             uart_flush(p_Config.Interface);
@@ -227,8 +231,10 @@ SIM70XX_Error_t SIM70XX_UART_Send(SIM70XX_UART_Conf_t& p_Config, const void* p_D
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
-    if(xSemaphoreTake(p_Config.Lock, 10 / portTICK_PERIOD_MS) == pdTRUE)
+    if(xSemaphoreTake(p_Config.Lock, 100 / portTICK_PERIOD_MS) == pdTRUE)
     {
+        SIM70XX_WDT_Reset();
+
         uart_write_bytes(p_Config.Interface, p_Data, Size);
         xSemaphoreGive(p_Config.Lock);
 
@@ -245,8 +251,10 @@ SIM70XX_Error_t SIM70XX_UART_SendLine(SIM70XX_UART_Conf_t& p_Config, std::string
         return SIM70XX_ERR_NOT_INITIALIZED;
     }
 
-    if(xSemaphoreTake(p_Config.Lock, 10 / portTICK_PERIOD_MS) == pdTRUE)
+    if(xSemaphoreTake(p_Config.Lock, 100 / portTICK_PERIOD_MS) == pdTRUE)
     {
+        SIM70XX_WDT_Reset();
+
         uart_write_bytes(p_Config.Interface, Data.c_str(), Data.size());
         uart_write_bytes(p_Config.Interface, "\r\n", 2);
         xSemaphoreGive(p_Config.Lock);
@@ -317,8 +325,10 @@ void SIM70XX_UART_Flush(SIM70XX_UART_Conf_t& p_Config)
         return;
     }
 
-    if(xSemaphoreTake(p_Config.Lock, 10 / portTICK_PERIOD_MS) == pdTRUE)
+    if(xSemaphoreTake(p_Config.Lock, 100 / portTICK_PERIOD_MS) == pdTRUE)
     {
+        SIM70XX_WDT_Reset();
+
         uart_flush(p_Config.Interface);
         xSemaphoreGive(p_Config.Lock);
     }
@@ -333,8 +343,10 @@ size_t SIM70XX_UART_Available(SIM70XX_UART_Conf_t& p_Config)
         return Avail;
     }
 
-    if(xSemaphoreTake(p_Config.Lock, 10 / portTICK_PERIOD_MS) == pdTRUE)
+    if(xSemaphoreTake(p_Config.Lock, 100 / portTICK_PERIOD_MS) == pdTRUE)
     {
+        SIM70XX_WDT_Reset();
+
         uart_get_buffered_data_len(p_Config.Interface, &Avail);
         xSemaphoreGive(p_Config.Lock);
     }

@@ -25,9 +25,9 @@
 #include "sim7080_tcpip.h"
 #include "Private/Client/sim7080_client.h"
 
-SIM70XX_Error_t SIM7080_TCP_Client_Create(SIM7080_t& p_Device, std::string IP, uint16_t Port, SIM7080_TCPIP_Socket_t* p_Socket, uint8_t CID, bool ReadManually)
+SIM70XX_Error_t SIM7080_TCP_Client_Create(SIM7080_t& p_Device, std::string IP, uint16_t Port, SIM7080_TCPIP_Socket_t* p_Socket, uint8_t CID)
 {
-    return SIM7080_Client_CreateSocket(p_Device, SIM7080_TCP_TYPE_TCP, IP, Port, p_Socket, CID, ReadManually);
+    return SIM7080_Client_CreateSocket(p_Device, SIM7080_TCP_TYPE_TCP, IP, Port, p_Socket, CID, false);
 }
 
 SIM70XX_Error_t SIM7080_TCP_Client_Connect(SIM7080_t& p_Device, SIM7080_TCPIP_Socket_t* p_Socket, SIM7080_PDP_Context_t* p_PDP, SIM7080_TCP_Error_t* p_Result)
