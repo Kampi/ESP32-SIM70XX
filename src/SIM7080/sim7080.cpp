@@ -65,7 +65,6 @@ static SIM70XX_Error_t SIM7080_BasicInit(SIM7080_t& p_Device)
         {
             goto SIM7080_BasicInit_NoGNSSEventQueue;
         }
-        p_Device.GNSS.isListening = false;
     #endif
 
     SIM70XX_GPIO_Init();
@@ -137,6 +136,14 @@ SIM70XX_Error_t SIM7080_Init(SIM7080_t& p_Device, const SIM7080_Config_t& p_Conf
             return Error;
         }
     }
+
+    #ifdef CONFIG_SIM70XX_DRIVER_WITH_GNSS
+        p_Device.GNSS.isListening = false;
+    #endif
+
+    #ifdef CONFIG_SIM70XX_DRIVER_WITH_FOTA
+        p_Device.FOTA.isPending = false;
+    #endif
 
 	SIM70XX_ERROR_CHECK(SIM7080_SoftReset(p_Device, Timeout));
 

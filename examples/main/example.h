@@ -83,6 +83,13 @@ void StartExamples(void);
     void UDP_Client_Run(DEVICE_TYPE& p_Device);
 #endif
 
+#ifdef CONFIG_DEMO_USE_TCPIP_SERVER
+    /** @brief          Run the TCP server.
+     *  @param p_Device Pointer to device object
+     */
+    void TCP_Server_Run(DEVICE_TYPE& p_Device);
+#endif
+
 #ifdef CONFIG_DEMO_USE_EMAIL
     /** @brief          Run the E-Mail example.
      *  @param p_Device Pointer to device object
@@ -94,8 +101,9 @@ void StartExamples(void);
 #ifdef CONFIG_DEMO_USE_SNTP
     /** @brief          Run the NTP example.
      *  @param p_Device Pointer to device object
+     *  @param p_Opts   (Optional) Pointer to additional options
      */
-    void NTP_Run(DEVICE_TYPE& p_Device);
+    void NTP_Run(DEVICE_TYPE& p_Device, void* p_Opts);
 #endif
 
 #ifdef CONFIG_DEMO_USE_MQTT
@@ -113,6 +121,13 @@ void StartExamples(void);
      *  @param p_Device Pointer to device object
      */
     void CoAP_Run(DEVICE_TYPE& p_Device);
+#endif
+
+#ifdef CONFIG_DEMO_USE_GNSS
+    /** @brief          Run the GNSS example.
+     *  @param p_Device Pointer to device object
+     */
+    void GNSS_Run(DEVICE_TYPE& p_Device);
 #endif
 
 #ifdef CONFIG_DEMO_USE_HTTP

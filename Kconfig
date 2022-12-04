@@ -123,7 +123,14 @@ menu "SIM70XX"
             depends on SIM70XX_DEV_SIM7020
             default n
             help
-                Enable this option if you want NWRAM support added to the driver.
+                Enable this option if you want NVRAM support added to the driver.
+
+        config SIM70XX_DRIVER_WITH_FOTA
+            bool "Enable FOTA support"
+            depends on SIM70XX_DEV_SIM7080
+            default n
+            help
+                Enable this option if you want FOTA support added to the driver.
 
         config SIM70XX_DRIVER_WITH_TLS
             bool "Enable TLS support"

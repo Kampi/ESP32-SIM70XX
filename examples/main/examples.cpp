@@ -190,7 +190,7 @@ void StartExamples(void)
         #endif
 
         #ifdef CONFIG_DEMO_USE_SNTP
-            NTP_Run(_Device);
+            NTP_Run(_Device, SIMXX_OPTS);
         #endif
 
         #ifdef CONFIG_DEMO_USE_TCPIP_CLIENT

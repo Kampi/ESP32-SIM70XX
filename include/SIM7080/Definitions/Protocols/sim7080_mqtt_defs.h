@@ -62,19 +62,18 @@ typedef struct
     std::string ClientID;                           /**< MQTT client ID. */
     uint16_t KeepAlive;                             /**< Keep alive interval in seconds. */
     bool CleanSession;                              /**< Clean session flag. */
-    bool WillFlag;                                  /**< Last will flag. */
+    SIM7080_MQTT_Will_t* p_LastWill;                /**< Pointer to last will configuration object. */
     std::string Username;                           /**< Optional username. */
     std::string Password;                           /**< Optional password. */
-    SIM7080_MQTT_Will_t* p_LastWill;                /**< Pointer to last will configuration object. */
     struct
     {
         bool isConnected;                           /**< Socket connected.
                                                          NOTE: Handled by the device driver. */
         bool isCreated;                             /**< #true when the socket is created.
                                                          NOTE: Handled by the device driver. */
-        QueueHandle_t SubQueue;                     /**< Subscribe event queue.
-                                                         NOTE: Managed by the device driver. */
         uint32_t SubTopics;                         /**< Topic subscription counter.
+                                                         NOTE: Managed by the device driver. */
+        QueueHandle_t SubQueue;                     /**< Subscribe event queue.
                                                          NOTE: Managed by the device driver. */
     } Internal;
 } SIM7080_MQTT_Socket_t;

@@ -26,9 +26,23 @@
  *                      MQTT Version    3.1
  *                      Client ID       SIM7020 MQTT
  *                      Keep Alive      600 s
- *  @param Host     
- *  @param Port
+ *  @param Host     Host address
+ *  @param HostPort Port number
  */
-#define SIM7080_MQTT_DEFAULT_SOCKET(Host, Port)
-
+#define SIM7080_MQTT_DEFAULT_SOCKET(Host, Port)                     {                                       \
+                                                                        .Broker = Host,                     \
+                                                                        .Port = HostPort,                   \
+                                                                        .ClientID = "SIM7080_MQTT",         \
+                                                                        .KeepAlive = 600,                   \
+                                                                        .CleanSession = true,               \
+                                                                        .p_LastWill = NULL,                 \
+                                                                        .Username = "",                     \
+                                                                        .Password = "",                     \
+                                                                        .Internal = {                       \
+                                                                            .isConnected = false,           \
+                                                                            .isCreated = false,             \
+                                                                            .SubTopics = 0,                 \
+                                                                            .SubQueue = NULL,               \
+                                                                        }                                   \
+                                                                    }
 #endif /* SIM7080_MQTT_CONFIG_SOCKET_H_ */

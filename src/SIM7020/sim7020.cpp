@@ -136,12 +136,6 @@ SIM70XX_Error_t SIM7020_Init(SIM7020_t& p_Device, SIM7020_Config_t& p_Config, ui
     }
 
     SIM70XX_ERROR_CHECK(SIM7020_GetFunctionality(p_Device))
-
-    // TODO: Needs check with PDP context activation functions (SIM7020_Baerer_SetAPN)
-    //SIM70XX_ERROR_CHECK(SIM7020_SetFunctionality(p_Device, SIM7020_FUNC_MIN));
-   // SIM70XX_ERROR_CHECK(SIM7020_SetPSD(p_Device, SIM7020_PDP_IP, p_Config.APN));
-    //SIM70XX_ERROR_CHECK(SIM7020_SetFunctionality(p_Device, SIM7020_FUNC_FULL));
-    //SIM70XX_ERROR_CHECK(SIM7020_SetOperator(p_Device, SIM_MODE_MANUAL, p_Config.OperatorFormat, p_Config.Operator));
     SIM70XX_ERROR_CHECK(SIM7020_SetBand(p_Device, p_Config.Band));
 
     return SIM7020_Baerer_PDP_DisableAll(p_Device);

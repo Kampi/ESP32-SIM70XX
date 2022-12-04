@@ -110,6 +110,10 @@ typedef int SIM70XX_Error_t;
  */
 #define SIM70XX_ERR_PDP_NOT_ACTIVE                              SIM70XX_ERR_BASE + 18
 
+/** @brief No FOTA update active.
+ */
+#define SIM70XX_ERR_FOTA_NOT_ACTIVE                             SIM70XX_ERR_BASE + 19
+
 /** @brief      Generic error check macro.
  *  @param Func Function call
  */

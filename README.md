@@ -52,22 +52,23 @@ Multidevice driver for SIMCom modules with UART interface.
 
 | Driver        | SIM7020       | SIM7080       |
 |---------------|---------------|---------------|
-| NTP           | √   | √ |
-| DNS           | √   | √ |
-| Ping          | √   | √ |
-| GNSS          | -   | x |
-| E-Mail        | -   | √ |
-| File system   | -   | √ |
-| SSL / TLS     | x   | x |
-| NVRAM         | √   | - |
-| TCP (Client)  | √   | √ |
-| UDP (Client)  | √   | √ |
-| TCP (Server)  | x   | x |
-| HTTP          | √   | x |
-| CoAP          | √   | x |
-| MQTT          | √   | √ |
-| FTP           | -   | - |
-| PSM           | ○   | ○ |
+| NTP           | √             | √             |
+| DNS           | √             | √             |
+| Ping          | √             | √             |
+| GNSS          | -             | x             |
+| E-Mail        | -             | √             |
+| File system   | -             | √             |
+| SSL / TLS     | x             | x             |
+| NVRAM         | √             | -             |
+| TCP (Client)  | √             | √             |
+| UDP (Client)  | √             | √             |
+| TCP (Server)  | x             | x             |
+| HTTP          | √             | x             |
+| CoAP          | √             | x             |
+| MQTT          | √             | √             |
+| FTP           | -             | -             |
+| PSM           | ○             | ○             |
+| FOTA          | x             | x             |
 
 ## Examples
 

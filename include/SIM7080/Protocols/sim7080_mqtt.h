@@ -32,7 +32,7 @@
  *  @param p_Socket Pointer to MQTT socket object
  *  @return         Number of messages ready.
  */
-inline __attribute__((always_inline)) uint32_t SIM7080_MQTT_GetSubcriptionItems(SIM7080_MQTT_Socket_t* p_Socket)
+inline __attribute__((always_inline)) uint32_t SIM7080_MQTT_GetSubcriptionItems(SIM7080_MQTT_Socket_t* const p_Socket)
 {
     if(p_Socket->Internal.isConnected == false)
     {
@@ -49,21 +49,21 @@ inline __attribute__((always_inline)) uint32_t SIM7080_MQTT_GetSubcriptionItems(
  *  @param Port     (Optional) MQTT broker port
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_MQTT_Create(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* p_Socket, std::string Broker, uint16_t Port = 1883);
+SIM70XX_Error_t SIM7080_MQTT_Create(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* const p_Socket, std::string Broker, uint16_t Port = 1883);
 
 /** @brief          Create a MQTT socket.
  *  @param p_Device SIM7080 device object
  *  @param p_Socket Pointer to MQTT socket object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_MQTT_Create(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* p_Socket);
+SIM70XX_Error_t SIM7080_MQTT_Create(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* const p_Socket);
 
 /** @brief          Open a connection to a MQTT socket.
  *  @param p_Device SIM7080 device object
  *  @param p_Socket Pointer to MQTT socket object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_MQTT_Connect(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* p_Socket);
+SIM70XX_Error_t SIM7080_MQTT_Connect(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* const p_Socket);
 
 /** @brief          Publish a message over MQTT.
  *  @param p_Device SIM7080 device object
@@ -74,7 +74,7 @@ SIM70XX_Error_t SIM7080_MQTT_Connect(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t*
  *  @param Retained (Optional) Retained flag
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_MQTT_Publish(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* p_Socket, std::string Topic, std::string Message, SIM7080_MQTT_QoS_t QoS = SIM7080_MQTT_QOS_0, bool Retained = false);
+SIM70XX_Error_t SIM7080_MQTT_Publish(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* const p_Socket, std::string Topic, std::string Message, SIM7080_MQTT_QoS_t QoS = SIM7080_MQTT_QOS_0, bool Retained = false);
 
 /** @brief              Publish a message over MQTT.
  *  @param p_Device     SIM7080 device object
@@ -88,7 +88,7 @@ SIM70XX_Error_t SIM7080_MQTT_Publish(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t*
  *  @param PacketSize   (Optional) Transmission size in bytes
  *  @return             SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_MQTT_Publish(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* p_Socket, std::string Topic, const void* p_Buffer, uint32_t Length, SIM7080_MQTT_QoS_t QoS = SIM7080_MQTT_QOS_0, bool Retained = false, uint8_t Retries = 20, uint16_t PacketSize = SIM7080_MQTT_MAX_PAYLOAD_SIZE);
+SIM70XX_Error_t SIM7080_MQTT_Publish(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* const p_Socket, std::string Topic, const void* p_Buffer, uint32_t Length, SIM7080_MQTT_QoS_t QoS = SIM7080_MQTT_QOS_0, bool Retained = false, uint8_t Retries = 20, uint16_t PacketSize = SIM7080_MQTT_MAX_PAYLOAD_SIZE);
 
 /** @brief          Subscribe to a MQTT topic.
  *  @param p_Device SIM7080 device object
@@ -97,7 +97,7 @@ SIM70XX_Error_t SIM7080_MQTT_Publish(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t*
  *  @param QoS      (Optional) Quality of Service
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_MQTT_Subscribe(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* p_Socket, std::string Topic, SIM7080_MQTT_QoS_t QoS = SIM7080_MQTT_QOS_0);
+SIM70XX_Error_t SIM7080_MQTT_Subscribe(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* const p_Socket, std::string Topic, SIM7080_MQTT_QoS_t QoS = SIM7080_MQTT_QOS_0);
 
 /** @brief              Get the next subscription message from the MQTT subscription queue.
  *  @param p_Device     SIM7080 device object
@@ -105,7 +105,7 @@ SIM70XX_Error_t SIM7080_MQTT_Subscribe(SIM7080_t& p_Device, SIM7080_MQTT_Socket_
  *  @param p_Message    Pointer to MQTT publish message object
  *  @return             SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_MQTT_GetSubscription(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* p_Socket, SIM7080_MQTT_Sub_Evt_t* p_Message);
+SIM70XX_Error_t SIM7080_MQTT_GetSubscription(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* const p_Socket, SIM7080_MQTT_Sub_Evt_t* p_Message);
 
 /** @brief          Unsubscribe a MQTT topic.
  *  @param p_Device SIM7080 device object
@@ -113,20 +113,20 @@ SIM70XX_Error_t SIM7080_MQTT_GetSubscription(SIM7080_t& p_Device, SIM7080_MQTT_S
  *  @param Topic    Message topic
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_MQTT_Unsubscribe(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* p_Socket, std::string Topic);
+SIM70XX_Error_t SIM7080_MQTT_Unsubscribe(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* const p_Socket, std::string Topic);
 
 /** @brief          Close a connection to a MQTT socket.
  *  @param p_Device SIM7080 device object
  *  @param p_Socket Pointer to MQTT socket object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_MQTT_Disconnect(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* p_Socket);
+SIM70XX_Error_t SIM7080_MQTT_Disconnect(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* const p_Socket);
 
 /** @brief          Release and destroy a socket.
  *  @param p_Device SIM7080 device object
  *  @param p_Socket Pointer to MQTT socket object
  *  @return         SIM70XX_ERR_OK when successful
  */
-SIM70XX_Error_t SIM7080_MQTT_Destroy(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* p_Socket);
+SIM70XX_Error_t SIM7080_MQTT_Destroy(SIM7080_t& p_Device, SIM7080_MQTT_Socket_t* const p_Socket);
 
 #endif /* SIM7080_MQTT_H_ */

@@ -186,4 +186,12 @@
 #define SIM7080_AT_CCOAPURL(Server, Port)                       SIM70XX_CMD("AT+CCOAPURL=\"coap://" + Server + ":" + std::to_string(Port) + "\"", false, 1, 1)
 #define SIM7080_AT_CCOAPTERM                                    SIM70XX_CMD("AT+CCCOAPTERM", false, 1, 1)
 
+/**
+ *
+ * Used in SIM7080 FOTA driver.
+ *
+ */
+#define SIM7080_AT_HTTPTOFS(Server, Path, Timeout, Retries)     SIM70XX_CMD("AT+HTTPTOFS=\"" + Server + "\",\"" + Path + "\"," + std::to_string(Timeout) + "," + std::to_string(Retries), true, 60, 1)
+#define SIM7080_AT_CFOTA                                        SIM70XX_CMD("AT+CFOTA=1", false, 10, 1)
+
 #endif /* SIM7080_COMMANDS_H_ */

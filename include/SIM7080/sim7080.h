@@ -80,6 +80,10 @@
     #include "sim7080_ftp.h"
 #endif
 
+#ifdef CONFIG_SIM70XX_DRIVER_WITH_FOTA
+    #include "sim7080_fota.h"
+#endif
+
 /** @brief          Check if the module is initialized.
  *  @param p_Device SIM7080 device object
  *  @return         #true when the module is initialized

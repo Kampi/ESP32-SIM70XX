@@ -198,6 +198,13 @@ typedef struct
                                                                  NOTE: Managed by the device driver. */
         } CoAP;
     #endif
+    #ifdef CONFIG_SIM70XX_DRIVER_WITH_FOTA
+        struct
+        {
+            bool isPending;                                 /**< Set to #true when a FOTA update is pending.
+                                                                 NOTE: Managed by the device driver. */
+        } FOTA;
+    #endif
     struct
     {
         QueueHandle_t RxQueue;                              /**< Message receive (Module -> ESP32) queue.
